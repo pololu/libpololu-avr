@@ -1,0 +1,492 @@
+/*
+  OrangutanLCD.cpp - Library for using the LCD on the Orangutan LV-168
+  Originally written by Tom Benedict as part of Orangutan-Lib.
+  Modified by Ben Schmidel, May 14, 2008.
+  Released into the public domain.
+*/
+
+// Read and write timing:
+// 
+// Write							Read
+// 
+// Set RS & R/W					Set RS & R/W
+// Wait >= 40ns					Wait >= 40ns
+// Set E High					Set E High
+// Wait >= 150ns				Wait >= 120ns
+// [Data must be valid by now]	[Data is now valid for read]
+// Wait >= 80ns					Wait >= 210ns
+// Set E Low					Set E Low
+// Wait >= 10ns					RS & R/W can change
+// [Data, RS, & R/W can change]
+//
+// In both cases, E cannot be brought high, then low, then high again
+// in less than 500ns.
+//
+// Even though all that timing information is in nanoseconds, we need
+// to be concerned about it.  At 20MHz, each AVR instruction executes
+// in 50ns.  There are delays in there that must be longer than 50ns,
+// so we must make sure we wait an appropriate amount of time.
+//
+// Initialization:
+// 
+// 4-Bit							8-Bit
+// 
+// Wait >= 15ms					Wait >= 15ms
+// Send 0x3						Send 0x30
+// Wait >= 4.1ms				Wait >= 4.1ms
+// Send 0x3						Send 0x30
+// Wait >= 100us				Wait >= 100us
+// Send 0x3						Send 0x30
+// Wait >= 100us				Wait >= 100us
+// Send 0x2
+// Wait >= 100us						
+// Send 0x2 0x8					Send 0x38
+// [Busy Flag is now valid]		[Busy Flag is now valid]
+// Check BF						Check BF
+// Send 0x0 0x8					Send 0x08
+// Check BF						Check BF
+// Send 0x0 0x1					Send 0x01
+// Check BF						Check BF
+// Send 0x0 0x6					Send 0x06
+// Check BF						Check BF
+// Send 0x0 0xC					Send 0x0C
+//
+// A point to consider:  Prior to a write, the busy flag (BF)
+// must be clear.  During the time BF is not valid, apparently
+// it stays clear.  So the BF check can apparently operate
+// even when BF is not valid.  It simply will not cause any
+// delays in execution.  I do not know if this is universally
+// true, but it appears to be true for the two LCD used on the
+// Orangutan LV-168.
+// 
+// Another point:  On 4-bit interfaces, reading the busy flag
+// is a little tricky.  The same command that returns the busy
+// flag also returns the cursor's current memory address.  This 
+// requires 8-bits of I/O, even if we're not interested in the 
+// cursor's address.  So to check for the busy flag we have to
+// do two 4-bit reads, complete with all the timing mentioned
+// above, even though we're discarding the contents of the second
+// 4-bit read.
+// 
+// The Orangutan LV-168 drives the LCD in 4-bit mode with E, R/W, and
+// RS control lines.
+// 
+// AVR		LCD		Direction		Function
+// ------	------	--------------	----------------------------
+// PD4		E		Out				Dedicated to LCD Enable
+// PD2		RS		Out				Dedicated to LCD ???
+// PB0		R/W		Out				Dedicated to LCD Read/Write
+// PD7		DB7		In/Out			Dedicated to LCD I/O
+// PB5		DB6		Out				LCD I/O and Orangutan Button 2
+// PB4		DB5		Out				LCD I/O and Orangutan Button 1
+// PB1		DB4		Out				LCD I/O and Orangutan Button 0
+// N/C		DB3
+// N/C		DB2
+// N/C		DB1
+// N/C		DB0
+
+
+#include <avr/io.h>
+
+#ifndef F_CPU
+#define F_CPU 20000000UL	// the Orangutan LV-168 runs at 20 MHz
+#endif //!F_CPU
+#include <util/delay.h>
+#include "private/OrangutanLCDPrivate.h"	// contains all of the macros (#defines)
+#include "OrangutanLCD.h"
+
+
+
+
+
+// *************************************************************************
+// *       Functions specifically tailored for the Orangutan LV-168        *
+// *************************************************************************
+
+
+// constructor (doesn't do anything)
+
+OrangutanLCD::OrangutanLCD()
+{
+}
+
+
+// Initialize the LCD for a 4-bit interface
+void OrangutanLCD::init()
+{
+	// Set up the DDR for the LCD control lines
+	LCD_RS_E_DDR |= (1 << LCD_RS) | (1 << LCD_E);
+	LCD_RW_DDR |= (1 << LCD_RW);
+
+	// Wait >15ms
+	_delay_ms(10);
+	_delay_ms(10);
+
+	// Send 0x3 (last four bits ignored)
+	lcd_cmd(0x30);
+
+	// Wait >4.1ms
+	_delay_ms(5);
+
+	// Send 0x3 (last four bits ignored)
+	lcd_cmd(0x30);
+
+	// Wait >120us
+	_delay_ms(1);
+
+	// Send 0x3 (last four bits ignored)
+	lcd_cmd(0x30);
+
+	// Wait >120us
+	_delay_ms(1);
+
+	// Send 0x2 (last four bits ignored)  Sets 4-bit mode
+	lcd_cmd(0x20);
+
+	// Wait >120us
+	_delay_ms(1);
+
+	// Send 0x28 = 4-bit, 2-line, 5x8 dots per char
+	lcd_cmd(0x28);
+
+	// Busy Flag is now valid, so hard-coded delays are no longer
+	// required.
+
+	// Send 0x08 = Display off, cursor off, blinking off
+	lcd_cmd(0x08);
+
+	// Send 0x01 = Clear display
+	lcd_cmd(0x01);
+
+	// Send 0x06 = Set entry mode: cursor shifts right, don't scroll
+	lcd_cmd(0x06);
+
+	// Send 0x0C = Display on, cursor off, blinking off
+	lcd_cmd(0x0C);
+}
+
+
+// Wait for the busy flag to clear on a 4-bit interface
+// This is necessarily more complicated than the 8-bit interface
+// because E must be strobed twice to get the full eight bits
+// back from the LCD, even though we're only interested in one
+// of them.
+void OrangutanLCD::busyWait()
+{
+
+	uint8_t temp_ddr, data;
+
+	// Save our DDR information
+	temp_ddr = DDRD;
+
+	// Set up the data DDR for input
+	DDRD &= ~(LCD_PORTD_MASK);
+
+	// Set up RS and RW to read the state of the LCD's busy flag
+	LCD_RS_E_PORT &= ~(1 << LCD_RS);
+	LCD_RW_PORT |= (1 << LCD_RW);
+
+	do
+	{
+		// Bring E high
+		LCD_RS_E_PORT |= (1 << LCD_E);
+
+		// Wait at least 120ns (1us is excessive)
+		_delay_us(1);
+
+		// Get the data back from the LCD
+		data = PIND & LCD_PORTD_MASK;
+
+		// That excessive delay means our cycle time on E cannot be
+		// shorter than 1000ns (500ns being the spec), so no further
+		// delays are required
+
+		// Bring E low
+		LCD_RS_E_PORT &= ~(1 << LCD_E);
+
+		// Wait a small bit
+		_delay_us(1);
+
+		// Strobe out the 4 bits we don't care about:
+
+		// Bring E high
+		LCD_RS_E_PORT |= (1 << LCD_E);
+
+		// Wait at least 120ns (1us is excessive)
+		_delay_us(1);
+
+		// Bring E low
+		LCD_RS_E_PORT &= ~(1 << LCD_E);
+	}
+	while (data & (1 << LCD_BF));
+
+	// To reach here our busy flag must be zero, meaning the LCD is free
+
+	// Restore our DDR information
+	DDRD = temp_ddr;
+}
+
+
+// Send four bits out the 4-bit interface.  This assumes the busy flag
+// is clear, that our DDRs are all set, etc.  Basically all it does is
+// line up the bits and shove them out the appropriate I/O lines.
+void OrangutanLCD::sendNibble(uint8_t nibble)
+{
+	PORTB = (PORTB & ~LCD_PORTB_MASK) | LCD_PORTB_DATA(nibble);
+	PORTD = (PORTD & ~LCD_PORTD_MASK) | LCD_PORTD_DATA(nibble);
+
+	// At this point the four data lines are set, so the Enable pin 
+	// is strobed to let the LCD latch them.
+
+	// Bring E high
+	LCD_RS_E_PORT |= (1 << LCD_E);
+	
+	// Wait => 450ns (1us is excessive)
+	_delay_us(1);
+
+	// Bring E low
+	LCD_RS_E_PORT &= ~(1 << LCD_E);
+
+	_delay_us(1);
+
+	// Dropping out of the routine will take at least 10ns, the time
+	// given by the datasheet for the LCD controller to read the
+	// nibble on the falling edge of E
+
+	// Our nibble has now been sent to the LCD.
+}
+
+
+// Send either data or a command on a 4-bit interface
+void OrangutanLCD::send(uint8_t data, uint8_t rs)
+{
+	uint8_t temp_ddrb, temp_portb, temp_ddrd, temp_portd;
+
+	// Wait until the busy flag clears
+	busyWait();
+
+	// Save our DDR and port information
+	temp_ddrb = DDRB;
+	temp_portb = PORTB;
+	temp_ddrd = DDRD;
+	temp_portd = PORTD;
+
+	// Clear RW and RS
+	LCD_RS_E_PORT &= ~(1 << LCD_RS);
+	LCD_RW_PORT &= ~(1 << LCD_RW);
+
+	// Set RS according to what this routine was told to do
+	LCD_RS_E_PORT |= (rs << LCD_RS);
+
+	// Set the data pins as outputs
+	DDRB |= LCD_PORTB_MASK;
+	DDRD |= LCD_PORTD_MASK;
+
+	// Send the high 4 bits
+	sendNibble(data >> 4);
+
+	// Send the low 4 bits
+	sendNibble(data & 0x0F);
+
+	// Restore our DDR and port information
+	PORTD = temp_portd;
+	DDRD = temp_ddrd;
+	PORTB = temp_portb;
+	DDRB = temp_ddrb;
+}
+
+
+
+// *************************************************************************
+// *                 device-independent LCD functions                      *
+// *************************************************************************
+
+
+// clears the LCD screen and returns the cursor to position (0, 0)
+void OrangutanLCD::clear()
+{
+	lcd_cmd(LCD_CLEAR);
+}
+
+
+// prints a single character at the current cursor location
+void OrangutanLCD::print(uint8_t character)
+{
+	lcd_data(character);
+}
+
+
+// sends a string to the LCD.  The string is printed from 
+// wherever the cursor is and will not span lines.  (This lets you 
+// concatenate print statements.)
+void OrangutanLCD::println(const char *str)
+{
+	while (*str != 0)
+		lcd_data(*str++);
+}
+
+// other LCD libraries have this incorrectly named method, so it is here to
+// provide some semblance of compatibility
+void OrangutanLCD::printIn(const char *str)
+{
+	println(str);
+}
+
+
+// prints a signed long.  This prints from wherever the cursor is and will not
+// span lines.  (This lets you concatenate print statements.)  This function
+// will only print as many characters as there are digits in the number (plus
+// a minus sign if the number is negative).
+void OrangutanLCD::printLong(int32_t value)
+{
+	if (value < 0)
+	{
+		value = -value;
+		lcd_data('-');		// print the minus sign
+	}
+	printUnsignedLong(value);
+}
+
+
+// prints an unsigned long.  This prints from wherever the cursor is and will
+// not span lines.  (This lets you concatenate print statements.)  This
+// will only print as many characters as there are digits in the number.
+void OrangutanLCD::printUnsignedLong(uint32_t value)
+{
+	uint8_t str[10];
+	uint8_t i = 10;
+	uint32_t digit;
+
+	do
+	{
+		digit = value;
+		value /= 10;
+		digit -= value * 10;
+		str[--i] = '0' + (uint8_t)digit;
+	}
+	while (value != 0);
+
+	for(; i < 10; i++)
+		lcd_data(str[i]);
+}
+
+
+// display a hex nibble (half of a hex byte) at your current cursor location
+void OrangutanLCD::printHexNibble(uint8_t nibble)
+{
+	if (nibble < 10)
+		lcd_data('0' + nibble);
+	else
+		lcd_data('A' + (nibble - 10));
+}
+
+
+
+// display a two-byte value (word) in hex at your current cursor location
+void OrangutanLCD::printHex(uint16_t word )
+{
+	uint8_t byte = word >> 8;
+	uint8_t val = byte >> 4;
+	if (val)
+		printHexNibble(val);		// display high byte high nibble
+	val = byte & 0x0F;
+	if (val)
+		printHexNibble(val);		// display high byte low nibble
+
+	byte = (unsigned char)word;
+	printHexNibble(byte >> 4);		// display low byte high nibble
+	printHexNibble(byte & 0x0F);	// display low byte low nibble
+}
+
+
+// display a byte in binary starting at your current cursor location
+void OrangutanLCD::printBinary(uint8_t byte)
+{
+	uint8_t i, bitmask;
+
+	bitmask = 1 << 7;
+	for (i = 0; i < 8; i++)
+	{
+		if (byte & bitmask)
+			lcd_data('1');
+		else
+			lcd_data('0');
+		bitmask >>= 1;
+	}
+}
+
+
+// moves the cursor to the specified (x, y) position
+// x is a zero-based column indicator (0 <= x <= 7)
+// y is a zero-based row indicator (0 <= y <= 1)
+void OrangutanLCD::gotoXY(uint8_t x, uint8_t y)
+{
+	// Memory locations for the start of each line
+	// The actual memory locations are 0x00, and 0x40, but since
+	// D7 needs to be high in order to set a new memory location, we can go
+	// ahead and make the seventh bit of our memory location bytes to 1,
+	// which makes the numbers 0x80 and 0xC0:
+
+	uint8_t line_mem[] = {0x80, 0xC0};
+
+	// Make sure our X and Y are within bounds
+	x = (x < LCD_MAX_X ? x : LCD_MAX_X);
+	y = (y < LCD_MAX_Y ? y : LCD_MAX_Y);
+
+	// Grab the location in the LCD's memory of the start of line y,
+	// and add X to it to get the right character location.
+	lcd_cmd(line_mem[y] + x);
+}
+
+
+// Shows the cursor as either a BLINKING or SOLID block
+// cursorType should be either CURSOR_BLINKING or CURSOR_SOLID
+void OrangutanLCD::showCursor(uint8_t cursorType)
+{
+	if (cursorType == CURSOR_BLINKING)
+		lcd_cmd(LCD_SHOW_BLINK);
+	else
+		lcd_cmd(LCD_SHOW_SOLID);
+}
+
+
+// Hides the cursor
+void OrangutanLCD::hideCursor()
+{
+	lcd_cmd(LCD_HIDE);
+}
+
+
+// shifts the cursor LEFT or RIGHT the given number of positions.
+// direction should be either LCD_LEFT or LCD_RIGHT
+void OrangutanLCD::moveCursor(uint8_t direction, uint8_t num)
+{
+	while(num-- > 0)
+	{
+		if (direction == LCD_LEFT)
+			lcd_cmd(LCD_CURSOR_L);
+		else
+			lcd_cmd(LCD_CURSOR_R);
+	}
+}
+
+
+// shifts the display LEFT or RIGHT the given number of
+// positions, delaying for delay_time milliseconds between each shift.
+// This is what you'd use for a scrolling display.
+// direction should be either LCD_LEFT or LCD_RIGHT
+void OrangutanLCD::scroll(uint8_t direction, uint8_t num, uint16_t delay_time)
+{
+	uint16_t i;
+	while(num--)
+	{
+		if (direction == LCD_LEFT)
+			lcd_cmd(LCD_SHIFT_L);
+		else
+			lcd_cmd(LCD_SHIFT_R);
+		i = delay_time;
+		while (i--)
+			_delay_ms(1);	// argument to _delay_ms() must be < 13
+	}
+}
+
