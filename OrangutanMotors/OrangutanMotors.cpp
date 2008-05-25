@@ -34,6 +34,7 @@ ISR(TIMER2_OVF_vect)
 extern volatile unsigned long timer0_overflow_count;
 unsigned char miniCount = 0;
 
+#ifdef ARDUINO
 // this ISR is called every time timer2 overflows.
 // it replaces the timer0 overflow ISR that drives millis()
 // so that millis() and delay() will still work
@@ -46,6 +47,35 @@ ISR(TIMER2_OVF_vect)
 		miniCount = 0;
 	}
 }
+#endif
+
+#ifndef ARDUINO
+
+// provide C-based interface
+OrangutanMotors motors(DISABLE_MILLIS);
+
+extern "C" void motors_init()
+{
+  motors.init();
+}
+
+extern "C" void set_m1_speed(int speed)
+{
+  motors.setM1Speed(speed);
+}
+
+extern "C" void set_m2_speed(int speed)
+{
+  motors.setM2Speed(speed);
+}
+
+extern "C" void set_motors(int m1, int m2)
+{
+  motors.setM1Speed(m1);
+  motors.setM2Speed(m2);
+}
+
+#endif
 
 
 // constructor
