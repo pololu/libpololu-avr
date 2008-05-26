@@ -1,10 +1,9 @@
 #include <stdio.h>
+#include <math.h>
 #include "orangutan.h"
 
 int main()
 {
-  int i=0;
-
   lcd_init();
   buzzer_init();
 
@@ -12,13 +11,14 @@ int main()
       "v12 >d cd<b->d<a>d<g>d <f+>d<g>d<a>d<b->d <d>d<e>d<f+>d<g>d <f+>d<g>d<a>d<b-4");*/
   
   printf("Hello, world!");
-  
-  while(1)
-  {
-    printf("%d ",i);
-    i++;
-    delay_ms(100);
-  }
+
+  delay_ms(500);
+
+  printf("\n3pi=");
+
+  delay_ms(500);
+
+  printf("%.9f",3*M_PI);
 
   return 0;
 }

@@ -145,7 +145,7 @@ extern "C" int lcd_putchar(char c, FILE *f) {
   /* control characters */
   if(c == '\n') {
     nextline = 1;
-  } if(c == 8) { // ^H
+  } else if(c == 8) { // ^H
     col--;
     if(col==(uint8_t)-1) { row--; col=7; }
     if(row==(uint8_t)-1) { row=0; col=0; }
