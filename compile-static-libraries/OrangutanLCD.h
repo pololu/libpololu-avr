@@ -85,8 +85,7 @@ class OrangutanLCD
 	// direction should be either LCD_LEFT or LCD_RIGHT
 	void scroll(uint8_t direction, uint8_t num, uint16_t delay_time);
 
-
-
+	static void test() { }
 
   private:
 

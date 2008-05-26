@@ -127,6 +127,7 @@ extern "C" void clear()
 
 extern "C" void println(const char *str)
 {
+  lcd.test();
   lcd.println(str);
 }
 
@@ -190,7 +191,6 @@ void OrangutanLCD::init()
 	// Send 0x0C = Display on, cursor off, blinking off
 	lcd_cmd(0x0C);
 }
-
 
 // Wait for the busy flag to clear on a 4-bit interface
 // This is necessarily more complicated than the 8-bit interface
