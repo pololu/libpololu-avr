@@ -9,7 +9,9 @@ CC=/usr/bin/avr-gcc
 LIBRARY_OBJECT_FILES=OrangutanMotors.o OrangutanBuzzer.o OrangutanPushbuttons.o OrangutanLCD.o \
 	OrangutanDelay.o OrangutanLEDs.o OrangutanLineSensors.o
 OBJ2HEX=/usr/bin/avr-objcopy 
-LDFLAGS=-Wl,-gc-sections -L. -lorangutan -Wl,-u,vfprintf -lprintf_flt -lm
+LDFLAGS=-Wl,-gc-sections -L. -lorangutan -lm
+# -Wl,-u,vfprintf -lprintf_flt
+# -Wl,-u,vfprintf -lprintf_min
 PORT=/dev/ttyUSB0
 AVRDUDE=/usr/bin/avrdude
 TARGET=test
