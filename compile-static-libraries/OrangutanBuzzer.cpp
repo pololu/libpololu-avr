@@ -50,7 +50,7 @@ OrangutanBuzzer::OrangutanBuzzer()
 #ifdef LIB_ORANGUTAN
 
 // provide C-based interface
-OrangutanBuzzer buzzer();
+OrangutanBuzzer buzzer;
 
 extern "C" void buzzer_init()
 {
@@ -325,11 +325,11 @@ unsigned char OrangutanBuzzer::isPlaying()
 
 void OrangutanBuzzer::play(char *sequence)
 {
-  uint8 i=0;
+  unsigned char i=0;
 
   while(sequence[i] != 0)
   {
-    unsigned char note;
+    unsigned char note = 0;
     unsigned int duration = 200;
     unsigned int tmp_duration = 200;
     unsigned char octave = 4;
@@ -363,6 +363,8 @@ void OrangutanBuzzer::play(char *sequence)
     case '<':
       octave ++;
       continue;
+    default:
+      return;
     }
 
     i++;

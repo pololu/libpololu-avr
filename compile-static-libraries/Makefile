@@ -1,14 +1,16 @@
-CFLAGS=-g -Os -Wall -mcall-prologues -mmcu=atmega168
+CFLAGS=-g -Os -Wall -mcall-prologues -mmcu=atmega168 -ffunction-sections -DLIB_ORANGUTAN
 CPP=/usr/bin/avr-g++
 CC=/usr/bin/avr-gcc
-C_FILES=../OrangutanMotors/OrangutanMotors.cpp
+LIBRARY_OBJECT_FILES=OrangutanMotors.o OrangutanBuzzer.o OrangutanPushbuttons.o OrangutanLCD.o \
+	OrangutanDelay.o
 OBJ2HEX=/usr/bin/avr-objcopy 
+LDFLAGS=-Wl,-gc-sections -lorangutan
 
-liborangutan.a: liborangutan.o
-	ar rs liborangutan.a liborangutan.o
+liborangutan.a: $(LIBRARY_OBJECT_FILES)
+	ar rs liborangutan.a $(LIBRARY_OBJECT_FILES)
 
-liborangutan.o:../OrangutanMotors/OrangutanMotors.cpp
-	$(CPP) $(CFLAGS) $(C_FILES) -c -o liborangutan.o
+%.o:%.cpp
+	$(CPP) $(CFLAGS) $< -c -o $@
 
 clean:
 	rm *.o *.a *.hex *.obj
@@ -17,4 +19,4 @@ clean:
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
 
 test.obj: test.o liborangutan.a
-	$(CC) $(CFLAGS) test.o -L. -lorangutan -o $@
+	$(CC) $(CFLAGS) test.o $(LDFLAGS) -o $@
