@@ -24,6 +24,8 @@
 
 volatile unsigned int buzzerTimeout;	// keeps track of time limit for buzzer
 volatile unsigned char buzzerFinished;	// flag: cleared while buzzer plays
+volatile char *sequence;
+void nextNote();
 
 // Timer1 overflow interrupt
 ISR (TIMER1_OVF_vect)
@@ -35,6 +37,8 @@ ISR (TIMER1_OVF_vect)
 		OCR1B = 0;						// 0% duty cycle
 		DDRB &= ~(1 << PB2);	// silence buz, pin->input
 		buzzerFinished = 1;
+		if(sequence)
+		  nextNote();
 	}
 }
 
@@ -43,7 +47,7 @@ ISR (TIMER1_OVF_vect)
 
 OrangutanBuzzer::OrangutanBuzzer()
 {
-
+  sequence = 0;
 }
 
 #ifdef LIB_ORANGUTAN
@@ -323,17 +327,32 @@ unsigned char OrangutanBuzzer::isPlaying()
 	return !buzzerFinished;
 }
 
-void OrangutanBuzzer::play(char *sequence)
+void OrangutanBuzzer::play(char *notes)
 {
-  unsigned char i=0;
-  unsigned char octave = 4;
-  unsigned int duration = 200;
+  sequence = notes;
+  nextNote();
+}
 
-  while(sequence[i] != 0)
+void nextNote()
+{
+  static unsigned char i=0;
+  static unsigned char octave = 4;
+  static unsigned int duration = 256;
+  static unsigned int volume = 15;
+  static unsigned int tmp_duration = 200;
+
+  unsigned char note = 0;
+
+  while(!note)
   {
-    unsigned char note = 0;
-    unsigned int tmp_duration = 200;
-      
+    if(sequence[i] == 0)
+    {
+      sequence = 0;
+      i = 0;
+    }
+    if(sequence == 0)
+      return;
+     
     switch(sequence[i])
     {
     case 'c':
@@ -365,7 +384,55 @@ void OrangutanBuzzer::play(char *sequence)
       octave --;
       i++;
       continue;
+    case 'v':
+      i++;
+      if(sequence[i] == '1' && sequence[i+1] < '6' && sequence[i+1] >= '0')
+      {
+	volume = 10 + sequence[i+1]-'0';
+	i++;
+      }
+      else
+	volume = sequence[i]-'0';
+      i++;
+      continue;
+    case ' ':
+      i++;
+      continue;
+    case 'l':
+      if(sequence[i+1] == '6' && sequence[i+2] == '4')
+      {
+	duration = 16;
+	i++;
+      }
+      else if(sequence[i+1] == '3' && sequence[i+2] == '2')
+      {
+	duration = 32;
+	i++;
+      }
+      else if(sequence[i+1] == '1' && sequence[i+2] == '6')
+      {
+	duration = 64;
+	i++;
+      }
+      else if(sequence[i+1] == '8')
+	duration = 128;
+      else if(sequence[i+1] == '4')
+	duration = 256;
+      else if(sequence[i+1] == '2')
+	duration = 512;
+      else if(sequence[i+1] == '1')
+	duration = 1024;
+      else // unrecognized
+      {
+	sequence = 0;
+	i = 0;
+	return;
+      }
+      i+=2;
+      continue;
     default:
+      sequence = 0;
+      i = 0;
       return;
     }
 
@@ -383,7 +450,8 @@ void OrangutanBuzzer::play(char *sequence)
     }
 
     tmp_duration = duration;
-    playNote(note + octave*12, tmp_duration, 15);
-    while(isPlaying()); // wait until the note is done
+    OrangutanBuzzer::playNote(note + octave*12, tmp_duration, volume);
+    return;
   }
+
 }

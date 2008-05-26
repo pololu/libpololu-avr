@@ -55,7 +55,7 @@ class OrangutanBuzzer
 	OrangutanBuzzer();
 
 	// initializes timer1 for buzzer control
-	void init();
+	static void init();
 
 	// Sets up timer 1 to play the desired frequency (in Hz or .1 Hz) for the
 	// the desired duration (in ms). Allowed frequencies are 40 Hz to 10 kHz.
@@ -68,7 +68,7 @@ class OrangutanBuzzer
 	// greater than 1 kHz.  For example, the max duration you can use for a
 	// frequency of 10 kHz is 6553 ms.  If you use a duration longer than this,
 	// you will cause an integer overflow that produces unexpected behavior.
-	void playFrequency(unsigned int freq, unsigned int duration, 
+	static void playFrequency(unsigned int freq, unsigned int duration, 
 				   	   unsigned char volume);
 	
 	// Sets up timer 1 to play the desired note for the desired duration
@@ -87,13 +87,13 @@ class OrangutanBuzzer
 	// if note = 57, freq = 440 Hz (A4 - central value of ET Scale)
 	// if note = 111, freq = 9.96 kHz (D#9 - upper limit, freq must be <10 kHz)
 	// if note = 255, freq = 1 kHz and buzzer is silent (silent note)
-	void playNote(unsigned char note, unsigned int duration,
+	static void playNote(unsigned char note, unsigned int duration,
 				  unsigned char volume);
 
-	void play(char *sequence);
+	static void play(char *sequence);
 
 	// Returns 1 if the buzzer is currently playing, otherwise it returns 0
-	unsigned char isPlaying();
+	static unsigned char isPlaying();
 };
 
 #endif
