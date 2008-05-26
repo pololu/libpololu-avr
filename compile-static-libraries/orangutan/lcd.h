@@ -9,8 +9,7 @@
 
 void lcd_init();
 void clear();
-void println(const char *str);
-void print(unsigned char character);
+void print(const char *str);
 void print_long(long value);
 
 #endif

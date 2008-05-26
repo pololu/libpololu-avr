@@ -4,12 +4,12 @@ int main()
 {
   lcd_init();
 
-  println("Press B");
+  print("Press B");
 
   wait_for_button(BUTTON_B);
 
   clear();
-  println("Go!");
+  print("Go!");
 
   leds_init();
   motors_init();

@@ -23,7 +23,7 @@ liborangutan.a: $(LIBRARY_OBJECT_FILES)
 	$(CPP) $(CFLAGS) $< -c -o $@
 
 clean:
-	rm *.o *.a *.hex *.obj
+	rm -f *.o *.a *.hex *.obj
 
 %.hex : %.obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@

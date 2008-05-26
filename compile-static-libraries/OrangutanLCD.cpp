@@ -111,29 +111,20 @@ OrangutanLCD::OrangutanLCD()
 }
 
 #ifdef LIB_ORANGUTAN
+#include <stdio.h>
 
 // provide C-based interface
 OrangutanLCD lcd;
-
-extern "C" void lcd_init()
-{
-  lcd.init();
-}
 
 extern "C" void clear()
 {
   lcd.clear();
 }
 
-extern "C" void println(const char *str)
+extern "C" void print(const char *str)
 {
   lcd.test();
   lcd.println(str);
-}
-
-extern "C" void print(unsigned char character)
-{
-  lcd.print(character);
 }
 
 extern "C" void print_long(int32_t value)
@@ -141,6 +132,63 @@ extern "C" void print_long(int32_t value)
   lcd.printLong(value);
 }
 
+/* define putchar and getchar functions for the LCD */
+#define repos(x,y) (row=y;col=x;LCDCommand(0x80+y<<6+x);)
+char row1[8]={' ',' ',' ',' ',' ',' ',' ',' '}; /* remember what we write for scrolling */
+uint8_t row=0; /* the current cursor position */
+uint8_t col=0;
+extern "C" int lcd_putchar(char c, FILE *f) {
+  uint8_t nextline=0; /* should we go to next line after output? */
+  uint8_t repos=0; /* should we relocate */
+  uint8_t i;
+
+  /* control characters */
+  if(c == '\n') {
+    nextline = 1;
+  } if(c == 8) { // ^H
+    col--;
+    if(col==(uint8_t)-1) { row--; col=7; }
+    if(row==(uint8_t)-1) { row=0; col=0; }
+    repos = 1;
+  } else {
+    lcd.print(c); /* write the character */
+    if(row==1) row1[col]=c; /* remember the character */
+    col++;
+
+    if(col==8) nextline = 1;
+  }
+
+  if(nextline) {
+    if(row==1) {
+      /******* scroll! *******/
+      lcd.clear(); /* clear display */
+      for(i=0;i<8;i++) {
+        lcd.print(row1[i]);
+        row1[i]=' ';
+      }
+    }
+
+    col=0;
+    row=1;
+    repos=1;
+  }
+
+  if(repos) {
+    lcd.gotoXY(col,row);
+  }
+
+  return c;
+}
+
+extern "C" int void_getchar(FILE *f) {
+  return 0;
+}
+
+extern "C" void lcd_init()
+{
+  lcd.init();
+  fdevopen(lcd_putchar, void_getchar);
+}
 #endif
 
 // Initialize the LCD for a 4-bit interface
@@ -521,4 +569,3 @@ void OrangutanLCD::scroll(uint8_t direction, uint8_t num, uint16_t delay_time)
 			_delay_ms(1);	// argument to _delay_ms() must be < 13
 	}
 }
-
