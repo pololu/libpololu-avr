@@ -1,4 +1,4 @@
-#include <orangutan.h>
+#include "orangutan.h"
 
 int main()
 {
@@ -18,7 +18,8 @@ int main()
 
   set_motors(0,0);
   
-  play("cdefg");
+  play_note(0+12*4,100,15);
 
+  while(1);
   return 0;
 }

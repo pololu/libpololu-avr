@@ -5,6 +5,10 @@ LIBRARY_OBJECT_FILES=OrangutanMotors.o OrangutanBuzzer.o OrangutanPushbuttons.o 
 	OrangutanDelay.o
 OBJ2HEX=/usr/bin/avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -lorangutan
+PORT=/dev/ttyUSB0
+AVRDUDE=/usr/bin/avrdude
+TARGET=test
+all: $(TARGET).hex
 
 liborangutan.a: $(LIBRARY_OBJECT_FILES)
 	ar rs liborangutan.a $(LIBRARY_OBJECT_FILES)
@@ -20,3 +24,6 @@ clean:
 
 test.obj: test.o liborangutan.a
 	$(CC) $(CFLAGS) test.o $(LDFLAGS) -o $@
+
+program : $(TARGET).hex
+	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
