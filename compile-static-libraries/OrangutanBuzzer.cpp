@@ -25,7 +25,6 @@
 volatile unsigned int buzzerTimeout;	// keeps track of time limit for buzzer
 volatile unsigned char buzzerFinished;	// flag: cleared while buzzer plays
 
-
 // Timer1 overflow interrupt
 ISR (TIMER1_OVF_vect)
 {
@@ -200,6 +199,7 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int duration,
 	OCR1B = OCR1A >> (16 - volume);		// set duty cycle (volume)
 	buzzerTimeout = timeout;			// set buzzer duration
 	SREG = sreg;		// restore status register
+	sei();
 }
 
 
@@ -326,13 +326,13 @@ unsigned char OrangutanBuzzer::isPlaying()
 void OrangutanBuzzer::play(char *sequence)
 {
   unsigned char i=0;
+  unsigned char octave = 4;
+  unsigned int duration = 200;
 
   while(sequence[i] != 0)
   {
     unsigned char note = 0;
-    unsigned int duration = 200;
     unsigned int tmp_duration = 200;
-    unsigned char octave = 4;
       
     switch(sequence[i])
     {
@@ -359,9 +359,11 @@ void OrangutanBuzzer::play(char *sequence)
       break;
     case '>':
       octave ++;
+      i++;
       continue;
     case '<':
-      octave ++;
+      octave --;
+      i++;
       continue;
     default:
       return;

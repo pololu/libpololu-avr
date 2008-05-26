@@ -1,10 +1,10 @@
-CFLAGS=-g -Os -Wall -mcall-prologues -mmcu=atmega168 -ffunction-sections -DLIB_ORANGUTAN
+CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_ORANGUTAN -ffunction-sections -Os
 CPP=/usr/bin/avr-g++
 CC=/usr/bin/avr-gcc
 LIBRARY_OBJECT_FILES=OrangutanMotors.o OrangutanBuzzer.o OrangutanPushbuttons.o OrangutanLCD.o \
-	OrangutanDelay.o
+	OrangutanDelay.o OrangutanLEDs.o
 OBJ2HEX=/usr/bin/avr-objcopy 
-LDFLAGS=-Wl,-gc-sections -lorangutan
+LDFLAGS=-Wl,-gc-sections -L. -lorangutan
 PORT=/dev/ttyUSB0
 AVRDUDE=/usr/bin/avrdude
 TARGET=test

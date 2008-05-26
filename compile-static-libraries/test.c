@@ -3,8 +3,16 @@
 int main()
 {
   motors_init();
-  buzzer_init();
   lcd_init();
+
+  buzzer_init();
+  leds_init();
+  left_led(1);
+  play("ceg>c<gec");
+
+  while(is_playing());
+
+  right_led(1);
 
   clear();
 
@@ -18,8 +26,5 @@ int main()
 
   set_motors(0,0);
   
-  play_note(0+12*4,100,15);
-
-  while(1);
   return 0;
 }
