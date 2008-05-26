@@ -136,6 +136,11 @@ extern "C" void print(unsigned char character)
   lcd.print(character);
 }
 
+extern "C" void print_long(int32_t value)
+{
+  lcd.printLong(value);
+}
+
 #endif
 
 // Initialize the LCD for a 4-bit interface

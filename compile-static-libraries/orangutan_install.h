@@ -4,3 +4,4 @@
 #include <orangutan/lcd.h>
 #include <orangutan/delay.h>
 #include <orangutan/leds.h>
+#include <orangutan/line_sensors.h>
