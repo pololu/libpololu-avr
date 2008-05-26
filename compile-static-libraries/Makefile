@@ -33,6 +33,9 @@ clean:
 test.obj: test.o liborangutan.a
 	$(CC) $(CFLAGS) test.o $(LDFLAGS) -o $@
 
+test-cpp.obj: test-cpp.o OrangutanLCD.o OrangutanLineSensors.o
+	$(CC) $(CFLAGS) test-cpp.o OrangutanLCD.o OrangutanLineSensors.o $(LDFLAGS) -o $@
+
 program : $(TARGET).hex
 	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
 

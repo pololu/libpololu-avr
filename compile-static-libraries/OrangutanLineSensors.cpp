@@ -2,35 +2,35 @@
 #include <util/delay.h>
 #include <avr/io.h>
 
-unsigned char singleSensor = 0;
-unsigned int value[8];
-unsigned int sum;
-unsigned long weightedSum;
+#include "OrangutanLineSensors.h"
 
-extern "C" void line_sensors_init() {
-  DDRC = 0;
-  //  TCCR1B = 0x02;	// use 20 MHz I/O clock divided by 8
-  TCCR1B = 0x01;	// use 20 MHz I/O clock
-}
-
+#ifdef LIB_ORANGUTAN
 extern "C" void ir_leds_on()
 {
-  // set to output
-  DDRC |= 1<<5;
-  PORTC |= 1<<5;
+  OrangutanLineSensors::emittersOn();
 }
 
 extern "C" void ir_leds_off()
 {
-  // set to output
-  DDRC |= 1<<5;
-  PORTC &= ~(1<<5);
+  OrangutanLineSensors::emittersOff();
 }
 
 // returns 5 raw RC sensor values
 extern "C" void read_line_sensors(unsigned int *sensor_values) {
+  OrangutanLineSensors::read(sensor_values);
+}
+#endif
+
+OrangutanLineSensors::OrangutanLineSensors()
+{
+  // no initialization needed
+}
+
+void OrangutanLineSensors::read(unsigned int *sensor_values)
+{
   uint8_t last_value = 0xff;
   uint8_t i;
+  int count;
 
   // reset the values
   for(i=0;i<5;i++)
@@ -44,7 +44,7 @@ extern "C" void read_line_sensors(unsigned int *sensor_values) {
 
   _delay_us(10);
 
-  ir_leds_on();
+  emittersOn();
 
   // set all ports to inputs
   DDRC &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4);
@@ -52,8 +52,8 @@ extern "C" void read_line_sensors(unsigned int *sensor_values) {
   // turn off pull ups
   PORTC &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4);
 
-  TCNT1 = 0;
-  while (TCNT1 < 20000) {
+  for( count = 0; count < 1000; count ++ )
+  {
     uint8_t value = PINC & 0b00111111;
     i=0;
 
@@ -63,17 +63,33 @@ extern "C" void read_line_sensors(unsigned int *sensor_values) {
 
     for(i=0;i<5;i++) {
       if(!sensor_values[i] && !(value & 1))
-	sensor_values[i] = TCNT1;
+	sensor_values[i] = count;
       value >>= 1;
     }
-
+    
+    _delay_us(1);
   }
 
   DDRC &= ~(1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4);
 
-  ir_leds_off();
+  emittersOff();
 
   for(i=0;i<5;i++)
     if(!sensor_values[i])
-      sensor_values[i] = 20000;
+      sensor_values[i] = 1000;
+
+}
+
+void OrangutanLineSensors::emittersOff()
+{
+  // set to output
+  DDRC |= 1<<5;
+  PORTC &= ~(1<<5);
+}
+
+void OrangutanLineSensors::emittersOn()
+{
+  // set to output
+  DDRC |= 1<<5;
+  PORTC |= 1<<5;
 }
