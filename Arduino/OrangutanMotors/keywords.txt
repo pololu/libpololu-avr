@@ -12,13 +12,10 @@ OrangutanMotors	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-init	KEYWORD2
 setM1Speed	KEYWORD2
-setM2Speed	KEYWORD2	
+setM2Speed	KEYWORD2
+setSpeeds	KEYWORD2	
 
 #######################################
 # Constants (LITERAL1)
 #######################################
-
-ENABLE_MILLIS	LITERAL1
-DISABLE_MILLIS	LITERAL1

@@ -8,32 +8,36 @@
 #define OrangutanMotors_h
 
 
-#define ENABLE_MILLIS	1
-#define DISABLE_MILLIS	0
-
-
-
 class OrangutanMotors
 {
   public:
 
-    // constructor (the argument if the millis() member function will work)
-	OrangutanMotors(uint8_t enable_millis);
-
-	// initializes timers 0 and 2 for proper PWM generation
-	void init();
+    // constructor (doesn't do anything)
+	OrangutanMotors();
 
 	// sets the motor speed.  The sign of 'speed' determines the direction
 	// and the magnitude determines the speed.  limits: -255 <= speed < 255
 	// |speed| = 255 produces the maximum speed while speed = 0 is full brake.
-	void setM1Speed(int16_t speed);
-	void setM2Speed(int16_t speed);
+	static void setM1Speed(int speed);
+	static void setM2Speed(int speed);
+	static void setSpeeds(int m1Speed, int m2Speed);
 
 
   private:
 
-  	uint8_t _enableMillis;		// 0 if this.millis() is to be disabled
-								// disabling millis() decreases load on the CPU
+	static inline void init()
+	{
+		static unsigned char initialized = 0;
+
+		if (!initialized)
+		{
+			initialized = 1;	// this MUST be set before init2() is called
+			init2();			// or else infinite recursion ensues
+		}
+	}
+  	
+	// initializes timers 0 and 2 for proper PWM generation
+	static void init2();
 };
 
 #endif

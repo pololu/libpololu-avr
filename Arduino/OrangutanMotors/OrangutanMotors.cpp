@@ -11,7 +11,6 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <util/delay.h>
 #include "OrangutanMotors.h"
 
 /*  This comment block will efficiently count elapsed milliseconds
@@ -51,28 +50,24 @@ ISR(TIMER2_OVF_vect)
 
 #ifdef LIB_ORANGUTAN
 
-// provide C-based interface
-OrangutanMotors motors(DISABLE_MILLIS);
-
 extern "C" void motors_init()
 {
-  motors.init();
+  OrangutanMotors.init();
 }
 
 extern "C" void set_m1_speed(int speed)
 {
-  motors.setM1Speed(speed);
+  OrangutanMotors.setM1Speed(speed);
 }
 
 extern "C" void set_m2_speed(int speed)
 {
-  motors.setM2Speed(speed);
+  OrangutanMotors.setM2Speed(speed);
 }
 
 extern "C" void set_motors(int m1, int m2)
 {
-  motors.setM1Speed(m1);
-  motors.setM2Speed(m2);
+  OrangutanMotors.setSpeeds(m1, m2);
 }
 
 #endif
@@ -80,23 +75,18 @@ extern "C" void set_motors(int m1, int m2)
 
 // constructor
 
-OrangutanMotors::OrangutanMotors(uint8_t enableMillis)
+OrangutanMotors::OrangutanMotors()
 {
-	_enableMillis = enableMillis;
 }
 
 
 // initialize timers 0 and 2 to generate the proper PWM ouputs
 // to the motor drivers
-void OrangutanMotors::init()
+void OrangutanMotors::init2()
 {
 	TIMSK0 &= ~(1 << TOIE0);	// timer0 overflow interrupt disabled
-	if (_enableMillis)
-	{
-		//msCounter = 0;
-		//us_times_10 = 0;
-		TIMSK2 |= 1 << TOIE2;	// timer2 overflow interrupt enabled
-	}
+	TIMSK2 |= 1 << TOIE2;		// timer2 overflow interrupt enabled
+	sei();						// global interrupt enable
 
 	// configure for inverted PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
@@ -126,9 +116,10 @@ void OrangutanMotors::init()
 // sets the motor speed.  The sign of 'speed' determines the direction
 // and the magnitude determines the speed.  limits: -255 <= speed < 255
 // |speed| = 255 produces the maximum speed while speed = 0 is full brake.
-void OrangutanMotors::setM1Speed(int16_t speed)
+void OrangutanMotors::setM1Speed(int speed)
 {
-	uint8_t reverse = 0;
+	init();
+	unsigned char reverse = 0;
 
 	if (speed < 0)
 	{
@@ -151,9 +142,10 @@ void OrangutanMotors::setM1Speed(int16_t speed)
 }
 
 
-void OrangutanMotors::setM2Speed(int16_t speed)
+void OrangutanMotors::setM2Speed(int speed)
 {
-	uint8_t reverse = 0;
+	init();
+	unsigned char reverse = 0;
 
 	if (speed < 0)
 	{
@@ -173,4 +165,11 @@ void OrangutanMotors::setM2Speed(int16_t speed)
 		OCR2B = speed;	// pwm one driver input
 		OCR2A = 0;		// hold the other driver input high
 	}
+}
+
+
+void OrangutanMotors::setSpeeds(int m1Speed, int m2Speed)
+{
+	setM1Speed(m1Speed);
+	setM2Speed(m2Speed);
 }
