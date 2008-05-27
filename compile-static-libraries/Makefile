@@ -4,11 +4,11 @@ INCLUDE_ORANGUTAN=$(INCLUDE)/orangutan
 LIB=$(PREFIX)/lib
 
 CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_ORANGUTAN -ffunction-sections -Os
-CPP=/usr/bin/avr-g++
-CC=/usr/bin/avr-gcc
+CPP=avr-g++
+CC=avr-gcc
 LIBRARY_OBJECT_FILES=OrangutanMotors.o OrangutanBuzzer.o OrangutanPushbuttons.o OrangutanLCD.o \
 	OrangutanDelay.o OrangutanLEDs.o OrangutanLineSensors.o
-OBJ2HEX=/usr/bin/avr-objcopy 
+OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lorangutan -lm
 # -Wl,-u,vfprintf -lprintf_flt
 # -Wl,-u,vfprintf -lprintf_min
@@ -19,7 +19,7 @@ TARGET=test
 all: $(TARGET).hex
 
 liborangutan.a: $(LIBRARY_OBJECT_FILES)
-	ar rs liborangutan.a $(LIBRARY_OBJECT_FILES)
+	avr-ar rs liborangutan.a $(LIBRARY_OBJECT_FILES)
 
 %.o:%.cpp
 	$(CPP) $(CFLAGS) $< -c -o $@

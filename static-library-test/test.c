@@ -1,4 +1,5 @@
 #include <orangutan.h>
+//#include <stdio.h>
 
 int main()
 {
@@ -13,7 +14,8 @@ int main()
 
   leds_init();
   motors_init();
-  line_sensors_init();
+  //line_sensors_init();
+  //print("int %d", 5);
 
   while(1)
   {
