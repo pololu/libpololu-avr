@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map OrangutanPushbuttons
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+OrangutanPushbuttons	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init	KEYWORD2
+waitForPress	KEYWORD2
+waitForRelease	KEYWORD2	
+isPressed	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+TOP_BUTTON	LITERAL1
+MIDDLE_BUTTON	LITERAL1
+BOTTOM_BUTTON	LITERAL1
+ALL_BUTTONS	LITERAL1
