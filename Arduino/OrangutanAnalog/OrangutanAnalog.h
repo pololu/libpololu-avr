@@ -8,8 +8,8 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
-#define 8_BIT_MODE
-#define 10_BIT_MODE
+#define MODE_8_BIT		(1 << ADLAR)
+#define MODE_10_BIT		0
 
 
 class OrangutanAnalog
@@ -19,9 +19,24 @@ class OrangutanAnalog
     // constructor (doesn't do anything)
 	OrangutanAnalog();
 
-	// set the ADC to run in either 8-bit mode (8_BIT_MODE) or 
-	// 10-bit mode (10_BIT_MODE)
-	static void setMode(unsigned char mode);
+	// set the ADC to run in either 8-bit mode (MODE_8_BIT) or 
+	// 10-bit mode (MODE_10_BIT)
+	static inline void setMode(unsigned char mode)
+	{
+		if (mode == MODE_10_BIT)
+			ADMUX &= ~(1 << ADLAR);	// right-adjust result (ADC has result)
+		else
+			ADMUX |= 1 << ADLAR;		// left-adjust result (ADCH has result)	
+	}
+	
+	// returns 0 if in 10-bit mode, otherwise returns non-zero.  The return
+	// value of this method can be directly compared against the macros
+	// MODE_8_BIT and MODE_10_BIT:
+	// For example: if (getMode() == MODE_8_BIT) ...
+	static inline unsigned char getMode()
+	{
+		return ADMUX & (1 << ADLAR);
+	}
 
 	// take a single analog reading of the specified channel
 	static unsigned int read(unsigned char channel);
@@ -39,49 +54,31 @@ class OrangutanAnalog
 	static int readTemperatureF();
 	static int readTemperatureC();
 	
-	// the following inline methods can be used to initiate an ADC conversion
+	// the following methods can be used to initiate an ADC conversion
 	// that runs in the background, allowing the CPU to perform other tasks
 	// while the conversion is in progress.  The procedure is to start a
 	// conversion on a channel with startConversion(channel), and then
 	// poll isConverting in your main loop.  Once isConverting() returns
 	// a zero, the result can be obtained through a call to conversionResult().
-	static inline void startConversion(unsigned char channel)
-	{
-		
-	}
-	
+	static void startConversion(unsigned char channel);
+
 	// returns 1 if the ADC is in the middle of an conversion, otherwise
 	// returns 0
 	static inline unsigned char isConverting()
 	{
-	
+		return ADCSRA & (1 << ADSC);
 	}
 	
 	// returns the result of the previous ADC conversion.
 	static inline unsigned int conversionResult()
 	{
-	
+		if (getMode())				// if left-adjusted (i.e. 8-bit mode)
+			return ADCH;			// 8-bit result
+		return ADC;				// 10-bit result
 	}
 	
 	// converts the specified ADC result to millivolts
 	static unsigned int toMillivolts(unsigned int adcResult);
-
-	
-  private:
-	
-	static inline void init()
-	{
-		static unsigned char initialized = 0;
-
-		if (!initialized)
-		{
-			initialized = 1;
-			init2();
-		}
-	}
-	
-	static void init2();
 };
 
 #endif
-
