@@ -18,9 +18,13 @@
 #include <avr/interrupt.h>
 #include "OrangutanBuzzer.h"
 
-#define TIMER1_OFF		0x00
-#define TIMER1_CLK_1	0x01  // 20 MHz
-#define TIMER1_CLK_8	0x02  // 2.5 MHz
+#define TIMER1_OFF					0x00	// timer1 disconnected
+#define TIMER1_CLK_1				0x01	// 20 MHz
+#define TIMER1_CLK_8				0x02	// 2.5 MHz
+
+#define ENABLE_TIMER1_INTERRUPT()	TIMSK1 = (1 << TOIE1)
+#define DISABLE_TIMER1_INTERRUPT()	TIMSK1 = 0
+
 
 volatile unsigned int buzzerTimeout = 0;	// keeps track of time limit for buzzer
 volatile unsigned char buzzerFinished = 1;	// flag: cleared while buzzer plays
@@ -115,8 +119,8 @@ void OrangutanBuzzer::init2()
 	TCNT1 = 0;								// clear counter register
 
 	TIFR1 = 0xFF;							// clear all timer1 interrupt flags
-	TIMSK1 = (1 << TOIE1);					// overflow interrupt enabled
-											//   all other timer1 ints disabled
+	ENABLE_TIMER1_INTERRUPT()				// overflow interrupt enabled
+											//  all other timer1 ints disabled
 }
 
 
@@ -194,12 +198,12 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int duration,
 	if (volume > 15)
 		volume = 15;
 
-	cli();				// disable interrupts while writing to 16-bit registers
+	DISABLE_TIMER1_INTERRUPT()			// disable interrupts while writing to 16-bit registers
 	TCCR1B = newTCCR1B;					// select timer 1 clock prescaler
 	OCR1A = newOCR1A;					// set timer 1 pwm frequency
 	OCR1B = OCR1A >> (16 - volume);		// set duty cycle (volume)
 	buzzerTimeout = timeout;			// set buzzer duration
-	sei();
+	ENABLE_TIMER1_INTERRUPT();
 }
 
 
@@ -326,20 +330,22 @@ unsigned char OrangutanBuzzer::isPlaying()
 
 void OrangutanBuzzer::play(const char *notes)
 {
-	cli();  // prevent the following assignment from being interrupted
+	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
 	sequence = notes;
-	sei();
 	nextNote();
+	ENABLE_TIMER1_INTERRUPT();	// re-enable interrupts
 }
 
 void OrangutanBuzzer::stopPlaying()
 {
+	DISABLE_TIMER1_INTERRUPT();					// diable interrupts
 	TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
-	OCR1A = F_CPU / 1000;			// set TOP for freq = 1 kHz
-	OCR1B = 0;						// 0% duty cycle
-	DDRB &= ~(1 << PB2);	// silence buz, pin->input
+	OCR1A = F_CPU / 1000;						// set TOP for freq = 1 kHz
+	OCR1B = 0;									// 0% duty cycle
+	DDRB &= ~(1 << PB2);						// silence buz, pin->input
 	buzzerFinished = 1;
 	sequence = 0;
+	ENABLE_TIMER1_INTERRUPT();					// re-enable interrupts
 }
 
 // Returns the numerical argument specified at sequence[*i] and

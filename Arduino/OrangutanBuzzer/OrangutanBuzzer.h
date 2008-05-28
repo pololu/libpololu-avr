@@ -134,6 +134,8 @@ class OrangutanBuzzer
 	
 	// Stops all sound playback immediately.
 	static void stopPlaying();
+	
+	
   private:
 	
 	// initializes timer1 for buzzer control
@@ -146,8 +148,8 @@ class OrangutanBuzzer
 
 		if (!initialized)
 		{
-			initialized = 1;	// this MUST be set before init2() is called
-			init2();			// or else infinite recursion ensues
+			initialized = 1;
+			init2();
 		}
 	}
 };
