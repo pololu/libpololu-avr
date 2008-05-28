@@ -1,9 +1,8 @@
 #include <orangutan.h>
-//#include <stdio.h>
 
 int main()
 {
-  //  lcd_init_printf();
+  play("v8 c8d8.e8");
 
   while(!button_is_pressed(BUTTON_B))
   {
@@ -12,11 +11,10 @@ int main()
     set_analog_mode(MODE_10_BIT);
 
     battery_voltage = read_analog_average(6,10)*5000L*3/2/1023;
+
     clear();
-    print_long(battery_voltage/1000);
-    print(".");
-    print_long((battery_voltage/10)%100);
-    print("V");
+    print_long(battery_voltage);
+    print("mV");
     lcd_goto_xy(0,1);
     print("Press B");
 

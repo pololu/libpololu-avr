@@ -327,6 +327,42 @@ void OrangutanBuzzer::play(const char *notes)
   nextNote();
 }
 
+// Returns the duration specified at sequence[*i] and increments
+// i to point to the character immediately after the duration
+// specification.
+unsigned int getDuration(const char *sequence, unsigned char *i)
+{
+  if(sequence[*i] == '6' && sequence[*i+1] == '4')
+  {
+    *i+=2;
+    return 16;
+  }
+  if(sequence[*i] == '3' && sequence[*i+1] == '2')
+  {
+    *i+=2;
+    return 32;
+  }
+  if(sequence[*i] == '1' && sequence[*i+1] == '6')
+  {
+    *i+=2;
+    return 64;
+  }
+
+  // definitely going to be a one-character duration
+  (*i)++;
+  
+  if(sequence[*i-1] == '8')
+    return 128;
+  if(sequence[*i-1] == '4')
+    return 256;
+  if(sequence[*i-1] == '2')
+    return 512;
+  if(sequence[*i-1] == '1')
+    return 1024;
+
+  // unrecognized
+  return 256;
+}
 
 void nextNote()
 {
@@ -394,36 +430,8 @@ void nextNote()
       i++;
       continue;
     case 'l':
-      if(sequence[i+1] == '6' && sequence[i+2] == '4')
-      {
-	duration = 16;
-	i++;
-      }
-      else if(sequence[i+1] == '3' && sequence[i+2] == '2')
-      {
-	duration = 32;
-	i++;
-      }
-      else if(sequence[i+1] == '1' && sequence[i+2] == '6')
-      {
-	duration = 64;
-	i++;
-      }
-      else if(sequence[i+1] == '8')
-	duration = 128;
-      else if(sequence[i+1] == '4')
-	duration = 256;
-      else if(sequence[i+1] == '2')
-	duration = 512;
-      else if(sequence[i+1] == '1')
-	duration = 1024;
-      else // unrecognized
-      {
-	sequence = 0;
-	i = 0;
-	return;
-      }
-      i+=2;
+      i++;
+      duration = getDuration(sequence, &i);
       continue;
     default:
       sequence = 0;
@@ -433,7 +441,7 @@ void nextNote()
 
     i++;
 
-	note += octave*12;
+    note += octave*12;
 	
     while(sequence[i] == '+')
     {
@@ -447,6 +455,21 @@ void nextNote()
     }
 
     tmp_duration = duration;
+
+    // if the input is 'c16', make it a 16th note, etc.
+    if(sequence[i] > '0' && sequence[i] < '9')
+      tmp_duration = getDuration(sequence, &i);
+
+    // handle dotted notes - the first dot adds 50%, and each
+    // additional dot adds 50% of the previous dot
+    unsigned int dot_add = tmp_duration/2;
+    while(sequence[i] == '.')
+    {
+      i++;
+      tmp_duration += dot_add;
+      dot_add /= 2;
+    }
+
     OrangutanBuzzer::playNote(note, tmp_duration, volume);
     return;
   }
