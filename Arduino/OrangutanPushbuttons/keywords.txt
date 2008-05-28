@@ -12,9 +12,9 @@ OrangutanPushbuttons	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-init	KEYWORD2
 waitForPress	KEYWORD2
-waitForRelease	KEYWORD2	
+waitForRelease	KEYWORD2
+waitForButton	KEYWORD2	
 isPressed	KEYWORD2
 
 #######################################

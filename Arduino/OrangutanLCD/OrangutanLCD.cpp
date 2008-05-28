@@ -168,7 +168,6 @@ extern "C" int void_getchar(FILE *f) {
 
 extern "C" void lcd_init()
 {
-  lcd.init();
   fdevopen(lcd_putchar, void_getchar);
 }
 
@@ -179,7 +178,7 @@ extern "C" void clear()
 
 extern "C" void print(const char *str)
 {
-  lcd.println(str);
+  lcd.print(str);
 }
 
 extern "C" void print_long(long value)

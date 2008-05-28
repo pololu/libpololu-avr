@@ -52,11 +52,6 @@ OrangutanBuzzer::OrangutanBuzzer()
 
 #ifdef LIB_ORANGUTAN
 
-extern "C" void buzzer_init()
-{
-  OrangutanBuzzer.init();
-}
-
 extern "C" void play_frequency(unsigned int freq, unsigned int duration, 
 			       unsigned char volume)
 {

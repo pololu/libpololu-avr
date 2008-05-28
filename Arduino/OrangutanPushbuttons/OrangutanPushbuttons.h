@@ -22,11 +22,8 @@ class OrangutanPushbuttons
 {
   public:
 
-    // constructor
+    // constructor (doesn't do anything)
 	OrangutanPushbuttons();
-
-	// initializes I/O pins for use as button inputs
-	void init();
 
 	// wait for any of the specified buttons to be pressed, at which point
 	// execution will return from this method.  The argument 'buttons' can
@@ -34,19 +31,36 @@ class OrangutanPushbuttons
 	// return value is the ID of the button that was pressed.  Note that
 	// this method takes care of button debouncing.
 	// Example: waitForPress(TOP_BUTTON | BOTTOM_BUTTON);
-	uint8_t waitForPress(uint8_t buttons);
+	static unsigned char waitForPress(unsigned char buttons);
 
 	// wait for any of the specified buttons to be released, at which point
 	// execution will return from this method.
-	uint8_t waitForRelease(uint8_t buttons);
+	static unsigned char waitForRelease(unsigned char buttons);
+
+	// Waits for the any of the specified buttons to be pressed and released.
+	static unsigned char waitForButton(unsigned char buttons);
 
 	// returns 1 (true) if any of the specified buttons is currently being
 	// pressed.  Otherwise this method returns 0 (false).  The argument
 	// 'buttons' can refer to multiple buttons using the bitwise OR operator |.
-	uint8_t isPressed(uint8_t buttons);
+	static unsigned char isPressed(unsigned char buttons);
 
-	// Waits for the specified buttons to be pressed and releaed.
-	uint8_t waitForButton(uint8_t buttons);
+	
+  private:
+
+	static inline void init()
+	{
+		static unsigned char initialized = 0;
+
+		if (!initialized)
+		{
+			initialized = 1;
+			init2();
+		}
+	}
+  	
+	// initializes I/O pins for use as button inputs
+	static void init2();
 };
 
 #endif

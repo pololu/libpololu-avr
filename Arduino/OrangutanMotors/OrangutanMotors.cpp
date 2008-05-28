@@ -50,11 +50,6 @@ ISR(TIMER2_OVF_vect)
 
 #ifdef LIB_ORANGUTAN
 
-extern "C" void motors_init()
-{
-  OrangutanMotors.init();
-}
-
 extern "C" void set_m1_speed(int speed)
 {
   OrangutanMotors.setM1Speed(speed);

@@ -23,41 +23,34 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 
 #ifdef LIB_ORANGUTAN
 
-// provide C-based interface
-OrangutanPushbuttons pushbuttons;
-
-extern "C" void buttons_init()
-{
-  pushbuttons.init();
-}
-
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {
-  return pushbuttons.waitForPress(buttons);
+  return OrangutanPushbuttons.waitForPress(buttons);
 }
 
 extern "C" unsigned char wait_for_button_release(unsigned char buttons)
 {
-  return pushbuttons.waitForRelease(buttons);
+  return OrangutanPushbuttons.waitForRelease(buttons);
 }
 
 extern "C" unsigned char wait_for_button(unsigned char buttons)
 {
-  return pushbuttons.waitForButton(buttons);
+  return OrangutanPushbuttons.waitForButton(buttons);
 }
 
 extern "C" unsigned char button_is_pressed(unsigned char buttons)
 {
-  return pushbuttons.isPressed(buttons);
+  return OrangutanPushbuttons.isPressed(buttons);
 }
 
 #endif
 
 // initializes I/O pins for use as button inputs
-void OrangutanPushbuttons::init()
+void OrangutanPushbuttons::init2()
 {
 	DDRB &= ~ALL_BUTTONS;	// set the pushbutton pins to be inputs
 	PORTB |= ALL_BUTTONS;	// enable pullups on the pushbutton pins
+	_delay_us(1);			// give pullups time to stabilize
 }
 
 // wait for any of the specified buttons to be pressed, at which point
@@ -66,8 +59,9 @@ void OrangutanPushbuttons::init()
 // return value is the ID of the button that was pressed.  Note that
 // this method takes care of button debouncing.
 // Example: waitForPress(TOP_BUTTON | BOTTOM_BUTTON);
-uint8_t OrangutanPushbuttons::waitForPress(uint8_t buttons)
+unsigned char OrangutanPushbuttons::waitForPress(unsigned char buttons)
 {
+	init();		// initialize pushbutton I/O pins if necessary
 	do
 	{
 		while (!(~PINB & buttons))	// wait for a button to be pressed
@@ -85,8 +79,9 @@ uint8_t OrangutanPushbuttons::waitForPress(uint8_t buttons)
 // return value is the ID of the button that was released.  Note that
 // this method takes care of button debouncing.
 // Example: waitForRelease(TOP_BUTTON | BOTTOM_BUTTON);
-uint8_t OrangutanPushbuttons::waitForRelease(uint8_t buttons)
+unsigned char OrangutanPushbuttons::waitForRelease(unsigned char buttons)
 {
+	init();		// initialize pushbutton I/O pins if necessary
 	do
 	{
 		while (!(PINB & buttons))	// wait for a button to be released
@@ -97,17 +92,24 @@ uint8_t OrangutanPushbuttons::waitForRelease(uint8_t buttons)
 	return PINB & buttons;			// return the released button(s)
 }
 
-uint8_t OrangutanPushbuttons::waitForButton(uint8_t buttons)
+// wait for any of the specified buttons to be pressed and then released,
+// at which point execution will return from this method.  The argument
+// 'buttons' can refer to multiple buttons using the bitwise OR operator |.
+// The return value is the ID of the button that was pressed and released.
+// Note that this method takes care of button debouncing.
+// Example: waitForButton(TOP_BUTTON | BOTTOM_BUTTON);
+unsigned char OrangutanPushbuttons::waitForButton(unsigned char buttons)
 {
-  uint8_t button_pressed = waitForPress(buttons);
-  waitForRelease(button_pressed);
-  return button_pressed;
+  unsigned char pressedButton = waitForPress(buttons);
+  waitForRelease(pressedButton);
+  return pressedButton;
 }
 
 // returns 1 (true) if any of the specified buttons is currently being
 // pressed.  Otherwise this method returns 0 (false).  The argument
 // 'buttons' can refer to multiple buttons using the bitwise OR operator |.
-uint8_t OrangutanPushbuttons::isPressed(uint8_t buttons)
+unsigned char OrangutanPushbuttons::isPressed(unsigned char buttons)
 {
+	init();		// initialize pushbutton I/O pins if necessary
 	return (~PINB & buttons) ? 1 : 0;
 }
