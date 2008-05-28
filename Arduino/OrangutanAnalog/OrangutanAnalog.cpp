@@ -14,57 +14,57 @@
 
 extern "C" void set_analog_mode(unsigned char mode)
 {
-  OrangutanAnalog::setMode(mode);
+	OrangutanAnalog::setMode(mode);
 }
 
 extern "C" unsigned char get_analog_mode()
 {
-  return OrangutanAnalog::getMode();
+	return OrangutanAnalog::getMode();
 }
 
 extern "C" unsigned int read_analog(unsigned char channel)
 {
-  return OrangutanAnalog::read(channel);
+	return OrangutanAnalog::read(channel);
 }
 
 extern "C" unsigned int read_analog_average(unsigned char channel, unsigned int samples)
 {
-  return OrangutanAnalog::readAverage(channel, samples);
+	return OrangutanAnalog::readAverage(channel, samples);
 }
 
 extern "C" unsigned int read_trimpot()
 {
-  return OrangutanAnalog::readTrimpot();
+	return OrangutanAnalog::readTrimpot();
 }
 
 extern "C" int read_temperature_f()
 {
-  return OrangutanAnalog::readTemperatureF();
+	return OrangutanAnalog::readTemperatureF();
 }
 
 extern "C" int read_temperature_c()
 {
-  return OrangutanAnalog::readTemperatureC();
+	return OrangutanAnalog::readTemperatureC();
 }
 
 extern "C" void start_analog_conversion(unsigned char channel)
 {
-  OrangutanAnalog::startConversion(channel);
+	OrangutanAnalog::startConversion(channel);
 }
 
 extern "C" unsigned char analog_is_converting()
 {
-  return OrangutanAnalog::isConverting();
+	return OrangutanAnalog::isConverting();
 }
 
 extern "C" unsigned int conversion_result()
 {
-  return OrangutanAnalog::conversionResult();
+	return OrangutanAnalog::conversionResult();
 }
 
 extern "C" unsigned int to_millivolts(unsigned int analog_result)
 {
-  return OrangutanAnalog::toMillivolts(analog_result);
+	return OrangutanAnalog::toMillivolts(analog_result);
 }
 
 #endif
@@ -163,3 +163,10 @@ unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 		return temp / 255;
 	return temp / 1023;
 }
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

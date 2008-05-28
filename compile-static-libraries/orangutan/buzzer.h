@@ -19,5 +19,6 @@ void play_note(unsigned char note, unsigned int duration,
 		  unsigned char volume);
 void play(char *sequence);
 unsigned char is_playing();
+void stop_playing();
 
 #endif

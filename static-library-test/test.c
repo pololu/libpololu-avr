@@ -2,11 +2,12 @@
 
 int main()
 {
-  play("v8 c8d8.e8");
-
   while(!button_is_pressed(BUTTON_B))
   {
     int battery_voltage;
+
+    if(!is_playing())
+      play("v8 l8 cdefg");
 
     set_analog_mode(MODE_10_BIT);
 
@@ -21,7 +22,8 @@ int main()
     delay_ms(50);
   }
 
-  wait_for_button(BUTTON_B);
+  stop_playing();
+  wait_for_button_release(BUTTON_B);
 
   clear();
   print("Go!");

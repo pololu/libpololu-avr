@@ -55,3 +55,10 @@ void OrangutanLEDs::right(unsigned char on)
 	else
 		PORTD &= ~(1 << GREEN_LED);
 }
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

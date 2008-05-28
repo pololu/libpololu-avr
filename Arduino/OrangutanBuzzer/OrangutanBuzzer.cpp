@@ -53,25 +53,30 @@ OrangutanBuzzer::OrangutanBuzzer()
 #ifdef LIB_ORANGUTAN
 
 extern "C" void play_frequency(unsigned int freq, unsigned int duration, 
-			       unsigned char volume)
+							   unsigned char volume)
 {
-  OrangutanBuzzer::playFrequency(freq, duration, volume);
+	OrangutanBuzzer::playFrequency(freq, duration, volume);
 }
 
 extern "C" void play_note(unsigned char note, unsigned int duration,
-			  unsigned char volume)
+						  unsigned char volume)
 {
-  OrangutanBuzzer::playNote(note, duration, volume);
+	OrangutanBuzzer::playNote(note, duration, volume);
 }
 
 extern "C" void play(char *sequence)
 {
-  OrangutanBuzzer::play(sequence);
+	OrangutanBuzzer::play(sequence);
 }
 
 extern "C" unsigned char is_playing()
 {
-  return OrangutanBuzzer::isPlaying();
+	return OrangutanBuzzer::isPlaying();
+}
+
+extern "C" void stop_playing()
+{
+	OrangutanBuzzer::stopPlaying();
 }
 
 #endif
@@ -321,10 +326,20 @@ unsigned char OrangutanBuzzer::isPlaying()
 
 void OrangutanBuzzer::play(const char *notes)
 {
-  cli();  // prevent the following assignment from being interrupted
-  sequence = notes;
-  sei();
-  nextNote();
+	cli();  // prevent the following assignment from being interrupted
+	sequence = notes;
+	sei();
+	nextNote();
+}
+
+void OrangutanBuzzer::stopPlaying()
+{
+	TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
+	OCR1A = F_CPU / 1000;			// set TOP for freq = 1 kHz
+	OCR1B = 0;						// 0% duty cycle
+	DDRB &= ~(1 << PB2);	// silence buz, pin->input
+	buzzerFinished = 1;
+	sequence = 0;
 }
 
 // Returns the duration specified at sequence[*i] and increments
@@ -370,7 +385,6 @@ void nextNote()
   static unsigned char octave = 4;
   static unsigned int duration = 256;
   static unsigned int volume = 15;
-  static unsigned int tmp_duration = 200;
 
   unsigned char note = 0;
 
@@ -454,7 +468,7 @@ void nextNote()
       note --;
     }
 
-    tmp_duration = duration;
+    unsigned int tmp_duration = duration;
 
     // if the input is 'c16', make it a 16th note, etc.
     if(sequence[i] > '0' && sequence[i] < '9')
@@ -475,3 +489,10 @@ void nextNote()
   }
 
 }
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

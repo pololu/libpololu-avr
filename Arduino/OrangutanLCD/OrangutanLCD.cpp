@@ -119,83 +119,83 @@ char row1[8]={' ',' ',' ',' ',' ',' ',' ',' '}; /* remember what we write for sc
 unsigned char row=0; /* the current cursor position */
 unsigned char col=0;
 extern "C" int lcd_putchar(char c, FILE *f) {
-  unsigned char nextline=0; /* should we go to next line after output? */
-  unsigned char repos=0; /* should we relocate */
-  unsigned char i;
+	unsigned char nextline=0; /* should we go to next line after output? */
+	unsigned char repos=0; /* should we relocate */
+	unsigned char i;
 
-  /* control characters */
-  if(c == '\n') {
-    nextline = 1;
-  } else if(c == 8) { // ^H
-    col--;
-    if(col==(unsigned char)-1) { row--; col=7; }
-    if(row==(unsigned char)-1) { row=0; col=0; }
-    repos = 1;
-  } else {
-    OrangutanLCD::print(c); /* write the character */
-    if(row==1) row1[col]=c; /* remember the character */
-    col++;
+	/* control characters */
+	if(c == '\n') {
+		nextline = 1;
+	} else if(c == 8) { // ^H
+		col--;
+		if(col==(unsigned char)-1) { row--; col=7; }
+		if(row==(unsigned char)-1) { row=0; col=0; }
+		repos = 1;
+	} else {
+		OrangutanLCD::print(c); /* write the character */
+		if(row==1) row1[col]=c; /* remember the character */
+		col++;
 
-    if(col==8) nextline = 1;
-  }
+		if(col==8) nextline = 1;
+	}
 
-  if(nextline) {
-    if(row==1) {
-      /******* scroll! *******/
-      OrangutanLCD::clear(); /* clear display */
-      for(i=0;i<8;i++) {
-        OrangutanLCD::print(row1[i]);
-        row1[i]=' ';
-      }
-    }
+	if(nextline) {
+		if(row==1) {
+			/******* scroll! *******/
+			OrangutanLCD::clear(); /* clear display */
+			for(i=0;i<8;i++) {
+				OrangutanLCD::print(row1[i]);
+				row1[i]=' ';
+			}
+		}
 
-    col=0;
-    row=1;
-    repos=1;
-  }
+		col=0;
+		row=1;
+		repos=1;
+	}
 
-  if(repos) {
-    OrangutanLCD::gotoXY(col,row);
-  }
+	if(repos) {
+		OrangutanLCD::gotoXY(col,row);
+	}
 
-  return c;
+	return c;
 }
 
 extern "C" int void_getchar(FILE *f) {
-  return 0;
+	return 0;
 }
 
 extern "C" void lcd_goto_xy(int col, int row)
 {
-  OrangutanLCD::gotoXY(col,row);
+	OrangutanLCD::gotoXY(col,row);
 }
 
 extern "C" void lcd_init_printf()
 {
-  fdevopen(lcd_putchar, void_getchar);
+	fdevopen(lcd_putchar, void_getchar);
 }
 
 extern "C" void clear()
 {
-  unsigned char i;
-  OrangutanLCD::clear();
+	unsigned char i;
+	OrangutanLCD::clear();
 
-  // clear out the LCD
-  for(i=0;i<8;i++)
-    row1[i] = ' ';
+	// clear out the LCD
+	for(i=0;i<8;i++)
+		row1[i] = ' ';
 
-  col = 0;
-  row = 0;
+	col = 0;
+	row = 0;
 }
 
 extern "C" void print(const char *str)
 {
-  OrangutanLCD::print(str);
+	OrangutanLCD::print(str);
 }
 
 extern "C" void print_long(long value)
 {
-  OrangutanLCD::print(value);
+	OrangutanLCD::print(value);
 }
 #endif
 
@@ -592,3 +592,10 @@ void OrangutanLCD::scroll(unsigned char direction, unsigned char num,
 			_delay_ms(1);	// argument to _delay_ms() must be < 13
 	}
 }
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

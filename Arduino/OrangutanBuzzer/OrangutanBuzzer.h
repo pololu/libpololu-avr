@@ -96,7 +96,8 @@ class OrangutanBuzzer
 	// Returns 1 if the buzzer is currently playing, otherwise it returns 0
 	static unsigned char isPlaying();
 	
-	
+	// Stops all sound playback immediately.
+	static void stopPlaying();
   private:
 	
 	// initializes timer1 for buzzer control
@@ -116,3 +117,10 @@ class OrangutanBuzzer
 };
 
 #endif
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **
