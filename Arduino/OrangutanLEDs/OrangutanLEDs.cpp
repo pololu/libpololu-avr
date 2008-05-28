@@ -1,21 +1,43 @@
+/*
+  OrangutanLEDs.cpp - Library for using the LED(s) on the
+      Orangutan LV-168 and Baby Orangutan B-48/B-168
+  Written by Ben Schmidel, May 27, 2008.
+  Released into the public domain.
+*/
+
 #include <avr/io.h>
+#include "OrangutanLEDs.h"
 
 #define RED_LED		PD1
 #define GREEN_LED	PD7
 
+#ifdef LIB_ORANGUTAN
 
 extern "C" void left_led(unsigned char on)
 {
-	OrangutanLEDs::red(on);
+	OrangutanLEDs::left(on);
 }
 
 extern "C" void right_led(unsigned char on)
 {
-	OrangutanLEDs::green(on);
+	OrangutanLEDs::right(on);
+}
+
+#endif
+
+
+// constructor
+OrangutanLEDs::OrangutanLEDs()
+{
+
 }
 
 
-static void OrangutanLEDs::red(unsigned char on)
+// turns the Orangutan LED off if 'on' is zero, else this method
+// turns the LED on.  Note that the Baby Orangutan B only has
+// one LED (the red one), so green() will just drive I/O line PD7
+// high or low, depending on the argument.
+void OrangutanLEDs::left(unsigned char on)
 {
 	DDRD |= 1 << RED_LED;
 	if (on)
@@ -24,7 +46,8 @@ static void OrangutanLEDs::red(unsigned char on)
 		PORTD &= ~(1 << RED_LED);
 }
 
-static void OrangutanLEDs::green(unsigned char on)
+
+void OrangutanLEDs::right(unsigned char on)
 {
 	DDRD |= 1 << GREEN_LED;
 	if (on)

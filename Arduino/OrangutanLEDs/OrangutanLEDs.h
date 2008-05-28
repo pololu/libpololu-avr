@@ -19,8 +19,17 @@ class OrangutanLEDs
 	// turns the LED on.  Note that the Baby Orangutan B only has
 	// one LED (the red one), so green() will just drive I/O line PD7
 	// high or low, depending on the argument.
-	static void red(unsigned char on);
-	static void green(unsigned char on);
+	static void left(unsigned char on);				// same as red()
+	static inline void red(unsigned char on)
+	{
+		left(on);
+	}
+	
+	static void right(unsigned char on);				// same as green()
+	static inline void green(unsigned char on)
+	{
+		right(on);
+	}
 };
 
 #endif
