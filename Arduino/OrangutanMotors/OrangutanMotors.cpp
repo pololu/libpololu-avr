@@ -11,7 +11,7 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include "include/OrangutanMotors.h"
+#include "OrangutanMotors.h"
 
 /*  This comment block will efficiently count elapsed milliseconds
 volatile unsigned long msCounter;	// returned by OrangutanMotors::millis()

@@ -16,7 +16,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "include/OrangutanBuzzer.h"
+#include "OrangutanBuzzer.h"
 
 #define TIMER1_OFF		0x00
 #define TIMER1_CLK_1	0x01  // 20 MHz
