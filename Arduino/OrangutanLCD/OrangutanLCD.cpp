@@ -165,15 +165,27 @@ extern "C" int void_getchar(FILE *f) {
   return 0;
 }
 
+extern "C" void lcd_goto_xy(int col, int row)
+{
+  OrangutanLCD::gotoXY(col,row);
+}
 
-extern "C" void lcd_init()
+extern "C" void lcd_init_printf()
 {
   fdevopen(lcd_putchar, void_getchar);
 }
 
 extern "C" void clear()
 {
+  unsigned char i;
   OrangutanLCD::clear();
+
+  // clear out the LCD
+  for(i=0;i<8;i++)
+    row1[i] = ' ';
+
+  col = 0;
+  row = 0;
 }
 
 extern "C" void print(const char *str)

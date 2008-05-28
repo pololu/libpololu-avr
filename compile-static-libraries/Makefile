@@ -12,7 +12,9 @@ LIBRARY_OBJECT_FILES=\
 	../Arduino/OrangutanBuzzer/OrangutanBuzzer.o \
 	../Arduino/OrangutanPushbuttons/OrangutanPushbuttons.o \
 	../Arduino/OrangutanLCD/OrangutanLCD.o \
-	../Arduino/OrangutanLEDs/OrangutanLEDs.o
+	../Arduino/OrangutanLEDs/OrangutanLEDs.o \
+	../Arduino/OrangutanAnalog/OrangutanAnalog.o \
+	Delay.o
 
 #	OrangutanDelay/OrangutanDelay.o \
 #	OrangutanLineSensors/OrangutanLineSensors.o
@@ -32,7 +34,7 @@ liborangutan.a: $(LIBRARY_OBJECT_FILES)
 	$(CPP) $(CFLAGS) $< -c -o $@
 
 clean:
-	rm -f *.o *.a *.hex *.obj
+	rm -f $(LIBRARY_OBJECT_FILES) *.a *.hex *.obj
 
 %.hex : %.obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
@@ -42,9 +44,6 @@ test.obj: test.o liborangutan.a
 
 test-cpp.obj: test-cpp.o OrangutanLCD.o OrangutanLineSensors.o
 	$(CC) $(CFLAGS) test-cpp.o OrangutanLCD.o OrangutanLineSensors.o $(LDFLAGS) -o $@
-
-program : $(TARGET).hex
-	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
 
 install: liborangutan.a
 	install -d $(LIB)

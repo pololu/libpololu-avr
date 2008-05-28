@@ -3,15 +3,31 @@
 
 int main()
 {
-  lcd_init();
+  //  lcd_init_printf();
 
-  print("Press B");
+  while(!button_is_pressed(BUTTON_B))
+  {
+    int battery_voltage;
+
+    set_analog_mode(MODE_10_BIT);
+
+    battery_voltage = read_analog_average(6,10)*5000L*3/2/1023;
+    clear();
+    print_long(battery_voltage/1000);
+    print(".");
+    print_long((battery_voltage/10)%100);
+    print("V");
+    lcd_goto_xy(0,1);
+    print("Press B");
+
+    delay_ms(50);
+  }
 
   wait_for_button(BUTTON_B);
 
   clear();
   print("Go!");
-
+  /*
   //print("int %d", 5);
 
   while(1)
@@ -32,6 +48,6 @@ int main()
       set_motors(100,0);
     }
   }
-
+  */
   return 0;
 }

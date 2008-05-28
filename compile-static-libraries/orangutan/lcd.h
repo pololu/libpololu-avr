@@ -7,9 +7,10 @@
 #ifndef OrangutanLCD_h
 #define OrangutanLCD_h
 
-void lcd_init();
+void lcd_init_printf();
 void clear();
 void print(const char *str);
 void print_long(long value);
+void lcd_goto_xy(int col, int row);
 
 #endif

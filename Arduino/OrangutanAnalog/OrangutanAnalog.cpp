@@ -12,6 +12,61 @@
 
 #ifdef LIB_ORANGUTAN
 
+extern "C" void set_analog_mode(unsigned char mode)
+{
+  OrangutanAnalog::setMode(mode);
+}
+
+extern "C" unsigned char get_analog_mode()
+{
+  return OrangutanAnalog::getMode();
+}
+
+extern "C" unsigned int read_analog(unsigned char channel)
+{
+  return OrangutanAnalog::read(channel);
+}
+
+extern "C" unsigned int read_analog_average(unsigned char channel, unsigned int samples)
+{
+  return OrangutanAnalog::readAverage(channel, samples);
+}
+
+extern "C" unsigned int read_trimpot()
+{
+  return OrangutanAnalog::readTrimpot();
+}
+
+extern "C" int read_temperature_f()
+{
+  return OrangutanAnalog::readTemperatureF();
+}
+
+extern "C" int read_temperature_c()
+{
+  return OrangutanAnalog::readTemperatureC();
+}
+
+extern "C" void start_analog_conversion(unsigned char channel)
+{
+  OrangutanAnalog::startConversion(channel);
+}
+
+extern "C" unsigned char analog_is_converting()
+{
+  return OrangutanAnalog::isConverting();
+}
+
+extern "C" unsigned int conversion_result()
+{
+  return OrangutanAnalog::conversionResult();
+}
+
+extern "C" unsigned int to_millivolts(unsigned int analog_result)
+{
+  return OrangutanAnalog::toMillivolts(analog_result);
+}
+
 #endif
 
 
