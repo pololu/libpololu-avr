@@ -16,6 +16,7 @@ playFrequency	KEYWORD2
 playNote	KEYWORD2
 play	KEYWORD2	
 isPlaying	KEYWORD2
+stopPlaying	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
