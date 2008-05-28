@@ -342,151 +342,157 @@ void OrangutanBuzzer::stopPlaying()
 	sequence = 0;
 }
 
-// Returns the duration specified at sequence[*i] and increments
-// i to point to the character immediately after the duration
-// specification.
-unsigned int getDuration(const char *sequence, unsigned char *i)
+// Returns the numerical argument specified at sequence[*i] and
+// increments i to point to the character immediately after the
+// argument.
+unsigned int getNumber(const char *sequence, unsigned char *i)
 {
-  if(sequence[*i] == '6' && sequence[*i+1] == '4')
-  {
-    *i+=2;
-    return 16;
-  }
-  if(sequence[*i] == '3' && sequence[*i+1] == '2')
-  {
-    *i+=2;
-    return 32;
-  }
-  if(sequence[*i] == '1' && sequence[*i+1] == '6')
-  {
-    *i+=2;
-    return 64;
-  }
+	unsigned int arg = 0;
 
-  // definitely going to be a one-character duration
-  (*i)++;
-  
-  if(sequence[*i-1] == '8')
-    return 128;
-  if(sequence[*i-1] == '4')
-    return 256;
-  if(sequence[*i-1] == '2')
-    return 512;
-  if(sequence[*i-1] == '1')
-    return 1024;
+	// read all digits, one at a time
+	while(sequence[*i] >= '0' && sequence[*i] <= '9')
+	{
+		arg *= 10;
+		arg += sequence[*i]-'0';
+		(*i)++;
+	}
 
-  // unrecognized
-  return 256;
+	return arg;
 }
 
 void nextNote()
 {
-  static unsigned char i=0;
-  static unsigned char octave = 4;
-  static unsigned int duration = 256;
-  static unsigned int volume = 15;
 
-  unsigned char note = 0;
+	static unsigned char i=0;
 
-  while(!note)
-  {
-    if(sequence[i] == 0)
-    {
-      sequence = 0;
-      i = 0;
-    }
-    if(sequence == 0)
-      return;
-     
-    switch(sequence[i])
-    {
-    case 'c':
-      note = C(0);
-      break;
-    case 'd':
-      note = D(0);
-      break;
-    case 'e':
-      note = E(0);
-      break;
-    case 'f':
-      note = F(0);
-      break;
-    case 'g':
-      note = G(0);
-      break;
-    case 'a':
-      note = A(0);
-      break;
-    case 'b':
-      note = B(0);
-      break;
-    case '>':
-      octave ++;
-      i++;
-      continue;
-    case '<':
-      octave --;
-      i++;
-      continue;
-    case 'v':
-      i++;
-      if(sequence[i] == '1' && sequence[i+1] < '6' && sequence[i+1] >= '0')
-      {
-	volume = 10 + sequence[i+1]-'0';
-	i++;
-      }
-      else
-	volume = sequence[i]-'0';
-      i++;
-      continue;
-    case ' ':
-      i++;
-      continue;
-    case 'l':
-      i++;
-      duration = getDuration(sequence, &i);
-      continue;
-    default:
-      sequence = 0;
-      i = 0;
-      return;
-    }
+	static unsigned char octave = 4; // the current octave
 
-    i++;
+	static unsigned int tempo = 120; // the tempo, in quarter-notes per minute
+	static unsigned int duration = 500; // the duration of a note in ms
+	static unsigned int volume = 15; // the note volume
 
-    note += octave*12;
-	
-    while(sequence[i] == '+')
-    {
-      i++;
-      note ++;
-    }
-    while(sequence[i] == '-')
-    {
-      i++;
-      note --;
-    }
+	unsigned char note = 0;
+	unsigned char rest = 0;
+	unsigned char tmp_octave = octave; // the octave for this note
+	unsigned int tmp_duration; // the duration of this note
 
-    unsigned int tmp_duration = duration;
+	while(!note)
+	{
+		char c; // temporary variable
 
-    // if the input is 'c16', make it a 16th note, etc.
-    if(sequence[i] > '0' && sequence[i] < '9')
-      tmp_duration = getDuration(sequence, &i);
+		if(sequence[i] == 0)
+		{
+			sequence = 0;
+			i = 0;
+		}
+		if(sequence == 0)
+			return;
+	  
+		// Convert the current character to lower case.
+		c = sequence[i];
+		if(c >= 'A' && c <= 'Z')
+			c += 'a'-'A';
 
-    // handle dotted notes - the first dot adds 50%, and each
-    // additional dot adds 50% of the previous dot
-    unsigned int dot_add = tmp_duration/2;
-    while(sequence[i] == '.')
-    {
-      i++;
-      tmp_duration += dot_add;
-      dot_add /= 2;
-    }
+		// Advance to the next character.
+		i++;
 
-    OrangutanBuzzer::playNote(note, tmp_duration, volume);
-    return;
-  }
+		// Interpret the character.
+		switch(c)
+		{
+		case 'c':
+			note = C(0);
+			break;
+		case 'd':
+			note = D(0);
+			break;
+		case 'e':
+			note = E(0);
+			break;
+		case 'f':
+			note = F(0);
+			break;
+		case 'g':
+			note = G(0);
+			break;
+		case 'a':
+			note = A(0);
+			break;
+		case 'b':
+			note = B(0);
+			break;
+		case 'r':
+			// Rest - the note value doesn't matter.
+			rest = 1;
+			break;
+		case '>':
+			// shift the octave temporarily up
+			tmp_octave ++;
+			continue;
+		case '<':
+			// shift the octave temporarily down
+			tmp_octave --;
+			continue;
+		case 'o':
+			// set the octave permanently
+			octave = getNumber(sequence, &i);
+			tmp_octave = octave;
+			continue;
+		case 't':
+			// set the tempo
+			tempo = getNumber(sequence, &i);
+			duration = 60*400/tempo*10/tempo;
+			continue;
+		case 'v':
+			// set the volume
+			volume = getNumber(sequence, &i);
+			continue;
+		case ' ':
+			// ignore spaces
+			continue;
+		case 'l':
+			// set the default note duration
+			duration = 60*400/tempo*10/getNumber(sequence, &i);
+			continue;
+		default:
+			sequence = 0;
+			i = 0;
+			return;
+		}
+
+		note += tmp_octave*12;
+
+		// handle sharps and flats
+		while(sequence[i] == '+' || sequence[i] == '#')
+		{
+			i++;
+			note ++;
+		}
+		while(sequence[i] == '-')
+		{
+			i++;
+			note --;
+		}
+
+		// set the duration of just this note
+		tmp_duration = duration;
+
+		// If the input is 'c16', make it a 16th note, etc.
+		if(sequence[i] > '0' && sequence[i] < '9')
+			tmp_duration = 60*400/tempo*10/getNumber(sequence, &i);
+		
+		// Handle dotted notes - the first dot adds 50%, and each
+		// additional dot adds 50% of the previous dot.
+		unsigned int dot_add = tmp_duration/2;
+		while(sequence[i] == '.')
+		{
+			i++;
+			tmp_duration += dot_add;
+			dot_add /= 2;
+		}
+
+		OrangutanBuzzer::playNote(note, tmp_duration, rest ? 0 : volume);
+		return;
+	}
 
 }
 

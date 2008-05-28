@@ -2,12 +2,11 @@
 
 int main()
 {
+  play("T240 L8 V8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
+
   while(!button_is_pressed(BUTTON_B))
   {
     int battery_voltage;
-
-    if(!is_playing())
-      play("v8 l8 cdefg");
 
     set_analog_mode(MODE_10_BIT);
 

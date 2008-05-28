@@ -87,10 +87,46 @@ class OrangutanBuzzer
 	static void playNote(unsigned char note, unsigned int duration,
 				  unsigned char volume);
 
-	// plays the specified sequence of notes without requiring any further
-	// input from the user.  For example:
-	// play("l8 v10 a gafaeada c+adaeafa <a>a<b>ac+ada c+adaeaf");
-    // play("v12 >d cd<b->d<a>d<g>d <f+>d<g>d<a>d<b->d <d>d<e>d<f+>d<g>d <f+>d<g>d<a>d<b-4");
+
+	// Plays the specified sequence of notes without requiring any further
+	// input from the user.  Modeled after the PLAY commands in
+	// GW-BASIC, with just a few differences.
+	//
+	// The notes are specified by the characters C, D, E, F, G, A, and
+	// B, and they are played by default as "quarter notes" with a
+	// length of 500 ms.  This corresponds to a tempo of 120
+	// beats/min.  The special note R plays a rest (no sound).
+	//
+	// Various control characters alter the sound:
+	//   '>' plays the next note one octave higher
+	//
+	//   '<' plays the next note one octave lower
+	//
+	//   '+' or '#' after a note raises any note one half-step
+	//
+	//   '-' after a note lowers any note one half-step
+	//
+	//   '.' after a note "dots" it, increasing the length by
+	//       50%.  Each additional dot adds half as much as the
+	//       previous dot, so that "A.." is 1.75 times the length of
+	//       "A".
+	//
+	//   'O' followed by a number sets the octave (default: O4).
+	//
+	//   'T' followed by a number sets the tempo (default: T120).
+	//
+	//   'L' followed by a number sets the default note duration to
+	//       the type specified by the number: 4 for quarter notes, 8
+	//       for eighth notes, 16 for sixteenth notes, etc.
+	//
+	//   'V' followed by a number from 1-15 sets the music volume.
+	//
+	// The following plays a c major scale up and back down:
+	//   play("L16 V8 cdefgab>cbagfedc");
+	//
+	// Here is an example from Bach:
+	//   play("T240 L8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
+	
 	static void play(const char *sequence);
 
 	// Returns 1 if the buzzer is currently playing, otherwise it returns 0
