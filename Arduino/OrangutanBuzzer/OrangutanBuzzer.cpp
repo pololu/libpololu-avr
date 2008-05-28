@@ -30,6 +30,14 @@ volatile unsigned int buzzerTimeout = 0;	// keeps track of time limit for buzzer
 volatile unsigned char buzzerFinished = 1;	// flag: cleared while buzzer plays
 const char *sequence = 0;
 
+unsigned char i;
+
+unsigned char octave;	// the current octave
+
+unsigned int tempo;	// the tempo, in quarter-notes per minute
+unsigned int duration;	// the duration of a note in ms
+unsigned int volume;	// the note volume
+
 void nextNote();
 
 // Timer1 overflow interrupt
@@ -119,7 +127,7 @@ void OrangutanBuzzer::init2()
 	TCNT1 = 0;								// clear counter register
 
 	TIFR1 = 0xFF;							// clear all timer1 interrupt flags
-	ENABLE_TIMER1_INTERRUPT()				// overflow interrupt enabled
+	ENABLE_TIMER1_INTERRUPT();				// overflow interrupt enabled
 											//  all other timer1 ints disabled
 }
 
@@ -198,7 +206,7 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int duration,
 	if (volume > 15)
 		volume = 15;
 
-	DISABLE_TIMER1_INTERRUPT()			// disable interrupts while writing to 16-bit registers
+	DISABLE_TIMER1_INTERRUPT();			// disable interrupts while writing to 16-bit registers
 	TCCR1B = newTCCR1B;					// select timer 1 clock prescaler
 	OCR1A = newOCR1A;					// set timer 1 pwm frequency
 	OCR1B = OCR1A >> (16 - volume);		// set duty cycle (volume)
@@ -361,14 +369,19 @@ unsigned char OrangutanBuzzer::isPlaying()
 //
 //   'V' followed by a number from 1-15 sets the music volume.
 //
-// The following plays a c major scale up and back down:
-//   play("L16 V8 cdefgab>cbagfedc");
+// The following plays a quiet c major scale up and back down:
+//   play("V8 cdefgab>cbagfedc");
 //
 // Here is an example from Bach:
 //   play("T240 L8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
 void OrangutanBuzzer::play(const char *notes)
 {
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
+	i=0;
+	octave = 4; // the current octave
+	tempo = 120; // the tempo, in quarter-notes per minute
+	duration = 500; // the duration of a note in ms
+	volume = 15; // the note volume
 	sequence = notes;
 	nextNote();
 	ENABLE_TIMER1_INTERRUPT();	// re-enable interrupts
@@ -409,15 +422,6 @@ unsigned int getNumber(const char *sequence, unsigned char *i)
 
 void nextNote()
 {
-
-	static unsigned char i=0;
-
-	static unsigned char octave = 4; // the current octave
-
-	static unsigned int tempo = 120; // the tempo, in quarter-notes per minute
-	static unsigned int duration = 500; // the duration of a note in ms
-	static unsigned int volume = 15; // the note volume
-
 	unsigned char note = 0;
 	unsigned char rest = 0;
 	unsigned char tmp_octave = octave; // the octave for this note
