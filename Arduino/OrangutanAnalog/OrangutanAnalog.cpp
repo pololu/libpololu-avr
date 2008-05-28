@@ -76,7 +76,7 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 // The trimpot is on ADC channel 7
 unsigned int OrangutanAnalog::readTrimpot()
 {
-	return readAverage(7, 20);
+	return readAverage(TRIMPOT, 20);
 }
 
 
@@ -86,7 +86,7 @@ unsigned int OrangutanAnalog::readTrimpot()
 // the accuracy of the temperature sensor is +/- 2 C.
 int OrangutanAnalog::readTemperatureF()
 {
-	unsigned int adcResult = readAverage(6, 20) * 18;
+	unsigned int adcResult = readAverage(TEMP_SENSOR, 20) * 18;
 	if (getMode())							// if 8-bit mode
 		return adcResult - 40;
 	return ((adcResult + 2) >> 2) - 40;

@@ -10,6 +10,8 @@
 
 #define MODE_8_BIT		1
 #define MODE_10_BIT		0
+#define TRIMPOT			7
+#define TEMP_SENSOR		6
 
 
 class OrangutanAnalog
