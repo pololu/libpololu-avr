@@ -53,7 +53,7 @@ class OrangutanLCD
 
 	// Go to an (X,Y) location on the LCD.  The top line is Y=0, the 
 	// leftmost character is X=0.
-	void gotoXY(unsigned char x, unsigned char y);
+	static void gotoXY(unsigned char x, unsigned char y);
 
 	// Shows the cursor as either a BLINKING or SOLID block
 	// cursorType should be either CURSOR_BLINKING or CURSOR_SOLID

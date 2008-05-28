@@ -7,16 +7,15 @@ CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_ORANGUTAN -ffunction-sect
 CPP=avr-g++
 CC=avr-gcc
 
-LIBRARY_OBJECT_FILES1=\
-	OrangutanMotors/OrangutanMotors.o \
-	OrangutanBuzzer/OrangutanBuzzer.o \
-	OrangutanPushbuttons/OrangutanPushbuttons.o \
-	OrangutanLCD/OrangutanLCD.o \
-	OrangutanDelay/OrangutanDelay.o \
-	OrangutanLEDs/OrangutanLEDs.o \
-	OrangutanLineSensors/OrangutanLineSensors.o
+LIBRARY_OBJECT_FILES=\
+	../Arduino/OrangutanMotors/OrangutanMotors.o \
+	../Arduino/OrangutanBuzzer/OrangutanBuzzer.o \
+	../Arduino/OrangutanPushbuttons/OrangutanPushbuttons.o \
+	../Arduino/OrangutanLCD/OrangutanLCD.o \
+	../Arduino/OrangutanLEDs/OrangutanLEDs.o
 
-LIBRARY_OBJECT_FILES=$(addprefix ../Arduino/,$(LIBRARY_OBJECT_FILES1))
+#	OrangutanDelay/OrangutanDelay.o \
+#	OrangutanLineSensors/OrangutanLineSensors.o
 
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lorangutan -lm

@@ -52,17 +52,17 @@ ISR(TIMER2_OVF_vect)
 
 extern "C" void set_m1_speed(int speed)
 {
-  OrangutanMotors.setM1Speed(speed);
+  OrangutanMotors::setM1Speed(speed);
 }
 
 extern "C" void set_m2_speed(int speed)
 {
-  OrangutanMotors.setM2Speed(speed);
+  OrangutanMotors::setM2Speed(speed);
 }
 
 extern "C" void set_motors(int m1, int m2)
 {
-  OrangutanMotors.setSpeeds(m1, m2);
+  OrangutanMotors::setSpeeds(m1, m2);
 }
 
 #endif

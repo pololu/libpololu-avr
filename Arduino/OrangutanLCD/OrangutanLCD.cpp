@@ -173,17 +173,17 @@ extern "C" void lcd_init()
 
 extern "C" void clear()
 {
-  lcd.clear();
+  OrangutanLCD::clear();
 }
 
 extern "C" void print(const char *str)
 {
-  lcd.print(str);
+  OrangutanLCD::print(str);
 }
 
 extern "C" void print_long(long value)
 {
-  lcd.print(value);
+  OrangutanLCD::print(value);
 }
 #endif
 

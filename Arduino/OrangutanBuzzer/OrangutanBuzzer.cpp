@@ -1,5 +1,5 @@
 /*
-  OrangutanBuzzer.h - Library for controlling the buzzer on the
+  OrangutanBuzzer::h - Library for controlling the buzzer on the
       Orangutan LV-168
   Written by Ben Schmidel, May 23, 2008.
   Released into the public domain.
@@ -55,23 +55,23 @@ OrangutanBuzzer::OrangutanBuzzer()
 extern "C" void play_frequency(unsigned int freq, unsigned int duration, 
 			       unsigned char volume)
 {
-  OrangutanBuzzer.playFrequency(freq, duration, volume);
+  OrangutanBuzzer::playFrequency(freq, duration, volume);
 }
 
 extern "C" void play_note(unsigned char note, unsigned int duration,
 			  unsigned char volume)
 {
-  OrangutanBuzzer.playNote(note, duration, volume);
+  OrangutanBuzzer::playNote(note, duration, volume);
 }
 
 extern "C" void play(char *sequence)
 {
-  OrangutanBuzzer.play(sequence);
+  OrangutanBuzzer::play(sequence);
 }
 
 extern "C" unsigned char is_playing()
 {
-  return OrangutanBuzzer.isPlaying();
+  return OrangutanBuzzer::isPlaying();
 }
 
 #endif

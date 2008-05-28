@@ -12,15 +12,12 @@ int main()
   clear();
   print("Go!");
 
-  leds_init();
-  motors_init();
-  //line_sensors_init();
   //print("int %d", 5);
 
   while(1)
   {
-    unsigned int sensors[5];
-    read_line_sensors(sensors);
+    unsigned int sensors[5] = {1,2,3,4,5};
+    //    read_line_sensors(sensors);
 
     if(sensors[1] > sensors[3])
     {

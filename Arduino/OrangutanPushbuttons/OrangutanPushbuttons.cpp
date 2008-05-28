@@ -1,5 +1,5 @@
 /*
-  OrangutanPushbuttons.h - Library for using the thee user pushbuttons on the
+  OrangutanPushbuttons::h - Library for using the thee user pushbuttons on the
       Orangutan LV-168
   Written by Ben Schmidel, May 23, 2008.
   Released into the public domain.
@@ -25,22 +25,22 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {
-  return OrangutanPushbuttons.waitForPress(buttons);
+  return OrangutanPushbuttons::waitForPress(buttons);
 }
 
 extern "C" unsigned char wait_for_button_release(unsigned char buttons)
 {
-  return OrangutanPushbuttons.waitForRelease(buttons);
+  return OrangutanPushbuttons::waitForRelease(buttons);
 }
 
 extern "C" unsigned char wait_for_button(unsigned char buttons)
 {
-  return OrangutanPushbuttons.waitForButton(buttons);
+  return OrangutanPushbuttons::waitForButton(buttons);
 }
 
 extern "C" unsigned char button_is_pressed(unsigned char buttons)
 {
-  return OrangutanPushbuttons.isPressed(buttons);
+  return OrangutanPushbuttons::isPressed(buttons);
 }
 
 #endif
