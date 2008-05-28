@@ -92,8 +92,8 @@
 #define F_CPU 20000000UL	// the Orangutan LV-168 runs at 20 MHz
 #endif //!F_CPU
 #include <util/delay.h>
-#include "private/OrangutanLCDPrivate.h"	// contains all of the macros
-#include "OrangutanLCD.h"
+#include "include/OrangutanLCDPrivate.h"	// contains all of the macros
+#include "include/OrangutanLCD.h"
 
 
 
