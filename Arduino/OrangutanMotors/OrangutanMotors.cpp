@@ -79,9 +79,11 @@ OrangutanMotors::OrangutanMotors()
 // to the motor drivers
 void OrangutanMotors::init2()
 {
+#ifndef LIB_ORANGUTAN
 	TIMSK0 &= ~(1 << TOIE0);	// timer0 overflow interrupt disabled
 	TIMSK2 |= 1 << TOIE2;		// timer2 overflow interrupt enabled
-	sei();						// global interrupt enable
+	// we intentionally do not call sei() here
+#endif
 
 	// configure for inverted PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
