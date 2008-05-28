@@ -6,8 +6,18 @@ LIB=$(PREFIX)/lib
 CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_ORANGUTAN -ffunction-sections -Os
 CPP=avr-g++
 CC=avr-gcc
-LIBRARY_OBJECT_FILES=OrangutanMotors.o OrangutanBuzzer.o OrangutanPushbuttons.o OrangutanLCD.o \
-	OrangutanDelay.o OrangutanLEDs.o OrangutanLineSensors.o
+
+LIBRARY_OBJECT_FILES1=\
+	OrangutanMotors/OrangutanMotors.o \
+	OrangutanBuzzer/OrangutanBuzzer.o \
+	OrangutanPushbuttons/OrangutanPushbuttons.o \
+	OrangutanLCD/OrangutanLCD.o \
+	OrangutanDelay/OrangutanDelay.o \
+	OrangutanLEDs/OrangutanLEDs.o \
+	OrangutanLineSensors/OrangutanLineSensors.o
+
+LIBRARY_OBJECT_FILES=$(addprefix ../Arduino/,$(LIBRARY_OBJECT_FILES1))
+
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lorangutan -lm
 # -Wl,-u,vfprintf -lprintf_flt
@@ -15,8 +25,6 @@ LDFLAGS=-Wl,-gc-sections -L. -lorangutan -lm
 PORT=/dev/ttyUSB0
 AVRDUDE=/usr/bin/avrdude
 TARGET=test
-
-all: $(TARGET).hex
 
 liborangutan.a: $(LIBRARY_OBJECT_FILES)
 	avr-ar rs liborangutan.a $(LIBRARY_OBJECT_FILES)
