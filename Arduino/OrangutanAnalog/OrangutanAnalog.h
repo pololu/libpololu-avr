@@ -8,7 +8,7 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
-#define MODE_8_BIT		(1 << ADLAR)
+#define MODE_8_BIT		1
 #define MODE_10_BIT		0
 
 
@@ -35,21 +35,22 @@ class OrangutanAnalog
 	// For example: if (getMode() == MODE_8_BIT) ...
 	static inline unsigned char getMode()
 	{
-		return ADMUX & (1 << ADLAR);
+		return ADMUX & (1 << ADLAR) ? 1 : 0;
 	}
 
 	// take a single analog reading of the specified channel
 	static unsigned int read(unsigned char channel);
 	
 	// take 'sample' readings of the specified channel and return the average
-	static unsigned int readAvg(unsigned char channel, unsigned int samples);
+	static unsigned int readAverage(unsigned char channel, 
+									  unsigned int samples);
 	
-	// returns the position of the trimpot (4 readings averaged together).
+	// returns the position of the trimpot (20 readings averaged together).
 	// The trimpot is on ADC channel 7
 	static unsigned int readTrimpot();
 	
 	// returns the output of the LV-168's temperature sensor in tenths of a 
-	// degree F or C (4 readings averaged together).  The temperature sensor 
+	// degree F or C (20 readings averaged together).  The temperature sensor 
 	// is on ADC channel 6.
 	static int readTemperatureF();
 	static int readTemperatureC();

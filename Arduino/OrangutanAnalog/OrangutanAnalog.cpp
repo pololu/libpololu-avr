@@ -22,6 +22,12 @@ OrangutanAnalog::OrangutanAnalog()
 }
 
 
+// the following method can be used to initiate an ADC conversion
+// that runs in the background, allowing the CPU to perform other tasks
+// while the conversion is in progress.  The procedure is to start a
+// conversion on a channel with startConversion(channel), and then
+// poll isConverting in your main loop.  Once isConverting() returns
+// a zero, the result can be obtained through a call to conversionResult().
 void OrangutanAnalog::startConversion(unsigned char channel)
 {
 	ADCSRA = 0x87;		// bit 7 set: ADC enabled
@@ -36,6 +42,7 @@ void OrangutanAnalog::startConversion(unsigned char channel)
 }
 
 
+// take a single analog reading of the specified channel
 unsigned int OrangutanAnalog::read(unsigned char channel)
 {
 	startConversion(channel);
@@ -44,8 +51,9 @@ unsigned int OrangutanAnalog::read(unsigned char channel)
 }
 
 
-unsigned int OrangutanAnalog::readAvg(unsigned char channel, 
-										unsigned int samples)
+// take 'sample' readings of the specified channel and return the average
+unsigned int OrangutanAnalog::readAverage(unsigned char channel, 
+											unsigned int samples)
 {
 	unsigned int i = samples;
 	unsigned long sum = 0;
@@ -64,28 +72,31 @@ unsigned int OrangutanAnalog::readAvg(unsigned char channel,
 }
 
 
+// returns the position of the trimpot (20 readings averaged together).
+// The trimpot is on ADC channel 7
 unsigned int OrangutanAnalog::readTrimpot()
 {
-	return readAvg(7, 4);
+	return readAverage(7, 20);
 }
 
 
 // The temperature sensor reading can be converted into degrees C as follows:
 //   T = (Vout - 0.4) / 0.0195 Celcius
-// The return value of this function is tenths of a degree Celcius, although
+// The return value of this function is tenths of a degree Farenheit, although
 // the accuracy of the temperature sensor is +/- 2 C.
-int OrangutanAnalog::readTemperatureC()
-{
-	unsigned int adcResult = readAvg(6, 4);
-	if (getMode())							// if 8-bit mode
-		return adcResult * 10 - 200;
-	return (adcResult >> 2) * 10 - 200;
-}
-
-// The return value of this function is tenths of a degree Farenheit.
 int OrangutanAnalog::readTemperatureF()
 {
-	return (readTemperatureC() * 9 + 3) / 5 + 320;
+	unsigned int adcResult = readAverage(6, 20) * 18;
+	if (getMode())							// if 8-bit mode
+		return adcResult - 40;
+	return ((adcResult + 2) >> 2) - 40;
+}
+
+
+// The return value of this function is tenths of a degree Celcius.
+int OrangutanAnalog::readTemperatureC()
+{
+	return ((readTemperatureF() - 320) * 5 + 5) / 9;
 }
 
 

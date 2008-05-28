@@ -1,20 +1,32 @@
 #######################################
-# Syntax Coloring Map OrangutanLEDs
+# Syntax Coloring Map OrangutanAnalog
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-OrangutanLEDs	KEYWORD1
+OrangutanAnalog	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-red	KEYWORD2
-green	KEYWORD2	
+setMode	KEYWORD2
+getMode	KEYWORD2
+read	KEYWORD2
+readAvg	KEYWORD2
+readTrimpot	KEYWORD2
+readTemperatureF	KEYWORD2
+readTemperatureC	KEYWORD2
+startConversion	KEYWORD2
+isConverting	KEYWORD2
+conversionResult	KEYWORD2
+toMillivolts	KEYWORD2	
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+MODE_8_BIT	LITERAL1
+MODE_10_BIT	LITERAL1
