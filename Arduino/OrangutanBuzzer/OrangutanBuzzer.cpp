@@ -212,6 +212,7 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int duration,
 	OCR1B = OCR1A >> (16 - volume);		// set duty cycle (volume)
 	buzzerTimeout = timeout;			// set buzzer duration
 	ENABLE_TIMER1_INTERRUPT();
+	sei();
 }
 
 
