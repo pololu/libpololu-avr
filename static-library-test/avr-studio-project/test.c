@@ -15,9 +15,10 @@ void display_readings(const unsigned int *calibrated_values)
 int main()
 {
 	unsigned int counter;
-	int last_y=0;
 
 	pololu_3pi_init(2000);
+
+	// display temperature and wait for button press
   
 	while(!button_is_pressed(BUTTON_B))
 	{
@@ -34,6 +35,8 @@ int main()
 
 	wait_for_button_release(BUTTON_B);
 	delay_ms(500);
+
+	// auto-calibration
 
 	for(counter=0;counter<80;counter++)
 	{
@@ -52,6 +55,8 @@ int main()
 	}
 	set_motors(0,0);
 
+	// display calibrated values
+
 	while(!button_is_pressed(BUTTON_B))
 	{
 		unsigned int sensors[5] = {1,2,3,4,5};
@@ -67,39 +72,25 @@ int main()
 	wait_for_button_release(BUTTON_B);
 
 	clear();
-	print("Go!");
-	
-		
 
-		delay_ms(500);
+	play("L16 cdegreg4");
 
-		while(1)
-		{
-			unsigned int sensors[5] = {1,2,3,4,5};
-			unsigned int position = read_line(sensors);
-			int y = ((signed int)position) - 2000;
-			int dy = y - last_y;
-			int diff = y/6 + 5*dy; // the amount to turn RIGHT
-			int m1, m2;
+	print("Go!");		
 
-			m1 = 255 + diff;
-			m2 = 255 - diff;
+	while(is_playing());
 
-			if(m1 > 255)
-				m1 = 255;
-			if(m1 < 0)
-				m1 = 0;
-			if(m2 > 255)
-				m2 = 255;
-			if(m2 < 0)
-				m2 = 0;
+	while(1)
+	{
+		unsigned int sensors[5] = {1,2,3,4,5};
+		unsigned int position = read_line(sensors);
 
-			set_motors(m1,m2);
+		if(position < 2000)
+			set_motors(0,100);
+		else
+			set_motors(100,0);
+	}
 
-			last_y = y;
-		}
-
-		return 0;
+	return 0;
 }
 
 // Local Variables: **
