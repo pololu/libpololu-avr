@@ -35,6 +35,10 @@ unsigned char octave;	// the current octave
 unsigned int whole_note_duration;	// the duration of a whole note
 unsigned int duration;	// the duration of a note in ms
 unsigned int volume;	// the note volume
+unsigned char staccato; // true if playing staccato
+unsigned char staccato_rest_duration; // set to the duration of a staccato
+								  // rest, or zero if it is time to
+								  // play a note
 
 void nextNote();
 
@@ -380,6 +384,7 @@ void OrangutanBuzzer::play(const char *notes)
 	whole_note_duration = 2000; // the whole note duration
 	duration = 500; // the duration of a note in ms
 	volume = 15; // the note volume
+	staccato = 0;
 	sequence = notes;
 	nextNote();
 	ENABLE_TIMER1_INTERRUPT();	// re-enable interrupts
@@ -433,6 +438,14 @@ void nextNote()
 
 	char c; // temporary variable
 
+	// if we are playing staccato, after every note we play a rest
+	if(staccato && staccato_rest_duration)
+	{
+		OrangutanBuzzer::playNote(20, staccato_rest_duration, 0);
+		staccato_rest_duration = 0;
+		return;
+	}
+
  parse_character:
 
 	// Convert the current character to lower case.
@@ -482,6 +495,17 @@ void nextNote()
 		// set the default note duration
 		duration = getDuration();
 		goto parse_character;
+	case 'm':
+		// set music staccato or legato
+		if(sequence[0] == 'l' || sequence[0] == 'L')
+			staccato = false;
+		else
+		{
+			staccato = true;
+			staccato_rest_duration = 0;
+		}
+		sequence++;
+		goto parse_character;
 	case 'o':
 		// set the octave permanently
 		octave = getNumber();
@@ -490,7 +514,7 @@ void nextNote()
 	case 'r':
 		// Rest - the note value doesn't matter.
 		rest = 1;
-		goto parse_character;
+		break;
 	case 't':
 		// set the tempo
 		whole_note_duration = 60*400/getNumber()*10;
@@ -536,6 +560,11 @@ void nextNote()
 		dot_add /= 2;
 	}
 
+	if(staccato)
+	{
+		staccato_rest_duration = tmp_duration / 2;
+		tmp_duration -= staccato_rest_duration;
+	}
 	OrangutanBuzzer::playNote(note, tmp_duration, rest ? 0 : volume);
 }
 

@@ -23,8 +23,12 @@ int main()
   print("Go!");
 
   delay_ms(500);
-
-  //  play("T240 L8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
+  play("T120 V8 L16" 
+       "agafaea dac+adaea fa<aa<bac#a dac#adaea f"
+       "O5 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad "
+       "O5 L8 MS <b-d<b-d ML e-<ge-<g MS c<ac<a ML d<fd<f O4 MS b-gb-g ML >c#e>c#e"
+       "MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"
+       );
 
   while(1)
   {
