@@ -34,7 +34,7 @@ unsigned char i;
 
 unsigned char octave;	// the current octave
 
-unsigned int whole_note_duration;	// the duration of a whole note
+unsigned int tempo;	// the tempo, in quarter-notes per minute
 unsigned int duration;	// the duration of a note in ms
 unsigned int volume;	// the note volume
 
@@ -379,7 +379,7 @@ void OrangutanBuzzer::play(const char *notes)
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
 	i=0;
 	octave = 4; // the current octave
-	whole_note_duration = 2000; // the whole note duration
+	tempo = 120; // the tempo, in quarter-notes per minute
 	duration = 500; // the duration of a note in ms
 	volume = 15; // the note volume
 	sequence = notes;
@@ -404,26 +404,21 @@ void OrangutanBuzzer::stopPlaying()
 // Returns the numerical argument specified at sequence[*i] and
 // increments i to point to the character immediately after the
 // argument.
-unsigned int getNumber()
+unsigned int getNumber(const char *sequence, unsigned char *i)
 {
 	unsigned int arg = 0;
 
 	// read all digits, one at a time
-	while(sequence[i] >= '0' && sequence[i] <= '9')
+	while(sequence[*i] >= '0' && sequence[*i] <= '9')
 	{
 		arg *= 10;
-		arg += sequence[i]-'0';
-		i++;
+		arg += sequence[*i]-'0';
+		(*i)++;
 	}
 
 	return arg;
 }
 
-// Returns whole_note_duration/getNumber()
-unsigned int getDuration()
-{
-	return whole_note_duration/getNumber();
-}
 
 void nextNote()
 {
@@ -455,23 +450,6 @@ void nextNote()
 		// Interpret the character.
 		switch(c)
 		{
-		case ' ':
-			// ignore spaces
-			continue;
-		case '>':
-			// shift the octave temporarily up
-			tmp_octave ++;
-			continue;
-		case '<':
-			// shift the octave temporarily down
-			tmp_octave --;
-			continue;
-		case 'a':
-			note = A(0);
-			break;
-		case 'b':
-			note = B(0);
-			break;
 		case 'c':
 			note = C(0);
 			break;
@@ -487,37 +465,50 @@ void nextNote()
 		case 'g':
 			note = G(0);
 			break;
-		case 'l':
-			// set the default note duration
-			duration = getDuration();
+		case 'a':
+			note = A(0);
 			break;
-		case 'o':
-			// set the octave permanently
-			octave = getNumber();
-			tmp_octave = octave;
+		case 'b':
+			note = B(0);
 			break;
 		case 'r':
 			// Rest - the note value doesn't matter.
 			rest = 1;
 			break;
+		case '>':
+			// shift the octave temporarily up
+			tmp_octave ++;
+			continue;
+		case '<':
+			// shift the octave temporarily down
+			tmp_octave --;
+			continue;
+		case 'o':
+			// set the octave permanently
+			octave = getNumber(sequence, &i);
+			tmp_octave = octave;
+			continue;
 		case 't':
 			// set the tempo
-			whole_note_duration = 60*400/getNumber()*10;
-			duration = whole_note_duration/4;
-			break;
+			tempo = getNumber(sequence, &i);
+			duration = 60*400/tempo*10/tempo;
+			continue;
 		case 'v':
 			// set the volume
-			volume = getNumber();
-			break;
+			volume = getNumber(sequence, &i);
+			continue;
+		case ' ':
+			// ignore spaces
+			continue;
+		case 'l':
+			// set the default note duration
+			duration = 60*400/tempo*10/getNumber(sequence, &i);
+			continue;
 		default:
 			sequence = 0;
 			i = 0;
 			return;
 		}
-
-		// go back if we didn't get the note yet
-		if(!note)
-			continue;
 
 		note += tmp_octave*12;
 
@@ -538,8 +529,8 @@ void nextNote()
 
 		// If the input is 'c16', make it a 16th note, etc.
 		if(sequence[i] > '0' && sequence[i] < '9')
- 			tmp_duration = getDuration();
-
+			tmp_duration = 60*400/tempo*10/getNumber(sequence, &i);
+		
 		// Handle dotted notes - the first dot adds 50%, and each
 		// additional dot adds 50% of the previous dot.
 		unsigned int dot_add = tmp_duration/2;
