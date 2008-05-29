@@ -1,9 +1,9 @@
 PREFIX=/usr/avr
 INCLUDE=$(PREFIX)/include
-INCLUDE_ORANGUTAN=$(INCLUDE)/orangutan
+INCLUDE_POLOLU=$(INCLUDE)/pololu
 LIB=$(PREFIX)/lib
 
-CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_ORANGUTAN -ffunction-sections -Os
+CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_POLOLU -ffunction-sections -Os
 CPP=avr-g++
 CC=avr-gcc
 
@@ -21,15 +21,15 @@ LIBRARY_OBJECT_FILES=\
 #	OrangutanLineSensors/OrangutanLineSensors.o
 
 OBJ2HEX=avr-objcopy 
-LDFLAGS=-Wl,-gc-sections -L. -lorangutan -lm
+LDFLAGS=-Wl,-gc-sections -L. -lpololu -lm
 # -Wl,-u,vfprintf -lprintf_flt
 # -Wl,-u,vfprintf -lprintf_min
 PORT=/dev/ttyUSB0
 AVRDUDE=/usr/bin/avrdude
 TARGET=test
 
-liborangutan.a: $(LIBRARY_OBJECT_FILES)
-	avr-ar rs liborangutan.a $(LIBRARY_OBJECT_FILES)
+libpololu.a: $(LIBRARY_OBJECT_FILES)
+	avr-ar rs libpololu.a $(LIBRARY_OBJECT_FILES)
 
 %.o:%.cpp
 	$(CPP) $(CFLAGS) $< -c -o $@
@@ -40,15 +40,9 @@ clean:
 %.hex : %.obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
 
-test.obj: test.o liborangutan.a
-	$(CC) $(CFLAGS) test.o $(LDFLAGS) -o $@
-
-test-cpp.obj: test-cpp.o OrangutanLCD.o OrangutanLineSensors.o
-	$(CC) $(CFLAGS) test-cpp.o OrangutanLCD.o OrangutanLineSensors.o $(LDFLAGS) -o $@
-
-install: liborangutan.a
+install: libpololu.a
 	install -d $(LIB)
-	install -d $(INCLUDE_ORANGUTAN)
-	install -t $(LIB) liborangutan.a
-	install orangutan_install.h $(INCLUDE)/orangutan.h
-	install -t $(INCLUDE_ORANGUTAN) orangutan/*.h
+	install -d $(INCLUDE_POLOLU)
+	install -t $(LIB) libpololu.a
+	install pololu_install.h $(INCLUDE)/pololu.h
+	install -t $(INCLUDE_POLOLU) pololu/*.h
