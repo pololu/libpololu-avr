@@ -30,19 +30,21 @@
 #define DISABLE_TIMER1_INTERRUPT()	TIMSK1 = 0
 
 
-volatile unsigned int buzzerTimeout = 0;	// keeps track of time limit for buzzer
-volatile unsigned char buzzerFinished = 1;	// flag: cleared while buzzer plays
-const char *sequence = 0;
+// declaring these globals as static means they won't conflict
+// with globals in other .cpp files that share the same name
+static volatile unsigned int buzzerTimeout = 0;		// tracks buzzer time limit
+static volatile unsigned char buzzerFinished = 1;	// flag: 0 while playing
+static const char *sequence = 0;
 
-unsigned char octave;	// the current octave
+static unsigned char octave;				// the current octave
 
-unsigned int whole_note_duration;	// the duration of a whole note
-unsigned int duration;	// the duration of a note in ms
-unsigned int volume;	// the note volume
-unsigned char staccato; // true if playing staccato
-unsigned char staccato_rest_duration; // set to the duration of a staccato
-								  // rest, or zero if it is time to
-								  // play a note
+static unsigned int whole_note_duration;	// the duration of a whole note
+static unsigned int duration;				// the duration of a note in ms
+static unsigned int volume;				// the note volume
+static unsigned char staccato; 			// true if playing staccato
+static unsigned char staccato_rest_duration;	// duration of a staccato
+												//  rest, or zero if it is time
+												//  to play a note
 
 void nextNote();
 
@@ -70,16 +72,16 @@ OrangutanBuzzer::OrangutanBuzzer()
 
 #ifdef LIB_POLOLU
 
-extern "C" void play_frequency(unsigned int freq, unsigned int duration, 
+extern "C" void play_frequency(unsigned int freq, unsigned int dur, 
 							   unsigned char volume)
 {
-	OrangutanBuzzer::playFrequency(freq, duration, volume);
+	OrangutanBuzzer::playFrequency(freq, dur, volume);
 }
 
-extern "C" void play_note(unsigned char note, unsigned int duration,
+extern "C" void play_note(unsigned char note, unsigned int dur,
 						  unsigned char volume)
 {
-	OrangutanBuzzer::playNote(note, duration, volume);
+	OrangutanBuzzer::playNote(note, dur, volume);
 }
 
 extern "C" void play(char *sequence)
@@ -146,7 +148,7 @@ void OrangutanBuzzer::init2()
 //   greater than 1 kHz.  For example, the max duration you can use for a
 //   frequency of 10 kHz is 6553 ms.  If you use a duration longer than this,
 //   you will cause an integer overflow that produces unexpected behavior.
-void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int duration, 
+void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur, 
 				   					unsigned char volume)
 {
 	unsigned int newOCR1A;
@@ -200,9 +202,9 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int duration,
 		freq = (freq + 5) / 10;
 
 	if (freq == 1000)
-		timeout = duration;	// duration for silent notes is exact
+		timeout = dur;	// duration for silent notes is exact
 	else
-		timeout = (unsigned int)((long)duration * freq / 1000);
+		timeout = (unsigned int)((long)dur * freq / 1000);
 
 	if (volume == 0)
 		DDRB &= ~(1 << PB2);		// buzzer pin->input (silence buz.)
@@ -232,7 +234,7 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int duration,
 //   greater than 1 kHz.  For example, the max duration you can use for a
 //   frequency of 10 kHz is 6553 ms.  If you use a duration longer than this,
 //   you will cause an integer overflow that produces unexpected behavior.
-void OrangutanBuzzer::playNote(unsigned char note, unsigned int duration,
+void OrangutanBuzzer::playNote(unsigned char note, unsigned int dur,
 							   unsigned char volume)
 {
 	// note = key + octave * 12, where 0 <= key < 12
@@ -266,7 +268,7 @@ void OrangutanBuzzer::playNote(unsigned char note, unsigned int duration,
 	if (note == SILENT_NOTE || volume == 0)
 	{
 		freq = 1000;	// silent notes => use 1kHz freq (for cycle counter)
-		playFrequency(freq, duration, 0);
+		playFrequency(freq, dur, 0);
 		return;
 	}
 
@@ -332,7 +334,7 @@ void OrangutanBuzzer::playNote(unsigned char note, unsigned int duration,
 
 	if (volume > 15)
 		volume = 15;
-	playFrequency(freq, duration, volume);	// set buzzer this freq/duration
+	playFrequency(freq, dur, volume);	// set buzzer this freq/duration
 }
 
 
