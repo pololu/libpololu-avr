@@ -1,3 +1,20 @@
+/*
+  PololuQTRRC.cpp - Library for using Pololu QTR-1RC or QTR-8RC reflectance
+	sensors.  Simply specify in the constructor which Arduino I/O pins are
+	connected to a QTR-RC sensor, and then the read() method will obtain
+	reflectance measurements for those sensors.  The sensor values returned
+	are pulse lengths measured in microseconds, with shorter pulses
+	corresponding to higher reflectance.
+  Written by Ben Schmidel and Paul Grayson, May 28, 2008.
+  http://www.pololu.com
+  http://forum.pololu.com
+  Released into the public domain.
+  
+  Disclaimer: To the extent permitted by law, Pololu Corporation provides
+  this work without any warranty.  It may be defective, in which case you
+  agree to be responsible for all resulting costs and damages.
+*/
+
 #ifndef F_CPU
 #define F_CPU 20000000UL
 #endif
@@ -6,42 +23,43 @@
 
 #include "PololuQTRRC.h"
 
-unsigned char _bitmask[8];
-volatile unsigned char* _register[8];
-unsigned char _numSensors;
-unsigned int _timeout_us;
-unsigned char _emitterBitmask;
-volatile unsigned char* _emitterPORT;
-volatile unsigned char* _emitterDDR;
-	
-unsigned char _portBMask;
-unsigned char _portCMask;
-unsigned char _portDMask;
 
 #ifdef LIB_POLOLU
-PololuQTRRC *qtr;
+PololuQTRRC qtr;
 
 extern "C" void qtr_emitters_on()
 {
-	PololuQTRRC::emittersOn();
+	qtr.emittersOn();
 }
 
 extern "C" void qtr_emitters_off()
 {
-	PololuQTRRC::emittersOff();
+	qtr.emittersOff();
 }
 
 extern "C" void qtr_rc_init(unsigned char* pins, unsigned char numSensors, 
 			    unsigned int timeout_us, unsigned char emitterPin)
 {
-	PololuQTRRC::init(pins, numSensors, timeout_us, emitterPin);
+	qtr.init(pins, numSensors, timeout_us, emitterPin);
 }
 
 // returns 5 raw RC sensor values
 extern "C" void read_line_sensors(unsigned int *sensor_values) {
-	PololuQTRRC::read(sensor_values);
+	qtr.read(sensor_values);
 }
 #endif
+
+// Constructors
+PololuQTRRC::PololuQTRRC()
+{
+
+}
+
+PololuQTRRC::PololuQTRRC(unsigned char* pins, unsigned char numSensors, 
+	unsigned int timeout_us, unsigned char emitterPin)
+{
+	init(pins, numSensors, timeout_us, emitterPin);
+}
 
 // the array 'pins' contains the Arduino pin assignment for each
 // sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
@@ -133,6 +151,14 @@ void PololuQTRRC::init(unsigned char* pins, unsigned char numSensors,
 }
 
 
+// Reads the sensor values into an array. There *MUST* be space
+// for as many values as there were sensors specified in the constructor.
+// Example usage:
+// unsigned int sensor_values[8];
+// sensors.read(sensor_values);
+// ...
+// The values returned are in microseconds and range from 0 to
+// timeout_us (as specified in the constructor).
 void PololuQTRRC::read(unsigned int *sensor_values)
 {
 	unsigned char i;
@@ -218,6 +244,10 @@ void PololuQTRRC::read(unsigned int *sensor_values)
 }
 
 
+// Turn the IR LEDs off and on.  This is mainly for use by the
+// readLineSensors method, and calling these functions before or
+// after the reading the sensors will have no effect on the
+// readings, but you may wish to use these for testing purposes.
 void PololuQTRRC::emittersOff()
 {
 	if (_emitterDDR == 0)

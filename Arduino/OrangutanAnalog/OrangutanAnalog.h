@@ -3,8 +3,15 @@
 	Orangutan LV-168 and Baby Orangutan B.  This library also provides a
 	method for reading the temperature sensor on the LV-168.
   Written by Ben Schmidel, May 27, 2008.
+  http://www.pololu.com
+  http://forum.pololu.com
   Released into the public domain.
+  
+  Disclaimer: To the extent permitted by law, Pololu Corporation provides
+  this work without any warranty.  It may be defective, in which case you
+  agree to be responsible for all resulting costs and damages.
 */
+
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 

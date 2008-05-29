@@ -1,9 +1,14 @@
 /*
   OrangutanLCD.h - Library for using the LCD on the Orangutan LV-168
-  Originally written by Tom Benedict and Ben Schmidel as part of 
-  Orangutan-Lib.
+  Originally written by Tom Benedict and Ben Schmidel as part of Orangutan-Lib.
   Modified by Ben Schmidel, May 14, 2008.
+  http://www.pololu.com
+  http://forum.pololu.com
   Released into the public domain.
+  
+  Disclaimer: To the extent permitted by law, Pololu Corporation provides
+  this work without any warranty.  It may be defective, in which case you
+  agree to be responsible for all resulting costs and damages.
 */
 #ifndef OrangutanLCD_h
 #define OrangutanLCD_h

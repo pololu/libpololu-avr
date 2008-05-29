@@ -1,8 +1,14 @@
 /*
-  OrangutanPushbuttons::h - Library for using the thee user pushbuttons on the
+  OrangutanPushbuttons.cpp - Library for using the three user pushbuttons on the
       Orangutan LV-168
   Written by Ben Schmidel, May 23, 2008.
+  http://www.pololu.com
+  http://forum.pololu.com
   Released into the public domain.
+  
+  Disclaimer: To the extent permitted by law, Pololu Corporation provides
+  this work without any warranty.  It may be defective, in which case you
+  agree to be responsible for all resulting costs and damages.
 */
 
 #ifndef F_CPU

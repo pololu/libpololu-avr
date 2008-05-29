@@ -1,13 +1,17 @@
 /*
-  OrangutanBuzzer::h - Library for controlling the buzzer on the
-      Orangutan LV-168
-  Written by Ben Schmidel, May 23, 2008.
+  OrangutanBuzzer.cpp - Library for controlling the buzzer on the
+    Orangutan LV-168. This library uses a timer1 PWM to generate the note
+	frequencies and timer1 overflow interrupt to time the duration of the
+	notes, so the buzzer can be playing a melody in the background while
+	the rest of your code executes.
+  Written by Ben Schmidel and Paul Grayson, May 23, 2008.
+  http://www.pololu.com
+  http://forum.pololu.com
   Released into the public domain.
-
-  This library uses a timer1 PWM to generate the note frequencies and
-  timer1 overflow interrupt to time the duration of the notes,
-  so the buzzer can be playing a melody in the background while the rest
-  of your code executes.
+  
+  Disclaimer: To the extent permitted by law, Pololu Corporation provides
+  this work without any warranty.  It may be defective, in which case you
+  agree to be responsible for all resulting costs and damages.
 */
 
 #ifndef F_CPU

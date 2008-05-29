@@ -2,7 +2,13 @@
   OrangutanMotors.h - Library for using the motor drivers on the
       Orangutan LV-168 and Baby Orangutan B-48/B-168
   Written by Ben Schmidel, May 15, 2008.
+  http://www.pololu.com
+  http://forum.pololu.com
   Released into the public domain.
+  
+  Disclaimer: To the extent permitted by law, Pololu Corporation provides
+  this work without any warranty.  It may be defective, in which case you
+  agree to be responsible for all resulting costs and damages.
 */
 #ifndef OrangutanMotors_h
 #define OrangutanMotors_h
