@@ -2,7 +2,7 @@
 #include <util/delay.h>
 #include <avr/io.h>
 
-#include "OrangutanLineSensors.h"
+#include "LineSensors.h"
 
 #ifdef LIB_ORANGUTAN
 extern "C" void ir_leds_on()

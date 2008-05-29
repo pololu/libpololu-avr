@@ -2,8 +2,6 @@
 
 int main()
 {
-  play("T240 L8 V8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
-
   while(!button_is_pressed(BUTTON_B))
   {
     int battery_voltage;
@@ -21,18 +19,19 @@ int main()
     delay_ms(50);
   }
 
-  stop_playing();
   wait_for_button_release(BUTTON_B);
 
   clear();
   print("Go!");
-  /*
-  //print("int %d", 5);
+
+  delay_ms(500);
+
+  play("T240 L8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
 
   while(1)
   {
     unsigned int sensors[5] = {1,2,3,4,5};
-    //    read_line_sensors(sensors);
+    read_line_sensors(sensors);
 
     if(sensors[1] > sensors[3])
     {
@@ -47,6 +46,6 @@ int main()
       set_motors(100,0);
     }
   }
-  */
+
   return 0;
 }
