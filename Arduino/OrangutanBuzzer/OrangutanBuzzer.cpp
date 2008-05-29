@@ -30,11 +30,9 @@ volatile unsigned int buzzerTimeout = 0;	// keeps track of time limit for buzzer
 volatile unsigned char buzzerFinished = 1;	// flag: cleared while buzzer plays
 const char *sequence = 0;
 
-unsigned char i;
-
 unsigned char octave;	// the current octave
 
-unsigned int tempo;	// the tempo, in quarter-notes per minute
+unsigned int whole_note_duration;	// the duration of a whole note
 unsigned int duration;	// the duration of a note in ms
 unsigned int volume;	// the note volume
 
@@ -378,9 +376,8 @@ unsigned char OrangutanBuzzer::isPlaying()
 void OrangutanBuzzer::play(const char *notes)
 {
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
-	i=0;
 	octave = 4; // the current octave
-	tempo = 120; // the tempo, in quarter-notes per minute
+	whole_note_duration = 2000; // the whole note duration
 	duration = 500; // the duration of a note in ms
 	volume = 15; // the note volume
 	sequence = notes;
@@ -402,24 +399,29 @@ void OrangutanBuzzer::stopPlaying()
 	ENABLE_TIMER1_INTERRUPT();					// re-enable interrupts
 }
 
-// Returns the numerical argument specified at sequence[*i] and
-// increments i to point to the character immediately after the
+// Returns the numerical argument specified at sequence[0] and
+// increments sequence to point to the character immediately after the
 // argument.
-unsigned int getNumber(const char *sequence, unsigned char *i)
+unsigned int getNumber()
 {
 	unsigned int arg = 0;
 
 	// read all digits, one at a time
-	while(sequence[*i] >= '0' && sequence[*i] <= '9')
+	while(*sequence >= '0' && *sequence <= '9')
 	{
 		arg *= 10;
-		arg += sequence[*i]-'0';
-		(*i)++;
+		arg += *sequence-'0';
+		sequence ++;
 	}
 
 	return arg;
 }
 
+// Returns whole_note_duration/getNumber()
+unsigned int getDuration()
+{
+	return whole_note_duration/getNumber();
+}
 
 void nextNote()
 {
@@ -427,125 +429,114 @@ void nextNote()
 	unsigned char rest = 0;
 	unsigned char tmp_octave = octave; // the octave for this note
 	unsigned int tmp_duration; // the duration of this note
+	unsigned int dot_add;
 
-	while(!note)
+	char c; // temporary variable
+
+ parse_character:
+
+	// Convert the current character to lower case.
+	c = *sequence;
+	if(c >= 'A' && c <= 'Z')
+		c += 'a'-'A';
+
+	// Advance to the next character.
+	sequence ++;
+
+	// Interpret the character.
+	switch(c)
 	{
-		char c; // temporary variable
-
-		if(sequence[i] == 0)
-		{
-			sequence = 0;
-			i = 0;
-		}
-		if(sequence == 0)
-			return;
-	  
-		// Convert the current character to lower case.
-		c = sequence[i];
-		if(c >= 'A' && c <= 'Z')
-			c += 'a'-'A';
-
-		// Advance to the next character.
-		i++;
-
-		// Interpret the character.
-		switch(c)
-		{
-		case 'c':
-			note = C(0);
-			break;
-		case 'd':
-			note = D(0);
-			break;
-		case 'e':
-			note = E(0);
-			break;
-		case 'f':
-			note = F(0);
-			break;
-		case 'g':
-			note = G(0);
-			break;
-		case 'a':
-			note = A(0);
-			break;
-		case 'b':
-			note = B(0);
-			break;
-		case 'r':
-			// Rest - the note value doesn't matter.
-			rest = 1;
-			break;
-		case '>':
-			// shift the octave temporarily up
-			tmp_octave ++;
-			continue;
-		case '<':
-			// shift the octave temporarily down
-			tmp_octave --;
-			continue;
-		case 'o':
-			// set the octave permanently
-			octave = getNumber(sequence, &i);
-			tmp_octave = octave;
-			continue;
-		case 't':
-			// set the tempo
-			tempo = getNumber(sequence, &i);
-			duration = 60*400/tempo*10/tempo;
-			continue;
-		case 'v':
-			// set the volume
-			volume = getNumber(sequence, &i);
-			continue;
-		case ' ':
-			// ignore spaces
-			continue;
-		case 'l':
-			// set the default note duration
-			duration = 60*400/tempo*10/getNumber(sequence, &i);
-			continue;
-		default:
-			sequence = 0;
-			i = 0;
-			return;
-		}
-
-		note += tmp_octave*12;
-
-		// handle sharps and flats
-		while(sequence[i] == '+' || sequence[i] == '#')
-		{
-			i++;
-			note ++;
-		}
-		while(sequence[i] == '-')
-		{
-			i++;
-			note --;
-		}
-
-		// set the duration of just this note
-		tmp_duration = duration;
-
-		// If the input is 'c16', make it a 16th note, etc.
-		if(sequence[i] > '0' && sequence[i] < '9')
-			tmp_duration = 60*400/tempo*10/getNumber(sequence, &i);
-		
-		// Handle dotted notes - the first dot adds 50%, and each
-		// additional dot adds 50% of the previous dot.
-		unsigned int dot_add = tmp_duration/2;
-		while(sequence[i] == '.')
-		{
-			i++;
-			tmp_duration += dot_add;
-			dot_add /= 2;
-		}
-
-		OrangutanBuzzer::playNote(note, tmp_duration, rest ? 0 : volume);
+	case ' ':
+		// ignore spaces
+		goto parse_character;
+	case '>':
+		// shift the octave temporarily up
+		tmp_octave ++;
+		goto parse_character;
+	case '<':
+		// shift the octave temporarily down
+		tmp_octave --;
+		goto parse_character;
+	case 'a':
+		note = A(0);
+		break;
+	case 'b':
+		note = B(0);
+		break;
+	case 'c':
+		note = C(0);
+		break;
+	case 'd':
+		note = D(0);
+		break;
+	case 'e':
+		note = E(0);
+		break;
+	case 'f':
+		note = F(0);
+		break;
+	case 'g':
+		note = G(0);
+		break;
+	case 'l':
+		// set the default note duration
+		duration = getDuration();
+		goto parse_character;
+	case 'o':
+		// set the octave permanently
+		octave = getNumber();
+		tmp_octave = octave;
+		goto parse_character;
+	case 'r':
+		// Rest - the note value doesn't matter.
+		rest = 1;
+		goto parse_character;
+	case 't':
+		// set the tempo
+		whole_note_duration = 60*400/getNumber()*10;
+		duration = whole_note_duration/4;
+		goto parse_character;
+	case 'v':
+		// set the volume
+		volume = getNumber();
+		goto parse_character;
+	default:
+		sequence = 0;
 		return;
 	}
 
+	note += tmp_octave*12;
+
+	// handle sharps and flats
+	while(*sequence == '+' || *sequence == '#')
+	{
+		sequence ++;
+		note ++;
+	}
+	while(*sequence == '-')
+	{
+		sequence ++;
+		note --;
+	}
+
+	// set the duration of just this note
+	tmp_duration = duration;
+
+	// If the input is 'c16', make it a 16th note, etc.
+	if(*sequence > '0' && *sequence < '9')
+		tmp_duration = getDuration();
+
+	// Handle dotted notes - the first dot adds 50%, and each
+	// additional dot adds 50% of the previous dot.
+	dot_add = tmp_duration/2;
+	while(*sequence == '.')
+	{
+		sequence ++;
+		tmp_duration += dot_add;
+		dot_add /= 2;
+	}
+
+	OrangutanBuzzer::playNote(note, tmp_duration, rest ? 0 : volume);
 }
 
 // Local Variables: **
