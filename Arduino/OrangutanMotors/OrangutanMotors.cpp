@@ -33,7 +33,7 @@ ISR(TIMER2_OVF_vect)
 extern volatile unsigned long timer0_overflow_count;
 unsigned char miniCount = 0;
 
-#ifndef LIB_ORANGUTAN
+#ifndef LIB_POLOLU
 // this ISR is called every time timer2 overflows.
 // it replaces the timer0 overflow ISR that drives millis()
 // so that millis() and delay() will still work
@@ -48,7 +48,7 @@ ISR(TIMER2_OVF_vect)
 }
 #endif
 
-#ifdef LIB_ORANGUTAN
+#ifdef LIB_POLOLU
 
 extern "C" void set_m1_speed(int speed)
 {
@@ -79,7 +79,7 @@ OrangutanMotors::OrangutanMotors()
 // to the motor drivers
 void OrangutanMotors::init2()
 {
-#ifndef LIB_ORANGUTAN
+#ifndef LIB_POLOLU
 	TIMSK0 &= ~(1 << TOIE0);	// timer0 overflow interrupt disabled
 	TIMSK2 |= 1 << TOIE2;		// timer2 overflow interrupt enabled
 	// we intentionally do not call sei() here

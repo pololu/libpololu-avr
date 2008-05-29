@@ -21,7 +21,7 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 
 }
 
-#ifdef LIB_ORANGUTAN
+#ifdef LIB_POLOLU
 
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {

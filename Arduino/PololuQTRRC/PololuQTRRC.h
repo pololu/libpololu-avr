@@ -6,6 +6,7 @@ class PololuQTRRC
   public:
 
 	// Constructor
+	PololuQTRRC() { }
 
 	// the array 'pins' contains the Arduino pin assignment for each
 	// sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
@@ -32,7 +33,7 @@ class PololuQTRRC
 	// Using timeout_us allows you to shorten the
 	// duration of a sensor-reading cycle while still maintaining
 	// useful analog measurements of reflectance.
-	PololuQTRRC(unsigned char* pins, unsigned char numSensors, 
+	static void init(unsigned char* pins, unsigned char numSensors, 
 		  unsigned int timeout_us, unsigned char emitterPin);
 	
 	// Reads the sensor values into an array. There *MUST* be space
@@ -43,30 +44,26 @@ class PololuQTRRC
 	// ...
 	// The values returned are in microseconds and range from 0 to
 	// timeout_us (as specified in the constructor).
-	void read(unsigned int *sensor_values);
+	static void read(unsigned int *sensor_values);
 	
 	// Turn the IR LEDs off and on.  This is mainly for use by the
 	// readLineSensors method, and calling these functions before or
 	// after the reading the sensors will have no effect on the
 	// readings, but you may wish to use these for testing purposes.
 	
-	void emittersOff();
-	void emittersOn();
+	static void emittersOff();
+	static void emittersOn();
   
   
   private:
   
-	unsigned char _bitmask[8];
-	volatile unsigned char* _register[8];
-	unsigned char _numSensors;
-	unsigned int _timeout_us;
-	unsigned char _emitterBitmask;
-	volatile unsigned char* _emitterPORT;
-	volatile unsigned char* _emitterDDR;
-	
-	unsigned char _portBMask;
-	unsigned char _portCMask;
-	unsigned char _portDMask;
 };
 
 #endif
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

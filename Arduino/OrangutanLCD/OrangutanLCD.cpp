@@ -110,7 +110,7 @@ OrangutanLCD::OrangutanLCD()
 {
 }
 
-#ifdef LIB_ORANGUTAN
+#ifdef LIB_POLOLU
 #include <stdio.h>
 
 /* define putchar and getchar functions for the LCD */
@@ -416,7 +416,7 @@ void OrangutanLCD::print(const char *str)
 		lcd_data(*str++);
 }
 
-#ifndef LIB_ORANGUTAN
+#ifndef LIB_POLOLU
 // other LCD libraries have this incorrectly named method, so it is here to
 // provide some semblance of compatibility
 void OrangutanLCD::printIn(const char *str)

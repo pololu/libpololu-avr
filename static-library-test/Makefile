@@ -1,8 +1,8 @@
-CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_ORANGUTAN -ffunction-sections -Os
+CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -Os
 CPP=/usr/bin/avr-g++
 CC=/usr/bin/avr-gcc
 OBJ2HEX=/usr/bin/avr-objcopy 
-LDFLAGS=-Wl,-gc-sections -lorangutan
+LDFLAGS=-Wl,-gc-sections -lpololu
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_flt -lm
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_min
 

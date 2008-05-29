@@ -6,24 +6,42 @@
 
 #include "PololuQTRRC.h"
 
-#ifdef LIB_ORANGUTAN
-extern "C" void ir_leds_on()
+unsigned char _bitmask[8];
+volatile unsigned char* _register[8];
+unsigned char _numSensors;
+unsigned int _timeout_us;
+unsigned char _emitterBitmask;
+volatile unsigned char* _emitterPORT;
+volatile unsigned char* _emitterDDR;
+	
+unsigned char _portBMask;
+unsigned char _portCMask;
+unsigned char _portDMask;
+
+#ifdef LIB_POLOLU
+PololuQTRRC *qtr;
+
+extern "C" void qtr_emitters_on()
 {
-	OrangutanLineSensors::emittersOn();
+	PololuQTRRC::emittersOn();
 }
 
-extern "C" void ir_leds_off()
+extern "C" void qtr_emitters_off()
 {
-	OrangutanLineSensors::emittersOff();
+	PololuQTRRC::emittersOff();
+}
+
+extern "C" void qtr_rc_init(unsigned char* pins, unsigned char numSensors, 
+			    unsigned int timeout_us, unsigned char emitterPin)
+{
+	PololuQTRRC::init(pins, numSensors, timeout_us, emitterPin);
 }
 
 // returns 5 raw RC sensor values
 extern "C" void read_line_sensors(unsigned int *sensor_values) {
-	OrangutanLineSensors::read(sensor_values);
+	PololuQTRRC::read(sensor_values);
 }
 #endif
-
-// Constructor
 
 // the array 'pins' contains the Arduino pin assignment for each
 // sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
@@ -54,7 +72,7 @@ extern "C" void read_line_sensors(unsigned int *sensor_values) {
 // 'emitterPin' is the Arduino pin that controls the IR LEDs on the 8RC
 // modules.  If you are using a 1RC (i.e. if there is no emitter pin),
 // use an invalid Arduino pin value (20 or greater).
-PololuQTRRC::PololuQTRRC(unsigned char* pins, unsigned char numSensors, 
+void PololuQTRRC::init(unsigned char* pins, unsigned char numSensors, 
 						 unsigned int timeout_us, unsigned char emitterPin)
 {
 	unsigned char i;
@@ -101,7 +119,7 @@ PololuQTRRC::PololuQTRRC(unsigned char* pins, unsigned char numSensors,
 		_emitterPORT = &PORTB;
 		_emitterDDR = &DDRB;
 	}
-	else if (emitterPin < 8)		// port C
+	else if (emitterPin < 20)		// port C
 	{
 		_emitterBitmask = 1 << (emitterPin - 14);
 		_emitterPORT = &PORTC;
@@ -118,10 +136,15 @@ PololuQTRRC::PololuQTRRC(unsigned char* pins, unsigned char numSensors,
 void PololuQTRRC::read(unsigned int *sensor_values)
 {
 	unsigned char i;
-	unsigned char startTCNT2;
+	unsigned char start_time;
+	unsigned char delta_time;
 	unsigned int time = 0;
 	unsigned int timeout =
 		(unsigned int)(_timeout_us * (unsigned long)(F_CPU / 800000UL) / 10);
+
+	unsigned char last_b = _portBMask;
+	unsigned char last_c = _portCMask;
+	unsigned char last_d = _portDMask;
 	
 	TCCR2A |= 0x03;
 	TCCR2B = 0x02;		// run timer2 in normal mode at 2.5 MHz
@@ -143,7 +166,7 @@ void PololuQTRRC::read(unsigned int *sensor_values)
 	
 	_delay_us(10);
 	
-	emittersOn();
+	PololuQTRRC::emittersOn();
 	
 	// set all ports to inputs
 	DDRB &= ~_portBMask;
@@ -154,20 +177,35 @@ void PololuQTRRC::read(unsigned int *sensor_values)
 	PORTB &= ~_portBMask;
 	PORTC &= ~_portCMask;
 	PORTD &= ~_portDMask;
-	
+
+	start_time = TCNT2;
 	while (time < timeout)
 	{
-		startTCNT2 = TCNT2;
+		// Keep track of the total time.
+		// This explicitly casts the difference to unsigned char, so
+		// we don't add negative values.
+		delta_time = TCNT2 - start_time;
+		time += delta_time;
+		start_time += delta_time;
+
+		// continue immediately if there is no change
+		if (PINB == last_b && PINC == last_c && PIND == last_d)
+			continue;
+
+		// save the last observed values
+		last_b = PINB;
+		last_c = PINC;
+		last_d = PIND;
+
+		// figure out which pins changed
 		for (i = 0; i < _numSensors; i++)
 		{
 			if (sensor_values[i] == 0 && !(*_register[i] & _bitmask[i]))
 				sensor_values[i] = time;
 		}
-		// the following line does not work without the explicit cast
-		time += (unsigned char)(TCNT2 - startTCNT2);
 	}
 
-	emittersOff();
+	PololuQTRRC::emittersOff();
 	
 	for(i = 0; i < _numSensors; i++)
 		if (!sensor_values[i])
@@ -196,3 +234,10 @@ void PololuQTRRC::emittersOn()
 	*_emitterDDR |= _emitterBitmask;
 	*_emitterPORT |= _emitterBitmask;
 }
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

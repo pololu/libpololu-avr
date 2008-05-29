@@ -11,7 +11,7 @@
 #define RED_LED		PD1
 #define GREEN_LED	PD7
 
-#ifdef LIB_ORANGUTAN
+#ifdef LIB_POLOLU
 
 extern "C" void left_led(unsigned char on)
 {

@@ -10,7 +10,7 @@
 #include "OrangutanAnalog.h"
 
 
-#ifdef LIB_ORANGUTAN
+#ifdef LIB_POLOLU
 
 extern "C" void set_analog_mode(unsigned char mode)
 {

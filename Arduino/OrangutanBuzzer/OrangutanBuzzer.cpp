@@ -60,7 +60,7 @@ OrangutanBuzzer::OrangutanBuzzer()
 {
 }
 
-#ifdef LIB_ORANGUTAN
+#ifdef LIB_POLOLU
 
 extern "C" void play_frequency(unsigned int freq, unsigned int duration, 
 							   unsigned char volume)
