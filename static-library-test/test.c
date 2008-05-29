@@ -15,6 +15,7 @@ void display_readings(const unsigned int *calibrated_values)
 int main()
 {
   unsigned int counter;
+  int last_y=0;
 
   pololu_3pi_init(2000);
   
@@ -70,7 +71,7 @@ int main()
 
   delay_ms(500);
 
-  play("T120 V8 L16" 
+  play("T120 V15 L16" 
        "agafaea dac+adaea fa<aa<bac#a dac#adaea f"
        "O5 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad "
        "O5 L8 MS <b-d<b-d ML e-<ge-<g MS c<ac<a ML d<fd<f O4 MS b-gb-g ML >c#e>c#e"
@@ -85,21 +86,26 @@ int main()
   {
     unsigned int sensors[5] = {1,2,3,4,5};
     unsigned int position = read_line(sensors);
+    int y = ((signed int)position) - 2000;
+    int dy = y - last_y;
+    int diff = y/6 + 5*dy; // the amount to turn RIGHT
+    int m1, m2;
 
-    /*
-    if(sensors[1] > sensors[3])
-    {
-      left_led(1);
-      right_led(0);
-      set_motors(0,100);
-    }
-    else
-    {
-      right_led(1);
-      left_led(0);
-      set_motors(100,0);
-    }
-    */
+    m1 = 255 + diff;
+    m2 = 255 - diff;
+
+    if(m1 > 255)
+      m1 = 255;
+    if(m1 < 0)
+      m1 = 0;
+    if(m2 > 255)
+      m2 = 255;
+    if(m2 < 0)
+      m2 = 0;
+
+    set_motors(m1,m2);
+
+    last_y = y;
   }
 
   return 0;
