@@ -2,22 +2,14 @@
 
 int main()
 {
-  {
-    unsigned char pins[5] = {14,15,16,17,18};
-    qtr_rc_init(pins,5,1000,19);
-    qtr_emitters_off();
-  }
-
+  pololu_3pi_init(1000);
+  
   while(!button_is_pressed(BUTTON_B))
   {
-    int battery_voltage;
-
-    set_analog_mode(MODE_10_BIT);
-
-    battery_voltage = read_analog_average(6,10)*5000L*3/2/1023;
+    int bat = battery_millivolts();
 
     clear();
-    print_long(battery_voltage);
+    print_long(bat);
     print("mV");
     lcd_goto_xy(0,1);
     print("Press B");

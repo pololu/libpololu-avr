@@ -15,6 +15,7 @@ LIBRARY_OBJECT_FILES=\
 	../Arduino/OrangutanLEDs/OrangutanLEDs.o \
 	../Arduino/OrangutanAnalog/OrangutanAnalog.o \
 	../Arduino/PololuQTRRC/PololuQTRRC.o \
+	../Arduino/Pololu3pi/Pololu3pi.o \
 	Delay.o
 
 #	OrangutanDelay/OrangutanDelay.o \
