@@ -45,5 +45,4 @@ install: libpololu.a
 	install -d $(LIB)
 	install -d $(INCLUDE_POLOLU)
 	install -t $(LIB) libpololu.a
-	install pololu_install.h $(INCLUDE)/pololu.h
 	install -t $(INCLUDE_POLOLU) pololu/*.h

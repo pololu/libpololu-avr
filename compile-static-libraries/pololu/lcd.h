@@ -10,6 +10,7 @@
 void lcd_init_printf();
 void clear();
 void print(const char *str);
+void print_character(char c);
 void print_long(long value);
 void lcd_goto_xy(int col, int row);
 

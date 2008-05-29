@@ -25,7 +25,7 @@
 
 
 #ifdef LIB_POLOLU
-PololuQTRRC qtr;
+static PololuQTRRC qtr;
 
 extern "C" void qtr_emitters_on()
 {
@@ -43,10 +43,30 @@ extern "C" void qtr_rc_init(unsigned char* pins, unsigned char numSensors,
 	qtr.init(pins, numSensors, timeout_us, emitterPin);
 }
 
-// returns 5 raw RC sensor values
-extern "C" void read_line_sensors(unsigned int *sensor_values) {
+extern "C" void qtr_read(unsigned int *sensor_values) {
 	qtr.read(sensor_values);
 }
+
+extern "C" void qtr_calibrate()
+{
+	qtr.calibrate();
+}
+
+extern "C" void qtr_read_calibrated(unsigned int *sensor_values)
+{
+	qtr.readCalibrated(sensor_values);
+}
+
+extern "C" unsigned int qtr_read_line(unsigned int *sensor_values)
+{
+	return qtr.readLine(sensor_values);
+}
+
+extern "C" unsigned int qtr_read_line_white(unsigned int *sensor_values)
+{
+	return qtr.readLine(sensor_values, true);
+}
+
 #endif
 
 // Constructors
@@ -105,6 +125,11 @@ void PololuQTRRC::init(unsigned char* pins, unsigned char numSensors,
 		_numSensors = numSensors;
 	for (i = 0; i < _numSensors; i++)
 	{
+		// Initialize the max and min calibrated values to values that
+		// will cause the first reading to update them.
+		calibratedMinimum[i] = 1000;
+		calibratedMaximum[i] = 0;
+
 		if (pins[i] < 8)			// port D
 		{
 			_bitmask[i] = 1 << pins[i];
@@ -263,6 +288,86 @@ void PololuQTRRC::emittersOn()
 		return;
 	*_emitterDDR |= _emitterBitmask;
 	*_emitterPORT |= _emitterBitmask;
+}
+
+void PololuQTRRC::calibrate()
+{
+	unsigned int sensor_values[8];
+	int i;
+	read(sensor_values);
+	
+	for(i=0;i<_numSensors;i++)
+	{
+		if(sensor_values[i] > calibratedMaximum[i])
+			calibratedMaximum[i] = sensor_values[i];
+		if(sensor_values[i] < calibratedMinimum[i])
+			calibratedMinimum[i] = sensor_values[i];
+	}
+}
+
+void PololuQTRRC::readCalibrated(unsigned int *sensor_values)
+{
+	int i;
+
+	read(sensor_values);
+
+	for(i=0;i<_numSensors;i++)
+	{
+		int denominator = calibratedMaximum[i] - calibratedMinimum[i];
+		signed int x = 0;
+		if(denominator != 0)
+			x = (((signed long)sensor_values[i]) - calibratedMinimum[i])
+				* 1000 / denominator;
+		if(x < 0)
+			x = 0;
+		else if(x > 1000)
+			x = 1000;
+		sensor_values[i] = x;
+	}
+}
+
+unsigned int PololuQTRRC::readLine(unsigned int *sensor_values, unsigned char white_line)
+{
+	unsigned char i, on_line = 0;
+	unsigned long avg; // this is for the weighted total, which is long
+	                   // before division
+	unsigned int sum; // this is for the denominator which is <= 64000
+	static int16_t last_value=0; // assume initially that the line is left.
+
+	readCalibrated(sensor_values);
+
+	avg = 0;
+	sum = 0;
+  
+	for(i=0;i<_numSensors;i++) {
+		int value = sensor_values[i];
+		if(white_line)
+			value = 1000-value;
+
+		// keep track of whether we see the line at all
+		if(value > 200) {
+			on_line = 1;
+		}
+
+		avg += (long)(value) * (i * 1000);
+		sum += value;
+	}
+
+	if(!on_line)
+	{
+		// If it last read to the left of center, return 0.
+		if(last_value < (_numSensors-1)*1000/2)
+			return 0;
+		
+		// If it last read to the right of center, return the max.
+		else
+			return (_numSensors-1)*1000;
+
+	}
+
+	last_value = avg/sum;
+
+	return last_value;
 }
 
 // Local Variables: **

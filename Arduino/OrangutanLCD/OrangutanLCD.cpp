@@ -196,6 +196,11 @@ extern "C" void print(const char *str)
 	OrangutanLCD::print(str);
 }
 
+extern "C" void print_character(char c)
+{
+	OrangutanLCD::print(c);
+}
+
 extern "C" void print_long(long value)
 {
 	OrangutanLCD::print(value);

@@ -126,6 +126,13 @@ class OrangutanBuzzer
 	//
 	//   'V' followed by a number from 1-15 sets the music volume.
 	//
+	//   'MS' sets the music to play staccato - each note is played
+	//       for 1/2 of its allotted time, followed by an equal period
+	//       of silence.
+	//
+	//   'ML' sets the music to play legato - each note is played for
+	//       its full length.
+	//
 	// The following plays a c major scale up and back down:
 	//   play("L16 V8 cdefgab>cbagfedc");
 	//

@@ -20,6 +20,12 @@ public:
 	// space for five unsigned int values and be called AFTER init.
 	static void readLineSensors(unsigned int *sensor_values);
 
+	void emittersOn();
+	void emittersOff();
+	void calibrateLineSensors();
+	void readLineSensorsCalibrated(unsigned int *sensor_values);
+	unsigned int readLine(unsigned int *sensor_values, unsigned char white_line);
+
 	// Returns the voltage of the battery in millivolts, using 10
 	// averaged samples.
 	static unsigned int batteryMillivolts();

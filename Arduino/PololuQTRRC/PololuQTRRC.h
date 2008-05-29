@@ -72,7 +72,50 @@ class PololuQTRRC
 	void emittersOff();
 	void emittersOn();
   
-  
+	// Reads the sensors for calibration.  The sensor values are
+	// not returned; instead, the maximum and minimum values found
+	// over time are stored internally and used for the
+	// readCalibrated() method.
+	void calibrate();
+
+	// Returns values calibrated to a value between 0 and 1000, where
+	// 0 corresponds to the minimum value read by calibrate() and 1000
+	// corresponds to the maximum value.  Calibration values are
+	// stored separately for each sensor, so that differences in the
+	// sensors are accounted for automatically.
+	void readCalibrated(unsigned int *sensor_values);
+
+	// Operates the same as read calibrated, but also returns an
+	// estimated position of the robot with respect to a line. The
+	// estimate is made using a weighted average of the sensor indices
+	// multiplied by 1000, so that a return value of 0 indicates that
+	// the line is directly below sensor 0, a return value of 1000
+	// indicates that the line is directly below sensor 1, 2000
+	// indicates that it's below sensor 2000, etc.  Intermediate
+	// values indicate that the line is between two sensors.  The
+	// formula is:
+	// 
+	//    0*value0 + 1000*value1 + 2000*value2 + ...
+	//   --------------------------------------------
+	//         value0  +  value1  +  value2 + ...
+	//
+	// By default, this function assumes a dark line (high values)
+	// surrounded by white (low values).  If your line is light on
+	// black, set the optional second argument white_line to true.  In
+	// this case, each sensor value will be replaced by (1000-value)
+	// before the averaging.
+	unsigned int readLine(unsigned int *sensor_values, unsigned char white_line = 0);
+
+	// Calibrated minumum and maximum values. These start at 1000 and
+	// 0, respectively, so that the very first sensor reading will
+	// update both of them.
+	//
+	// These variables are made public so that you can use them for
+	// your own calculations and do things like saving the values to
+	// EEPROM, performing sanity checking, etc.
+	unsigned int calibratedMinimum[8];
+	unsigned int calibratedMaximum[8];
+
   private:
   
 	unsigned char _bitmask[8];
@@ -89,7 +132,6 @@ class PololuQTRRC
 	unsigned char _portBMask;
 	unsigned char _portCMask;
 	unsigned char _portDMask;
-  
 };
 
 #endif
