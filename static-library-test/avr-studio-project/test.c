@@ -69,18 +69,9 @@ int main()
   clear();
   print("Go!");
 
-  delay_ms(500);
 
-  play("T120 V15 L16" 
-       "agafaea dac+adaea fa<aa<bac#a dac#adaea f"
-       "O5 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad "
-       "O5 L8 MS <b-d<b-d ML e-<ge-<g MS c<ac<a ML d<fd<f O4 MS b-gb-g ML >c#e>c#e"
-       "MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"
-       "L16 O5 ragafaea dac#adaea fa<aa<bac#a dac#adaea faeadaca <b-acadgb-g egdgcg<b-g"
-       "<ag<b-gcf<af dfcf<b-f<af <gf<af<b-e<ge c#e<b-e<ae<ge <fe<ge<ad<fd"
-       "O4 e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d e>d>c#>db>d>c#b"
-       ">c#agaegfe fO5dc#dfdc#<b c#4"
-       );
+
+  delay_ms(500);
 
   while(1)
   {
