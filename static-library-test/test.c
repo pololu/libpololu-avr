@@ -75,7 +75,10 @@ int main()
        "O5 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad "
        "O5 L8 MS <b-d<b-d ML e-<ge-<g MS c<ac<a ML d<fd<f O4 MS b-gb-g ML >c#e>c#e"
        "MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"
-       "L16 O5 rc<b-c<ac<gc <fc"
+       "L16 O5 ragafaea dac#adaea fa<aa<bac#a dac#adaea faeadaca <b-acadgb-g egdgcg<b-g"
+       "<ag<b-gcf<af dfcf<b-f<af <gf<af<b-e<ge c#e<b-e<ae<ge <fe<ge<ad<fd"
+       "O4 e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d e>d>c#>db>d>c#b"
+       ">c#agaegfe fO5dc#dfdc#<b c#4"
        );
 
   while(1)
@@ -83,12 +86,6 @@ int main()
     unsigned int sensors[5] = {1,2,3,4,5};
     unsigned int position = read_line(sensors);
 
-    clear();
-    print_long(position);
-    lcd_goto_xy(0,1);
-    display_readings(sensors);
-
-    delay_ms(50);
     /*
     if(sensors[1] > sensors[3])
     {
