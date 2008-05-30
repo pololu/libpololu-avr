@@ -111,7 +111,7 @@ unsigned char OrangutanPushbuttons::waitForButton(unsigned char buttons)
   return pressedButton;
 }
 
-// returns the value of any buttons that are currently pressed, or 0.  
+// returns the value of any specified buttons that are currently pressed, or 0.
 // For example, if the top and middle buttons are both pressed, this method
 // will return (TOP_BUTTON | MIDDLE_BUTTON).  The argument 'buttons' can
 // refer to multiple buttons using the bitwise OR operator |.
