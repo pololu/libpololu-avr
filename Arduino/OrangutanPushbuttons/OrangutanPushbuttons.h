@@ -47,8 +47,7 @@ class OrangutanPushbuttons
 	// Waits for the any of the specified buttons to be pressed and released.
 	static unsigned char waitForButton(unsigned char buttons);
 
-	// returns 1 (true) if any of the specified buttons is currently being
-	// pressed.  Otherwise this method returns 0 (false).  The argument
+	// returns the value of the button if it is currently pressed, or 0.  The argument
 	// 'buttons' can refer to multiple buttons using the bitwise OR operator |.
 	static unsigned char isPressed(unsigned char buttons);
 

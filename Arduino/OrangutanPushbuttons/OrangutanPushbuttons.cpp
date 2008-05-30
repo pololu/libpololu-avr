@@ -111,13 +111,12 @@ unsigned char OrangutanPushbuttons::waitForButton(unsigned char buttons)
   return pressedButton;
 }
 
-// returns 1 (true) if any of the specified buttons is currently being
-// pressed.  Otherwise this method returns 0 (false).  The argument
+// returns the value of the button if it is currently pressed, or 0.  The argument
 // 'buttons' can refer to multiple buttons using the bitwise OR operator |.
 unsigned char OrangutanPushbuttons::isPressed(unsigned char buttons)
 {
 	init();		// initialize pushbutton I/O pins if necessary
-	return (~PINB & buttons) ? 1 : 0;
+	return ~PINB & buttons;
 }
 
 // Local Variables: **
