@@ -58,7 +58,8 @@ ISR (TIMER1_OVF_vect)
 		OCR1B = 0;						// 0% duty cycle
 		DDRB &= ~(1 << PB2);	// silence buz, pin->input
 		buzzerFinished = 1;
-		if(sequence)
+		DISABLE_TIMER1_INTERRUPT();
+		if (sequence)
 			nextNote();
 	}
 }
@@ -104,8 +105,10 @@ extern "C" void stop_playing()
 // initializes timer1 for buzzer control
 void OrangutanBuzzer::init2()
 {
+	DISABLE_TIMER1_INTERRUPT();				// disable all timer1 interrupts
+	
 	DDRB &= ~(1 << PB2);		// buzzer pin set as input
-
+	
 	TCCR1A = 0x23;	// bits 6 and 7 clear: normal port op., OC1A disconnected
 					// bit 4 clear, 5 set: clear OC1B on compare match
 					// bits 2 and 3: not used
@@ -132,11 +135,6 @@ void OrangutanBuzzer::init2()
 
 	OCR1A = F_CPU / 1000;					// set TOP for freq = 1 kHz
 	OCR1B = 0;								// set 0% duty cycle
-	TCNT1 = 0;								// clear counter register
-
-	TIFR1 = 0xFF;							// clear all timer1 interrupt flags
-	ENABLE_TIMER1_INTERRUPT();				// overflow interrupt enabled
-											//  all other timer1 ints disabled
 }
 
 
@@ -161,8 +159,8 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 	buzzerFinished = 0;
 
 	if (freq & DIV_BY_10)		// if frequency's DIV_BY_10 bit is set
-	{							//   then the true frequency is freq/10
-		multiplier = 10;		//   (gives higher resolution for small freqs)
+	{							//  then the true frequency is freq/10
+		multiplier = 10;		//  (gives higher resolution for small freqs)
 		freq &= ~DIV_BY_10;		// clear DIV_BY_10 bit
 	}
 
@@ -214,26 +212,30 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 	if (volume > 15)
 		volume = 15;
 
-	DISABLE_TIMER1_INTERRUPT();			// disable interrupts while writing to 16-bit registers
+	DISABLE_TIMER1_INTERRUPT();			// disable interrupts while writing 
+										//  to 16-bit registers
 	TCCR1B = newTCCR1B;					// select timer 1 clock prescaler
 	OCR1A = newOCR1A;					// set timer 1 pwm frequency
-	OCR1B = OCR1A >> (16 - volume);		// set duty cycle (volume)
+	OCR1B = OCR1A >> (16 - volume);	// set duty cycle (volume)
 	buzzerTimeout = timeout;			// set buzzer duration
-	ENABLE_TIMER1_INTERRUPT();
+	TCNT1 = 0;
+	TIFR1 |= 0xFF;						// clear any pending t1 overflow int.
+	ENABLE_TIMER1_INTERRUPT();			// this is the only place the t1
+										//  overflow is enabled
 	sei();
 }
 
 
 
 // Determine the frequency for the specified note, then play that note
-//   for the desired duration (in ms).  This is done without using floats
-//   and without having to loop.  volume controls buzzer volume, with 15 being
-//   loudest and 0 being quietest.
+//  for the desired duration (in ms).  This is done without using floats
+//  and without having to loop.  volume controls buzzer volume, with 15 being
+//  loudest and 0 being quietest.
 // Note: frequency*duration/1000 must be less than 0xFFFF (65535).  This
-//   means that you can't use a max duration of 65535 ms for frequencies
-//   greater than 1 kHz.  For example, the max duration you can use for a
-//   frequency of 10 kHz is 6553 ms.  If you use a duration longer than this,
-//   you will cause an integer overflow that produces unexpected behavior.
+//  means that you can't use a max duration of 65535 ms for frequencies
+//  greater than 1 kHz.  For example, the max duration you can use for a
+//  frequency of 10 kHz is 6553 ms.  If you use a duration longer than this,
+//  you will cause an integer overflow that produces unexpected behavior.
 void OrangutanBuzzer::playNote(unsigned char note, unsigned int dur,
 							   unsigned char volume)
 {
@@ -398,28 +400,26 @@ unsigned char OrangutanBuzzer::isPlaying()
 void OrangutanBuzzer::play(const char *notes)
 {
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
-	octave = 4; // the current octave
+	octave = 4; 				// the current octave
 	whole_note_duration = 2000; // the whole note duration
-	duration = 500; // the duration of a note in ms
-	volume = 15; // the note volume
+	duration = 500;				// the duration of a note in ms
+	volume = 15; 				// the note volume
 	staccato = 0;
 	sequence = notes;
-	nextNote();
-	ENABLE_TIMER1_INTERRUPT();	// re-enable interrupts
+	nextNote();					// this re-enables the timer1 interrupt
 }
 
 
 // stop all sound playback immediately
 void OrangutanBuzzer::stopPlaying()
 {
-	DISABLE_TIMER1_INTERRUPT();					// diable interrupts
+	DISABLE_TIMER1_INTERRUPT();					// disable interrupts
 	TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 	OCR1A = F_CPU / 1000;						// set TOP for freq = 1 kHz
 	OCR1B = 0;									// 0% duty cycle
 	DDRB &= ~(1 << PB2);						// silence buz, pin->input
 	buzzerFinished = 1;
 	sequence = 0;
-	ENABLE_TIMER1_INTERRUPT();					// re-enable interrupts
 }
 
 // Returns the numerical argument specified at sequence[0] and
@@ -456,10 +456,14 @@ void nextNote()
 
 	char c; // temporary variable
 
+	// allow all interrupts except for timer1 overflow interrupt
+	//DISABLE_TIMER1_INTERRUPT();
+	//sei();
+
 	// if we are playing staccato, after every note we play a rest
 	if(staccato && staccato_rest_duration)
 	{
-		OrangutanBuzzer::playNote(20, staccato_rest_duration, 0);
+		OrangutanBuzzer::playNote(SILENT_NOTE, staccato_rest_duration, 0);
 		staccato_rest_duration = 0;
 		return;
 	}
@@ -583,7 +587,9 @@ void nextNote()
 		staccato_rest_duration = tmp_duration / 2;
 		tmp_duration -= staccato_rest_duration;
 	}
-	OrangutanBuzzer::playNote(note, tmp_duration, rest ? 0 : volume);
+	
+	// this will re-enable the timer1 overflow interrupt
+	OrangutanBuzzer::playNote(rest ? SILENT_NOTE : note, tmp_duration, volume);
 }
 
 // Local Variables: **
