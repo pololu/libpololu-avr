@@ -123,22 +123,23 @@ class OrangutanBuzzer
 	//   'L' followed by a number sets the default note duration to
 	//       the type specified by the number: 4 for quarter notes, 8
 	//       for eighth notes, 16 for sixteenth notes, etc.
+	//       (default: L4)
 	//
-	//   'V' followed by a number from 1-15 sets the music volume.
+	//   'V' followed by a number from 0-15 sets the music volume.
+	//       (default: V15)
 	//
-	//   'MS' sets the music to play staccato - each note is played
+	//   'MS' sets all subsequent notes to play staccato - each note is played
 	//       for 1/2 of its allotted time, followed by an equal period
 	//       of silence.
 	//
-	//   'ML' sets the music to play legato - each note is played for
-	//       its full length.
+	//   'ML' sets all subsequent notes to play legato - each note is played
+	//       for its full length.  This is the default setting.
 	//
 	// The following plays a c major scale up and back down:
 	//   play("L16 V8 cdefgab>cbagfedc");
 	//
 	// Here is an example from Bach:
 	//   play("T240 L8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
-	
 	static void play(const char *sequence);
 
 	// Returns 1 if the buzzer is currently playing, otherwise it returns 0

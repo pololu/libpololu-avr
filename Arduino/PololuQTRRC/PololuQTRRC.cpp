@@ -173,6 +173,10 @@ void PololuQTRRC::init(unsigned char* pins, unsigned char numSensors,
 		_emitterDDR = 0;
 		_emitterPORT = 0;
 	}
+	
+	TCCR2A |= 0x03;
+	TCCR2B = 0x02;		// run timer2 in normal mode at 2.5 MHz
+						// this is compatible with OrangutanMotors
 }
 
 
@@ -196,10 +200,6 @@ void PololuQTRRC::read(unsigned int *sensor_values)
 	unsigned char last_b = _portBMask;
 	unsigned char last_c = _portCMask;
 	unsigned char last_d = _portDMask;
-	
-	TCCR2A |= 0x03;
-	TCCR2B = 0x02;		// run timer2 in normal mode at 2.5 MHz
-						// this is compatible with OrangutanMotors
 	
 	// reset the values
 	for(i = 0; i < _numSensors; i++)

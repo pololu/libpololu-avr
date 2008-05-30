@@ -74,8 +74,8 @@ unsigned char OrangutanPushbuttons::waitForPress(unsigned char buttons)
 			;
 		_delay_ms(10);				// debounce the button press
 	}
-	while (!(~PINB & buttons));		// if button isn't still pressed, loop
-	return ~PINB & buttons;			// return the pressed button(s)
+	while (!(~PINB & buttons));	// if button isn't still pressed, loop
+	return ~PINB & buttons;		// return the pressed button(s)
 }
 
 
