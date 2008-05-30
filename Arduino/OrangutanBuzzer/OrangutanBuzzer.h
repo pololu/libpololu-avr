@@ -17,6 +17,8 @@
 #ifndef OrangutanBuzzer_h
 #define OrangutanBuzzer_h
 
+#define PLAY_AUTOMATIC 0
+#define PLAY_CHECK 1
 
 //                                             n
 // Equal Tempered Scale is given by f  = f  * a
@@ -144,6 +146,24 @@ class OrangutanBuzzer
 	// Here is an example from Bach:
 	//   play("T240 L8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
 	static void play(const char *sequence);
+
+	// This puts play() into a mode where instead of advancing to the
+	// next note in the sequence automatically, it waits until the
+	// function playCheck() is called. The idea is that you can
+	// put playCheck() in your main loop and avoid potential
+	// delays due to the note sequence being checked in the middle of
+	// a time sensitive calculation.  It is recommended that you use
+	// this function if you are doing anything that can't tolerate
+	// being interrupted for more than a few microseconds.
+	//
+	// Usage: playMode(PLAY_AUTOMATIC) makes it automatic (the
+	// default), playMode(PLAY_CHECK) sets it to a mode where you have
+	// to call playCheck().
+	static void playMode(char mode);
+
+	// Checks whether it is time to start another note, and starts
+	// it.  Call this as often as possible in your main loop.
+	static void playCheck();
 
 	// Returns 1 if the buzzer is currently playing, otherwise it returns 0
 	static unsigned char isPlaying();

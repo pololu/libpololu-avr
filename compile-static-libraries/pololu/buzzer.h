@@ -12,6 +12,9 @@
 #ifndef OrangutanBuzzer_h
 #define OrangutanBuzzer_h
 
+#define PLAY_AUTOMATIC 0
+#define PLAY_CHECK 1
+
 void buzzer_init();
 void play_frequency(unsigned int freq, unsigned int duration, 
 		       unsigned char volume);
@@ -20,5 +23,8 @@ void play_note(unsigned char note, unsigned int duration,
 void play(char *sequence);
 unsigned char is_playing();
 void stop_playing();
+
+void play_check();
+void play_mode(char on);
 
 #endif

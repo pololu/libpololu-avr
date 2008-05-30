@@ -35,6 +35,7 @@
 static volatile unsigned int buzzerTimeout = 0;		// tracks buzzer time limit
 static volatile unsigned char buzzerFinished = 1;	// flag: 0 while playing
 static const char *sequence = 0;
+static char play_mode_setting = PLAY_AUTOMATIC;
 
 static unsigned char octave;				// the current octave
 
@@ -59,7 +60,7 @@ ISR (TIMER1_OVF_vect)
 		DDRB &= ~(1 << PB2);	// silence buz, pin->input
 		buzzerFinished = 1;
 		DISABLE_TIMER1_INTERRUPT();
-		if (sequence)
+		if (sequence && (play_mode_setting == PLAY_AUTOMATIC))
 			nextNote();
 	}
 }
@@ -98,6 +99,16 @@ extern "C" unsigned char is_playing()
 extern "C" void stop_playing()
 {
 	OrangutanBuzzer::stopPlaying();
+}
+
+extern "C" void play_mode(char mode)
+{
+	OrangutanBuzzer::playMode(mode);
+}
+
+extern "C" void play_check()
+{
+	OrangutanBuzzer::playCheck();
 }
 
 #endif
@@ -590,6 +601,24 @@ void nextNote()
 	
 	// this will re-enable the timer1 overflow interrupt
 	OrangutanBuzzer::playNote(rest ? SILENT_NOTE : note, tmp_duration, volume);
+}
+
+void OrangutanBuzzer::playMode(char mode)
+{
+	play_mode_setting = mode;
+
+	// We want to check to make sure that we didn't miss a note if we
+	// are going out of play-check mode.
+	if(mode == PLAY_AUTOMATIC)
+		playCheck();
+}
+
+void OrangutanBuzzer::playCheck()
+{
+	DISABLE_TIMER1_INTERRUPT();
+	if(!isPlaying() && sequence != 0)
+		nextNote();
+	ENABLE_TIMER1_INTERRUPT();
 }
 
 // Local Variables: **
