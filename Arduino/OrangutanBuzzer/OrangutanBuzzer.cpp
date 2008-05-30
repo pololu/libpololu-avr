@@ -352,7 +352,10 @@ unsigned char OrangutanBuzzer::isPlaying()
 // The notes are specified by the characters C, D, E, F, G, A, and
 // B, and they are played by default as "quarter notes" with a
 // length of 500 ms.  This corresponds to a tempo of 120
-// beats/min.  The special note R plays a rest (no sound).
+// beats/min.  Other durations can be specified by putting a number
+// immediately after the note.  For example, C8 specifies C played as an
+// eighth note, with half the duration of a quarter note. The special
+// note R plays a rest (no sound).
 //
 // Various control characters alter the sound:
 //   '>' plays the next note one octave higher
