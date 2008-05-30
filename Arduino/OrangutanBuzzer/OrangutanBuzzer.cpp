@@ -101,7 +101,7 @@ extern "C" void stop_playing()
 	OrangutanBuzzer::stopPlaying();
 }
 
-extern "C" void play_mode(char mode)
+extern "C" void play_mode(unsigned char mode)
 {
 	OrangutanBuzzer::playMode(mode);
 }
@@ -358,9 +358,14 @@ unsigned char OrangutanBuzzer::isPlaying()
 }
 
 
-// Plays the specified sequence of notes without requiring any further
-// input from the user.  Modeled after the PLAY commands in
-// GW-BASIC, with just a few differences.
+// Plays the specified sequence of notes.  If the play mode is 
+// PLAY_AUTOMATIC, the sequence of notes will play with no further
+// action required by the user.  If the play mode is PLAY_CHECK,
+// the user will need to call playCheck() in the main loop to initiate
+// the playing of each new note in the sequence.  The play mode can
+// be changed while the sequence is playing.  
+// This is modeled after the PLAY commands in GW-BASIC, with just a
+// few differences.
 //
 // The notes are specified by the characters C, D, E, F, G, A, and
 // B, and they are played by default as "quarter notes" with a
@@ -451,11 +456,13 @@ unsigned int getNumber()
 	return arg;
 }
 
+
 // Returns whole_note_duration/getNumber()
 unsigned int getDuration()
 {
 	return whole_note_duration/getNumber();
 }
+
 
 void nextNote()
 {
@@ -603,7 +610,22 @@ void nextNote()
 	OrangutanBuzzer::playNote(rest ? SILENT_NOTE : note, tmp_duration, volume);
 }
 
-void OrangutanBuzzer::playMode(char mode)
+
+// This puts play() into a mode where instead of advancing to the
+// next note in the sequence automatically, it waits until the
+// function playCheck() is called. The idea is that you can
+// put playCheck() in your main loop and avoid potential
+// delays due to the note sequence being checked in the middle of
+// a time sensitive calculation.  It is recommended that you use
+// this function if you are doing anything that can't tolerate
+// being interrupted for more than a few microseconds.
+// Note that the play mode can be changed while a sequence is being
+// played.
+//
+// Usage: playMode(PLAY_AUTOMATIC) makes it automatic (the
+// default), playMode(PLAY_CHECK) sets it to a mode where you have
+// to call playCheck().
+void OrangutanBuzzer::playMode(unsigned char mode)
 {
 	play_mode_setting = mode;
 
@@ -613,6 +635,11 @@ void OrangutanBuzzer::playMode(char mode)
 		playCheck();
 }
 
+
+// Checks whether it is time to start another note, and starts
+// it if so.  If it is not yet time to start the next note, this method
+// returns without doing anything.  Call this as often as possible 
+// in your main loop to avoid delays between notes in the sequence.
 void OrangutanBuzzer::playCheck()
 {
 	DISABLE_TIMER1_INTERRUPT();

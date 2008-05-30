@@ -17,8 +17,8 @@
 #ifndef OrangutanBuzzer_h
 #define OrangutanBuzzer_h
 
-#define PLAY_AUTOMATIC 0
-#define PLAY_CHECK 1
+#define PLAY_AUTOMATIC	0
+#define PLAY_CHECK		1
 
 //                                             n
 // Equal Tempered Scale is given by f  = f  * a
@@ -94,10 +94,14 @@ class OrangutanBuzzer
 	static void playNote(unsigned char note, unsigned int duration,
 				  unsigned char volume);
 
-
-	// Plays the specified sequence of notes without requiring any further
-	// input from the user.  Modeled after the PLAY commands in
-	// GW-BASIC, with just a few differences.
+	// Plays the specified sequence of notes.  If the play mode is 
+	// PLAY_AUTOMATIC, the sequence of notes will play with no further
+	// action required by the user.  If the play mode is PLAY_CHECK,
+	// the user will need to call playCheck() in the main loop to initiate
+	// the playing of each new note in the sequence.  The play mode can
+	// be changed while the sequence is playing.  
+	// This is modeled after the PLAY commands in GW-BASIC, with just a
+	// few differences.
 	//
 	// The notes are specified by the characters C, D, E, F, G, A, and
 	// B, and they are played by default as "quarter notes" with a
@@ -155,14 +159,18 @@ class OrangutanBuzzer
 	// a time sensitive calculation.  It is recommended that you use
 	// this function if you are doing anything that can't tolerate
 	// being interrupted for more than a few microseconds.
+	// Note that the play mode can be changed while a sequence is being
+	// played.
 	//
 	// Usage: playMode(PLAY_AUTOMATIC) makes it automatic (the
 	// default), playMode(PLAY_CHECK) sets it to a mode where you have
 	// to call playCheck().
-	static void playMode(char mode);
+	static void playMode(unsigned char mode);
 
 	// Checks whether it is time to start another note, and starts
-	// it.  Call this as often as possible in your main loop.
+	// it if so.  If it is not yet time to start the next note, this method
+	// returns without doing anything.  Call this as often as possible 
+	// in your main loop to avoid delays between notes in the sequence.
 	static void playCheck();
 
 	// Returns 1 if the buzzer is currently playing, otherwise it returns 0
