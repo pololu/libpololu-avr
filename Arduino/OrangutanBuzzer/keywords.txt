@@ -17,11 +17,15 @@ playNote	KEYWORD2
 play	KEYWORD2	
 isPlaying	KEYWORD2
 stopPlaying	KEYWORD2
+playMode	KEYWORD2
+playCheck	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
+PLAY_AUTOMATIC	LITERAL1
+PLAY_CHECK	LITERAL1
 C	LITERAL1
 C_SHARP	LITERAL1
 D_FLAT	LITERAL1
