@@ -37,12 +37,12 @@ static volatile unsigned char buzzerFinished = 1;	// flag: 0 while playing
 static const char *sequence = 0;
 static char play_mode_setting = PLAY_AUTOMATIC;
 
-static unsigned char octave;				// the current octave
+static unsigned char octave = 4;				// the current octave
 
-static unsigned int whole_note_duration;	// the duration of a whole note
-static unsigned int duration;				// the duration of a note in ms
-static unsigned int volume;				// the note volume
-static unsigned char staccato; 			// true if playing staccato
+static unsigned int whole_note_duration = 2000;	// the duration of a whole note
+static unsigned int duration = 500;				// the duration of a note in ms
+static unsigned int volume = 15;				// the note volume
+static unsigned char staccato = 0; 			// true if playing staccato
 static unsigned char staccato_rest_duration;	// duration of a staccato
 												//  rest, or zero if it is time
 												//  to play a note
@@ -354,7 +354,7 @@ void OrangutanBuzzer::playNote(unsigned char note, unsigned int dur,
 // Returns 1 if the buzzer is currently playing, otherwise it returns 0
 unsigned char OrangutanBuzzer::isPlaying()
 {
-	return !buzzerFinished;
+	return !buzzerFinished || sequence != 0;
 }
 
 
@@ -416,11 +416,6 @@ unsigned char OrangutanBuzzer::isPlaying()
 void OrangutanBuzzer::play(const char *notes)
 {
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
-	octave = 4; 				// the current octave
-	whole_note_duration = 2000; // the whole note duration
-	duration = 500;				// the duration of a note in ms
-	volume = 15; 				// the note volume
-	staccato = 0;
 	sequence = notes;
 	nextNote();					// this re-enables the timer1 interrupt
 }
