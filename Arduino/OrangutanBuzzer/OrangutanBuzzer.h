@@ -171,7 +171,9 @@ class OrangutanBuzzer
 	// it if so.  If it is not yet time to start the next note, this method
 	// returns without doing anything.  Call this as often as possible 
 	// in your main loop to avoid delays between notes in the sequence.
-	static void playCheck();
+	//
+	// Returns true if it is still playing.
+	static unsigned char playCheck();
 
 	// Returns 1 if the buzzer is currently playing, otherwise it returns 0
 	static unsigned char isPlaying();

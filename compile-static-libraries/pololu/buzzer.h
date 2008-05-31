@@ -24,7 +24,7 @@ void play(char *sequence);
 unsigned char is_playing();
 void stop_playing();
 
-void play_check();
+unsigned char play_check();
 void play_mode(char on);
 
 #endif

@@ -106,9 +106,9 @@ extern "C" void play_mode(unsigned char mode)
 	OrangutanBuzzer::playMode(mode);
 }
 
-extern "C" void play_check()
+extern "C" unsigned char play_check()
 {
-	OrangutanBuzzer::playCheck();
+	return OrangutanBuzzer::playCheck();
 }
 
 #endif
@@ -640,12 +640,15 @@ void OrangutanBuzzer::playMode(unsigned char mode)
 // it if so.  If it is not yet time to start the next note, this method
 // returns without doing anything.  Call this as often as possible 
 // in your main loop to avoid delays between notes in the sequence.
-void OrangutanBuzzer::playCheck()
+//
+// Returns true if it is still playing.
+unsigned char OrangutanBuzzer::playCheck()
 {
 	DISABLE_TIMER1_INTERRUPT();
 	if(!isPlaying() && sequence != 0)
 		nextNote();
 	ENABLE_TIMER1_INTERRUPT();
+	return sequence != 0;
 }
 
 // Local Variables: **
