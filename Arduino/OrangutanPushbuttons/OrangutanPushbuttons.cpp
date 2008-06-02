@@ -1,15 +1,26 @@
 /*
   OrangutanPushbuttons.cpp - Library for using the three user pushbuttons on the
       Orangutan LV-168
-  Written by Ben Schmidel, May 23, 2008.
-  http://www.pololu.com
-  http://forum.pololu.com
-  Released into the public domain.
-  
-  Disclaimer: To the extent permitted by law, Pololu Corporation provides
-  this work without any warranty.  It may be defective, in which case you
-  agree to be responsible for all resulting costs and damages.
 */
+
+/*
+ * Written by Ben Schmidel, May 23, 2008.
+ * Copyright (c) 2008 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J17/5.f
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
 
 #ifndef F_CPU
 #define F_CPU 20000000UL	// Orangutans run at 20 MHz

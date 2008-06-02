@@ -10,6 +10,7 @@
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J17/5.a
  *
  * You may freely modify and share this code, as long as you keep this
  * notice intact (including the two links above).  Licensed under the
@@ -18,7 +19,7 @@
  *   http://creativecommons.org/licenses/by-sa/3.0/
  *
  * Disclaimer: To the extent permitted by law, Pololu provides this work
- * without any warranty.  It may be defective, in which case you agree
+ * without any warranty.  It might be defective, in which case you agree
  * to be responsible for all resulting costs and damages.
  */
 
