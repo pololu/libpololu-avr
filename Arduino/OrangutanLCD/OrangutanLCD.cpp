@@ -232,46 +232,46 @@ void OrangutanLCD::init2()
 	_delay_ms(10);
 
 	// Send 0x3 (last four bits ignored)
-	lcd_cmd(0x30);
+	send_cmd(0x30);
 
 	// Wait >4.1ms
 	_delay_ms(5);
 
 	// Send 0x3 (last four bits ignored)
-	lcd_cmd(0x30);
+	send_cmd(0x30);
 
 	// Wait >120us
 	_delay_ms(1);
 
 	// Send 0x3 (last four bits ignored)
-	lcd_cmd(0x30);
+	send_cmd(0x30);
 
 	// Wait >120us
 	_delay_ms(1);
 
 	// Send 0x2 (last four bits ignored)  Sets 4-bit mode
-	lcd_cmd(0x20);
+	send_cmd(0x20);
 
 	// Wait >120us
 	_delay_ms(1);
 
 	// Send 0x28 = 4-bit, 2-line, 5x8 dots per char
-	lcd_cmd(0x28);
+	send_cmd(0x28);
 
 	// Busy Flag is now valid, so hard-coded delays are no longer
 	// required.
 
 	// Send 0x08 = Display off, cursor off, blinking off
-	lcd_cmd(0x08);
+	send_cmd(0x08);
 
 	// Send 0x01 = Clear display
-	lcd_cmd(0x01);
+	send_cmd(0x01);
 
 	// Send 0x06 = Set entry mode: cursor shifts right, don't scroll
-	lcd_cmd(0x06);
+	send_cmd(0x06);
 
 	// Send 0x0C = Display on, cursor off, blinking off
-	lcd_cmd(0x0C);
+	send_cmd(0x0C);
 }
 
 // Wait for the busy flag to clear on a 4-bit interface
@@ -415,14 +415,14 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 // clears the LCD screen and returns the cursor to position (0, 0)
 void OrangutanLCD::clear()
 {
-	lcd_cmd(LCD_CLEAR);
+	send_cmd(LCD_CLEAR);
 }
 
 
 // prints a single character at the current cursor location
 void OrangutanLCD::print(char character)
 {
-	lcd_data(character);
+	send_data(character);
 }
 
 
@@ -432,7 +432,7 @@ void OrangutanLCD::print(char character)
 void OrangutanLCD::print(const char *str)
 {
 	while (*str != 0)
-		lcd_data(*str++);
+		send_data(*str++);
 }
 
 #ifndef LIB_POLOLU
@@ -453,7 +453,7 @@ void OrangutanLCD::print(long value)
 	if (value < 0)
 	{
 		value = -value;
-		lcd_data('-');		// print the minus sign
+		send_data('-');		// print the minus sign
 	}
 	print((unsigned long)value);
 }
@@ -478,7 +478,7 @@ void OrangutanLCD::print(unsigned long value)
 	while (value != 0);
 
 	for(; i < 10; i++)
-		lcd_data(str[i]);
+		send_data(str[i]);
 }
 
 void OrangutanLCD::print(int value)
@@ -496,9 +496,9 @@ void OrangutanLCD::print(unsigned int value)
 void OrangutanLCD::printHexNibble(unsigned char nibble)
 {
 	if (nibble < 10)
-		lcd_data('0' + nibble);
+		send_data('0' + nibble);
 	else
-		lcd_data('A' + (nibble - 10));
+		send_data('A' + (nibble - 10));
 }
 
 
@@ -528,9 +528,9 @@ void OrangutanLCD::printBinary(unsigned char byte)
 	for (i = 0; i < 8; i++)
 	{
 		if (byte & bitmask)
-			lcd_data('1');
+			send_data('1');
 		else
-			lcd_data('0');
+			send_data('0');
 		bitmask >>= 1;
 	}
 }
@@ -555,7 +555,7 @@ void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 
 	// Grab the location in the LCD's memory of the start of line y,
 	// and add X to it to get the right character location.
-	lcd_cmd(line_mem[y] + x);
+	send_cmd(line_mem[y] + x);
 }
 
 
@@ -564,16 +564,16 @@ void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 void OrangutanLCD::showCursor(unsigned char cursorType)
 {
 	if (cursorType == CURSOR_BLINKING)
-		lcd_cmd(LCD_SHOW_BLINK);
+		send_cmd(LCD_SHOW_BLINK);
 	else
-		lcd_cmd(LCD_SHOW_SOLID);
+		send_cmd(LCD_SHOW_SOLID);
 }
 
 
 // Hides the cursor
 void OrangutanLCD::hideCursor()
 {
-	lcd_cmd(LCD_HIDE);
+	send_cmd(LCD_HIDE);
 }
 
 
@@ -585,9 +585,9 @@ void OrangutanLCD::moveCursor(unsigned char direction,
 	while(num-- > 0)
 	{
 		if (direction == LCD_LEFT)
-			lcd_cmd(LCD_CURSOR_L);
+			send_cmd(LCD_CURSOR_L);
 		else
-			lcd_cmd(LCD_CURSOR_R);
+			send_cmd(LCD_CURSOR_R);
 	}
 }
 
@@ -603,9 +603,9 @@ void OrangutanLCD::scroll(unsigned char direction, unsigned char num,
 	while(num--)
 	{
 		if (direction == LCD_LEFT)
-			lcd_cmd(LCD_SHIFT_L);
+			send_cmd(LCD_SHIFT_L);
 		else
-			lcd_cmd(LCD_SHIFT_R);
+			send_cmd(LCD_SHIFT_R);
 		i = delay_time;
 		while (i--)
 			_delay_ms(1);	// argument to _delay_ms() must be < 13

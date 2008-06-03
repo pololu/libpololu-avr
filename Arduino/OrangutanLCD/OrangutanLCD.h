@@ -38,6 +38,19 @@ class OrangutanLCD
   	
     // constructor
 	OrangutanLCD();
+	
+	// Send either data or a command on a 4-bit interface
+	static void send(unsigned char data, unsigned char rs);
+	
+	static inline void send_cmd(unsigned char cmd)
+	{
+		send(cmd, 0);
+	}
+
+	static inline void send_data(unsigned char data)
+	{
+		send(data, 1);
+	}
 
 	// clears the LCD screen and returns the cursor to position (0, 0)
 	static void clear();
@@ -120,9 +133,6 @@ class OrangutanLCD
 	// is clear, that our DDRs are all set, etc.  Basically all it does is
 	// line up the bits and shove them out the appropriate I/O lines.
 	static void sendNibble(unsigned char nibble);
-
-	// Send either data or a command on a 4-bit interface
-	static void send(unsigned char data, unsigned char rs);
 	
 	// prints a hex nibble (half of a hex byte) at
 	// your current cursor location.

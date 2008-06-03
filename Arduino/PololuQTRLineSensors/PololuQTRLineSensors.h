@@ -1,69 +1,52 @@
 /*
-  PololuQTRRC.h - Library for using Pololu QTR-1RC or QTR-8RC reflectance
-	sensors.  Simply specify in the constructor which Arduino I/O pins are
-	connected to a QTR-RC sensor, and then the read() method will obtain
-	reflectance measurements for those sensors.  The sensor values returned
-	are pulse lengths measured in microseconds, with shorter pulses
-	corresponding to higher reflectance.
-  Written by Ben Schmidel and Paul Grayson, May 28, 2008.
-  http://www.pololu.com
-  http://forum.pololu.com
-  Released into the public domain.
-  
-  Disclaimer: To the extent permitted by law, Pololu Corporation provides
-  this work without any warranty.  It may be defective, in which case you
-  agree to be responsible for all resulting costs and damages.
+  PololuQTRLineSensors.h - Library for using Pololu QTR reflectance
+	sensors and reflectance sensor arrays: QTR-1A, QTR-8A, QTR-1RC, and 
+	QTR-8RC.  The object used will determine the type of the sensor (either
+	QTR-xA or QTR-xRC).  Then simply specify in the constructor which 
+	Arduino I/O pins are connected to a QTR sensor, and the read() method
+	will obtain reflectance measurements for those sensors.  Smaller sensor
+	values correspond to higher reflectance (e.g. white) while larger
+	sensor values correspond to lower reflectance (e.g. black or a void).
 */
+	
+/*
+ * Written by Ben Schmidel et al., May 28, 2008.
+ * Copyright (c) 2008 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J19
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
 
-#ifndef PololuQTRRC_h
-#define PololuQTRRC_h
+#ifndef PololuQTRLineSensors_h
+#define PololuQTRLineSensors_h
 
-class PololuQTRRC
+class PololuQTRLineSensors
 {
   public:
-
-	// Constructor
-	PololuQTRRC();
-	PololuQTRRC(unsigned char* pins, unsigned char numSensors, 
-		  unsigned int timeout_us, unsigned char emitterPin);
-
-	// the array 'pins' contains the Arduino pin assignment for each
-	// sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
-	// Arduino digital pin 3, sensor 2 is on Arduino Digital pin 6,
-	// and sensor 3 is on Arduino analog input 1 (digital pin 15).
-	// Note that Arduino digital pins 0 - 7 correpsond to port D
-	// pins PD0 - PD7, respectively.  Arduino digital pins 8 - 13
-	// correspond to port B pins PB0 - PB5.  Arduino analog inputs
-	// 0 - 5 are referred to as digital pins 14 - 19 (these are the
-	// enumerations you should use for this library) and correspond
-	// to port C pins PC0 - PC5.
-	
-	// 'numSensors' specifies the length of the 'pins' array (i.e. the
-	// number of QTR-RC sensors you are using).  numSensors must be 
-	// no greater than 8.
-	
-	// 'timeout_us' specifies the length of time in microseconds beyond
-	// which you consider the sensor reading completely black.  That is to say,
-	// if the pulse length for a pin exceeds timeout_us, pulse timing will stop
-	// and the reading for that pin will be considered full black.
-	// It is recommended that you set timeout_us to be between 1000 and
-	// 3000, depending on things like the height of your sensors and
-	// ambient lighting.  It *MUST* be less than 6000.
-	// Using timeout_us allows you to shorten the
-	// duration of a sensor-reading cycle while still maintaining
-	// useful analog measurements of reflectance.
-	void init(unsigned char* pins, unsigned char numSensors, 
-		  unsigned int timeout_us, unsigned char emitterPin);
 	
 	// Reads the sensor values into an array. There *MUST* be space
 	// for as many values as there were sensors specified in the constructor.
 	// Example usage:
 	// unsigned int sensor_values[8];
 	// sensors.read(sensor_values);
-	// ...
-	// The values returned are in microseconds and range from 0 to
-	// timeout_us (as specified in the constructor).
-	void read(unsigned int *sensor_values);
+	// The values returned are a measure of the reflectance in abstract units,
+	// with higher values corresponding to lower reflectance (e.g. a black
+	// surface or a void).
+	virtual void read(unsigned int *sensor_values)
+	{
+	
+	};
 	
 	// Turn the IR LEDs off and on.  This is mainly for use by the
 	// readLineSensors method, and calling these functions before or
@@ -115,19 +98,95 @@ class PololuQTRRC
 	// EEPROM, performing sanity checking, etc.
 	unsigned int calibratedMinimum[8];
 	unsigned int calibratedMaximum[8];
+	
+	
+  protected:
+
+	PololuQTRLineSensors()
+	{
+	
+	};
+
+	void init(unsigned char numSensors, unsigned char emitterPin);
+	unsigned char _numSensors;
+
+	unsigned char _emitterBitmask;
+	// pointer to emitter PORT register
+	volatile unsigned char* _emitterPORT;	// needs to be volatile
+	// pointer to emitter DDR register
+	volatile unsigned char* _emitterDDR;		// needs to be volatile
+};
+
+
+class PololuQTRLineSensors_RC : public PololuQTRLineSensors
+{
+  public:
+  
+	PololuQTRLineSensors_RC()
+	{
+	
+	};
+	
+	
+	PololuQTRLineSensors_RC(unsigned char* pins, unsigned char numSensors, 
+		  unsigned int timeout, unsigned char emitterPin);
+
+	// the array 'pins' contains the Arduino pin assignment for each
+	// sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
+	// Arduino digital pin 3, sensor 2 is on Arduino Digital pin 6,
+	// and sensor 3 is on Arduino analog input 1 (digital pin 15).
+	// Note that Arduino digital pins 0 - 7 correpsond to port D
+	// pins PD0 - PD7, respectively.  Arduino digital pins 8 - 13
+	// correspond to port B pins PB0 - PB5.  Arduino analog inputs
+	// 0 - 5 are referred to as digital pins 14 - 19 (these are the
+	// enumerations you should use for this library) and correspond
+	// to port C pins PC0 - PC5.
+	
+	// 'numSensors' specifies the length of the 'pins' array (i.e. the
+	// number of QTR-RC sensors you are using).  numSensors must be 
+	// no greater than 8.
+	
+	// 'timeout' specifies the length of time in timer2 counts beyond
+	// which you consider the sensor reading completely black.  That is to say,
+	// if the pulse length for a pin exceeds 'timeout', pulse timing will stop
+	// and the reading for that pin will be considered full black.
+	// It is recommended that you set timeout to be between 1000 and
+	// 3000 us, depending on things like the height of your sensors and
+	// ambient lighting.  Using timeout_us allows you to shorten the
+	// duration of a sensor-reading cycle while still maintaining
+	// useful analog measurements of reflectance.  On a 16 MHz microcontroller,
+	// you can convert timer2 counts to microseconds by dividing by 2
+	// (i.e. 2000 us = 4000 timer2 counts = 'timeout' of 4000).  On a 20 MHz
+	// microcontroller, you can convert timer2 counts to microseconds by
+	// dividing by 2.5 or multiplying by 0.4 
+	// (i.e. 2000 us = 5000 timer2 counts = 'timeout' of 5000).
+	
+	// emitterPin is the Arduino digital pin that controls whether the IR LEDs
+	// are on or off.  This pin is optional and only exists on the 8A and 8RC
+	// QTR sensor arrays.  If a valid pin is specified,
+	// the emitters will only be turned on during a reading.  If an invalid
+	// pin is specified (e.g. 255), the IR emitters will always be on.
+	void init(unsigned char* pins, unsigned char numSensors, 
+		  unsigned int timeout, unsigned char emitterPin = 255);
+		  
+	
+	// Reads the sensor values into an array. There *MUST* be space
+	// for as many values as there were sensors specified in the constructor.
+	// Example usage:
+	// unsigned int sensor_values[8];
+	// sensors.read(sensor_values);
+	// The values returned are a measure of the reflectance in timer2 counts,
+	// with higher values corresponding to lower reflectance (e.g. a black
+	// surface or a void).  Timer2 will be running at the MCU clock / 8, which
+	// means 2 MHz for a 16 MHz MCU and 2.5 MHz for a 20 MHz MCU.
+	void read(unsigned int *sensor_values);
 
   private:
   
 	unsigned char _bitmask[8];
 	// pointer to PIN registers
 	volatile unsigned char* _register[8];	// needs to be volatile
-	unsigned char _numSensors;
-	unsigned int _timeout_us;
-	unsigned char _emitterBitmask;
-	// pointer to emitter PORT register
-	volatile unsigned char* _emitterPORT;	// needs to be volatile
-	// pointer to emitter DDR register
-	volatile unsigned char* _emitterDDR;		// needs to be volatile
+	unsigned int _timeout;
 		
 	unsigned char _portBMask;
 	unsigned char _portCMask;

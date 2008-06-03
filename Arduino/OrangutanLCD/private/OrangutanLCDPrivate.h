@@ -72,11 +72,4 @@
 #define LCD_SHIFT_L		0x18
 #define LCD_SHIFT_R		0x1C
 
-
-// Inlines to determine the setting of the RS line for command
-// and data writes to the LCD
-
-#define lcd_cmd(cmd)	(send(cmd, 0))
-#define lcd_data(data)	(send(data, 1))
-
 #endif
