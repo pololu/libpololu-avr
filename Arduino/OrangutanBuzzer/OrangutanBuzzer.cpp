@@ -32,6 +32,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include "OrangutanBuzzer.h"
 
 #define TIMER1_OFF					0x00	// timer1 disconnected
@@ -48,6 +49,9 @@ static volatile unsigned int buzzerTimeout = 0;		// tracks buzzer time limit
 static volatile unsigned char buzzerFinished = 1;	// flag: 0 while playing
 static const char *sequence = 0;
 static char play_mode_setting = PLAY_AUTOMATIC;
+
+static unsigned char use_program_space; // boolean: true if we should
+										// use program space
 
 static unsigned char octave = 4;				// the current octave
 
@@ -98,9 +102,14 @@ extern "C" void play_note(unsigned char note, unsigned int dur,
 	OrangutanBuzzer::playNote(note, dur, volume);
 }
 
-extern "C" void play(char *sequence)
+extern "C" void play(const char *sequence)
 {
 	OrangutanBuzzer::play(sequence);
+}
+
+extern "C" void play_from_program_space(char *sequence_p)
+{
+	OrangutanBuzzer::playFromProgramSpace(sequence_p);
 }
 
 extern "C" unsigned char is_playing()
@@ -429,6 +438,15 @@ void OrangutanBuzzer::play(const char *notes)
 {
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
 	sequence = notes;
+	use_program_space = 0;
+	nextNote();					// this re-enables the timer1 interrupt
+}
+
+void OrangutanBuzzer::playFromProgramSpace(const char *notes_p)
+{
+	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
+	sequence = notes_p;
+	use_program_space = 1;
 	nextNote();					// this re-enables the timer1 interrupt
 }
 
@@ -445,6 +463,24 @@ void OrangutanBuzzer::stopPlaying()
 	sequence = 0;
 }
 
+// Gets the current character, converting to lower-case and skipping spaces.
+char currentCharacter()
+{
+	char c = 0;
+	do
+	{
+		if(use_program_space)
+			c = pgm_read_byte(sequence);
+		else
+			c = *sequence;
+
+		if(c >= 'A' && c <= 'Z')
+			c += 'a'-'A';
+	} while(c == ' ');
+
+	return c;
+}
+
 // Returns the numerical argument specified at sequence[0] and
 // increments sequence to point to the character immediately after the
 // argument.
@@ -453,11 +489,13 @@ unsigned int getNumber()
 	unsigned int arg = 0;
 
 	// read all digits, one at a time
-	while(*sequence >= '0' && *sequence <= '9')
+	char c = currentCharacter();
+	while(c >= '0' && c <= '9')
 	{
 		arg *= 10;
-		arg += *sequence-'0';
+		arg += c-'0';
 		sequence ++;
+		c = currentCharacter();
 	}
 
 	return arg;
@@ -470,7 +508,6 @@ unsigned int getDuration()
 	return whole_note_duration/getNumber();
 }
 
-
 void nextNote()
 {
 	unsigned char note = 0;
@@ -480,10 +517,6 @@ void nextNote()
 	unsigned int dot_add;
 
 	char c; // temporary variable
-
-	// allow all interrupts except for timer1 overflow interrupt
-	//DISABLE_TIMER1_INTERRUPT();
-	//sei();
 
 	// if we are playing staccato, after every note we play a rest
 	if(staccato && staccato_rest_duration)
@@ -495,20 +528,13 @@ void nextNote()
 
  parse_character:
 
-	// Convert the current character to lower case.
-	c = *sequence;
-	if(c >= 'A' && c <= 'Z')
-		c += 'a'-'A';
-
-	// Advance to the next character.
+	// Get current character
+	c = currentCharacter();
 	sequence ++;
 
 	// Interpret the character.
 	switch(c)
 	{
-	case ' ':
-		// ignore spaces
-		goto parse_character;
 	case '>':
 		// shift the octave temporarily up
 		tmp_octave ++;
@@ -544,14 +570,13 @@ void nextNote()
 		goto parse_character;
 	case 'm':
 		// set music staccato or legato
-		if(sequence[0] == 'l' || sequence[0] == 'L')
+		if(currentCharacter() == 'l')
 			staccato = false;
 		else
 		{
 			staccato = true;
 			staccato_rest_duration = 0;
 		}
-		sequence++;
 		goto parse_character;
 	case 'o':
 		// set the octave permanently
@@ -579,28 +604,31 @@ void nextNote()
 	note += tmp_octave*12;
 
 	// handle sharps and flats
-	while(*sequence == '+' || *sequence == '#')
+	c = currentCharacter();
+	while(c == '+' || c == '#')
 	{
 		sequence ++;
 		note ++;
+		c = currentCharacter();
 	}
-	while(*sequence == '-')
+	while(c == '-')
 	{
 		sequence ++;
 		note --;
+		c = currentCharacter();
 	}
 
 	// set the duration of just this note
 	tmp_duration = duration;
 
 	// If the input is 'c16', make it a 16th note, etc.
-	if(*sequence > '0' && *sequence < '9')
+	if(c > '0' && c < '9')
 		tmp_duration = getDuration();
 
 	// Handle dotted notes - the first dot adds 50%, and each
 	// additional dot adds 50% of the previous dot.
 	dot_add = tmp_duration/2;
-	while(*sequence == '.')
+	while(currentCharacter() == '.')
 	{
 		sequence ++;
 		tmp_duration += dot_add;

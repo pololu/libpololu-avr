@@ -20,7 +20,8 @@ void play_frequency(unsigned int freq, unsigned int duration,
 		       unsigned char volume);
 void play_note(unsigned char note, unsigned int duration,
 		  unsigned char volume);
-void play(char *sequence);
+void play(const char *sequence);
+void play_from_program_space(const char *sequence);
 unsigned char is_playing();
 void stop_playing();
 

@@ -162,6 +162,11 @@ class OrangutanBuzzer
 	//   play("T240 L8 a gafaeada c+adaeafa <aa<bac#ada c#adaeaf4");
 	static void play(const char *sequence);
 
+	// A version of play that takes a pointer to program space instead
+	// of RAM.  This is desirable since RAM is limited and the string
+	// must be in program space anyway.
+	static void playFromProgramSpace(const char *sequence_p);
+
 	// This puts play() into a mode where instead of advancing to the
 	// next note in the sequence automatically, it waits until the
 	// function playCheck() is called. The idea is that you can

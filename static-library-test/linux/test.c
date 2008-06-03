@@ -107,18 +107,23 @@ void display_readings(const unsigned int *calibrated_values)
 	}
 }
 
+const prog_char welcome[] PROGMEM = ">g32>>c32";
+
 int main()
 {
 	unsigned int counter;
 
 	pololu_3pi_init(2000);
 	load_custom_characters();
+	
+	// Welcome music and message
 	print_character('3');
 	print_character(7);
+
+	play_from_program_space(welcome);
 	delay_ms(1000);
 
-	// display temperature and wait for button press
-  
+	// Display temperature and wait for button press
 	while(!button_is_pressed(BUTTON_B))
 	{
 		int bat = battery_millivolts();
