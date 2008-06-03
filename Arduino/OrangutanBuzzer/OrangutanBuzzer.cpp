@@ -463,7 +463,8 @@ void OrangutanBuzzer::stopPlaying()
 	sequence = 0;
 }
 
-// Gets the current character, converting to lower-case and skipping spaces.
+// Gets the current character, converting to lower-case and skipping
+// spaces.  For any spaces, this automatically increments sequence!
 char currentCharacter()
 {
 	char c = 0;
@@ -476,7 +477,7 @@ char currentCharacter()
 
 		if(c >= 'A' && c <= 'Z')
 			c += 'a'-'A';
-	} while(c == ' ');
+	} while(c == ' ' && (sequence ++));
 
 	return c;
 }
@@ -577,6 +578,7 @@ void nextNote()
 			staccato = true;
 			staccato_rest_duration = 0;
 		}
+		sequence ++;
 		goto parse_character;
 	case 'o':
 		// set the octave permanently
