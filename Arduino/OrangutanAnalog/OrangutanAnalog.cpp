@@ -74,7 +74,7 @@ extern "C" unsigned char analog_is_converting()
 	return OrangutanAnalog::isConverting();
 }
 
-extern "C" unsigned int conversion_result()
+extern "C" unsigned int analog_conversion_result()
 {
 	return OrangutanAnalog::conversionResult();
 }

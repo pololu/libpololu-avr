@@ -1,10 +1,10 @@
 #include <avr/io.h>
 #include "Pololu3pi.h"
-#include "../PololuQTRRC/PololuQTRRC.h"
+#include "../PololuQTRLineSensors/PololuQTRLineSensors.h"
 #include "../OrangutanAnalog/OrangutanAnalog.h"
 
 // a global qtr sensors
-static PololuQTRRC qtr3pi;
+static PololuQTRLineSensors_RC qtr3pi;
 
 #ifdef LIB_POLOLU
 

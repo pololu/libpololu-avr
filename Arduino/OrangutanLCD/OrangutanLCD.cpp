@@ -104,6 +104,7 @@
 
 
 #include <avr/io.h>
+#include <avr/pgmspace.h>
 
 #ifndef F_CPU
 #define F_CPU 20000000UL	// the Orangutan LV-168 runs at 20 MHz
@@ -216,7 +217,33 @@ extern "C" void print_long(long value)
 {
 	OrangutanLCD::print(value);
 }
+
+extern "C" void load_custom_character(const PROGMEM char *picture, unsigned char number)
+{
+	OrangutanLCD::loadCustomCharacter(picture, number);
+}
 #endif
+
+#define LCD_CGRAM   6
+
+// Loads a custom character
+void OrangutanLCD::loadCustomCharacter(const PROGMEM char *picture, unsigned char number)
+{
+  unsigned char i;
+
+  // Each character takes up 8 bytes of the character memory, so we
+  // multiply by 8 to get the address.
+  number *= 8;
+
+  for(i=0; i<8; i++)
+  {
+    // set CG RAM address
+    send_cmd((1<<LCD_CGRAM) | (number+i));
+
+    // write character data
+    send_data(pgm_read_byte(picture+i));
+  }
+}
 
 // Initialize the LCD for a 4-bit interface
 // this method is automatically called the first time any LCD member

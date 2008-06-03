@@ -7,11 +7,14 @@
 #ifndef OrangutanLCD_h
 #define OrangutanLCD_h
 
+#include <avr/pgmspace.h>
+
 void lcd_init_printf();
 void clear();
 void print(const char *str);
 void print_character(char c);
 void print_long(long value);
 void lcd_goto_xy(int col, int row);
+void load_custom_character(const PROGMEM char *picture, unsigned char number);
 
 #endif

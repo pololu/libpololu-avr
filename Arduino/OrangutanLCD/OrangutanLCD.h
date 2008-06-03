@@ -103,6 +103,8 @@ class OrangutanLCD
 	static void scroll(unsigned char direction, unsigned char num, 
 						unsigned int delay_time);
 
+	// Loads a custom character
+	static void loadCustomCharacter(const PROGMEM char *picture, unsigned char number);
 
   private:
   
@@ -137,7 +139,6 @@ class OrangutanLCD
 	// prints a hex nibble (half of a hex byte) at
 	// your current cursor location.
 	static void printHexNibble(unsigned char nibble);
-
 };
 
 #endif

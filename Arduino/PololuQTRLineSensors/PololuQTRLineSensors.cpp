@@ -38,7 +38,7 @@
 
 
 #ifdef LIB_POLOLU
-static PololuQTRRC qtr;
+static PololuQTRLineSensors_RC qtr;
 
 extern "C" void qtr_emitters_on()
 {

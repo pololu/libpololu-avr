@@ -10,5 +10,5 @@ int read_temperature_f();
 int read_temperature_c();
 void start_analog_conversion(unsigned char channel);
 unsigned char analog_is_converting();
-unsigned int conversion_result();
+unsigned int analog_conversion_result();
 unsigned int to_millivolts(unsigned int analog_result);
