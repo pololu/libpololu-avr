@@ -2,14 +2,18 @@
 #include <stdio.h>
 #include "assert.h"
 #include "analog.h"
+#include "delay.h"
 
 int main()
 {
+	delay_ms(500); // warming up
+
 	lcd_init_printf();
 
 	printf("\nAssert");
 	assert(1 == 1); // make sure assert works
 	test_analog();
+	test_delay();
 
 	clear();
 	printf("\nSuccess");

@@ -31,7 +31,7 @@ void test_analog()
   unsigned char i;
   int min = 1023, max = 0, avg_min = 1023, avg_max = 0;
   
-  for(i=0;i<20;i++)
+  for(i=0;i<10;i++)
   {
     int x1 = analog_read(7);
     int x2 = analog_read_average(7,256);
@@ -42,7 +42,7 @@ void test_analog()
     if(x2 > avg_max) avg_max = x2;
     if(x2 < avg_min) avg_min = x2;
 
-    printf("\nAvgComp %d %d", x1, x2);
+    printf("\nAvgComp %03x %03x", x1, x2);
     assert( abs(x1-x2) < 10);
   }
 
