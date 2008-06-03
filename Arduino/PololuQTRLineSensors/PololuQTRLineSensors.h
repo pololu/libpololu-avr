@@ -31,6 +31,9 @@
 #ifndef PololuQTRLineSensors_h
 #define PololuQTRLineSensors_h
 
+// This class cannot be instantiated directly (it has no constructor).
+// Instead, you should instantiate one of its two derived classes (either the
+// QTR-A or QTR-RC version, depending on the type of your sensor).
 class PololuQTRLineSensors
 {
   public:
@@ -43,10 +46,11 @@ class PololuQTRLineSensors
 	// The values returned are a measure of the reflectance in abstract units,
 	// with higher values corresponding to lower reflectance (e.g. a black
 	// surface or a void).
-	virtual void read(unsigned int *sensor_values)
-	{
-	
-	};
+	// This method will call the appropriate derived class' readPrivate(), as
+	// determined by the _type data member.  Making this method virtual
+	// leads to compiler warnings, which is why this alternate approach was
+	// taken.
+	void read(unsigned int *sensor_values);
 	
 	// Turn the IR LEDs off and on.  This is mainly for use by the
 	// readLineSensors method, and calling these functions before or
@@ -107,7 +111,8 @@ class PololuQTRLineSensors
 	
 	};
 
-	void init(unsigned char numSensors, unsigned char emitterPin);
+	void init(unsigned char numSensors, unsigned char emitterPin,
+		unsigned char type);
 	unsigned char _numSensors;
 
 	unsigned char _emitterBitmask;
@@ -115,11 +120,21 @@ class PololuQTRLineSensors
 	volatile unsigned char* _emitterPORT;	// needs to be volatile
 	// pointer to emitter DDR register
 	volatile unsigned char* _emitterDDR;		// needs to be volatile
+	
+
+  private:
+	
+	unsigned char _type;	// the type of the derived class (QTR_RC or QTR_A)
 };
+
 
 
 class PololuQTRLineSensors_RC : public PololuQTRLineSensors
 {
+	// allows the base PololuQTRLineSensors class to access this class' 
+	// readPrivate()
+	friend class PololuQTRLineSensors;
+	
   public:
   
 	PololuQTRLineSensors_RC()
@@ -169,7 +184,10 @@ class PololuQTRLineSensors_RC : public PololuQTRLineSensors
 	void init(unsigned char* pins, unsigned char numSensors, 
 		  unsigned int timeout, unsigned char emitterPin = 255);
 		  
-	
+
+  
+  private:
+
 	// Reads the sensor values into an array. There *MUST* be space
 	// for as many values as there were sensors specified in the constructor.
 	// Example usage:
@@ -179,10 +197,11 @@ class PololuQTRLineSensors_RC : public PololuQTRLineSensors
 	// with higher values corresponding to lower reflectance (e.g. a black
 	// surface or a void).  Timer2 will be running at the MCU clock / 8, which
 	// means 2 MHz for a 16 MHz MCU and 2.5 MHz for a 20 MHz MCU.
-	void read(unsigned int *sensor_values);
+	void readPrivate(unsigned int *sensor_values);
+ 
 
   private:
-  
+
 	unsigned char _bitmask[8];
 	// pointer to PIN registers
 	volatile unsigned char* _register[8];	// needs to be volatile

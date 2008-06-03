@@ -33,9 +33,10 @@
 #endif
 #include <util/delay.h>
 #include <avr/io.h>
-
 #include "PololuQTRLineSensors.h"
 
+#define QTR_RC		0
+#define QTR_A		1
 
 #ifdef LIB_POLOLU
 static PololuQTRLineSensors_RC qtr;
@@ -86,13 +87,15 @@ extern "C" unsigned int qtr_read_line_white(unsigned int *sensor_values)
 
 // Base class data member initialization (called by derived class init())
 void PololuQTRLineSensors::init(unsigned char numSensors, 
-  unsigned char emitterPin)
+  unsigned char emitterPin, unsigned char type)
 {
 	if (numSensors > 8)
 		_numSensors = 8;
 	else
 		_numSensors = numSensors;
-
+		
+	_type = type;
+		
 	if (emitterPin < 8)				// port D
 	{
 		_emitterBitmask = 1 << emitterPin;
@@ -117,6 +120,22 @@ void PololuQTRLineSensors::init(unsigned char numSensors,
 		_emitterPORT = 0;
 	}
 }
+
+
+// Reads the sensor values into an array. There *MUST* be space
+// for as many values as there were sensors specified in the constructor.
+// Example usage:
+// unsigned int sensor_values[8];
+// sensors.read(sensor_values);
+// The values returned are a measure of the reflectance in abstract units,
+// with higher values corresponding to lower reflectance (e.g. a black
+// surface or a void).
+void PololuQTRLineSensors::read(unsigned int *sensor_values)
+{
+	if (_type == QTR_RC)
+		((PololuQTRLineSensors_RC*)this)->readPrivate(sensor_values);
+}
+
 
 
 // Turn the IR LEDs off and on.  This is mainly for use by the
@@ -263,7 +282,7 @@ PololuQTRLineSensors_RC::PololuQTRLineSensors_RC(unsigned char* pins,
 void PololuQTRLineSensors_RC::init(unsigned char* pins,
   unsigned char numSensors, unsigned int timeout, unsigned char emitterPin)
 {
-	PololuQTRLineSensors::init(numSensors, emitterPin);
+	PololuQTRLineSensors::init(numSensors, emitterPin, QTR_RC);
 	
 	unsigned char i;
 	_portBMask = 0;
@@ -312,7 +331,7 @@ void PololuQTRLineSensors_RC::init(unsigned char* pins,
 // ...
 // The values returned are in microseconds and range from 0 to
 // timeout_us (as specified in the constructor).
-void PololuQTRLineSensors_RC::read(unsigned int *sensor_values)
+void PololuQTRLineSensors_RC::readPrivate(unsigned int *sensor_values)
 {
 	unsigned char i;
 	unsigned char start_time;
