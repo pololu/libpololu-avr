@@ -16,7 +16,7 @@ LIBRARY_OBJECT_FILES=\
 	../Arduino/OrangutanAnalog/OrangutanAnalog.o \
 	../Arduino/PololuQTRLineSensors/PololuQTRLineSensors.o \
 	../Arduino/Pololu3pi/Pololu3pi.o \
-	Delay.o
+	OrangutanDelay.o
 
 #	OrangutanDelay/OrangutanDelay.o \
 #	OrangutanLineSensors/OrangutanLineSensors.o

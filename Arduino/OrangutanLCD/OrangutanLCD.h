@@ -78,6 +78,9 @@ class OrangutanLCD
 	// cursor location.
 	static void printHex(unsigned int word);
 
+	// prints a one-byte value in hex at your current location
+	static void printHex(unsigned char byte);
+
 	// lcd_binary prints a byte in binary starting at your current cursor location.
 	static void printBinary(unsigned char byte);
 

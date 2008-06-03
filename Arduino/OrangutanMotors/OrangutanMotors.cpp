@@ -49,11 +49,12 @@ ISR(TIMER2_OVF_vect)
 
 // declared in wiring.c and used to drive millis()
 extern volatile unsigned long timer0_overflow_count;
+
+#ifndef LIB_POLOLU
 // declaring this global as static means it won't conflict
 // with globals in other .cpp files that share the same name
 static unsigned char miniCount = 0;	// only used in timer2 overflow ISR
 
-#ifndef LIB_POLOLU
 // this ISR is called every time timer2 overflows.
 // it replaces the timer0 overflow ISR that drives millis()
 // so that millis() and delay() will still work

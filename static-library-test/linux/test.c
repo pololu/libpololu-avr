@@ -84,14 +84,14 @@ const prog_char pi[] PROGMEM = {
 
 void load_custom_characters()
 {
-	load_custom_character(level0,0);
-	load_custom_character(level1,1);
-	load_custom_character(level2,2);
-	load_custom_character(level3,3);
-	load_custom_character(level4,4);
-	load_custom_character(level5,5);
-	load_custom_character(level6,6);
-	load_custom_character(pi,7);
+	lcd_load_custom_character(level0,0);
+	lcd_load_custom_character(level1,1);
+	lcd_load_custom_character(level2,2);
+	lcd_load_custom_character(level3,3);
+	lcd_load_custom_character(level4,4);
+	lcd_load_custom_character(level5,5);
+	lcd_load_custom_character(level6,6);
+	lcd_load_custom_character(pi,7);
 	clear();
 }
 

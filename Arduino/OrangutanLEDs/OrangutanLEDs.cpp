@@ -40,6 +40,16 @@ extern "C" void right_led(unsigned char on)
 	OrangutanLEDs::right(on);
 }
 
+extern "C" void red_led(unsigned char on)
+{
+	OrangutanLEDs::red(on);
+}
+
+extern "C" void green_led(unsigned char on)
+{
+	OrangutanLEDs::green(on);
+}
+
 #endif
 
 
