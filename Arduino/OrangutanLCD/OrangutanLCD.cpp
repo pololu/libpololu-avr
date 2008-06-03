@@ -218,16 +218,16 @@ extern "C" void print_long(long value)
 	OrangutanLCD::print(value);
 }
 
-extern "C" void load_custom_character(const PROGMEM char *picture, unsigned char number)
+extern "C" void load_custom_character(const char *picture_p, unsigned char number)
 {
-	OrangutanLCD::loadCustomCharacter(picture, number);
+	OrangutanLCD::loadCustomCharacter(picture_p, number);
 }
 #endif
 
 #define LCD_CGRAM   6
 
 // Loads a custom character
-void OrangutanLCD::loadCustomCharacter(const PROGMEM char *picture, unsigned char number)
+void OrangutanLCD::loadCustomCharacter(const char *picture_p, unsigned char number)
 {
   unsigned char i;
 
@@ -241,7 +241,7 @@ void OrangutanLCD::loadCustomCharacter(const PROGMEM char *picture, unsigned cha
     send_cmd((1<<LCD_CGRAM) | (number+i));
 
     // write character data
-    send_data(pgm_read_byte(picture+i));
+    send_data(pgm_read_byte(picture_p+i));
   }
 }
 

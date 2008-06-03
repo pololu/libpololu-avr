@@ -1,12 +1,107 @@
 #include <pololu/3pi.h>
+#include <avr/pgmspace.h>
+
+const prog_char level0[] PROGMEM = {
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b11111
+};
+const prog_char level1[] PROGMEM = {
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b11111,
+  0b11111
+};
+const prog_char level2[] PROGMEM = {
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b11111,
+  0b11111,
+  0b11111
+};
+const prog_char level3[] PROGMEM = {
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111
+};
+const prog_char level4[] PROGMEM = {
+  0b00000,
+  0b00000,
+  0b00000,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111
+};
+const prog_char level5[] PROGMEM = {
+  0b00000,
+  0b00000,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111
+};
+const prog_char level6[] PROGMEM = {
+  0b00000,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111,
+  0b11111
+};
+const prog_char pi[] PROGMEM = {
+  0b00000,
+  0b00000,
+  0b00000,
+  0b11111,
+  0b01010,
+  0b01010,
+  0b01010,
+  0b10011,
+};
+
+void load_custom_characters()
+{
+	load_custom_character(level0,0);
+	load_custom_character(level1,1);
+	load_custom_character(level2,2);
+	load_custom_character(level3,3);
+	load_custom_character(level4,4);
+	load_custom_character(level5,5);
+	load_custom_character(level6,6);
+	load_custom_character(pi,7);
+	clear();
+}
 
 void display_readings(const unsigned int *calibrated_values)
 {
 	unsigned char i;
 
 	for(i=0;i<5;i++) {
-		const char display_characters[10] = {' ','.',',','-','+','o','O','0','@','#'};
-		// values from 0 to 9
+		const char display_characters[10] = {' ',0,0,1,2,3,4,5,6,255};
+		// values from 0 to 10
 		char c = display_characters[calibrated_values[i]/101];
 		print_character(c);
 	}
@@ -17,6 +112,10 @@ int main()
 	unsigned int counter;
 
 	pololu_3pi_init(2000);
+	load_custom_characters();
+	print_character('3');
+	print_character(7);
+	delay_ms(1000);
 
 	// display temperature and wait for button press
   

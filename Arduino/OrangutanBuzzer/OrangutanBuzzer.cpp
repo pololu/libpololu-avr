@@ -652,7 +652,7 @@ void OrangutanBuzzer::playMode(unsigned char mode)
 unsigned char OrangutanBuzzer::playCheck()
 {
 	DISABLE_TIMER1_INTERRUPT();
-	if(!isPlaying() && sequence != 0)
+	if(buzzerFinished && sequence != 0)
 		nextNote();
 	ENABLE_TIMER1_INTERRUPT();
 	return sequence != 0;

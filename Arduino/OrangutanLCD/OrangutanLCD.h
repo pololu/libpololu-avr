@@ -103,8 +103,24 @@ class OrangutanLCD
 	static void scroll(unsigned char direction, unsigned char num, 
 						unsigned int delay_time);
 
-	// Loads a custom character
-	static void loadCustomCharacter(const PROGMEM char *picture, unsigned char number);
+	// Loads a custom character into the character memory of the LCD.
+	// The parameter 'number' is a character value between 0 and 7,
+	// which represents the character that will be customized.  That is
+	// The pointer 'picture_p' is a pointer to an 8 byte array in
+	// program space containing the picture data.  This kind of array
+	// may be defined as follows:
+	//
+	// #include <avr/pgmspace.h>
+	// const prog_char pi[] PROGMEM = { 0b11100, .... }
+	//
+	// The first byte represets row one, which has, in this example,
+	// three black pixels on the left, followed by two clear
+	// pixels.  Subsequent values specify the pixels for the remaining
+	// rows of the 5x8 character.
+	//
+	// After loading all desired custom characters, clear() should be
+	// called to reset the LCD.
+	static void loadCustomCharacter(const char *picture_p, unsigned char number);
 
   private:
   
