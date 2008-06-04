@@ -93,6 +93,39 @@ OrangutanAnalog::OrangutanAnalog()
 
 }
 
+// set the ADC to run in either 8-bit mode (MODE_8_BIT) or 
+// 10-bit mode (MODE_10_BIT)
+void OrangutanAnalog::setMode(unsigned char mode)
+{
+	if (mode == MODE_10_BIT)
+		ADMUX &= ~(1 << ADLAR);	// right-adjust result (ADC has result)
+	else
+		ADMUX |= 1 << ADLAR;		// left-adjust result (ADCH has result)	
+}
+	
+// returns 0 if in 10-bit mode, otherwise returns non-zero.  The return
+// value of this method can be directly compared against the macros
+// MODE_8_BIT and MODE_10_BIT:
+// For example: if (getMode() == MODE_8_BIT) ...
+inline unsigned char OrangutanAnalog::getMode()
+{
+	return ADMUX & (1 << ADLAR) ? 1 : 0;
+}
+
+// returns 1 if the ADC is in the middle of an conversion, otherwise
+// returns 0
+unsigned char OrangutanAnalog::isConverting()
+{
+	return ADCSRA & (1 << ADSC);
+}
+
+// returns the result of the previous ADC conversion.
+inline unsigned int OrangutanAnalog::conversionResult()
+{
+	if (getMode())				// if left-adjusted (i.e. 8-bit mode)
+		return ADCH;			// 8-bit result
+	return ADC;				// 10-bit result
+}
 
 // the following method can be used to initiate an ADC conversion
 // that runs in the background, allowing the CPU to perform other tasks

@@ -1,10 +1,10 @@
 #include <avr/io.h>
 #include "Pololu3pi.h"
-#include "../PololuQTRLineSensors/PololuQTRLineSensors.h"
+#include "../PololuQTRSensors/PololuQTRSensors.h"
 #include "../OrangutanAnalog/OrangutanAnalog.h"
 
 // a global qtr sensors
-static PololuQTRLineSensors_RC qtr3pi;
+static PololuQTRSensorsRC qtr3pi;
 
 #ifdef LIB_POLOLU
 
@@ -84,7 +84,7 @@ void Pololu3pi::calibrateLineSensors()
 	qtr3pi.calibrate();
 }
 
-void readLineSensorsCalibrated(unsigned int *sensor_values)
+void readSensorsCalibrated(unsigned int *sensor_values)
 {
 	qtr3pi.readCalibrated(sensor_values);
 }

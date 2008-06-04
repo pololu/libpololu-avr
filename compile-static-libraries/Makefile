@@ -14,7 +14,7 @@ LIBRARY_OBJECT_FILES=\
 	../Arduino/OrangutanLCD/OrangutanLCD.o \
 	../Arduino/OrangutanLEDs/OrangutanLEDs.o \
 	../Arduino/OrangutanAnalog/OrangutanAnalog.o \
-	../Arduino/PololuQTRLineSensors/PololuQTRLineSensors.o \
+	../Arduino/PololuQTRSensors/PololuQTRSensors.o \
 	../Arduino/Pololu3pi/Pololu3pi.o \
 	OrangutanDelay.o
 
@@ -46,3 +46,5 @@ install: libpololu.a
 	install -d $(INCLUDE_POLOLU)
 	install -t $(LIB) libpololu.a
 	install -t $(INCLUDE_POLOLU) pololu/*.h
+	install -t $(INCLUDE_POLOLU) ../Arduino/*/*.h
+	install -t $(INCLUDE_POLOLU) OrangutanDelay.h
