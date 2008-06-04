@@ -155,6 +155,8 @@ class OrangutanBuzzer
 	//   'ML' sets all subsequent notes to play legato - each note is played
 	//       for its full length.  This is the default setting.
 	//
+	//   '!' resets all persistent settings to their defaults.
+	//
 	// The following plays a c major scale up and back down:
 	//   play("L16 V8 cdefgab>cbagfedc");
 	//
