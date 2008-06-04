@@ -479,6 +479,7 @@ void OrangutanLCD::clear()
 {
 	send_cmd(LCD_CLEAR);
 
+#ifdef LIB_POLOLU
 	unsigned char i;
 
 	// clear out the LCD
@@ -487,6 +488,7 @@ void OrangutanLCD::clear()
 
 	col = 0;
 	row = 0;
+#endif
 }
 
 
@@ -617,9 +619,11 @@ void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 	// and add X to it to get the right character location.
 	send_cmd(line_mem[y] + x);
 
+#ifdef LIB_POLOLU
 	// Save it for use with printf.
 	col = x;
 	row = y;
+#endif
 }
 
 
