@@ -4,6 +4,7 @@
 #include "analog.h"
 #include "delay.h"
 #include "lcd.h"
+#include "buzzer.h"
 
 int main()
 {
@@ -13,6 +14,7 @@ int main()
 
 	printf("\nAssert");
 	assert(1 == 1); // make sure assert works
+	test_buzzer();
 	test_analog();
 	test_delay();
 	test_lcd();

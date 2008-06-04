@@ -439,6 +439,7 @@ void OrangutanBuzzer::play(const char *notes)
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
 	sequence = notes;
 	use_program_space = 0;
+	staccato_rest_duration = 0;
 	nextNote();					// this re-enables the timer1 interrupt
 }
 
@@ -447,6 +448,7 @@ void OrangutanBuzzer::playFromProgramSpace(const char *notes_p)
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
 	sequence = notes_p;
 	use_program_space = 1;
+	staccato_rest_duration = 0;
 	nextNote();					// this re-enables the timer1 interrupt
 }
 
