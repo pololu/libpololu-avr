@@ -482,6 +482,8 @@ void PololuQTRSensorsAnalog::init(unsigned char* analogPins,
   unsigned char numSensors, unsigned char numSamplesPerSensor,
   unsigned char emitterPin)
 {
+	unsigned char i;
+	
 	PololuQTRSensors::init(numSensors, emitterPin, QTR_A);
 	
 	_numSamplesPerSensor = numSamplesPerSensor;
@@ -514,7 +516,7 @@ void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
 	unsigned char portc = PORTC;
 
 	// wait for any current conversion to finish
-	while (ADCSRA & (1 << ADCS));
+	while (ADCSRA & (1 << ADSC));
 	
 	emittersOn();
 	
