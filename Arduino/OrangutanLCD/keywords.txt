@@ -23,6 +23,8 @@ showCursor	KEYWORD2
 hideCursor	KEYWORD2
 moveCursor	KEYWORD2
 scroll	KEYWORD2
+loadCustomCharacter	KEYWORD2
+initPrintf	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
