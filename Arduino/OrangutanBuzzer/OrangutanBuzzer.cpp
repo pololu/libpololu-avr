@@ -253,10 +253,6 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 	OCR1A = newOCR1A;					// set timer 1 pwm frequency
 	OCR1B = OCR1A >> (16 - volume);	// set duty cycle (volume)
 	buzzerTimeout = timeout;			// set buzzer duration
-	// if it close to overflow, reset to zero so that overflow will not 
-	// occur until we return
-	if (OCR1A - TCNT1 < 30 || TCNT1 > OCR1A)
-		TCNT1 = 0;
 	TIFR1 |= 0xFF;						// clear any pending t1 overflow int.
 	ENABLE_TIMER1_INTERRUPT();			// this is the only place the t1
 										//  overflow is enabled
