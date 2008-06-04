@@ -46,5 +46,6 @@ install: libpololu.a
 	install -d $(INCLUDE_POLOLU)
 	install -t $(LIB) libpololu.a
 	install -t $(INCLUDE_POLOLU) pololu/*.h
+	install -t $(INCLUDE_POLOLU) pololu/orangutan
 	install -t $(INCLUDE_POLOLU) ../Arduino/*/*.h
 	install -t $(INCLUDE_POLOLU) OrangutanDelay.h

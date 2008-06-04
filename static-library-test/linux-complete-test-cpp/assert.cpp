@@ -1,4 +1,4 @@
-#include <pololu/Orangutan.h>
+#include <pololu/orangutan>
 #include "assert.h"
 
 void assert(unsigned char truth)

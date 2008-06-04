@@ -1,4 +1,4 @@
-#include <pololu/Orangutan.h>
+#include <pololu/orangutan>
 #include <stdio.h>
 #include "assert.h"
 #include "analog.h"

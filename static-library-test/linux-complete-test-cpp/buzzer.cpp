@@ -1,4 +1,4 @@
-#include <pololu/Orangutan.h>
+#include <pololu/orangutan>
 #include <stdio.h>
 #include <avr/pgmspace.h>
 #include "assert.h"
