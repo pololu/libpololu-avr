@@ -1,5 +1,5 @@
 /*
-  PololuQTRLineSensors.cpp - Library for using Pololu QTR reflectance
+  PololuQTRSensors.cpp - Library for using Pololu QTR reflectance
 	sensors and reflectance sensor arrays: QTR-1A, QTR-8A, QTR-1RC, and 
 	QTR-8RC.  The object used will determine the type of the sensor (either
 	QTR-xA or QTR-xRC).  Then simply specify in the constructor which 
@@ -7,6 +7,9 @@
 	will obtain reflectance measurements for those sensors.  Smaller sensor
 	values correspond to higher reflectance (e.g. white) while larger
 	sensor values correspond to lower reflectance (e.g. black or a void).
+	
+	* PololuQTRSensorsRC should be used for QTR-1RC and QTR-8RC sensors.
+	* PololuQTRSensorsAnalog should be used for QTR-1A and QTR-8A sensors.
 */
 	
 /*
@@ -33,13 +36,13 @@
 #endif
 #include <util/delay.h>
 #include <avr/io.h>
-#include "PololuQTRLineSensors.h"
+#include "PololuQTRSensors.h"
 
 #define QTR_RC		0
 #define QTR_A		1
 
 #ifdef LIB_POLOLU
-static PololuQTRLineSensors_RC qtr;
+static PololuQTRSensorsRC qtr;
 
 extern "C" void qtr_emitters_on()
 {
@@ -86,7 +89,7 @@ extern "C" unsigned int qtr_read_line_white(unsigned int *sensor_values)
 
 
 // Base class data member initialization (called by derived class init())
-void PololuQTRLineSensors::init(unsigned char numSensors, 
+void PololuQTRSensors::init(unsigned char numSensors, 
   unsigned char emitterPin, unsigned char type)
 {
 	if (numSensors > 8)
@@ -130,19 +133,20 @@ void PololuQTRLineSensors::init(unsigned char numSensors,
 // The values returned are a measure of the reflectance in abstract units,
 // with higher values corresponding to lower reflectance (e.g. a black
 // surface or a void).
-void PololuQTRLineSensors::read(unsigned int *sensor_values)
+void PololuQTRSensors::read(unsigned int *sensor_values)
 {
 	if (_type == QTR_RC)
-		((PololuQTRLineSensors_RC*)this)->readPrivate(sensor_values);
+		((PololuQTRSensorsRC*)this)->readPrivate(sensor_values);
+	else
+		((PololuQTRSensorsAnalog*)this)->readPrivate(sensor_values);
 }
-
 
 
 // Turn the IR LEDs off and on.  This is mainly for use by the
 // readLineSensors method, and calling these functions before or
 // after the reading the sensors will have no effect on the
 // readings, but you may wish to use these for testing purposes.
-void PololuQTRLineSensors::emittersOff()
+void PololuQTRSensors::emittersOff()
 {
 	if (_emitterDDR == 0)
 		return;
@@ -150,8 +154,7 @@ void PololuQTRLineSensors::emittersOff()
 	*_emitterPORT &= ~_emitterBitmask;
 }
 
-
-void PololuQTRLineSensors::emittersOn()
+void PololuQTRSensors::emittersOn()
 {
   if (_emitterDDR == 0)
 		return;
@@ -159,7 +162,12 @@ void PololuQTRLineSensors::emittersOn()
 	*_emitterPORT |= _emitterBitmask;
 }
 
-void PololuQTRLineSensors::calibrate()
+
+// Reads the sensors for calibration.  The sensor values are
+// not returned; instead, the maximum and minimum values found
+// over time are stored internally and used for the
+// readCalibrated() method.
+void PololuQTRSensors::calibrate()
 {
 	unsigned int sensor_values[8];
 	int i;
@@ -174,7 +182,13 @@ void PololuQTRLineSensors::calibrate()
 	}
 }
 
-void PololuQTRLineSensors::readCalibrated(unsigned int *sensor_values)
+
+// Returns values calibrated to a value between 0 and 1000, where
+// 0 corresponds to the minimum value read by calibrate() and 1000
+// corresponds to the maximum value.  Calibration values are
+// stored separately for each sensor, so that differences in the
+// sensors are accounted for automatically.
+void PololuQTRSensors::readCalibrated(unsigned int *sensor_values)
 {
 	int i;
 
@@ -195,7 +209,27 @@ void PololuQTRLineSensors::readCalibrated(unsigned int *sensor_values)
 	}
 }
 
-unsigned int PololuQTRLineSensors::readLine(unsigned int *sensor_values,
+
+// Operates the same as read calibrated, but also returns an
+// estimated position of the robot with respect to a line. The
+// estimate is made using a weighted average of the sensor indices
+// multiplied by 1000, so that a return value of 0 indicates that
+// the line is directly below sensor 0, a return value of 1000
+// indicates that the line is directly below sensor 1, 2000
+// indicates that it's below sensor 2000, etc.  Intermediate
+// values indicate that the line is between two sensors.  The
+// formula is:
+// 
+//    0*value0 + 1000*value1 + 2000*value2 + ...
+//   --------------------------------------------
+//         value0  +  value1  +  value2 + ...
+//
+// By default, this function assumes a dark line (high values)
+// surrounded by white (low values).  If your line is light on
+// black, set the optional second argument white_line to true.  In
+// this case, each sensor value will be replaced by (1000-value)
+// before the averaging.
+unsigned int PololuQTRSensors::readLine(unsigned int *sensor_values,
   unsigned char white_line)
 {
 	unsigned char i, on_line = 0;
@@ -243,7 +277,7 @@ unsigned int PololuQTRLineSensors::readLine(unsigned int *sensor_values,
 
 
 // Derived RC class constructor
-PololuQTRLineSensors_RC::PololuQTRLineSensors_RC(unsigned char* pins,
+PololuQTRSensorsRC::PololuQTRSensorsRC(unsigned char* pins,
   unsigned char numSensors, unsigned int timeout_us, unsigned char emitterPin)
 {
 	init(pins, numSensors, timeout_us, emitterPin);
@@ -252,7 +286,7 @@ PololuQTRLineSensors_RC::PololuQTRLineSensors_RC(unsigned char* pins,
 
 // the array 'pins' contains the Arduino pin assignment for each
 // sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
-// Arduino digital pin 3, sensor 2 is on Arduino Digital pin 6,
+// Arduino digital pin 3, sensor 2 is on Arduino digital pin 6,
 // and sensor 3 is on Arduino analog input 1 (digital pin 15).
 // Note that Arduino digital pins 0 - 7 correpsond to port D
 // pins PD0 - PD7, respectively.  Arduino digital pins 8 - 13
@@ -279,10 +313,10 @@ PololuQTRLineSensors_RC::PololuQTRLineSensors_RC(unsigned char* pins,
 // 'emitterPin' is the Arduino pin that controls the IR LEDs on the 8RC
 // modules.  If you are using a 1RC (i.e. if there is no emitter pin),
 // use an invalid Arduino pin value (20 or greater).
-void PololuQTRLineSensors_RC::init(unsigned char* pins,
+void PololuQTRSensorsRC::init(unsigned char* pins,
   unsigned char numSensors, unsigned int timeout, unsigned char emitterPin)
 {
-	PololuQTRLineSensors::init(numSensors, emitterPin, QTR_RC);
+	PololuQTRSensors::init(numSensors, emitterPin, QTR_RC);
 	
 	unsigned char i;
 	_portBMask = 0;
@@ -331,7 +365,7 @@ void PololuQTRLineSensors_RC::init(unsigned char* pins,
 // ...
 // The values returned are in microseconds and range from 0 to
 // timeout_us (as specified in the constructor).
-void PololuQTRLineSensors_RC::readPrivate(unsigned int *sensor_values)
+void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 {
 	unsigned char i;
 	unsigned char start_time;
@@ -402,6 +436,119 @@ void PololuQTRLineSensors_RC::readPrivate(unsigned int *sensor_values)
 	for(i = 0; i < _numSensors; i++)
 		if (!sensor_values[i])
 			sensor_values[i] = _timeout;
+}
+
+
+
+// Derived Analog class constructor
+PololuQTRSensorsAnalog::PololuQTRSensorsAnalog(unsigned char* analogPins,
+  unsigned char numSensors, unsigned char numSamplesPerSensor,
+  unsigned char emitterPin)
+{
+	init(analogPins, numSensors, numSamplesPerSensor, emitterPin);
+}
+
+
+// the array 'pins' contains the Arduino analog pin assignment for each
+// sensor.  For example, if pins is {0, 1, 7}, sensor 1 is on
+// Arduino analog input 0, sensor 2 is on Arduino analog input 1,
+// and sensor 3 is on Arduino analog input 7.  The ATmega168 has 8
+// total analog input channels (0 - 7) that correspond to port C
+// pins PC0 - PC7.
+
+// 'numSensors' specifies the length of the 'analogPins' array (i.e. the
+// number of QTR-A sensors you are using).  numSensors must be 
+// no greater than 8.
+
+// 'numSamplesPerSensor' indicates the number of 10-bit analog samples
+// to average per channel (i.e. per sensor) for each reading.  The total
+// number of analog-to-digital conversions performed will be equal to
+// numSensors*numSamplesPerSensor.  Note that the amount of time it takes
+// to perform a single analog-to-digital conversion is approximately:
+// 128 * 13 / F_CPU = 1664 / F_CPU
+// If F_CPU is 16 MHz, as on most Arduinos, this becomes:
+// 1664 / 16 MHz = 104 us
+// So if numSamplesPerSensor is 4 and numSensors is, say, 6, it will take
+// 4 * 6 * 104 us = 2.5 ms to perform a full readLine() if F_CPU is 16 MHz.
+// Increasing this parameter increases noise suppression at the cost of
+// sample rate.  Recommended value: 4.
+
+// emitterPin is the Arduino digital pin that controls whether the IR LEDs
+// are on or off.  This pin is optional and only exists on the 8A and 8RC
+// QTR sensor arrays.  If a valid pin is specified, the emitters will only
+// be turned on during a reading.  If an invalid pin is specified 
+// (e.g. 255), the IR emitters will always be on.
+void PololuQTRSensorsAnalog::init(unsigned char* analogPins,
+  unsigned char numSensors, unsigned char numSamplesPerSensor,
+  unsigned char emitterPin)
+{
+	PololuQTRSensors::init(numSensors, emitterPin, QTR_A);
+	
+	_numSamplesPerSensor = numSamplesPerSensor;
+	_portCMask = 0;
+	for (i = 0; i < _numSensors; i++)
+	{
+		_analogPins[i] = analogPins[i];
+		if (analogPins[i] <= 5)	// no need to mask for dedicated analog inputs
+			_portCMask |= (1 << analogPins[i]);
+	}
+}
+
+
+// Reads the sensor values into an array. There *MUST* be space
+// for as many values as there were sensors specified in the constructor.
+// Example usage:
+// unsigned int sensor_values[8];
+// sensors.read(sensor_values);
+// The values returned are a measure of the reflectance in terms of a
+// 10-bit ADC average with higher values corresponding to lower 
+// reflectance (e.g. a black surface or a void).
+void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
+{
+	unsigned char i, j;
+	
+	// store current state of various registers
+	unsigned char admux = ADMUX;
+	unsigned char adcsra = ADCSRA;
+	unsigned char ddrc = DDRC;
+	unsigned char portc = PORTC;
+
+	// wait for any current conversion to finish
+	while (ADCSRA & (1 << ADCS));
+	
+	emittersOn();
+	
+	// reset the values
+	for(i = 0; i < _numSensors; i++)
+		sensor_values[i] = 0;
+
+	// set all sensor pins to high-Z inputs
+	DDRC &= ~_portCMask;
+	PORTC &= ~_portCMask;
+	
+	ADCSRA = 0x87;	// configure the ADC
+	for (j = 0; j < _numSamplesPerSensor; j++)
+	{
+		for (i = 0; i < _numSensors; i++)
+		{
+			ADMUX = _analogPins[i];			// set analog input channel
+			ADCSRA |= 1 << ADSC;			// start the conversion
+			while (ADCSRA & (1 << ADSC));	// wait for conversion to finish
+			sensor_values[i] += ADC;		// add in the conversion result
+		}
+	}
+	
+	// get the rounded average of the readings for each sensor
+	for (i = 0; i < _numSensors; i++)
+		sensor_values[i] = (sensor_values[i] + (_numSamplesPerSensor >> 1)) /
+			_numSamplesPerSensor;
+
+	emittersOff();
+			
+	ADMUX = admux;
+	ADCSRA = adcsra;
+	PORTC = portc;
+	DDRC = ddrc;
 }
 
 

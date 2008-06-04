@@ -1,5 +1,5 @@
 /*
-  PololuQTRLineSensors.h - Library for using Pololu QTR reflectance
+  PololuQTRSensors.h - Library for using Pololu QTR reflectance
 	sensors and reflectance sensor arrays: QTR-1A, QTR-8A, QTR-1RC, and 
 	QTR-8RC.  The object used will determine the type of the sensor (either
 	QTR-xA or QTR-xRC).  Then simply specify in the constructor which 
@@ -7,6 +7,9 @@
 	will obtain reflectance measurements for those sensors.  Smaller sensor
 	values correspond to higher reflectance (e.g. white) while larger
 	sensor values correspond to lower reflectance (e.g. black or a void).
+	
+	* PololuQTRSensorsRC should be used for QTR-1RC and QTR-8RC sensors.
+	* PololuQTRSensorsAnalog should be used for QTR-1A and QTR-8A sensors.
 */
 	
 /*
@@ -28,13 +31,13 @@
  * to be responsible for all resulting costs and damages.
  */
 
-#ifndef PololuQTRLineSensors_h
-#define PololuQTRLineSensors_h
+#ifndef PololuQTRSensors_h
+#define PololuQTRSensors_h
 
 // This class cannot be instantiated directly (it has no constructor).
 // Instead, you should instantiate one of its two derived classes (either the
 // QTR-A or QTR-RC version, depending on the type of your sensor).
-class PololuQTRLineSensors
+class PololuQTRSensors
 {
   public:
 	
@@ -106,7 +109,7 @@ class PololuQTRLineSensors
 	
   protected:
 
-	PololuQTRLineSensors()
+	PololuQTRSensors()
 	{
 	
 	};
@@ -129,26 +132,30 @@ class PololuQTRLineSensors
 
 
 
-class PololuQTRLineSensors_RC : public PololuQTRLineSensors
+// Object to be used for QTR-1RC and QTR-8RC sensors
+class PololuQTRSensorsRC : public PololuQTRSensors
 {
-	// allows the base PololuQTRLineSensors class to access this class' 
+	// allows the base PololuQTRSensors class to access this class' 
 	// readPrivate()
-	friend class PololuQTRLineSensors;
+	friend class PololuQTRSensors;
 	
   public:
   
-	PololuQTRLineSensors_RC()
+	// if this constructor is used, the user must call init() before using
+	// the methods in this class
+	PololuQTRSensorsRC()
 	{
 	
 	};
 	
 	
-	PololuQTRLineSensors_RC(unsigned char* pins, unsigned char numSensors, 
-		  unsigned int timeout, unsigned char emitterPin);
+	// this constructor just calls init()
+	PololuQTRSensorsRC(unsigned char* pins, unsigned char numSensors, 
+		  unsigned int timeout = 4000, unsigned char emitterPin = 255);
 
 	// the array 'pins' contains the Arduino pin assignment for each
 	// sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
-	// Arduino digital pin 3, sensor 2 is on Arduino Digital pin 6,
+	// Arduino digital pin 3, sensor 2 is on Arduino digital pin 6,
 	// and sensor 3 is on Arduino analog input 1 (digital pin 15).
 	// Note that Arduino digital pins 0 - 7 correpsond to port D
 	// pins PD0 - PD7, respectively.  Arduino digital pins 8 - 13
@@ -182,7 +189,7 @@ class PololuQTRLineSensors_RC : public PololuQTRLineSensors
 	// the emitters will only be turned on during a reading.  If an invalid
 	// pin is specified (e.g. 255), the IR emitters will always be on.
 	void init(unsigned char* pins, unsigned char numSensors, 
-		  unsigned int timeout, unsigned char emitterPin = 255);
+		  unsigned int timeout = 4000, unsigned char emitterPin = 255);
 		  
 
   
@@ -211,6 +218,85 @@ class PololuQTRLineSensors_RC : public PololuQTRLineSensors
 	unsigned char _portCMask;
 	unsigned char _portDMask;
 };
+
+
+
+// Object to be used for QTR-1A and QTR-8A sensors
+class PololuQTRSensorsAnalog : public PololuQTRSensors
+{
+	// allows the base PololuQTRSensors class to access this class' 
+	// readPrivate()
+	friend class PololuQTRSensors;
+	
+  public:
+  
+	// if this constructor is used, the user must call init() before using
+	// the methods in this class
+	PololuQTRSensorsAnalog()
+	{
+	
+	};
+	
+	
+	// this constructor just calls init()
+	PololuQTRSensorsAnalog(unsigned char* analogPins, 
+		unsigned char numSensors, unsigned char numSamplesPerSensor = 4,
+		unsigned char emitterPin = 255);
+
+	// the array 'pins' contains the Arduino analog pin assignment for each
+	// sensor.  For example, if pins is {0, 1, 7}, sensor 1 is on
+	// Arduino analog input 0, sensor 2 is on Arduino analog input 1,
+	// and sensor 3 is on Arduino analog input 7.  The ATmega168 has 8
+	// total analog input channels (0 - 7) that correspond to port C
+	// pins PC0 - PC7.
+	
+	// 'numSensors' specifies the length of the 'analogPins' array (i.e. the
+	// number of QTR-A sensors you are using).  numSensors must be 
+	// no greater than 8.
+	
+	// 'numSamplesPerSensor' indicates the number of 10-bit analog samples
+	// to average per channel (i.e. per sensor) for each reading.  The total
+	// number of analog-to-digital conversions performed will be equal to
+	// numSensors*numSamplesPerSensor.  Note that the amount of time it takes
+	// to perform a single analog-to-digital conversion is approximately:
+	// 128 * 13 / F_CPU = 1664 / F_CPU
+	// If F_CPU is 16 MHz, as on most Arduinos, this becomes:
+	// 1664 / 16 MHz = 104 us
+	// So if numSamplesPerSensor is 4 and numSensors is, say, 6, it will take
+	// 4 * 6 * 104 us = 2.5 ms to perform a full readLine() if F_CPU is 16 MHz.
+	// Increasing this parameter increases noise suppression at the cost of
+	// sample rate.  Recommended value: 4.
+	
+	// emitterPin is the Arduino digital pin that controls whether the IR LEDs
+	// are on or off.  This pin is optional and only exists on the 8A and 8RC
+	// QTR sensor arrays.  If a valid pin is specified, the emitters will only
+	// be turned on during a reading.  If an invalid pin is specified 
+	// (e.g. 255), the IR emitters will always be on.
+	void init(unsigned char* analogPins, unsigned char numSensors, 
+		unsigned char numSamplesPerSensor = 4, unsigned char emitterPin = 255);
+		  
+
+  
+  private:
+
+	// Reads the sensor values into an array. There *MUST* be space
+	// for as many values as there were sensors specified in the constructor.
+	// Example usage:
+	// unsigned int sensor_values[8];
+	// sensors.read(sensor_values);
+	// The values returned are a measure of the reflectance in terms of a
+	// 10-bit ADC average with higher values corresponding to lower 
+	// reflectance (e.g. a black surface or a void).
+	void readPrivate(unsigned int *sensor_values);
+ 
+
+  private:
+
+	unsigned char _analogPins[8];
+	unsigned char _numSamplesPerSensor;
+	unsigned char _portCMask;
+};
+
 
 #endif
 
