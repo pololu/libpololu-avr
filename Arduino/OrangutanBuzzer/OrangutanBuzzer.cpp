@@ -609,6 +609,9 @@ void nextNote()
 		duration = 500;
 		volume = 15;
 		staccato = 0;
+		// reset temp variables that depend on the defaults
+		tmp_octave = octave;
+		tmp_duration = duration;
 		goto parse_character;
 	default:
 		sequence = 0;
