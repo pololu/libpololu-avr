@@ -125,6 +125,8 @@ OrangutanLCD::OrangutanLCD()
 {
 }
 
+#ifdef LIB_POLOLU
+
 #include <stdio.h>
 
 /* define putchar and getchar functions for the LCD */
@@ -178,8 +180,6 @@ extern "C" int lcd_putchar(char c, FILE *f) {
 extern "C" int void_getchar(FILE *f) {
 	return 0;
 }
-
-#ifdef LIB_POLOLU
 
 extern "C" void lcd_goto_xy(int col, int row)
 {
@@ -676,12 +676,14 @@ void OrangutanLCD::scroll(unsigned char direction, unsigned char num,
 	}
 }
 
+#ifdef LIB_POLOLU
 // Initializes the LCD library for printf support.  After this,
 // printf will start sending characters to the LCD.
 void OrangutanLCD::initPrintf()
 {
 	fdevopen(lcd_putchar, void_getchar);
 }
+#endif
 
 // Local Variables: **
 // mode: C++ **
