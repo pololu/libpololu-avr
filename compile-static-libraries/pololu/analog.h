@@ -1,10 +1,10 @@
-#define MODE_8_BIT		(1 << ADLAR)
+#define MODE_8_BIT		1
 #define MODE_10_BIT		0
 
 void set_analog_mode(unsigned char mode);
 unsigned char get_analog_mode();
-unsigned int read_analog(unsigned char channel);
-unsigned int read_analog_average(unsigned char channel, unsigned int samples);
+unsigned int analog_read(unsigned char channel);
+unsigned int analog_read_average(unsigned char channel, unsigned int samples);
 unsigned int read_trimpot();
 int read_temperature_f();
 int read_temperature_c();

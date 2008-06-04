@@ -39,12 +39,12 @@ extern "C" unsigned char get_analog_mode()
 	return OrangutanAnalog::getMode();
 }
 
-extern "C" unsigned int read_analog(unsigned char channel)
+extern "C" unsigned int analog_read(unsigned char channel)
 {
 	return OrangutanAnalog::read(channel);
 }
 
-extern "C" unsigned int read_analog_average(unsigned char channel, unsigned int samples)
+extern "C" unsigned int analog_read_average(unsigned char channel, unsigned int samples)
 {
 	return OrangutanAnalog::readAverage(channel, samples);
 }
@@ -168,17 +168,17 @@ int OrangutanAnalog::readTemperatureF()
 // The return value of this function is tenths of a degree Celcius.
 int OrangutanAnalog::readTemperatureC()
 {
-	return ((readTemperatureF() - 320) * 5 + 5) / 9;
+	return ((readTemperatureF() - 320) * 5 + 4) / 9;
 }
 
 
 // converts the specified ADC result to millivolts
 unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 {
-	unsigned long temp = adcResult * 5000UL + 511;
+	unsigned long temp = adcResult * 5000UL;
 	if (getMode())							// if 8-bit mode
-		return temp / 255;
-	return temp / 1023;
+		return (temp + 127) / 255;
+	return (temp + 511) / 1023;
 }
 
 // Local Variables: **
