@@ -53,12 +53,14 @@ static char play_mode_setting = PLAY_AUTOMATIC;
 static unsigned char use_program_space; // boolean: true if we should
 										// use program space
 
+// music settings and defaults
 static unsigned char octave = 4;				// the current octave
-
 static unsigned int whole_note_duration = 2000;	// the duration of a whole note
 static unsigned int duration = 500;				// the duration of a note in ms
 static unsigned int volume = 15;				// the note volume
 static unsigned char staccato = 0; 			// true if playing staccato
+
+// staccato handling
 static unsigned char staccato_rest_duration;	// duration of a staccato
 												//  rest, or zero if it is time
 												//  to play a note
@@ -599,6 +601,14 @@ void nextNote()
 	case 'v':
 		// set the volume
 		volume = getNumber();
+		goto parse_character;
+	case '!':
+		// reset to defaults
+		octave = 4;
+		whole_note_duration = 2000;
+		duration = 500;
+		volume = 15;
+		staccato = 0;
 		goto parse_character;
 	default:
 		sequence = 0;

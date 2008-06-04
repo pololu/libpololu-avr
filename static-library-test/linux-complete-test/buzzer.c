@@ -17,7 +17,7 @@ void test_buzzer()
   clear();
   printf("Nice\nscale?");
 
-  play("o4 l4 ms c");
+  play("T400! o4 l4 ms c");
   while(is_playing());
   play("ML d 1 6 d 16 r 8");
   while(is_playing());
