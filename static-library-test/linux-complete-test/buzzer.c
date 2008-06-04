@@ -32,7 +32,7 @@ void test_buzzer()
   stop_playing();
   delay_ms(250);
 
-  play("ml t240 o4 b t120 l8 >c "); // these notes should take 250 ms, like the others
+  play("ml t240 o4 b l8t120 >c "); // these notes should take 250 ms, like the others
   play_mode(PLAY_CHECK); // should just play the first note until we check
   delay_ms(500);
 

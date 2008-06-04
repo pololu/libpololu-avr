@@ -56,6 +56,7 @@ static unsigned char use_program_space; // boolean: true if we should
 // music settings and defaults
 static unsigned char octave = 4;				// the current octave
 static unsigned int whole_note_duration = 2000;	// the duration of a whole note
+static unsigned int note_type = 4;              // 4 for quarter, etc
 static unsigned int duration = 500;				// the duration of a note in ms
 static unsigned int volume = 15;				// the note volume
 static unsigned char staccato = 0; 			// true if playing staccato
@@ -431,6 +432,8 @@ unsigned char OrangutanBuzzer::isPlaying()
 //   'ML' sets all subsequent notes to play legato - each note is played
 //       for its full length.  This is the default setting.
 //
+//   '!' resets all persistent settings to their defaults.
+//
 // The following plays a c major scale up and back down:
 //   play("L16 V8 cdefgab>cbagfedc");
 //
@@ -506,13 +509,6 @@ unsigned int getNumber()
 	return arg;
 }
 
-
-// Returns whole_note_duration/getNumber()
-unsigned int getDuration()
-{
-	return whole_note_duration/getNumber();
-}
-
 void nextNote()
 {
 	unsigned char note = 0;
@@ -571,7 +567,8 @@ void nextNote()
 		break;
 	case 'l':
 		// set the default note duration
-		duration = getDuration();
+		note_type = getNumber();
+		duration = whole_note_duration/note_type;
 		goto parse_character;
 	case 'm':
 		// set music staccato or legato
@@ -596,7 +593,7 @@ void nextNote()
 	case 't':
 		// set the tempo
 		whole_note_duration = 60*400/getNumber()*10;
-		duration = whole_note_duration/4;
+		duration = whole_note_duration/note_type;
 		goto parse_character;
 	case 'v':
 		// set the volume
@@ -606,6 +603,7 @@ void nextNote()
 		// reset to defaults
 		octave = 4;
 		whole_note_duration = 2000;
+		note_type = 4;
 		duration = 500;
 		volume = 15;
 		staccato = 0;
@@ -640,7 +638,7 @@ void nextNote()
 
 	// If the input is 'c16', make it a 16th note, etc.
 	if(c > '0' && c < '9')
-		tmp_duration = getDuration();
+		tmp_duration = whole_note_duration/getNumber();
 
 	// Handle dotted notes - the first dot adds 50%, and each
 	// additional dot adds 50% of the previous dot.

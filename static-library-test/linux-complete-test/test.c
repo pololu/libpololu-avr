@@ -19,12 +19,12 @@ int main()
 	assert(1 == 1); // make sure assert works
 
 	test_pushbuttons();
+	test_buzzer();
 	test_motors();
-	test_analog();
-	test_delay();
 	test_lcd();
 	test_leds();
-	test_buzzer();
+	test_analog();
+	test_delay();
 
 	clear();
 	printf("\nSuccess");
