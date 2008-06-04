@@ -57,6 +57,10 @@ class OrangutanLCD
 
 	// prints an ASCII character at the current LCD cursor position
 	static void print(char character);
+	static inline void print(unsigned char character)
+	{
+		print((char)character);
+	};
 	
 	// sends a string to the LCD.  You can send a string
 	// longer than 8 characters, but only eight characters show up.
@@ -69,10 +73,16 @@ class OrangutanLCD
 	
 	// prints signed and unsigned integer values at the current cursor
 	// position and will not span lines.
-	static void print(unsigned int value);
 	static void print(unsigned long value);
-	static void print(int value);
 	static void print(long value);
+	static inline void print(unsigned int value)
+	{
+		print((unsigned long)value);
+	};
+	static inline void print(int value)
+	{
+		print((long)value);
+	};
 
 	// prints a two-byte value (word) in hex at your current
 	// cursor location.

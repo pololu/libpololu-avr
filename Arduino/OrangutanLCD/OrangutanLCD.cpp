@@ -552,16 +552,6 @@ void OrangutanLCD::print(unsigned long value)
 		send_data(str[i]);
 }
 
-void OrangutanLCD::print(int value)
-{
-	print((long)value);
-}
-
-void OrangutanLCD::print(unsigned int value)
-{
-	print((unsigned long)value);
-}
-
 
 // display a hex nibble (half of a hex byte) at your current cursor location
 void OrangutanLCD::printHexNibble(unsigned char nibble)
@@ -572,22 +562,14 @@ void OrangutanLCD::printHexNibble(unsigned char nibble)
 		send_data('A' + (nibble - 10));
 }
 
-
-// display a two-byte value (word) in hex at your current cursor location
+// display a two-byte value in hex (0000 - FFFF) at the current cursor location
 void OrangutanLCD::printHex(unsigned int word)
 {
-	unsigned char byte = word >> 8;
-	unsigned char val = byte >> 4;
-	printHexNibble(val);		// display high byte high nibble
-	val = byte & 0x0F;
-	printHexNibble(val);		// display high byte low nibble
-
-	byte = (unsigned char)word;
-	printHexNibble(byte >> 4);		// display low byte high nibble
-	printHexNibble(byte & 0x0F);	// display low byte low nibble
+	printHex((unsigned char)(word >> 8));
+	printHex((unsigned char)word);
 }
 
-// display a two-byte value (word) in hex at your current cursor location
+// display a single-byte value in hex (00 - FF) at the current cursor location
 void OrangutanLCD::printHex(unsigned char byte)
 {
 	unsigned char val = byte >> 4;
@@ -595,6 +577,7 @@ void OrangutanLCD::printHex(unsigned char byte)
 	val = byte & 0x0F;
 	printHexNibble(val);		// display high byte low nibble
 }
+
 
 // display a byte in binary starting at your current cursor location
 void OrangutanLCD::printBinary(unsigned char byte)
