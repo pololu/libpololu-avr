@@ -1,43 +1,46 @@
-#include <pololu/orangutan.h>
+#include <pololu/Orangutan.h>
 #include <stdio.h>
 #include "assert.h"
 
+extern OrangutanPushbuttons buttons;
+extern OrangutanLEDs leds;
+
 void test_leds()
 {
-  while(!button_is_pressed(ALL_BUTTONS))
+  while(!buttons.isPressed(ALL_BUTTONS))
   {
-    clear();
+    OrangutanLCD::clear();
     printf("Check\n");
     printf("Red");
 
-    red_led(1);
-    play_frequency(440,50,15);
-    delay_ms(250);
+    leds.red(1);
+    OrangutanBuzzer::playFrequency(440,50,15);
+    OrangutanDelay::ms(250);
 
-    if(button_is_pressed(ALL_BUTTONS))
+    if(buttons.isPressed(ALL_BUTTONS))
       break;
 
-    red_led(0);
-    delay_ms(250);
+    leds.red(0);
+    OrangutanDelay::ms(250);
 
-    if(button_is_pressed(ALL_BUTTONS))
+    if(buttons.isPressed(ALL_BUTTONS))
       break;
     
-    clear();
+    OrangutanLCD::clear();
     printf("Check\n");
     printf("Green");
 
-    green_led(1);
-    play_frequency(880,50,15);
-    delay_ms(250);
+    leds.green(1);
+    OrangutanBuzzer::playFrequency(880,50,15);
+    OrangutanDelay::ms(250);
 
-    if(button_is_pressed(ALL_BUTTONS))
+    if(buttons.isPressed(ALL_BUTTONS))
       break;
 
-    green_led(0);
-    delay_ms(250);
+    leds.green(0);
+    OrangutanDelay::ms(250);
   }
 
-  while(button_is_pressed(ALL_BUTTONS));
-  delay_ms(100);
+  while(buttons.isPressed(ALL_BUTTONS));
+  OrangutanDelay::ms(100);
 }

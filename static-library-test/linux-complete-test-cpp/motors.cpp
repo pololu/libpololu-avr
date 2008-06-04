@@ -1,53 +1,57 @@
-#include <pololu/orangutan.h>
+#include <pololu/Orangutan.h>
 #include <stdio.h>
 #include "assert.h"
 
+extern OrangutanMotors motors;
+
 void test_motors()
 {
-  clear();
+  OrangutanLCD::clear();
   printf("Motors\nready?");
-  wait_for_button(ALL_BUTTONS);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
-  printf("Left\nslow");
-  set_motors(60,0);
-  wait_for_button(ALL_BUTTONS);
+  OrangutanLCD::clear();
+  printf("M1\nslow");
+  OrangutanMotors::setSpeeds(60,0);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
-  printf("Left\nfast");
-  set_motors(255,0);
-  wait_for_button(ALL_BUTTONS);
+  OrangutanLCD::clear();
+  printf("M1\nfast");
+  motors.setM1Speed(255);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
-  printf("Left\nbk slow");
-  set_motors(-60,0);
-  wait_for_button(ALL_BUTTONS);
+  OrangutanLCD::clear();
+  printf("M1\nbk slow");
+  OrangutanMotors::setM1Speed(-60);
+  OrangutanMotors::setM2Speed(0);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
-  printf("Left\nbk fast");
-  set_motors(-255,0);
-  wait_for_button(ALL_BUTTONS);
+  OrangutanLCD::clear();
+  printf("M1\nbk fast");
+  motors.setSpeeds(-255,0);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
   /// right motor
-  clear();
-  printf("Right\nslow");
-  set_motors(0,60);
-  wait_for_button(ALL_BUTTONS);
+  OrangutanLCD::clear();
+  printf("M2\nslow");
+  OrangutanMotors::setSpeeds(0,60);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
-  printf("Right\nfast");
-  set_motors(0,255);
-  wait_for_button(ALL_BUTTONS);
+  OrangutanLCD::clear();
+  printf("M2\nfast");
+  motors.setM2Speed(255);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
+  OrangutanLCD::clear();
   printf("Right\nbk slow");
-  set_motors(0,-60);
-  wait_for_button(ALL_BUTTONS);
+  OrangutanMotors::setSpeeds(0,-60);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
+  OrangutanLCD::clear();
   printf("Right\nbk fast");
-  set_motors(0,-255);
-  wait_for_button(ALL_BUTTONS);
+  motors.setSpeeds(0,-255);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  set_motors(0,0);
+  OrangutanMotors::setM1Speed(0);
+  motors.setM2Speed(0);
 }

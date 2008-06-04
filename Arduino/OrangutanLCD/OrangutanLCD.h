@@ -125,6 +125,10 @@ class OrangutanLCD
 	// called to reset the LCD.
 	static void loadCustomCharacter(const char *picture_p, unsigned char number);
 
+	// Initializes the LCD library for printf support.  After this,
+	// printf will start sending characters to the LCD.
+	static void initPrintf();
+
   private:
   
 	static inline void init()

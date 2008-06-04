@@ -125,7 +125,6 @@ OrangutanLCD::OrangutanLCD()
 {
 }
 
-#ifdef LIB_POLOLU
 #include <stdio.h>
 
 /* define putchar and getchar functions for the LCD */
@@ -180,6 +179,8 @@ extern "C" int void_getchar(FILE *f) {
 	return 0;
 }
 
+#ifdef LIB_POLOLU
+
 extern "C" void lcd_goto_xy(int col, int row)
 {
 	OrangutanLCD::gotoXY(col,row);
@@ -187,20 +188,12 @@ extern "C" void lcd_goto_xy(int col, int row)
 
 extern "C" void lcd_init_printf()
 {
-	fdevopen(lcd_putchar, void_getchar);
+	OrangutanLCD::initPrintf();
 }
 
 extern "C" void clear()
 {
-	unsigned char i;
 	OrangutanLCD::clear();
-
-	// clear out the LCD
-	for(i=0;i<8;i++)
-		row1[i] = ' ';
-
-	col = 0;
-	row = 0;
 }
 
 extern "C" void print(const char *str)
@@ -263,6 +256,7 @@ extern "C" void lcd_load_custom_character(const char *picture_p, unsigned char n
 {
 	OrangutanLCD::loadCustomCharacter(picture_p, number);
 }
+
 #endif
 
 #define LCD_CGRAM   6
@@ -484,6 +478,15 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 void OrangutanLCD::clear()
 {
 	send_cmd(LCD_CLEAR);
+
+	unsigned char i;
+
+	// clear out the LCD
+	for(i=0;i<8;i++)
+		row1[i] = ' ';
+
+	col = 0;
+	row = 0;
 }
 
 
@@ -630,6 +633,10 @@ void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 	// Grab the location in the LCD's memory of the start of line y,
 	// and add X to it to get the right character location.
 	send_cmd(line_mem[y] + x);
+
+	// Save it for use with printf.
+	col = x;
+	row = y;
 }
 
 
@@ -684,6 +691,13 @@ void OrangutanLCD::scroll(unsigned char direction, unsigned char num,
 		while (i--)
 			_delay_ms(1);	// argument to _delay_ms() must be < 13
 	}
+}
+
+// Initializes the LCD library for printf support.  After this,
+// printf will start sending characters to the LCD.
+void OrangutanLCD::initPrintf()
+{
+	fdevopen(lcd_putchar, void_getchar);
 }
 
 // Local Variables: **

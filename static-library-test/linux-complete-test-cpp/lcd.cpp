@@ -1,39 +1,41 @@
-#include <pololu/orangutan.h>
+#include <pololu/Orangutan.h>
 #include <stdio.h>
 #include "assert.h"
 
+extern OrangutanLCD lcd;
+
 void test_lcd()
 {
-  lcd_goto_xy(8,0);
-  print_character(255); // print some junk here
+  lcd.gotoXY(8,0);
+  lcd.print((char)255); // print some junk here
 
-  clear();
+  lcd.clear();
   printf("Verify:\n");
 
   // prints 1234567 on the last line
-  print_binary(0b01000000);
-  lcd_goto_xy(2,1);
+  lcd.printBinary(0b01000000);
+  lcd.gotoXY(2,1);
   printf("%d",2);
 
-  lcd_goto_xy(4,1);
-  print_long(-56);
+  lcd.gotoXY(4,1);
+  lcd.print(-56);
 
-  lcd_goto_xy(3,1);
-  print_long(34);
+  lcd.gotoXY(3,1);
+  lcd.print(34);
 
-  lcd_goto_xy(7,1);
-  print_character('7');
+  lcd.gotoXY(7,1);
+  lcd.print('7');
 
-  lcd_goto_xy(8,0);
-  lcd_show_cursor(CURSOR_BLINKING);
+  lcd.gotoXY(8,0);
+  lcd.showCursor(CURSOR_BLINKING);
 
-  wait_for_button(ALL_BUTTONS);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  clear();
+  lcd.clear();
   printf("No blinking?");
-  lcd_show_cursor(CURSOR_SOLID);
+  lcd.showCursor(CURSOR_SOLID);
 
-  wait_for_button(ALL_BUTTONS);
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
-  lcd_hide_cursor();
+  lcd.hideCursor();
 }

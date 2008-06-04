@@ -1,18 +1,17 @@
-#include <pololu/orangutan.h>
+#include <pololu/Orangutan.h>
 #include <stdio.h>
 #include "assert.h"
 
 void test_delay()
 {
-  play_frequency(440,250,8); // should take exactly 250 ms
-  delay_ms(200);
+  OrangutanBuzzer::playFrequency(440,250,8); // should take exactly 250 ms
+  OrangutanDelay::ms(200);
 
   printf("\ndelay1");
-  assert(is_playing());
+  assert(OrangutanBuzzer::isPlaying());
 
-  delay_ms(100);
+  OrangutanDelay::ms(100);
   
   printf("\ndelay2");
-  assert(!is_playing());
-
+  assert(!OrangutanBuzzer::isPlaying());
 }

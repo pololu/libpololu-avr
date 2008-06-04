@@ -107,7 +107,7 @@ void OrangutanAnalog::setMode(unsigned char mode)
 // value of this method can be directly compared against the macros
 // MODE_8_BIT and MODE_10_BIT:
 // For example: if (getMode() == MODE_8_BIT) ...
-inline unsigned char OrangutanAnalog::getMode()
+unsigned char OrangutanAnalog::getMode()
 {
 	return ADMUX & (1 << ADLAR) ? 1 : 0;
 }
