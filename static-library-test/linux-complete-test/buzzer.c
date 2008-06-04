@@ -9,14 +9,15 @@ void test_buzzer()
   clear();
   printf("Volume\nchange?");
 
-  play("o5 v1 c v2 c v3 c v4 c v5 c v6 c v7 c v8 c v9 v v10 c v11 c v12 c v13 c v14 c v15 c");
+  play("o5 l8 v1 c v2 c v3 c v4 c v5 c v6 c v7 c v8 c v9 v v10 c v11 c v12 c v13 c v14 c v15 c");
+  while(is_playing());
 
   wait_for_button(ALL_BUTTONS);
 
   clear();
   printf("Nice\nscale?");
 
-  play("o4 ms c");
+  play("o4 l4 ms c");
   while(is_playing());
   play("ML d 1 6 d 16 r 8");
   while(is_playing());

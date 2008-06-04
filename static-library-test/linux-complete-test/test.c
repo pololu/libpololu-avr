@@ -5,6 +5,9 @@
 #include "delay.h"
 #include "lcd.h"
 #include "buzzer.h"
+#include "leds.h"
+#include "motors.h"
+#include "pushbuttons.h"
 
 int main()
 {
@@ -14,10 +17,14 @@ int main()
 
 	printf("\nAssert");
 	assert(1 == 1); // make sure assert works
-	test_buzzer();
+
+	test_pushbuttons();
+	test_motors();
 	test_analog();
 	test_delay();
 	test_lcd();
+	test_leds();
+	test_buzzer();
 
 	clear();
 	printf("\nSuccess");

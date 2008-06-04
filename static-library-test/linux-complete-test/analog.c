@@ -47,7 +47,7 @@ void test_analog()
   }
 
   printf("\nAB%03x%03x%03x%03x",max,min,avg_max,avg_min);
-  assert( max - min > avg_max - avg_min);
+  assert( max - min >= avg_max - avg_min);
 
   // check that temp C and F return appropriate values in 10bit mode
   set_analog_mode(MODE_10_BIT);
