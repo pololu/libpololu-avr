@@ -8,6 +8,7 @@
 #include "leds.h"
 #include "motors.h"
 #include "pushbuttons.h"
+#include "qtr.h"
 
 int main()
 {
@@ -18,6 +19,7 @@ int main()
 	printf("\nAssert");
 	assert(1 == 1); // make sure assert works
 
+	test_qtr();
 	test_pushbuttons();
 	test_buzzer();
 	test_motors();

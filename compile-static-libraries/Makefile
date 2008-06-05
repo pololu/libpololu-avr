@@ -16,10 +16,11 @@ LIBRARY_OBJECT_FILES=\
 	../Arduino/OrangutanAnalog/OrangutanAnalog.o \
 	../Arduino/PololuQTRSensors/PololuQTRSensors.o \
 	../Arduino/Pololu3pi/Pololu3pi.o \
+	../Arduino/PololuQTRSensors/PololuQTRSensors.o \
 	OrangutanDelay.o
 
 #	OrangutanDelay/OrangutanDelay.o \
-#	OrangutanLineSensors/OrangutanLineSensors.o
+#
 
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lpololu -lm

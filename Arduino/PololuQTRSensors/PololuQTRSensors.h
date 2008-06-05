@@ -174,7 +174,7 @@ class PololuQTRSensorsRC : public PololuQTRSensors
 	// and the reading for that pin will be considered full black.
 	// It is recommended that you set timeout to be between 1000 and
 	// 3000 us, depending on things like the height of your sensors and
-	// ambient lighting.  Using timeout_us allows you to shorten the
+	// ambient lighting.  Using timeout allows you to shorten the
 	// duration of a sensor-reading cycle while still maintaining
 	// useful analog measurements of reflectance.  On a 16 MHz microcontroller,
 	// you can convert timer2 counts to microseconds by dividing by 2

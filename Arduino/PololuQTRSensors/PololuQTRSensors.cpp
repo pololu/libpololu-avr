@@ -42,46 +42,60 @@
 #define QTR_A		1
 
 #ifdef LIB_POLOLU
-static PololuQTRSensorsRC qtr;
+
+// two options for our sensors
+static PololuQTRSensorsRC qtr_rc;
+static PololuQTRSensorsAnalog qtr_analog;
+
+// one pointer to the type in use
+static PololuQTRSensors *qtr;
 
 extern "C" void qtr_emitters_on()
 {
-	qtr.emittersOn();
+	qtr->emittersOn();
 }
 
 extern "C" void qtr_emitters_off()
 {
-	qtr.emittersOff();
+	qtr->emittersOff();
 }
 
 extern "C" void qtr_rc_init(unsigned char* pins, unsigned char numSensors, 
-			    unsigned int timeout_us, unsigned char emitterPin)
+			    unsigned int timeout, unsigned char emitterPin)
 {
-	qtr.init(pins, numSensors, timeout_us, emitterPin);
+	qtr_rc.init(pins, numSensors, timeout, emitterPin);
+	qtr = &qtr_rc;
+}
+
+extern "C" void qtr_analog_init(unsigned char* analogPins, unsigned char numSensors, 
+		unsigned char numSamplesPerSensor = 4, unsigned char emitterPin = 255)
+{
+	qtr_analog.init(analogPins, numSensors, numSamplesPerSensor = 4, emitterPin = 255);
+	qtr = &qtr_analog;
 }
 
 extern "C" void qtr_read(unsigned int *sensor_values) {
-	qtr.read(sensor_values);
+	qtr->read(sensor_values);
 }
 
 extern "C" void qtr_calibrate()
 {
-	qtr.calibrate();
+	qtr->calibrate();
 }
 
 extern "C" void qtr_read_calibrated(unsigned int *sensor_values)
 {
-	qtr.readCalibrated(sensor_values);
+	qtr->readCalibrated(sensor_values);
 }
 
 extern "C" unsigned int qtr_read_line(unsigned int *sensor_values)
 {
-	return qtr.readLine(sensor_values);
+	return qtr->readLine(sensor_values);
 }
 
 extern "C" unsigned int qtr_read_line_white(unsigned int *sensor_values)
 {
-	return qtr.readLine(sensor_values, true);
+	return qtr->readLine(sensor_values, true);
 }
 
 #endif
@@ -278,9 +292,9 @@ unsigned int PololuQTRSensors::readLine(unsigned int *sensor_values,
 
 // Derived RC class constructor
 PololuQTRSensorsRC::PololuQTRSensorsRC(unsigned char* pins,
-  unsigned char numSensors, unsigned int timeout_us, unsigned char emitterPin)
+  unsigned char numSensors, unsigned int timeout, unsigned char emitterPin)
 {
-	init(pins, numSensors, timeout_us, emitterPin);
+	init(pins, numSensors, timeout, emitterPin);
 }
 
 
@@ -299,17 +313,21 @@ PololuQTRSensorsRC::PololuQTRSensorsRC(unsigned char* pins,
 // number of QTR-RC sensors you are using).  numSensors must be 
 // no greater than 8.
 
-// 'timeout_us' specifies the length of time in microseconds beyond
+// 'timeout' specifies the length of time in timer2 counts beyond
 // which you consider the sensor reading completely black.  That is to say,
-// if the pulse length for a pin exceeds timeout_us, pulse timing will stop
+// if the pulse length for a pin exceeds 'timeout', pulse timing will stop
 // and the reading for that pin will be considered full black.
-// It is recommended that you set timeout_us to be between 1000 and
-// 3000, depending on things like the height of your sensors and
-// ambient lighting.
-// Using timeout_us allows you to shorten the
+// It is recommended that you set timeout to be between 1000 and
+// 3000 us, depending on things like the height of your sensors and
+// ambient lighting.  Using timeout allows you to shorten the
 // duration of a sensor-reading cycle while still maintaining
-// useful analog measurements of reflectance.
-
+// useful analog measurements of reflectance.  On a 16 MHz microcontroller,
+// you can convert timer2 counts to microseconds by dividing by 2
+// (i.e. 2000 us = 4000 timer2 counts = 'timeout' of 4000).  On a 20 MHz
+// microcontroller, you can convert timer2 counts to microseconds by
+// dividing by 2.5 or multiplying by 0.4 
+// (i.e. 2000 us = 5000 timer2 counts = 'timeout' of 5000).
+	
 // 'emitterPin' is the Arduino pin that controls the IR LEDs on the 8RC
 // modules.  If you are using a 1RC (i.e. if there is no emitter pin),
 // use an invalid Arduino pin value (20 or greater).
