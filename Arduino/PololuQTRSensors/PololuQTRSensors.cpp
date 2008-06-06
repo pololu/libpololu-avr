@@ -177,22 +177,38 @@ void PololuQTRSensors::emittersOn()
 }
 
 
-// Reads the sensors for calibration.  The sensor values are
-// not returned; instead, the maximum and minimum values found
-// over time are stored internally and used for the
-// readCalibrated() method.
+// Reads the sensors 10 times and uses the results for
+// calibration.  The sensor values are not returned; instead, the
+// maximum and minimum values found over time are stored internally
+// and used for the readCalibrated() method.
 void PololuQTRSensors::calibrate()
 {
 	unsigned int sensor_values[8];
-	int i;
-	read(sensor_values);
+	unsigned int max_sensor_values[8];
+	unsigned int min_sensor_values[8];
+
+	int i,j;
+	for(j=0;j<10;j++)
+	{
+		read(sensor_values);
+		for(i=0;i<_numSensors;i++)
+		{
+			// set the max we found THIS time
+			if(j == 0 || max_sensor_values[i] < sensor_values[i])
+				max_sensor_values[i] = sensor_values[i];
+
+			// set the min we found THIS time
+			if(j == 0 || min_sensor_values[i] > sensor_values[i])
+				min_sensor_values[i] = sensor_values[i];
+		}
+	}
 	
 	for(i=0;i<_numSensors;i++)
 	{
-		if(sensor_values[i] > calibratedMaximum[i])
-			calibratedMaximum[i] = sensor_values[i];
-		if(sensor_values[i] < calibratedMinimum[i])
-			calibratedMinimum[i] = sensor_values[i];
+		if(min_sensor_values[i] > calibratedMaximum[i])
+			calibratedMaximum[i] = min_sensor_values[i];
+		if(max_sensor_values[i] < calibratedMinimum[i])
+			calibratedMinimum[i] = max_sensor_values[i];
 	}
 }
 
@@ -266,9 +282,12 @@ unsigned int PololuQTRSensors::readLine(unsigned int *sensor_values,
 		if(value > 200) {
 			on_line = 1;
 		}
-
-		avg += (long)(value) * (i * 1000);
-		sum += value;
+		
+		// only average in values that are above a noise threshold
+		if(value > 50) {
+			avg += (long)(value) * (i * 1000);
+			sum += value;
+		}
 	}
 
 	if(!on_line)
@@ -346,7 +365,7 @@ void PololuQTRSensorsRC::init(unsigned char* pins,
 	{
 		// Initialize the max and min calibrated values to values that
 		// will cause the first reading to update them.
-		calibratedMinimum[i] = 1000;
+		calibratedMinimum[i] = timeout;
 		calibratedMaximum[i] = 0;
 
 		if (pins[i] < 8)			// port D

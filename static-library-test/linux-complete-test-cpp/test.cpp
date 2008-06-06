@@ -8,26 +8,28 @@
 #include "leds.h"
 #include "motors.h"
 #include "pushbuttons.h"
+#include "qtr.h"
 
 static OrangutanLCD lcd;
 static OrangutanBuzzer buzzer;
 
 int main()
 {
-	lcd.initPrintf();
-
 	OrangutanDelay::ms(500); // warming up
+
+	lcd.initPrintf();
 
 	lcd.print("\nAssert");
 	assert(1 == 1); // make sure assert works
 
+	test_qtr();
 	test_pushbuttons();
+	test_buzzer();
 	test_motors();
-	test_delay();
 	test_lcd();
 	test_leds();
-	test_buzzer();
 	test_analog();
+	test_delay();
 
 	lcd.clear();
 	lcd.print("Success");
