@@ -34,6 +34,10 @@
 #ifndef PololuQTRSensors_h
 #define PololuQTRSensors_h
 
+#define QTR_EMITTERS_ON 0
+#define QTR_EMITTERS_OFF 1
+#define QTR_EMITTERS_ON_AND_OFF 2
+
 // This class cannot be instantiated directly (it has no constructor).
 // Instead, you should instantiate one of its two derived classes (either the
 // QTR-A or QTR-RC version, depending on the type of your sensor).
@@ -49,11 +53,14 @@ class PololuQTRSensors
 	// The values returned are a measure of the reflectance in abstract units,
 	// with higher values corresponding to lower reflectance (e.g. a black
 	// surface or a void).
+	// If measureOffAndOn is true, measures the values with the
+	// emitters on AND off and returns on - (timeout - off).  If this
+	// value is less than zero, it returns zero.
 	// This method will call the appropriate derived class' readPrivate(), as
 	// determined by the _type data member.  Making this method virtual
 	// leads to compiler warnings, which is why this alternate approach was
 	// taken.
-	void read(unsigned int *sensor_values);
+	void read(unsigned int *sensor_values, unsigned char readMode = QTR_EMITTERS_ON);
 	
 	// Turn the IR LEDs off and on.  This is mainly for use by the
 	// readLineSensors method, and calling these functions before or
@@ -124,10 +131,12 @@ class PololuQTRSensors
 	// pointer to emitter DDR register
 	volatile unsigned char* _emitterDDR;		// needs to be volatile
 	
+	unsigned int _maxValue; // the maximum value returned by this function
 
   private:
 	
-	unsigned char _type;	// the type of the derived class (QTR_RC or QTR_A)
+	unsigned char _type;	// the type of the derived class (QTR_RC
+							// or QTR_A)
 };
 
 
@@ -212,7 +221,6 @@ class PololuQTRSensorsRC : public PololuQTRSensors
 	unsigned char _bitmask[8];
 	// pointer to PIN registers
 	volatile unsigned char* _register[8];	// needs to be volatile
-	unsigned int _timeout;
 		
 	unsigned char _portBMask;
 	unsigned char _portCMask;

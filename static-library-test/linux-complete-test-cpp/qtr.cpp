@@ -42,8 +42,6 @@ const char right_bar[] PROGMEM = {
   0b00000
 };
 
-#define max(x,y) ((x)>(y) ? (x) : (y))
-
 void display_values(unsigned int *values, unsigned int max)
 {
   unsigned char i;
@@ -54,12 +52,12 @@ void display_values(unsigned int *values, unsigned int max)
   for(i=0;i<5;i++)
   {
     // get characters[0] to characters[7]
-    OrangutanLCD::print(characters[max(((long)values[i])*8,max-1)/max]);
+    OrangutanLCD::print(characters[values[i]*8/(max+1)]);
   }
 }
 
 unsigned char pins[] = {14,15,16,17,18};
-PololuQTRSensorsRC qtr(pins,5,10000,19);
+PololuQTRSensorsRC qtr(pins,5,2000,19);
 
 void test_qtr()
 {
@@ -86,10 +84,42 @@ void test_qtr()
 
     qtr.read(values);
 
-    printf("Raw%5ud",values[0]);
+    printf("Raw %4ud",values[0]);
 
-    display_values(values,10000);
-    qtr.calibrate();
+    display_values(values,2000);
+    //    qtr.calibrate();
+    OrangutanDelay::ms(50);
+  }
+ 
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
+
+  // off values
+  while(!OrangutanPushbuttons::isPressed(ALL_BUTTONS))
+  {
+    OrangutanLCD::clear();
+
+    qtr.read(values,QTR_EMITTERS_OFF);
+
+    printf("Off %4ud",values[0]);
+
+    display_values(values,2000);
+    //    qtr.calibrate();
+    OrangutanDelay::ms(50);
+  }
+
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
+
+  // raw values - off values
+  while(!OrangutanPushbuttons::isPressed(ALL_BUTTONS))
+  {
+    OrangutanLCD::clear();
+
+    qtr.read(values,QTR_EMITTERS_ON_AND_OFF);
+
+    printf("Sub %4ud",values[0]);
+
+    display_values(values,2000);
+    //    qtr.calibrate();
     OrangutanDelay::ms(50);
   }
 

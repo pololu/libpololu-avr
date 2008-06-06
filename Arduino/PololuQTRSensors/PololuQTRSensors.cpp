@@ -75,7 +75,7 @@ extern "C" void qtr_analog_init(unsigned char* analogPins, unsigned char numSens
 }
 
 extern "C" void qtr_read(unsigned int *sensor_values) {
-	qtr->read(sensor_values);
+	qtr->read(sensor_values,0);
 }
 
 extern "C" void qtr_calibrate()
@@ -147,12 +147,36 @@ void PololuQTRSensors::init(unsigned char numSensors,
 // The values returned are a measure of the reflectance in abstract units,
 // with higher values corresponding to lower reflectance (e.g. a black
 // surface or a void).
-void PololuQTRSensors::read(unsigned int *sensor_values)
+void PololuQTRSensors::read(unsigned int *sensor_values, unsigned char readMode)
 {
+	unsigned int off_values[8];
+	unsigned char i;
+	
+	if(readMode == QTR_EMITTERS_ON || readMode == QTR_EMITTERS_ON_AND_OFF)
+		emittersOn();
+
 	if (_type == QTR_RC)
+	{
 		((PololuQTRSensorsRC*)this)->readPrivate(sensor_values);
+		emittersOff();
+		if(readMode == QTR_EMITTERS_ON_AND_OFF)
+			((PololuQTRSensorsRC*)this)->readPrivate(off_values);
+	}
 	else
+	{
 		((PololuQTRSensorsAnalog*)this)->readPrivate(sensor_values);
+		emittersOff();
+		if(readMode == QTR_EMITTERS_ON_AND_OFF)
+			((PololuQTRSensorsRC*)this)->readPrivate(off_values);
+	}
+
+	if(readMode == QTR_EMITTERS_ON_AND_OFF)
+	{
+		for(i=0;i<_numSensors;i++)
+		{
+			sensor_values[i] += _maxValue - off_values[i];
+		}
+	}
 }
 
 
@@ -190,7 +214,7 @@ void PololuQTRSensors::calibrate()
 	int i,j;
 	for(j=0;j<10;j++)
 	{
-		read(sensor_values);
+		read(sensor_values,0);
 		for(i=0;i<_numSensors;i++)
 		{
 			// set the max we found THIS time
@@ -222,7 +246,7 @@ void PololuQTRSensors::readCalibrated(unsigned int *sensor_values)
 {
 	int i;
 
-	read(sensor_values);
+	read(sensor_values,0);
 
 	for(i=0;i<_numSensors;i++)
 	{
@@ -351,7 +375,7 @@ PololuQTRSensorsRC::PololuQTRSensorsRC(unsigned char* pins,
 // modules.  If you are using a 1RC (i.e. if there is no emitter pin),
 // use an invalid Arduino pin value (20 or greater).
 void PololuQTRSensorsRC::init(unsigned char* pins,
-  unsigned char numSensors, unsigned int timeout, unsigned char emitterPin)
+	unsigned char numSensors, unsigned int timeout, unsigned char emitterPin)
 {
 	PololuQTRSensors::init(numSensors, emitterPin, QTR_RC);
 	
@@ -360,7 +384,7 @@ void PololuQTRSensorsRC::init(unsigned char* pins,
 	_portCMask = 0;
 	_portDMask = 0;
 	
-	_timeout = timeout;
+	_maxValue = timeout;
 	for (i = 0; i < _numSensors; i++)
 	{
 		// Initialize the max and min calibrated values to values that
@@ -429,8 +453,6 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	
 	_delay_us(10);
 	
-	emittersOn();
-	
 	// set all ports to inputs
 	DDRB &= ~_portBMask;
 	DDRC &= ~_portCMask;
@@ -442,7 +464,7 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	PORTD &= ~_portDMask;
 
 	start_time = TCNT2;
-	while (time < _timeout)
+	while (time < _maxValue)
 	{
 		// Keep track of the total time.
 		// This explicitly casts the difference to unsigned char, so
@@ -468,11 +490,9 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 		}
 	}
 
-	emittersOff();
-	
 	for(i = 0; i < _numSensors; i++)
 		if (!sensor_values[i])
-			sensor_values[i] = _timeout;
+			sensor_values[i] = _maxValue;
 }
 
 
@@ -516,8 +536,8 @@ PololuQTRSensorsAnalog::PololuQTRSensorsAnalog(unsigned char* analogPins,
 // be turned on during a reading.  If an invalid pin is specified 
 // (e.g. 255), the IR emitters will always be on.
 void PololuQTRSensorsAnalog::init(unsigned char* analogPins,
-  unsigned char numSensors, unsigned char numSamplesPerSensor,
-  unsigned char emitterPin)
+	unsigned char numSensors, unsigned char numSamplesPerSensor,
+	unsigned char emitterPin)
 {
 	unsigned char i;
 	
@@ -531,6 +551,8 @@ void PololuQTRSensorsAnalog::init(unsigned char* analogPins,
 		if (analogPins[i] <= 5)	// no need to mask for dedicated analog inputs
 			_portCMask |= (1 << analogPins[i]);
 	}
+
+	_maxValue = 1023; // this is the maximum returned by the A/D conversion
 }
 
 
@@ -554,8 +576,6 @@ void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
 
 	// wait for any current conversion to finish
 	while (ADCSRA & (1 << ADSC));
-	
-	emittersOn();
 	
 	// reset the values
 	for(i = 0; i < _numSensors; i++)
@@ -582,8 +602,6 @@ void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
 		sensor_values[i] = (sensor_values[i] + (_numSamplesPerSensor >> 1)) /
 			_numSamplesPerSensor;
 
-	emittersOff();
-			
 	ADMUX = admux;
 	ADCSRA = adcsra;
 	PORTC = portc;
