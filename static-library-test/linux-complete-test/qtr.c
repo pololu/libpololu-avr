@@ -74,19 +74,52 @@ void test_qtr()
   unsigned char pins[5] = {14,15,16,17,18};
   unsigned int values[5];
 
-  qtr_rc_init(pins,5,1000,19);
+  clear();
+  printf("\nqtr_rc_init");
+  assert(qtr_rc_init(pins,5,2000,19));
 
-  // raw values
   while(!button_is_pressed(ALL_BUTTONS))
   {
     clear();
 
-    qtr_read(values);
+    qtr_read(values,QTR_EMITTERS_ON);
 
-    printf("Raw %4d",values[0]);
+    printf("IR+ %4ud",values[0]);
+
+    display_values(values,2000);
+
+    qtr_calibrate(QTR_EMITTERS_ON);
+  }
+ 
+  wait_for_button(ALL_BUTTONS);
+
+  // calibrated values
+  while(!button_is_pressed(ALL_BUTTONS))
+  {
+    qtr_read_calibrated(values,QTR_EMITTERS_ON);
+
+    clear();
+    printf("C + %4ud",values[0]);
 
     display_values(values,1000);
-    qtr_calibrate();
+    delay_ms(50);
+  }
+
+  wait_for_button(ALL_BUTTONS);
+
+  // off values
+  while(!button_is_pressed(ALL_BUTTONS))
+  {
+    clear();
+
+    qtr_read(values,QTR_EMITTERS_OFF);
+
+    printf("IR- %4ud",values[0]);
+
+    display_values(values,2000);
+
+    qtr_calibrate(QTR_EMITTERS_OFF);
+
     delay_ms(50);
   }
 
@@ -95,10 +128,38 @@ void test_qtr()
   // calibrated values
   while(!button_is_pressed(ALL_BUTTONS))
   {
-    qtr_read_calibrated(values);
+    qtr_read_calibrated(values, QTR_EMITTERS_OFF);
 
     clear();
-    printf("Cal %4d",values[0]);
+    printf("C - %4ud",values[0]);
+
+    display_values(values,1000);
+    delay_ms(50);
+  }
+
+  wait_for_button(ALL_BUTTONS);
+
+  while(!button_is_pressed(ALL_BUTTONS))
+  {
+    clear();
+
+    qtr_read(values,QTR_EMITTERS_ON_AND_OFF);
+
+    printf("IR+-%4ud",values[0]);
+
+    display_values(values,2000);
+    delay_ms(50);
+  }
+
+  wait_for_button(ALL_BUTTONS);
+
+  // calibrated values
+  while(!button_is_pressed(ALL_BUTTONS))
+  {
+    qtr_read_calibrated(values, QTR_EMITTERS_ON_AND_OFF);
+
+    clear();
+    printf("C +-%4ud",values[0]);
 
     display_values(values,1000);
     delay_ms(50);
@@ -109,7 +170,7 @@ void test_qtr()
   // line detection
   while(!button_is_pressed(ALL_BUTTONS))
   {
-    unsigned int pos = qtr_read_line(values);
+    unsigned int pos = qtr_read_line(values, QTR_EMITTERS_ON);
 
     clear();
 
@@ -134,5 +195,4 @@ void test_qtr()
   }
 
   wait_for_button(ALL_BUTTONS);
-
 }

@@ -15,14 +15,15 @@ static OrangutanBuzzer buzzer;
 
 int main()
 {
+	OrangutanBuzzer::play(">>a16");
 	OrangutanDelay::ms(500); // warming up
 
 	lcd.initPrintf();
 
 	lcd.print("\nAssert");
 	assert(1 == 1); // make sure assert works
-
 	test_qtr();
+
 	test_pushbuttons();
 	test_buzzer();
 	test_motors();
@@ -35,7 +36,7 @@ int main()
 	lcd.print("Success");
 	
 	buzzer.play("O5 c16");
-	
+
 	return 0;
 }
 
