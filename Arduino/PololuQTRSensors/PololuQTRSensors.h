@@ -34,8 +34,8 @@
 #ifndef PololuQTRSensors_h
 #define PololuQTRSensors_h
 
-#define QTR_EMITTERS_ON 0
-#define QTR_EMITTERS_OFF 1
+#define QTR_EMITTERS_OFF 0
+#define QTR_EMITTERS_ON 1
 #define QTR_EMITTERS_ON_AND_OFF 2
 
 // This class cannot be instantiated directly (it has no constructor).
@@ -63,7 +63,7 @@ class PololuQTRSensors
 	void read(unsigned int *sensor_values, unsigned char readMode = QTR_EMITTERS_ON);
 	
 	// Turn the IR LEDs off and on.  This is mainly for use by the
-	// readLineSensors method, and calling these functions before or
+	// read method, and calling these functions before or
 	// after the reading the sensors will have no effect on the
 	// readings, but you may wish to use these for testing purposes.
 	void emittersOff();
@@ -73,14 +73,14 @@ class PololuQTRSensors
 	// not returned; instead, the maximum and minimum values found
 	// over time are stored internally and used for the
 	// readCalibrated() method.
-	void calibrate();
+	void calibrate(unsigned char readMode = QTR_EMITTERS_ON);
 
 	// Returns values calibrated to a value between 0 and 1000, where
 	// 0 corresponds to the minimum value read by calibrate() and 1000
 	// corresponds to the maximum value.  Calibration values are
 	// stored separately for each sensor, so that differences in the
 	// sensors are accounted for automatically.
-	void readCalibrated(unsigned int *sensor_values);
+	void readCalibrated(unsigned int *sensor_values, unsigned char readMode = QTR_EMITTERS_ON);
 
 	// Operates the same as read calibrated, but also returns an
 	// estimated position of the robot with respect to a line. The
@@ -101,19 +101,27 @@ class PololuQTRSensors
 	// black, set the optional second argument white_line to true.  In
 	// this case, each sensor value will be replaced by (1000-value)
 	// before the averaging.
-	unsigned int readLine(unsigned int *sensor_values, unsigned char white_line = 0);
+	unsigned int readLine(unsigned int *sensor_values, unsigned char white_line = 0, unsigned char readMode = QTR_EMITTERS_ON);
 
 	// Calibrated minumum and maximum values. These start at 1000 and
 	// 0, respectively, so that the very first sensor reading will
 	// update both of them.
 	//
+	// The pointers are unallocated until calibrate() is called, and
+	// then allocated to exactly the size required.  Depending on the
+	// readMode argument to calibrate, only the On or Off values may
+	// be allocated, as required.
+	//
 	// These variables are made public so that you can use them for
 	// your own calculations and do things like saving the values to
 	// EEPROM, performing sanity checking, etc.
-	unsigned int calibratedMinimum[8];
-	unsigned int calibratedMaximum[8];
+	unsigned int *calibratedMinimumOn;
+	unsigned int *calibratedMaximumOn;
+	unsigned int *calibratedMinimumOff;
+	unsigned int *calibratedMaximumOff;
 	
-	
+	~PololuQTRSensors();
+
   protected:
 
 	PololuQTRSensors()
@@ -137,6 +145,13 @@ class PololuQTRSensors
 	
 	unsigned char _type;	// the type of the derived class (QTR_RC
 							// or QTR_A)
+
+	// Handles the actual calibration. calibratedMinimum and
+	// calibratedMaximum are pointers to the requested calibration
+	// arrays, which will be allocated if necessary.
+	void calibrateOnOrOff(unsigned int **calibratedMinimum,
+						  unsigned int **calibratedMaximum,
+						  unsigned char readMode);
 };
 
 
@@ -152,11 +167,7 @@ class PololuQTRSensorsRC : public PololuQTRSensors
   
 	// if this constructor is used, the user must call init() before using
 	// the methods in this class
-	PololuQTRSensorsRC()
-	{
-	
-	};
-	
+	PololuQTRSensorsRC() { }
 	
 	// this constructor just calls init()
 	PololuQTRSensorsRC(unsigned char* pins, unsigned char numSensors, 
@@ -240,11 +251,7 @@ class PololuQTRSensorsAnalog : public PololuQTRSensors
   
 	// if this constructor is used, the user must call init() before using
 	// the methods in this class
-	PololuQTRSensorsAnalog()
-	{
-	
-	};
-	
+	PololuQTRSensorsAnalog() { }
 	
 	// this constructor just calls init()
 	PololuQTRSensorsAnalog(unsigned char* analogPins, 

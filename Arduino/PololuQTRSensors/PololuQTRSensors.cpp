@@ -36,6 +36,7 @@
 #endif
 #include <util/delay.h>
 #include <avr/io.h>
+#include <stdlib.h>
 #include "PololuQTRSensors.h"
 
 #define QTR_RC		0
@@ -44,8 +45,6 @@
 #ifdef LIB_POLOLU
 
 // two options for our sensors
-static PololuQTRSensorsRC qtr_rc;
-static PololuQTRSensorsAnalog qtr_analog;
 
 // one pointer to the type in use
 static PololuQTRSensors *qtr;
@@ -60,52 +59,63 @@ extern "C" void qtr_emitters_off()
 	qtr->emittersOff();
 }
 
-extern "C" void qtr_rc_init(unsigned char* pins, unsigned char numSensors, 
+extern "C" char qtr_rc_init(unsigned char* pins, unsigned char numSensors, 
 			    unsigned int timeout, unsigned char emitterPin)
 {
-	qtr_rc.init(pins, numSensors, timeout, emitterPin);
-	qtr = &qtr_rc;
+	PololuQTRSensorsRC *qtr_rc = (PololuQTRSensorsRC *)malloc(sizeof(PololuQTRSensorsRC));
+	if(!qtr_rc)
+		return 0; // out of memory
+	qtr_rc->init(pins, numSensors, timeout, emitterPin);
+	qtr = qtr_rc;
+	return 1;
 }
 
-extern "C" void qtr_analog_init(unsigned char* analogPins, unsigned char numSensors, 
-		unsigned char numSamplesPerSensor = 4, unsigned char emitterPin = 255)
+extern "C" char qtr_analog_init(unsigned char* analogPins, unsigned char numSensors, 
+		unsigned char numSamplesPerSensor, unsigned char emitterPin)
 {
-	qtr_analog.init(analogPins, numSensors, numSamplesPerSensor = 4, emitterPin = 255);
-	qtr = &qtr_analog;
+	PololuQTRSensorsAnalog *qtr_analog = (PololuQTRSensorsAnalog *)malloc(sizeof(PololuQTRSensorsAnalog));
+	if(!qtr_analog)
+		return 0; // out of memory
+	qtr_analog->init(analogPins, numSensors, numSamplesPerSensor, emitterPin);
+	qtr = qtr_analog;
+	return 1;
 }
 
-extern "C" void qtr_read(unsigned int *sensor_values) {
-	qtr->read(sensor_values,0);
+extern "C" void qtr_read(unsigned int *sensor_values, unsigned char readMode) {
+	qtr->read(sensor_values,readMode);
 }
 
-extern "C" void qtr_calibrate()
+extern "C" void qtr_calibrate(unsigned char readMode)
 {
-	qtr->calibrate();
+	qtr->calibrate(readMode);
 }
 
-extern "C" void qtr_read_calibrated(unsigned int *sensor_values)
+extern "C" void qtr_read_calibrated(unsigned int *sensor_values, unsigned char readMode)
 {
-	qtr->readCalibrated(sensor_values);
+	qtr->readCalibrated(sensor_values, readMode);
 }
 
-extern "C" unsigned int qtr_read_line(unsigned int *sensor_values)
+extern "C" unsigned int qtr_read_line(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr->readLine(sensor_values);
+	return qtr->readLine(sensor_values, false, readMode);
 }
 
-extern "C" unsigned int qtr_read_line_white(unsigned int *sensor_values)
+extern "C" unsigned int qtr_read_line_white(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr->readLine(sensor_values, true);
+	return qtr->readLine(sensor_values, true, readMode);
 }
 
 #endif
-
-
 
 // Base class data member initialization (called by derived class init())
 void PololuQTRSensors::init(unsigned char numSensors, 
   unsigned char emitterPin, unsigned char type)
 {
+	calibratedMinimumOn=0;
+	calibratedMaximumOn=0;
+	calibratedMinimumOff=0;
+	calibratedMaximumOff=0;
+
 	if (numSensors > 8)
 		_numSensors = 8;
 	else
@@ -181,7 +191,7 @@ void PololuQTRSensors::read(unsigned int *sensor_values, unsigned char readMode)
 
 
 // Turn the IR LEDs off and on.  This is mainly for use by the
-// readLineSensors method, and calling these functions before or
+// read method, and calling these functions before or
 // after the reading the sensors will have no effect on the
 // readings, but you may wish to use these for testing purposes.
 void PololuQTRSensors::emittersOff()
@@ -205,16 +215,64 @@ void PololuQTRSensors::emittersOn()
 // calibration.  The sensor values are not returned; instead, the
 // maximum and minimum values found over time are stored internally
 // and used for the readCalibrated() method.
-void PololuQTRSensors::calibrate()
+void PololuQTRSensors::calibrate(unsigned char readMode)
 {
+	if(readMode == QTR_EMITTERS_ON_AND_OFF || readMode == QTR_EMITTERS_ON)
+	{
+		calibrateOnOrOff(&calibratedMinimumOn,
+						 &calibratedMaximumOn,
+						 QTR_EMITTERS_ON);
+	}
+
+
+	if(readMode == QTR_EMITTERS_ON_AND_OFF || readMode == QTR_EMITTERS_OFF)
+	{
+		calibrateOnOrOff(&calibratedMinimumOff,
+						 &calibratedMaximumOff,
+						 QTR_EMITTERS_OFF);
+	}
+}
+
+void PololuQTRSensors::calibrateOnOrOff(unsigned int **calibratedMinimum,
+										unsigned int **calibratedMaximum,
+										unsigned char readMode)
+{
+	int i;
 	unsigned int sensor_values[8];
 	unsigned int max_sensor_values[8];
 	unsigned int min_sensor_values[8];
 
-	int i,j;
+	// Allocate the arrays if necessary.
+	if(*calibratedMaximum == 0)
+	{
+		*calibratedMaximum = (unsigned int*)malloc(sizeof(unsigned int)*_numSensors);
+
+		// If the malloc failed, don't continue.
+		if(*calibratedMaximum == 0)
+			return;
+
+		// Initialize the max and min calibrated values to values that
+		// will cause the first reading to update them.
+
+		for(i=0;i<_numSensors;i++)
+			(*calibratedMaximum)[i] = 0;
+	}
+	if(*calibratedMinimum == 0)
+	{
+		*calibratedMinimum = (unsigned int*)malloc(sizeof(unsigned int)*_numSensors);
+
+		// If the malloc failed, don't continue.
+		if(*calibratedMinimum == 0)
+			return;
+
+		for(i=0;i<_numSensors;i++)
+			(*calibratedMinimum)[i] = _maxValue;
+	}
+
+	int j;
 	for(j=0;j<10;j++)
 	{
-		read(sensor_values,0);
+		read(sensor_values,readMode);
 		for(i=0;i<_numSensors;i++)
 		{
 			// set the max we found THIS time
@@ -226,13 +284,14 @@ void PololuQTRSensors::calibrate()
 				min_sensor_values[i] = sensor_values[i];
 		}
 	}
-	
+
+	// record the min and max calibration values
 	for(i=0;i<_numSensors;i++)
 	{
-		if(min_sensor_values[i] > calibratedMaximum[i])
-			calibratedMaximum[i] = min_sensor_values[i];
-		if(max_sensor_values[i] < calibratedMinimum[i])
-			calibratedMinimum[i] = max_sensor_values[i];
+		if(min_sensor_values[i] > (*calibratedMaximum)[i])
+			(*calibratedMaximum)[i] = min_sensor_values[i];
+		if(max_sensor_values[i] < (*calibratedMinimum)[i])
+			(*calibratedMinimum)[i] = max_sensor_values[i];
 	}
 }
 
@@ -242,18 +301,56 @@ void PololuQTRSensors::calibrate()
 // corresponds to the maximum value.  Calibration values are
 // stored separately for each sensor, so that differences in the
 // sensors are accounted for automatically.
-void PololuQTRSensors::readCalibrated(unsigned int *sensor_values)
+void PololuQTRSensors::readCalibrated(unsigned int *sensor_values, unsigned char readMode)
 {
 	int i;
 
-	read(sensor_values,0);
+	// if not calibrated, do nothing
+	if(readMode == QTR_EMITTERS_ON_AND_OFF || readMode == QTR_EMITTERS_OFF)
+		if(!calibratedMinimumOff || !calibratedMaximumOff)
+			return;
+	if(readMode == QTR_EMITTERS_ON_AND_OFF || readMode == QTR_EMITTERS_ON)
+		if(!calibratedMinimumOn || !calibratedMaximumOn)
+			return;
+
+	// read the needed values
+	read(sensor_values,readMode);
 
 	for(i=0;i<_numSensors;i++)
 	{
-		int denominator = calibratedMaximum[i] - calibratedMinimum[i];
+		unsigned int calmin,calmax;
+		unsigned int denominator;
+
+		// find the correct calibration
+		if(readMode == QTR_EMITTERS_ON)
+		{
+			calmax = calibratedMaximumOn[i];
+		    calmin = calibratedMinimumOn[i];
+		}
+		else if(readMode == QTR_EMITTERS_OFF)
+		{
+			calmax = calibratedMaximumOff[i];
+		    calmin = calibratedMinimumOff[i];
+		}
+		else // QTR_EMITTERS_ON_AND_OFF
+		{
+			
+			if(calibratedMinimumOff[i] < calibratedMinimumOn[i]) // no meaningful signal
+				calmin = _maxValue;
+			else
+				calmin = calibratedMinimumOn[i] + _maxValue - calibratedMinimumOff[i]; // this won't go past _maxValue
+
+			if(calibratedMaximumOff[i] < calibratedMaximumOn[i]) // no meaningful signal
+				calmax = _maxValue;
+			else
+				calmax = calibratedMaximumOn[i] + _maxValue - calibratedMaximumOff[i]; // this won't go past _maxValue
+		}
+
+		denominator = calmax - calmin;
+
 		signed int x = 0;
 		if(denominator != 0)
-			x = (((signed long)sensor_values[i]) - calibratedMinimum[i])
+			x = (((signed long)sensor_values[i]) - calmin)
 				* 1000 / denominator;
 		if(x < 0)
 			x = 0;
@@ -261,6 +358,7 @@ void PololuQTRSensors::readCalibrated(unsigned int *sensor_values)
 			x = 1000;
 		sensor_values[i] = x;
 	}
+
 }
 
 
@@ -284,7 +382,7 @@ void PololuQTRSensors::readCalibrated(unsigned int *sensor_values)
 // this case, each sensor value will be replaced by (1000-value)
 // before the averaging.
 unsigned int PololuQTRSensors::readLine(unsigned int *sensor_values,
-  unsigned char white_line)
+	unsigned char white_line, unsigned char readMode)
 {
 	unsigned char i, on_line = 0;
 	unsigned long avg; // this is for the weighted total, which is long
@@ -292,7 +390,7 @@ unsigned int PololuQTRSensors::readLine(unsigned int *sensor_values,
 	unsigned int sum; // this is for the denominator which is <= 64000
 	static int16_t last_value=0; // assume initially that the line is left.
 
-	readCalibrated(sensor_values);
+	readCalibrated(sensor_values, readMode);
 
 	avg = 0;
 	sum = 0;
@@ -387,11 +485,6 @@ void PololuQTRSensorsRC::init(unsigned char* pins,
 	_maxValue = timeout;
 	for (i = 0; i < _numSensors; i++)
 	{
-		// Initialize the max and min calibrated values to values that
-		// will cause the first reading to update them.
-		calibratedMinimum[i] = timeout;
-		calibratedMaximum[i] = 0;
-
 		if (pins[i] < 8)			// port D
 		{
 			_bitmask[i] = 1 << pins[i];
@@ -608,6 +701,18 @@ void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
 	DDRC = ddrc;
 }
 
+// the destructor frees up allocated memory
+PololuQTRSensors::~PololuQTRSensors()
+{
+	if(calibratedMaximumOn)
+		free(calibratedMaximumOn);
+	if(calibratedMaximumOff)
+		free(calibratedMaximumOff);
+	if(calibratedMinimumOn)
+		free(calibratedMinimumOn);
+	if(calibratedMinimumOff)
+		free(calibratedMinimumOff);
+}
 
 
 // Local Variables: **

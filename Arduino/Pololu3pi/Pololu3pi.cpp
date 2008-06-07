@@ -33,22 +33,22 @@ extern "C" void emitters_off()
 	qtr3pi.emittersOff();
 }
 
-extern "C" void calibrate_line_sensors()
+extern "C" void calibrate_line_sensors(unsigned char readMode)
 {
-	qtr3pi.calibrate();
+	qtr3pi.calibrate(readMode);
 }
 
-extern "C" void read_line_sensors_calibrated(unsigned int *sensor_values)
+extern "C" void read_line_sensors_calibrated(unsigned int *sensor_values, unsigned char readMode)
 {
-	qtr3pi.readCalibrated(sensor_values);
+	qtr3pi.readCalibrated(sensor_values, readMode);
 }
 
-extern "C" unsigned int read_line(unsigned int *sensor_values)
+extern "C" unsigned int read_line(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr3pi.readLine(sensor_values);
+	return qtr3pi.readLine(sensor_values, readMode);
 }
 
-extern "C" unsigned int read_line_white(unsigned int *sensor_values)
+extern "C" unsigned int read_line_white(unsigned int *sensor_values, unsigned char readMode)
 {
 	return qtr3pi.readLine(sensor_values, 1);
 }
@@ -84,9 +84,9 @@ void Pololu3pi::calibrateLineSensors()
 	qtr3pi.calibrate();
 }
 
-void readSensorsCalibrated(unsigned int *sensor_values)
+void readSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode)
 {
-	qtr3pi.readCalibrated(sensor_values);
+	qtr3pi.readCalibrated(sensor_values, readMode);
 }
 
 unsigned int Pololu3pi::readLine(unsigned int *sensor_values, unsigned char white_line)
