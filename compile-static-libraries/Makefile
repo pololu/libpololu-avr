@@ -19,9 +19,6 @@ LIBRARY_OBJECT_FILES=\
 	../Arduino/PololuQTRSensors/PololuQTRSensors.o \
 	OrangutanDelay.o
 
-#	OrangutanDelay/OrangutanDelay.o \
-#
-
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lpololu -lm
 # -Wl,-u,vfprintf -lprintf_flt

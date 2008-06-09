@@ -59,12 +59,14 @@ void display_values(unsigned int *values, unsigned int max)
 
 unsigned char pins[] = {14,15,16,17,18};
 PololuQTRSensorsRC qtr(pins,5,2000,19);
+//unsigned char pins[] = {0,1,2,3,4};
+//PololuQTRSensorsAnalog qtr(pins,5,1,19);
 
 void test_qtr()
 {
   OrangutanLCD::clear();
 
-  OrangutanLCD::print(sizeof(PololuQTRSensorsRC));
+  OrangutanLCD::print(sizeof(PololuQTRSensorsAnalog));
   OrangutanDelay::ms(1000);
 
   OrangutanLCD::clear();
@@ -84,6 +86,42 @@ void test_qtr()
   unsigned int values[5];
 
   // raw values
+
+  while(!OrangutanPushbuttons::isPressed(ALL_BUTTONS))
+  {
+    OrangutanLCD::clear();
+
+    qtr.read(values);
+
+    printf("IR+ %4ud",values[0]);
+
+    display_values(values,2000);
+
+    qtr.calibrate(QTR_EMITTERS_ON);
+
+    assert(qtr.calibratedMaximumOn != 0); // make sure the malloc worked
+    assert(qtr.calibratedMinimumOn != 0); // make sure the malloc worked
+
+    OrangutanLCD::gotoXY(5,1);
+    //    OrangutanLCD::print(qtr.calibratedMinimumOn[0]);
+    OrangutanDelay::ms(50);
+  }
+ 
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
+
+  // calibrated values
+  while(!OrangutanPushbuttons::isPressed(ALL_BUTTONS))
+  {
+    qtr.readCalibrated(values);
+
+    OrangutanLCD::clear();
+    printf("C + %4ud",values[0]);
+
+    display_values(values,1000);
+    OrangutanDelay::ms(50);
+  }
+
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
 
   // off values
   while(!OrangutanPushbuttons::isPressed(ALL_BUTTONS))
@@ -116,44 +154,6 @@ void test_qtr()
 
     OrangutanLCD::clear();
     printf("C - %4ud",values[0]);
-
-    display_values(values,1000);
-    OrangutanDelay::ms(50);
-  }
-
-  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
-
-  //  qtr.calibratedMaximumOn = (unsigned int *)malloc(sizeof(qtr.calibratedMaximumOn[0])*5);
-  //  qtr.calibratedMinimumOn = (unsigned int *)malloc(sizeof(qtr.calibratedMaximumOn[0])*5);
-  while(!OrangutanPushbuttons::isPressed(ALL_BUTTONS))
-  {
-    OrangutanLCD::clear();
-
-    qtr.read(values);
-
-    printf("IR+ %4ud",values[0]);
-
-    display_values(values,2000);
-
-    qtr.calibrate(QTR_EMITTERS_ON);
-
-    assert(qtr.calibratedMaximumOn != 0); // make sure the malloc worked
-    assert(qtr.calibratedMinimumOn != 0); // make sure the malloc worked
-
-    OrangutanLCD::gotoXY(5,1);
-    OrangutanLCD::print(qtr.calibratedMinimumOn[0]);
-    OrangutanDelay::ms(50);
-  }
- 
-  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
-
-  // calibrated values
-  while(!OrangutanPushbuttons::isPressed(ALL_BUTTONS))
-  {
-    qtr.readCalibrated(values);
-
-    OrangutanLCD::clear();
-    printf("C + %4ud",values[0]);
 
     display_values(values,1000);
     OrangutanDelay::ms(50);

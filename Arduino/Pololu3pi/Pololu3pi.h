@@ -18,13 +18,13 @@ public:
 
 	// Reads values into the array sensor_values.  This must have
 	// space for five unsigned int values and be called AFTER init.
-	static void readLineSensors(unsigned int *sensor_values);
+	static void readLineSensors(unsigned int *sensor_values, unsigned char readMode);
 
 	void emittersOn();
 	void emittersOff();
-	void calibrateLineSensors();
-	void readLineSensorsCalibrated(unsigned int *sensor_values);
-	unsigned int readLine(unsigned int *sensor_values, unsigned char white_line);
+	void calibrateLineSensors(unsigned char readMode);
+	void readLineSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode);
+	unsigned int readLine(unsigned int *sensor_values, unsigned char readMode, unsigned char white_line);
 
 	// Returns the voltage of the battery in millivolts, using 10
 	// averaged samples.

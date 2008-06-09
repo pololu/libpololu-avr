@@ -20,16 +20,16 @@ int main()
 
 	lcd.initPrintf();
 
-	lcd.print("\nAssert");
+	lcd.print("Assert");
 	assert(1 == 1); // make sure assert works
-	test_qtr();
 
+	test_qtr();
+	test_analog();
 	test_pushbuttons();
 	test_buzzer();
 	test_motors();
 	test_lcd();
 	test_leds();
-	test_analog();
 	test_delay();
 
 	lcd.clear();

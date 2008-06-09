@@ -45,12 +45,12 @@ extern "C" void read_line_sensors_calibrated(unsigned int *sensor_values, unsign
 
 extern "C" unsigned int read_line(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr3pi.readLine(sensor_values, readMode);
+	return qtr3pi.readLine(sensor_values, 0, readMode);
 }
 
 extern "C" unsigned int read_line_white(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr3pi.readLine(sensor_values, 1);
+	return qtr3pi.readLine(sensor_values, 1, readMode);
 }
 
 #endif
@@ -64,9 +64,9 @@ void Pololu3pi::init(unsigned int line_sensor_timeout_us)
 	qtr3pi.emittersOff();
 }
 
-void Pololu3pi::readLineSensors(unsigned int *sensor_values)
+void Pololu3pi::readLineSensors(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr3pi.read(sensor_values);
+	return qtr3pi.read(sensor_values, readMode);
 }
 
 void Pololu3pi::emittersOn()
@@ -79,19 +79,19 @@ void Pololu3pi::emittersOff()
 	qtr3pi.emittersOff();
 }
 
-void Pololu3pi::calibrateLineSensors()
+void Pololu3pi::calibrateLineSensors(unsigned char readMode)
 {
-	qtr3pi.calibrate();
+	qtr3pi.calibrate(readMode);
 }
 
-void readSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode)
+void Pololu3pi::readLineSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode)
 {
 	qtr3pi.readCalibrated(sensor_values, readMode);
 }
 
-unsigned int Pololu3pi::readLine(unsigned int *sensor_values, unsigned char white_line)
+unsigned int Pololu3pi::readLine(unsigned int *sensor_values, unsigned char readMode, unsigned char white_line)
 {
-	return qtr3pi.readLine(sensor_values, white_line);
+	return qtr3pi.readLine(sensor_values, readMode, white_line);
 }
 
 unsigned int Pololu3pi::batteryMillivolts()
