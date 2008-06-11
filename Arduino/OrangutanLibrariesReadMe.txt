@@ -22,9 +22,6 @@ OrangutanMotors
 OrangutanPushbuttons
 
 
-Disclaimer: To the extent permitted by law, Pololu Corporation provides this work without any warranty.  It may be defective, in which case you agree to be responsible for all resulting costs and damages.
-
-
 == Installation & Usage Instructions ==
 
 If you currently have an older version of our Orangutan Arduino Libraries, your first step should be to delete all of the Orangutan____ directories from your arduino-0011/hardware/libraries directory. If you don’t perform this step, the newer version of the libraries might not get compiled.
