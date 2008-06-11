@@ -95,12 +95,12 @@ extern "C" void qtr_read_calibrated(unsigned int *sensor_values, unsigned char r
 	qtr->readCalibrated(sensor_values, readMode);
 }
 
-extern "C" unsigned int qtr_read_line(unsigned int *sensor_values, unsigned char readMode)
+extern "C" int qtr_read_line(unsigned int *sensor_values, unsigned char readMode)
 {
 	return qtr->readLine(sensor_values, false, readMode);
 }
 
-extern "C" unsigned int qtr_read_line_white(unsigned int *sensor_values, unsigned char readMode)
+extern "C" int qtr_read_line_white(unsigned int *sensor_values, unsigned char readMode)
 {
 	return qtr->readLine(sensor_values, true, readMode);
 }
@@ -381,14 +381,14 @@ void PololuQTRSensors::readCalibrated(unsigned int *sensor_values, unsigned char
 // black, set the optional second argument white_line to true.  In
 // this case, each sensor value will be replaced by (1000-value)
 // before the averaging.
-unsigned int PololuQTRSensors::readLine(unsigned int *sensor_values,
+int PololuQTRSensors::readLine(unsigned int *sensor_values,
 	unsigned char white_line, unsigned char readMode)
 {
 	unsigned char i, on_line = 0;
 	unsigned long avg; // this is for the weighted total, which is long
 	                   // before division
 	unsigned int sum; // this is for the denominator which is <= 64000
-	static int16_t last_value=0; // assume initially that the line is left.
+	static int last_value=0; // assume initially that the line is left.
 
 	readCalibrated(sensor_values, readMode);
 
