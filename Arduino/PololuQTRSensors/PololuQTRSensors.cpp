@@ -504,10 +504,6 @@ void PololuQTRSensorsRC::init(unsigned char* pins,
 			_register[i] = &PINC;
 		}
 	}
-	
-	TCCR2A |= 0x03;
-	TCCR2B = 0x02;		// run timer2 in normal mode at 2.5 MHz
-						// this is compatible with OrangutanMotors
 }
 
 
@@ -556,6 +552,13 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	PORTC &= ~_portCMask;
 	PORTD &= ~_portDMask;
 
+	unsigned char prevTCCR2A = TCCR2A;
+	unsigned char prevTCCR2B = TCCR2B;
+	TCCR2A |= 0x03;
+	TCCR2B = 0x02;		// run timer2 in normal mode at 2.5 MHz
+						// this is compatible with OrangutanMotors
+
+
 	start_time = TCNT2;
 	while (time < _maxValue)
 	{
@@ -583,6 +586,8 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 		}
 	}
 
+	TCCR2A = prevTCCR2A;
+	TCCR2B = prevTCCR2B;
 	for(i = 0; i < _numSensors; i++)
 		if (!sensor_values[i])
 			sensor_values[i] = _maxValue;
