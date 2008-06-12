@@ -8,9 +8,9 @@ static PololuQTRSensorsRC qtr3pi;
 
 #ifdef LIB_POLOLU
 
-extern "C" void pololu_3pi_init(unsigned int line_sensor_timeout_us)
+extern "C" void pololu_3pi_init(unsigned int line_sensor_timeout)
 {
-	Pololu3pi::init(line_sensor_timeout_us);
+	Pololu3pi::init(line_sensor_timeout);
 }
 
 extern "C" unsigned int battery_millivolts()
