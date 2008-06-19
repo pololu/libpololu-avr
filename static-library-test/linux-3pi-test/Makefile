@@ -1,7 +1,7 @@
 CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -Os
 CPP=/usr/bin/avr-g++
 CC=/usr/bin/avr-gcc
-OBJ2HEX=/usr/bin/avr-objcopy
+OBJ2HEX=/usr/bin/avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -lpololu
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_flt -lm
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_min
@@ -23,6 +23,3 @@ clean:
 
 program: $(TARGET).hex
 	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
-
-eep.hex:
-	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U eeprom:r:eep.hex:h
