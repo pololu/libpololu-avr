@@ -43,15 +43,23 @@ install: libpololu.a
 	install -t $(LIB) libpololu.a
 	install -t $(INCLUDE_POLOLU) pololu/*.h
 	install -t $(INCLUDE_POLOLU) pololu/orangutan
-	install -t $(INCLUDE_POLOLU) ../Arduino/*/*.h
-	install -t $(INCLUDE_POLOLU) OrangutanDelay.h
 
-ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip arduino_zipfiles/\* lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d
+ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\*
 
 zip: libpololu.a
 	mkdir -p $(ZIPDIR)
 	rm -f $(SRC_ZIPFILE)
 	rm -f $(BIN_ZIPFILE)
-	zip -rq $(SRC_ZIPFILE) . -x $(ZIP_EXCLUDES) \*.a
-	zip -rq $(BIN_ZIPFILE) libpololu.a pololu -x $(ZIP_EXCLUDES)
+	ln -s . libpololu-avr
+	zip -rq $(SRC_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) \*.a
+	rm libpololu-avr
+	ln -s extra/src libpololu-avr
+	zip -rq $(SRC_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES)
+	rm libpololu-avr
+	ln -s . libpololu-avr
+	zip -rq $(BIN_ZIPFILE) libpololu-avr/libpololu.a libpololu-avr/pololu -x $(ZIP_EXCLUDES)
+	rm libpololu-avr
+	ln -s extra/bin libpololu-avr
+	zip -rq $(BIN_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES)
+	rm libpololu-avr
 
