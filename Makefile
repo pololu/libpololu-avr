@@ -2,30 +2,28 @@ PREFIX=/usr/avr
 INCLUDE=$(PREFIX)/include
 INCLUDE_POLOLU=$(INCLUDE)/pololu
 LIB=$(PREFIX)/lib
+ZIPDIR=lib_zipfiles
+SRC_ZIPFILE=$(ZIPDIR)/libpololu-avr-$(shell date +%y%m%d).src.zip
+BIN_ZIPFILE=$(ZIPDIR)/libpololu-avr-$(shell date +%y%m%d).zip
 
 CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_POLOLU -ffunction-sections -Os
 CPP=avr-g++
 CC=avr-gcc
 
 LIBRARY_OBJECT_FILES=\
-	../Arduino/OrangutanMotors/OrangutanMotors.o \
-	../Arduino/OrangutanBuzzer/OrangutanBuzzer.o \
-	../Arduino/OrangutanPushbuttons/OrangutanPushbuttons.o \
-	../Arduino/OrangutanLCD/OrangutanLCD.o \
-	../Arduino/OrangutanLEDs/OrangutanLEDs.o \
-	../Arduino/OrangutanAnalog/OrangutanAnalog.o \
-	../Arduino/PololuQTRSensors/PololuQTRSensors.o \
-	../Arduino/Pololu3pi/Pololu3pi.o \
-	../Arduino/PololuQTRSensors/PololuQTRSensors.o \
+	Arduino/OrangutanMotors/OrangutanMotors.o \
+	Arduino/OrangutanBuzzer/OrangutanBuzzer.o \
+	Arduino/OrangutanPushbuttons/OrangutanPushbuttons.o \
+	Arduino/OrangutanLCD/OrangutanLCD.o \
+	Arduino/OrangutanLEDs/OrangutanLEDs.o \
+	Arduino/OrangutanAnalog/OrangutanAnalog.o \
+	Arduino/PololuQTRSensors/PololuQTRSensors.o \
+	Arduino/Pololu3pi/Pololu3pi.o \
+	Arduino/PololuQTRSensors/PololuQTRSensors.o \
 	OrangutanDelay.o
 
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lpololu -lm
-# -Wl,-u,vfprintf -lprintf_flt
-# -Wl,-u,vfprintf -lprintf_min
-PORT=/dev/ttyUSB0
-AVRDUDE=/usr/bin/avrdude
-TARGET=test
 
 libpololu.a: $(LIBRARY_OBJECT_FILES)
 	avr-ar rs libpololu.a $(LIBRARY_OBJECT_FILES)
@@ -47,3 +45,13 @@ install: libpololu.a
 	install -t $(INCLUDE_POLOLU) pololu/orangutan
 	install -t $(INCLUDE_POLOLU) ../Arduino/*/*.h
 	install -t $(INCLUDE_POLOLU) OrangutanDelay.h
+
+ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip arduino_zipfiles/\* lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d
+
+zip: libpololu.a
+	mkdir -p $(ZIPDIR)
+	rm -f $(SRC_ZIPFILE)
+	rm -f $(BIN_ZIPFILE)
+	zip -rq $(SRC_ZIPFILE) . -x $(ZIP_EXCLUDES) \*.a
+	zip -rq $(BIN_ZIPFILE) libpololu.a pololu -x $(ZIP_EXCLUDES)
+
