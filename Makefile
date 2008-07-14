@@ -50,16 +50,16 @@ zip: libpololu.a
 	mkdir -p $(ZIPDIR)
 	rm -f $(SRC_ZIPFILE)
 	rm -f $(BIN_ZIPFILE)
-	ln -s . libpololu-avr
-	zip -rq $(SRC_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) \*.a
-	rm libpololu-avr
 	ln -s extra/src libpololu-avr
 	zip -rq $(SRC_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES)
 	rm libpololu-avr
 	ln -s . libpololu-avr
-	zip -rq $(BIN_ZIPFILE) libpololu-avr/libpololu.a libpololu-avr/pololu -x $(ZIP_EXCLUDES)
+	zip -rq $(SRC_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) \*.a
 	rm libpololu-avr
 	ln -s extra/bin libpololu-avr
 	zip -rq $(BIN_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES)
+	rm libpololu-avr
+	ln -s . libpololu-avr
+	zip -rq $(BIN_ZIPFILE) libpololu-avr/libpololu.a libpololu-avr/pololu -x $(ZIP_EXCLUDES)
 	rm libpololu-avr
 
