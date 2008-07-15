@@ -111,7 +111,7 @@ Disassembly of section .text:
   b6:	0c 94 2b 06 	jmp	0xc56	; 0xc56 <_exit>
 
 000000ba <__bad_interrupt>:
-  ba:	0c 94 00 00 	jmp	0	; 0x0 <__heap_end>
+  ba:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 000000be <main>:
 #include <pololu/orangutan.h>
