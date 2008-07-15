@@ -32,6 +32,7 @@ Additionally, this library supports:
 * Pololu QTR-1RC and QTR-8RC reflectance sensors for use with digital inputs
 * The Pololu 3pi Robot, a complete robot kit to be released in August 2008
 
+
 == Prerequisites ==
 
 The free avr-gcc compiler, avr-libc, and other associated tools must
@@ -144,6 +145,17 @@ To add the -lpololu option within AVR studio, select
 You should see libpololu.a listed as an option on the left column.
 Select this file and click "add library" to add it to your project.
 
+We also strongly recommend the linker option
+
+  -Wl,-gc-sections 
+
+This causes unused library functions to not be included, resulting in
+a much smaller code size.  To include do this in AVR studio, select
+
+  Project -> Configuration Options -> Custom Options
+
+Click on [Linker options] add add -Wl,-gc-sections to the list.
+
 
 == Example AVR Studio Project ==
 
@@ -182,6 +194,43 @@ AVR.  To do this, click "Browse..." in the Flash section and select
 file "test.hex" that was compiled earlier.  Note that you have to
 first navigate to your project directory!  Now click "Program" in the
 Flash section, and the test code should be loaded onto your Orangutan.
+
+If your Orangutan was successfully programmed, you should hear a short
+tune, see the message "Hello!" on the LCD (if one is present), and the
+LEDs on the board should blink.
+
+
+== Linux-based example program ==
+
+There is a demo program for use with avr-gcc outside of the AVR Studio
+environment in the directory
+
+  test/simple-test/
+
+Change to this directory and inspect the Makefile.  Depending on your
+system, you may need to update the paths to the avr-gcc binaries and
+the device for your Orangutan Programmer.  Then, you should be able to
+compile the example with
+
+  make
+
+which should generate the following output as it compiles the source
+code:
+
+  /usr/bin/avr-gcc -g -Wall -mcall-prologues -mmcu=atmega168 -Os   -c -o test.o test.c
+  /usr/bin/avr-gcc -g -Wall -mcall-prologues -mmcu=atmega168 -Os test.o -Wl,-gc-sections -lpololu -o test.obj
+  /usr/bin/avr-objcopy  -R .eeprom -O ihex test.obj test.hex
+  rm test.obj
+
+If make completed successfully, connect your Orangutan Programmer to
+your computer and your Orangutan board, and turn on the Orangutan's
+power.  The green status LED close to the USB connector should be on,
+while the other two LEDs should be off, indicating that the programmer
+is ready. Type
+
+  make program
+
+to load the program onto the Orangutan.
 
 If your Orangutan was successfully programmed, you should hear a short
 tune, see the message "Hello!" on the LCD (if one is present), and the
