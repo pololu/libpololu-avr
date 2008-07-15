@@ -1,67 +1,14 @@
 #include <pololu/3pi.h>
 #include <avr/pgmspace.h>
 
-const prog_char level0[] PROGMEM = {
+// for generating the characters used in load_custom_characters and display_readings
+const prog_char levels[] PROGMEM = {
   0b00000,
   0b00000,
   0b00000,
   0b00000,
   0b00000,
   0b00000,
-  0b00000,
-  0b11111
-};
-const prog_char level1[] PROGMEM = {
-  0b00000,
-  0b00000,
-  0b00000,
-  0b00000,
-  0b00000,
-  0b00000,
-  0b11111,
-  0b11111
-};
-const prog_char level2[] PROGMEM = {
-  0b00000,
-  0b00000,
-  0b00000,
-  0b00000,
-  0b00000,
-  0b11111,
-  0b11111,
-  0b11111
-};
-const prog_char level3[] PROGMEM = {
-  0b00000,
-  0b00000,
-  0b00000,
-  0b00000,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111
-};
-const prog_char level4[] PROGMEM = {
-  0b00000,
-  0b00000,
-  0b00000,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111
-};
-const prog_char level5[] PROGMEM = {
-  0b00000,
-  0b00000,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111,
-  0b11111
-};
-const prog_char level6[] PROGMEM = {
   0b00000,
   0b11111,
   0b11111,
@@ -84,13 +31,13 @@ const prog_char pi[] PROGMEM = {
 
 void load_custom_characters()
 {
-	lcd_load_custom_character(level0,0);
-	lcd_load_custom_character(level1,1);
-	lcd_load_custom_character(level2,2);
-	lcd_load_custom_character(level3,3);
-	lcd_load_custom_character(level4,4);
-	lcd_load_custom_character(level5,5);
-	lcd_load_custom_character(level6,6);
+	lcd_load_custom_character(levels+0,0);
+	lcd_load_custom_character(levels+1,1);
+	lcd_load_custom_character(levels+2,2);
+	lcd_load_custom_character(levels+3,3);
+	lcd_load_custom_character(levels+4,4);
+	lcd_load_custom_character(levels+5,5);
+	lcd_load_custom_character(levels+6,6);
 	lcd_load_custom_character(pi,7);
 	clear();
 }
