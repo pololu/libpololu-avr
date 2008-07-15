@@ -54,7 +54,7 @@ want to install the following packages:
 For Windows users, we also recommend the AVR Studio development
 environment, which may be downloaded free of charge from Atmel at
 
-  http://www.atmel.com/dyn/Products/tools_card.asp?tool_id=2725
+  http://www.atmel.com/avrstudio
 
 To program the Pololu Orangutan or 3pi, we recommend the Pololu
 Orangutan Programmer.  If you will be using a Pololu programmer,
