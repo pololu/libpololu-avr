@@ -44,7 +44,7 @@ install: libpololu.a
 	install -t $(INCLUDE_POLOLU) pololu/*.h
 	install -t $(INCLUDE_POLOLU) pololu/orangutan
 
-ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\*
+ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map
 
 zip: libpololu.a
 	mkdir -p $(ZIPDIR)

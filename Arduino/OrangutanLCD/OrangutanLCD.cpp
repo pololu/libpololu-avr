@@ -130,7 +130,6 @@ OrangutanLCD::OrangutanLCD()
 #include <stdio.h>
 
 /* define putchar and getchar functions for the LCD */
-#define repos(x,y) (row=y;col=x;LCDCommand(0x80+y<<6+x);)
 char row1[8]={' ',' ',' ',' ',' ',' ',' ',' '}; /* remember what we write for scrolling */
 unsigned char row=0; /* the current cursor position */
 unsigned char col=0;
