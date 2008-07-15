@@ -159,8 +159,8 @@ Click on [Linker options] add add -Wl,-gc-sections to the list.
 
 == Example AVR Studio Project ==
 
-A very simple demo program for the Orangutan is available in the
-folder
+A very simple AVR Studio based demo program for the Orangutan is
+available in the folder
 
   test\avr-studio-project
 
