@@ -20,6 +20,7 @@ LIBRARY_OBJECT_FILES=\
 	Arduino/PololuQTRSensors/PololuQTRSensors.o \
 	Arduino/Pololu3pi/Pololu3pi.o \
 	Arduino/PololuQTRSensors/PololuQTRSensors.o \
+	Arduino/OrangutanResources/OrangutanResources.o \
 	OrangutanDelay.o
 
 OBJ2HEX=avr-objcopy 

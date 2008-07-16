@@ -6,3 +6,4 @@
 #include <pololu/leds.h>
 #include <pololu/pushbuttons.h>
 #include <pololu/qtr.h>
+#include <pololu/resources.h>

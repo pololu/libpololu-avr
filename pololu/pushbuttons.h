@@ -2,7 +2,6 @@
   OrangutanPushbuttons.h - Library for using the thee user pushbuttons on the
       Orangutan LV-168
   Written by Ben Schmidel, May 23, 2008.
-  Released into the public domain.
 */
 #ifndef OrangutanPushbuttons_h
 #define OrangutanPushbuttons_h

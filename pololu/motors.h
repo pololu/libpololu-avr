@@ -2,7 +2,6 @@
   OrangutanMotors.h - C Library for using the motor drivers on the
       Orangutan LV-168 and Baby Orangutan B-48/B-168
   Written by Ben Schmidel and Paul Grayson, 2008.
-  Released into the public domain.
 */
 #ifndef orangutan_motors_h
 #define orangutan_motors_h
