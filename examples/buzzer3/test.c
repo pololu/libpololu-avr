@@ -60,7 +60,7 @@
 //#define ALWAYS_CHECK       // playMode() is always PLAY_CHECK (delays interrupt the sequence)
 
 #include <avr/pgmspace.h>
-const char rhapsody[] PROGMEM = "V8 O6 T40 L16 d#<b<f#<d#<f#<bd#f#"
+const char rhapsody[] PROGMEM = "O6 T40 L16 d#<b<f#<d#<f#<bd#f#"
   "T80 c#<b-<f#<c#<f#<b-c#8"
   "T180 d#b<f#d#f#>bd#f#c#b-<f#c#f#>b-c#8 c>c#<c#>c#<b>c#<c#>c#c>c#<c#>c#<b>c#<c#>c#"
   "c>c#<c#>c#<b->c#<c#>c#c>c#<c#>c#<b->c#<c#>c#"
