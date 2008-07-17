@@ -1,5 +1,5 @@
 void delay_ms(unsigned int milliseconds);
-inline void delay_us(unsigned int microseconds)
+static inline void delay_us(unsigned int microseconds)
 {
   __asm__ volatile (
 		    "1: push r22"     "\n\t"

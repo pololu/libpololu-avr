@@ -7,8 +7,7 @@
  *
  * This example program is indended for use on the Orangutan LV-168.
  * It uses the OrangutanBuzzer library to play a series of notes on
- * the Orangutan LV-168's buzzer.  It uses the OrangutanPushbuttons
- * library to allow the user select which melody plays.
+ * the Orangutan LV-168's buzzer.
  *
  * This example demonstrates the use of the OrangutanBuzzer::playMode()
  * and OrangutanBuzzer::playCheck() methods, which allow you to select
