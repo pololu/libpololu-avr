@@ -57,27 +57,28 @@
  
 // *** UNCOMMENT ONE OF THE FOLLOWING PRECOMPILER DIRECTIVES ***
 // (the remaining two should be commented out)
-#define WORKING_CORRECTLY  // this is the right way to use playMode()
+#define WORKING_CORRECTLY    // this is the right way to use playMode()
 //#define ALWAYS_AUTOMATIC   // playMode() is always PLAY_AUTOMATIC (timing is inaccurate)
-//#define ALWAYS_CHECK         // playMode() is always PLAY_CHECK (delays interrupt the sequence)
+//#define ALWAYS_CHECK       // playMode() is always PLAY_CHECK (delays interrupt the sequence)
 
 OrangutanLEDs leds;
 OrangutanBuzzer buzzer;
 OrangutanLCD lcd;
 
+#include <avr/pgmspace.h>
+const char rhapsody[] PROGMEM = "O6 T40 L16 d#<b<f#<d#<f#<bd#f#"
+  "T80 c#<b-<f#<c#<f#<b-c#8"
+  "T180 d#b<f#d#f#>bd#f#c#b-<f#c#f#>b-c#8 c>c#<c#>c#<b>c#<c#>c#c>c#<c#>c#<b>c#<c#>c#"
+  "c>c#<c#>c#<b->c#<c#>c#c>c#<c#>c#<b->c#<c#>c#"
+  "c>c#<c#>c#f>c#<c#>c#c>c#<c#>c#f>c#<c#>c#"
+  "c>c#<c#>c#f#>c#<c#>c#c>c#<c#>c#f#>c#<c#>c#d#bb-bd#bf#d#c#b-ab-c#b-f#d#";
+
+
 void setup()                    // run once, when the sketch starts
 {
   TCCR2A = 0;         // configure timer2 to run at 78 kHz
   TCCR2B = 0x06;      // and overflow when TCNT2 = 256 (~3 ms)
-  buzzer.play("T120 V15 L16" 
-       "agafaea dac+adaea fa<aa<bac#a dac#adaea f"
-       "O5 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad "
-       "O5 L8 MS <b-d<b-d ML e-<ge-<g MS c<ac<a ML d<fd<f O4 MS b-gb-g ML >c#e>c#e"
-       "MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"
-       "L16 O5 ragafaea dac#adaea fa<aa<bac#a dac#adaea faeadaca <b-acadgb-g egdgcg<b-g"
-       "<ag<b-gcf<af dfcf<b-f<af <gf<af<b-e<ge c#e<b-e<ae<ge <fe<ge<ad<fd"
-       "O4 e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d e>d>c#>db>d>c#b"
-       ">c#agaegfe fO5dc#dfdc#<b c#4");
+  buzzer.playFromProgramSpace(rhapsody);
 }
 
 void loop()                     // run over and over again

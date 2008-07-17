@@ -21,8 +21,6 @@ void setup()                    // run once, when the sketch starts
 
 void loop()                     // run over and over again
 {
-  //int secs = millis() * 1000L;
-  //lcd.print(secs);
   lcd.print("Hello");           // display "Hello" at (0, 0), a.k.a. upper-left
   delay(200);
   lcd.scroll(LCD_RIGHT, 3, 200);// shift the display right every 200ms three times

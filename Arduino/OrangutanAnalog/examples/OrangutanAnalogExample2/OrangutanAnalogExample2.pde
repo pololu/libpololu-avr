@@ -2,7 +2,7 @@
 #include <OrangutanAnalog.h>
 
 /*
- * OrangutanAnalogExample for the Orangutan LV-168
+ * OrangutanAnalogExample2 for the Orangutan LV-168
  *
  * This sketch uses the OrangutanAnalog library to read the voltage output
  * of the trimpot (in millivolts) and to read the Orangutan LV-168's
