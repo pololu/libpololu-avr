@@ -32,7 +32,7 @@ int main()
 	printf("\nSuccess");
 	play("O5 c16");
 	
-	return 0;
+	while(1);
 }
 
 // Local Variables: **
