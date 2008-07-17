@@ -1,5 +1,7 @@
 #define MODE_8_BIT		1
 #define MODE_10_BIT		0
+#define TRIMPOT			7
+#define TEMP_SENSOR		6
 
 void set_analog_mode(unsigned char mode);
 unsigned char get_analog_mode();
