@@ -1,5 +1,6 @@
 #include <OrangutanPushbuttons.h>
 #include <OrangutanLCD.h>
+#include <stdlib.h>        // used for its "random" and "srandom" functions
 
 /*
  * OrangutanLCDExample2 for the Orangutan LV-168
@@ -85,20 +86,27 @@ void setup()                    // run once, when the sketch starts
   lcd.loadCustomCharacter(mocking, 4);
   lcd.clear();                  // this must be called before we can use the custom characters
   lcd.print("mood: ?");
+  
+  // initialize the random number generator based on how long they hold the button the first time
+  OrangutanPushbuttons::waitForPress(ALL_BUTTONS);
+  long seed = 0;
+  while(OrangutanPushbuttons::isPressed(ALL_BUTTONS))
+    seed++;
+  srandom(seed);                // the same as: randomSeed((unsigned int)seed);
 }
 
 void loop()                     // run over and over again
-{
-  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);   // wait for any button to be pressed
-  
+{  
   lcd.gotoXY(6, 0);             // move cursor to the correct position
   
   char mood;
   do
   {
-    mood = (char)random(5);
+    mood = random()%5;          // the same as: mood = random(5);
   } while (mood == prevMood);   // ensure we get a new mood that differs from the previous
   prevMood = mood;
   
   lcd.print(mood);   // print a random mood character
+  
+  OrangutanPushbuttons::waitForButton(ALL_BUTTONS);   // wait for any button to be pressed
 }
