@@ -11,7 +11,7 @@
  * the LCD.  Simply push a any user pushbutton to display a new,
  * randomly chosen, custom mood character.
  *
- * http://www.pololu.com/docs/0J20/6.e
+ * http://www.pololu.com/docs/0J20/6.f
  * http://www.pololu.com
  * http://forum.pololu.com
  */
