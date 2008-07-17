@@ -5,10 +5,10 @@
 /*
  * OrangutanLCDExample2 for the Orangutan LV-168
  *
- * This example program is indended for use on the Orangutan LV-168.
+ * This example program is intended for use on the Orangutan LV-168.
  * It uses the OrangutanLCD library to display custom characters on 
  * the LCD.  Simply push a any user pushbutton to display a new,
- * randomly chosen, custom mood characer.
+ * randomly chosen, custom mood character.
  *
  * http://www.pololu.com/docs/0J17/5.c
  * http://www.pololu.com
