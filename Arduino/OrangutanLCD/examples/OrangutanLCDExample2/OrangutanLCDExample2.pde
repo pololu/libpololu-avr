@@ -87,7 +87,7 @@ void setup()                    // run once, when the sketch starts
   lcd.clear();                  // this must be called before we can use the custom characters
   lcd.print("mood: ?");
   
-  // initialize the random number generator based on how long they hold the button the first time
+  // initialize the random number generator based on how long we hold the button the first time
   OrangutanPushbuttons::waitForPress(ALL_BUTTONS);
   long seed = 0;
   while(OrangutanPushbuttons::isPressed(ALL_BUTTONS))

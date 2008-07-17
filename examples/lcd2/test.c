@@ -86,7 +86,7 @@ int main()                    // run once, when the sketch starts
   clear();                  // this must be called before we can use the custom characters
   print("mood: ?");
 
-  // initialize the random number generator based on how long they hold the button the first time
+  // initialize the random number generator based on how long we hold the button the first time
   wait_for_button_press(ALL_BUTTONS);
   long seed = 0;
   while(button_is_pressed(ALL_BUTTONS))
