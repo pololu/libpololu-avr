@@ -61,6 +61,6 @@ zip: libpololu.a
 	zip -rq $(BIN_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES)
 	rm libpololu-avr
 	ln -s . libpololu-avr
-	zip -rq $(BIN_ZIPFILE) libpololu-avr/libpololu.a libpololu-avr/pololu libpololu-avr/test libpololu-avr/examples -x $(ZIP_EXCLUDES)
+	zip -rq $(BIN_ZIPFILE) README.txt libpololu-avr/libpololu.a libpololu-avr/pololu libpololu-avr/test libpololu-avr/examples -x $(ZIP_EXCLUDES)
 	rm libpololu-avr
 
