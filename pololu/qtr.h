@@ -3,7 +3,7 @@
 #define QTR_EMITTERS_ON_AND_OFF 2
 
 char qtr_rc_init(unsigned char* pins, unsigned char numSensors, 
-		 unsigned int timeout_us, unsigned char emitterPin);
+		 unsigned int timeout, unsigned char emitterPin);
 char qtr_analog_init(unsigned char* analogPins, unsigned char numSensors, 
 		     unsigned char numSamplesPerSensor, unsigned char emitterPin);
 void qtr_emitters_on();
