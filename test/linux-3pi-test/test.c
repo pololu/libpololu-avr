@@ -100,7 +100,7 @@ int main()
 		lcd_goto_xy(0,1);
 		print("Press B");
 
-		calibrate_line_sensors();
+		calibrate_line_sensors(IR_EMITTERS_ON);
 
 		delay_ms(20);
 	}
@@ -111,7 +111,7 @@ int main()
 	while(!button_is_pressed(BUTTON_B))
 	{
 		unsigned int sensors[5] = {1,2,3,4,5};
-		unsigned int position = read_line(sensors);
+		unsigned int position = read_line(sensors,IR_EMITTERS_ON);
 
 		clear();
 		print_long(position);
@@ -133,7 +133,7 @@ int main()
 	while(1)
 	{
 		unsigned int sensors[5] = {1,2,3,4,5};
-		unsigned int position = read_line(sensors);
+		unsigned int position = read_line(sensors,IR_EMITTERS_ON);
 
 		if(position < 2000)
 			set_motors(0,100);
