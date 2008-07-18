@@ -45,7 +45,7 @@ install: libpololu.a
 	install -t $(INCLUDE_POLOLU) pololu/*.h
 	install -t $(INCLUDE_POLOLU) pololu/orangutan
 
-ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map
+ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map
 
 zip: libpololu.a
 	mkdir -p $(ZIPDIR)
@@ -61,6 +61,6 @@ zip: libpololu.a
 	zip -rq $(BIN_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES)
 	rm libpololu-avr
 	ln -s . libpololu-avr
-	zip -rq $(BIN_ZIPFILE) libpololu-avr/libpololu.a libpololu-avr/pololu libpololu-avr/test -x $(ZIP_EXCLUDES)
+	zip -rq $(BIN_ZIPFILE) libpololu-avr/libpololu.a libpololu-avr/pololu libpololu-avr/test libpololu-avr/examples -x $(ZIP_EXCLUDES)
 	rm libpololu-avr
 
