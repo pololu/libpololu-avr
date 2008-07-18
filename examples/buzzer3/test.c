@@ -48,7 +48,7 @@
  * sound normal during the timing phase).  The maximum timing reading should
  * be 20, as expected.
  *
- * http://www.pololu.com/docs/0J20/6.e
+ * http://www.pololu.com/docs/0J20/6.d
  * http://www.pololu.com
  * http://forum.pololu.com
  */

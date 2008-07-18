@@ -9,7 +9,7 @@
  * library to allow the user to stop/reset the melody with the top
  * pushbutton.
  *
- * http://www.pololu.com/docs/0J20/6.e
+ * http://www.pololu.com/docs/0J20/6.d
  * http://www.pololu.com
  * http://forum.pololu.com
  */

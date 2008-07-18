@@ -13,7 +13,7 @@
  * no further action from the user once the method is called.  The CPU
  * is then free to execute other code while the melody plays.
  *
- * http://www.pololu.com/docs/0J20/6.e
+ * http://www.pololu.com/docs/0J20/6.d
  * http://www.pololu.com
  * http://forum.pololu.com
  */
