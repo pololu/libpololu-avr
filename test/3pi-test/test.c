@@ -21,12 +21,12 @@ const prog_char levels[] PROGMEM = {
 const prog_char pi[] PROGMEM = {
   0b00000,
   0b00000,
-  0b00000,
   0b11111,
   0b01010,
   0b01010,
   0b01010,
   0b10011,
+  0b00000,
 };
 
 void load_custom_characters()
@@ -64,13 +64,16 @@ int main()
 	load_custom_characters();
 	
 	// Welcome music and message
+	print(" Pololu");
+	lcd_goto_xy(0,1);
 	print_character('3');
 	print_character(7);
+	print(" Robot");
 
 	play_from_program_space(welcome);
 	delay_ms(1000);
 
-	// Display temperature and wait for button press
+	// Display battery voltage and wait for button press
 	while(!button_is_pressed(BUTTON_B))
 	{
 		int bat = battery_millivolts();
@@ -85,7 +88,7 @@ int main()
 	}
 
 	wait_for_button_release(BUTTON_B);
-	delay_ms(500);
+	delay_ms(1000);
 
 	// auto-calibration
 
@@ -136,9 +139,17 @@ int main()
 		unsigned int position = read_line(sensors,IR_EMITTERS_ON);
 
 		if(position < 2000)
+		{
+			left_led(0);
+			right_led(1);
 			set_motors(0,100);
+		}
 		else
+		{
+			left_led(1);
+			right_led(0);
 			set_motors(100,0);
+		}
 	}
 
 	return 0;
