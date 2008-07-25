@@ -16,6 +16,7 @@
 void lcd_init_printf();
 void clear();
 void print(const char *str);
+void print_from_program_space(const char *str);
 void print_character(char c);
 void print_long(long value);
 void print_unsigned_long(long value);

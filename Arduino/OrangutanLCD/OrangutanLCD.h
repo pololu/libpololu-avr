@@ -67,6 +67,10 @@ class OrangutanLCD
 	// The string is printed from wherever the cursor is, and will
 	// not span lines.  (This lets you concatenate print statements.)
 	static void print(const char *str);
+
+	// Sends a PROGMEM string to the LCD.
+	static void print_from_program_space(const char *str);
+
 #ifndef LIB_ORANGUTAN
 	static void printIn(const char *str);  // for compatibility with other libs
 #endif
