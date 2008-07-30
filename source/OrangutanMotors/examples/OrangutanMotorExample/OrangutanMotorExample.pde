@@ -4,9 +4,9 @@
 
 
 /*
- * OrangutanMotorExample for the Orangutan LV-168 or Baby Orangutan B
+ * OrangutanMotorExample for the 3pi robot, Orangutan LV-168, or Baby Orangutan B
  *
- * This example program is indended for use on the Orangutan LV-168 or
+ * This example program is indended for use on the 3pi, Orangutan LV-168, or
  * Baby Orangutan B.  It uses the OrangutanMotors library to drive
  * motors in response to the position of user trimmer potentiometer
  * and blinks the red user LED at a rate determined by the trimmer

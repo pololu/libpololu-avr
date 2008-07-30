@@ -4,9 +4,9 @@
 #include <OrangutanLCD.h>
 
 /*
- * OrangutanMotorExample2 for the Orangutan LV-168
+ * OrangutanMotorExample2 for the 3pi robot or Orangutan LV-168
  *
- * This example program is indended for use on the Orangutan LV-168.
+ * This example program is indended for use on the Orangutan LV-168 or 3pi.
  * It uses the OrangutanMotors and OrangutanLCD libraries to drive
  * motors in response to the position of user trimmer potentiometer
  * and to display the potentiometer position and desired motor speed

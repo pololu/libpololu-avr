@@ -1,6 +1,6 @@
 /*
   OrangutanLEDs.cpp - Library for using the LED(s) on the
-      Orangutan LV-168 and Baby Orangutan B-48/B-168
+      Orangutan LV-168, Baby Orangutan B-48/B-168, or 3pi robot.
 */
 
 /*
@@ -60,7 +60,7 @@ OrangutanLEDs::OrangutanLEDs()
 }
 
 
-// turns the Orangutan LED off if 'on' is zero, else this method
+// turns the target LED off if 'on' is zero, else this method
 // turns the LED on.  Note that the Baby Orangutan B only has
 // one LED (the red one), so green() will just drive I/O line PD7
 // high or low, depending on the argument.

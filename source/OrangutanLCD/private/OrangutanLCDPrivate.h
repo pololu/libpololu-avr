@@ -1,5 +1,5 @@
 /*
-  OrangutanLCDPrivate.h - Library for using the LCD on the Orangutan LV-168
+  OrangutanLCDPrivate.h - Library for using the LCD on the Orangutan LV-168 or 3pi robot.
   Originally written by Tom Benedict as part of Orangutan-Lib.
   Modified by Ben Schmidel, May 14, 2008.
   Released into the public domain.
@@ -10,7 +10,7 @@
 
 // LCD Pinouts:
 
-// On the Orangutan LV-168, the LCD control lines are split between
+// On the Orangutan LV-168 and 3pi robot, the LCD control lines are split between
 // ports B and D:
 
 #define LCD_RS_E_DDR		DDRD

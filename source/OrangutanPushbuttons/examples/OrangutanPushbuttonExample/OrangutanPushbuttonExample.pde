@@ -2,12 +2,12 @@
 #include <OrangutanPushbuttons.h>
 
 /*
- * OrangutanPushbuttonExample for the Orangutan LV-168
+ * OrangutanPushbuttonExample for the 3pi robot or Orangutan LV-168
  *
- * This example program is indended for use on the Orangutan LV-168.
- * It uses the OrangutanPushbuttons library to detect user input from
- * the pushbuttons, and it uses the OrangutanLCD library to display 
- * feedback on the LCD.
+ * This example program is indended for use on the 3pi or Orangutan LV-168.
+ * It uses the OrangutanPushbuttons library to detect user input from the
+ * pushbuttons, and it uses the OrangutanLCD library to display feedback
+ * on the LCD.
  *
  * http://www.pololu.com/docs/0J17/5.f
  * http://www.pololu.com

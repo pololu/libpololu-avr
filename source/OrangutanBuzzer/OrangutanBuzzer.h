@@ -1,6 +1,6 @@
 /*
-  OrangutanBuzzer.h - Library for controlling the buzzer on the
-    Orangutan LV-168. This library uses a timer1 PWM to generate the note
+  OrangutanBuzzer.h - Library for controlling the buzzer on the Orangutan
+    LV-168 or 3pi robot. This library uses a timer1 PWM to generate the note
 	frequencies and timer1 overflow interrupt to time the duration of the
 	notes, so the buzzer can be playing a melody in the background while
 	the rest of your code executes.

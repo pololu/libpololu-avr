@@ -2,12 +2,12 @@
 #include <OrangutanAnalog.h>
 
 /*
- * OrangutanAnalogExample for the Orangutan LV-168 or Baby Orangutan B
+ * OrangutanAnalogExample for the 3pi, Orangutan LV-168, or Baby Orangutan B
  *
  * This sketch uses the OrangutanAnalog library to read the voltage output
  * of the trimpot in the background while the rest of the main loop executes.
  * The LED is flashed so that its brightness appears proportional to the
- * trimpot position.  This example will work on both the Orangutan LV-168
+ * trimpot position.  This example will work on the 3pi robot, Orangutan LV-168,
  * and Baby Orangutan B.
  *
  * http://www.pololu.com/docs/0J17/5.a

@@ -1,5 +1,5 @@
 /*
-  OrangutanLCD.cpp - Library for using the LCD on the Orangutan LV-168.
+  OrangutanLCD.cpp - Library for using the LCD on the Orangutan LV-168 or 3pi robot.
   Originally written by Tom Benedict and Ben Schmidel as part of Orangutan-Lib.
 */
 

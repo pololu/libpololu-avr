@@ -3,9 +3,9 @@
 #include <OrangutanBuzzer.h>
 
 /*
- * OrangutanBuzzerExample for the Orangutan LV-168
+ * OrangutanBuzzerExample for the Orangutan LV-168 or 3pi robot
  *
- * This example program is indended for use on the Orangutan LV-168.
+ * This example program is indended for use on the Orangutan LV-168 or 3pi.
  * It uses the OrangutanBuzzer library to play a series of notes on
  * the Orangutan LV-168's buzzer.  It also uses the OrangutanLCD library
  * to display the notes its playing, and it uses the OrangutanPushbuttons

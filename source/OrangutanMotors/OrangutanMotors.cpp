@@ -1,6 +1,6 @@
 /*
   OrangutanMotors.cpp - Library for using the motor drivers on the
-      Orangutan LV-168 and Baby Orangutan B-48/B-168
+      Orangutan LV-168, Baby Orangutan B-48/B-168, or 3pi robot.
 */
 
 /*
