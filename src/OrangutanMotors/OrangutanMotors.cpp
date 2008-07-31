@@ -5,11 +5,12 @@
 
 /*
  * Written by Ben Schmidel, May 15, 2008.
+ * Last modified: July 30, 2008
  * Copyright (c) 2008 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
- *   http://www.pololu.com/docs/0J17/5.e
+ *   http://www.pololu.com/docs/0J18/7
  *
  * You may freely modify and share this code, as long as you keep this
  * notice intact (including the two links above).  Licensed under the
@@ -30,27 +31,11 @@
 #include <avr/io.h>
 #include "OrangutanMotors.h"
 
-/*  This comment block will efficiently count elapsed milliseconds
-volatile unsigned long msCounter;	// returned by OrangutanMotors::millis()
-unsigned int us_times_10 = 0;		// in units of 10^-7 s
 
-
-// this ISR is called every time timer2 overflows
-ISR(TIMER2_OVF_vect)
-{
-	us_times_10 += 1024;
-	if (us_times_10 >= 10000)
-	{
-		msCounter++;
-		us_times_10 -= 10000;
-	}
-}
-*/
-
+#ifndef LIB_POLOLU
 // declared in wiring.c and used to drive millis()
 extern volatile unsigned long timer0_overflow_count;
 
-#ifndef LIB_POLOLU
 // declaring this global as static means it won't conflict
 // with globals in other .cpp files that share the same name
 static unsigned char miniCount = 0;	// only used in timer2 overflow ISR
@@ -106,14 +91,25 @@ void OrangutanMotors::init2()
 	// we intentionally do not call sei() here
 #endif
 
-	// configure for inverted PWM output on motor control pins:   
+#ifdef POLOLU_3PI
+	// configure for inverted phase-correct PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
-    //  Timer0 and Timer2 count up from 0 to 255   
+    //  Timer0 and Timer2 count up from 0 to 255 and then counts back down to 0  
+    TCCR0A = TCCR2A = 0xF1;
+  
+    // use the system clock (=20 MHz) as the timer clock,
+	// which will produce a PWM frequency of 39 kHz (because of phase-correct mode)
+    TCCR0B = TCCR2B = 0x01;
+#else
+	// configure for inverted fast PWM output on motor control pins:   
+    //  set OCxx on compare match, clear on timer overflow   
+    //  Timer0 and Timer2 count up from 0 to 255 and then overflows directly to 0   
     TCCR0A = TCCR2A = 0xF3;
   
     // use the system clock/8 (=2.5 MHz) as the timer clock,
 	// which will produce a PWM frequency of 10 kHz
     TCCR0B = TCCR2B = 0x02;
+#endif
 
 	// use the system clock (=20 MHz) as the timer clock,
 	// which will produce a PWM frequency of 78 kHz.  The Baby Orangutan B
