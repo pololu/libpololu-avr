@@ -60,6 +60,9 @@ extern "C" {
 	unsigned long get_ms() { return OrangutanTime::ms(); }
 	unsigned long get_us() { return OrangutanTime::us(); }
 	void delay_ms(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
+
+	void time_init(char use_40khz) { OrangutanTime::init(use_40khz); }
+	void time_reset() { OrangutanTime::reset(); }
 }
 
 unsigned long OrangutanTime::ms()

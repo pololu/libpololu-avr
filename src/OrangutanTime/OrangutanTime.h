@@ -35,6 +35,8 @@ class OrangutanTime
 	// Initializes the timer.  This must be called before the
 	// milliseconds/microseconds elapsed time functions are used.  It
 	// is not required for the delay functions.
+	// Set use_40khz to 1 to use the high-frequency-PWM-compatible
+	// timer settings.
 	static void init(char use_40khz);
 
 	// Resets the ms and us counters to zero.

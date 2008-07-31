@@ -2,6 +2,8 @@
 unsigned long get_ms();
 unsigned long get_us();
 void delay_ms(unsigned int milliseconds);
+void time_init(char use_40khz);
+void time_reset();
 
 // These are alternative aliases:
 static inline void delay(unsigned int milliseconds) { delay_ms(milliseconds); }
