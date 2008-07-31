@@ -43,7 +43,7 @@
 
 #ifdef LIB_POLOLU
 
-#include "OrangutanTime.h"
+#include "../OrangutanTime/OrangutanTime.h"
 // two options for our sensors
 
 // one pointer to the type in use
@@ -540,7 +540,7 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	PORTC |= _portCMask;
 	PORTD |= _portDMask;
 	
-	delayMicrosecond(10);
+	delayMicroseconds(10);
 	
 	// set all ports to inputs
 	DDRB &= ~_portBMask;

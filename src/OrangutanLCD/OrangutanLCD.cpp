@@ -126,7 +126,7 @@ OrangutanLCD::OrangutanLCD()
 
 #ifdef LIB_POLOLU
 
-#include "OrangutanTime.h"
+#include "../OrangutanTime/OrangutanTime.h"
 #include <stdio.h>
 
 /* define putchar and getchar functions for the LCD */
@@ -365,7 +365,7 @@ void OrangutanLCD::busyWait()
 		LCD_RS_E_PORT |= (1 << LCD_E);
 
 		// Wait at least 120ns (1us is excessive)
-		delayMicrosecond(1);
+		delayMicroseconds(1);
 
 		// Get the data back from the LCD
 		data = PIND & LCD_PORTD_MASK;
@@ -378,7 +378,7 @@ void OrangutanLCD::busyWait()
 		LCD_RS_E_PORT &= ~(1 << LCD_E);
 
 		// Wait a small bit
-		delayMicrosecond(1);
+		delayMicroseconds(1);
 
 		// Strobe out the 4 bits we don't care about:
 
@@ -386,7 +386,7 @@ void OrangutanLCD::busyWait()
 		LCD_RS_E_PORT |= (1 << LCD_E);
 
 		// Wait at least 120ns (1us is excessive)
-		delayMicrosecond(1);
+		delayMicroseconds(1);
 
 		// Bring E low
 		LCD_RS_E_PORT &= ~(1 << LCD_E);
@@ -415,12 +415,12 @@ void OrangutanLCD::sendNibble(unsigned char nibble)
 	LCD_RS_E_PORT |= (1 << LCD_E);
 	
 	// Wait => 450ns (1us is excessive)
-	delayMicrosecond(1);
+	delayMicroseconds(1);
 
 	// Bring E low
 	LCD_RS_E_PORT &= ~(1 << LCD_E);
 
-	delayMicrosecond(1);
+	delayMicroseconds(1);
 
 	// Dropping out of the routine will take at least 10ns, the time
 	// given by the datasheet for the LCD controller to read the
