@@ -25,23 +25,61 @@
 #ifndef OrangutanTime_h
 #define OrangutanTime_h
 
-#ifdef LIB_POLOLU
-// will delay for for the specified nubmer of microseconds if F_CPU is 20 MHz
-extern "C" static inline void delayMicroseconds(unsigned int microseconds)
+class OrangutanTime
 {
-	__asm__ volatile (
-					  "1: push r22"     "\n\t"
-					  "   ldi  r22, 4"  "\n\t"
-					  "2: dec  r22"     "\n\t"
-					  "   brne 2b"      "\n\t"
-					  "   pop  r22"     "\n\t"   
-					  "   sbiw %0, 1"   "\n\t"
-					  "   brne 1b"
-					  : "=w" ( microseconds )  
-					  : "0" ( microseconds )
-					  );  
-}
-#endif // LIB_POLOLU
+  public:
+
+    // Constructor (doesn't do anything).
+	OrangutanTime();
+
+	// Initializes the timer.  This must be called before the
+	// milliseconds/microseconds elapsed time functions are used.  It
+	// is not required for the delay functions.
+	static void init(char use_40khz);
+
+	// Resets the ms and us counters to zero.
+	static void reset();
+
+	// Returns the number of elapsed milliseconds.
+	static inline unsigned long ms();
+
+	// Returns the number of elapsed microseconds.
+	static inline unsigned long us();
+
+	// Delays for the specified number of milliseconds.
+	static void delayMilliseconds(unsigned int milliseconds);
+
+	// Delays for for the specified nubmer of microseconds.
+	static inline void delayMicroseconds(unsigned int microseconds)
+	{
+		__asm__ volatile (
+						  "1: push r22"     "\n\t"
+						  "   ldi  r22, 4"  "\n\t"
+						  "2: dec  r22"     "\n\t"
+						  "   brne 2b"      "\n\t"
+						  "   pop  r22"     "\n\t"   
+						  "   sbiw %0, 1"   "\n\t"
+						  "   brne 1b"
+						  : "=w" ( microseconds )  
+						  : "0" ( microseconds )
+						  );  
+	}
+
+};
+
+#ifndef OrangutanTime_cpp
+// More convenient aliases for the static class functions.
+// These aliases are only accessible when the file is included from
+// another C++ file.
+inline unsigned long get_ms() { return OrangutanTime::ms(); }
+inline unsigned long millis() { return OrangutanTime::ms(); }
+inline unsigned long get_us() { return OrangutanTime::ms(); }
+inline unsigned long micros() { return OrangutanTime::ms(); }
+
+inline void delay(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
+inline void delay_ms(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
+inline void delay_us(unsigned int microseconds) { OrangutanTime::delayMicroseconds(microseconds); }
+#endif
 
 #endif
 

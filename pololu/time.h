@@ -1,4 +1,14 @@
+// these are defined in the .cpp file:
+unsigned long get_ms();
+unsigned long get_us();
 void delay_ms(unsigned int milliseconds);
+
+// These are alternative aliases:
+static inline void delay(unsigned int milliseconds) { delay_ms(milliseconds); }
+static inline unsigned long millis() { return get_ms(); }
+static inline unsigned long micros() { return get_us(); }
+
+// This is inline for efficiency:
 static inline void delay_us(unsigned int microseconds)
 {
   __asm__ volatile (

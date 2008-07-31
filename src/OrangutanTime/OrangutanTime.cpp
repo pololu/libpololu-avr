@@ -26,75 +26,92 @@
 #define F_CPU 20000000UL
 #endif
 
-#ifdef LIB_POLOLU
-#include "OrangutanTime.h"
-#include <util/delay.h>
+// Define a macro so that OrangutanTime.h can exclude definitions that
+// conflict with the C-only functions defined here.
+#define OrangutanTime_cpp
 
+#include "OrangutanTime.h"
+#include <avr/interrupt.h>
 
 volatile unsigned long msCounter = 0;	// returned by millis()
-unsigned int us_times_10 = 0;			// in units of 10^-7 s
-unsigned char initialized = 0;
+unsigned int us_over_10 = 0;			// in units of 10^-7 s
 
 // this ISR is called every time timer2 overflows
+// This is exactly every 25.5 us for 40khz pwm, 102.4 us for 10khz.
+unsigned int us_over_10_increment = 0; // either 255 or 1024
+
 ISR(TIMER2_OVF_vect)
 {
-#ifdef POLOLU_3PI
-	us_times_10 += 255;
-	if (us_times_10 >= 10000)
+	us_over_10 += us_over_10_increment;
+
+	if (us_over_10 >= 10000)
 	{
 		msCounter++;
-		us_times_10 -= 10000;
+		us_over_10 -= 10000;
 	}
-#else
-	us_times_10 += 1024;
-	if (us_times_10 >= 10000)
-	{
-		msCounter++;
-		us_times_10 -= 10000;
-	}
-#endif
 }
 
+// Standard aliases for the static class functions, accessible from C.
+// There are some inline ones defined to alias to these in the C
+// header files.  Also, delay_us() is only in the header, since it's
+// inline assembly code.
 
-extern "C" void initTime()
+extern "C" {
+	unsigned long get_ms() { return OrangutanTime::ms(); }
+	unsigned long get_us() { return OrangutanTime::us(); }
+	void delay_ms(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
+}
+
+unsigned long OrangutanTime::ms()
 {
-	initialized = 1;
+	return msCounter;
+}
+
+unsigned long OrangutanTime::us()
+{
+	return msCounter * 1000 + us_over_10 / 10;
+}
+
+void OrangutanTime::delayMilliseconds(unsigned int milliseconds)
+{
+	while (milliseconds--)
+	  delayMicroseconds(1000);
+}
+
+void OrangutanTime::init(char use_40khz)
+{
 	TIMSK2 &= ~(1 << TOIE2);	// disable timer2 overflow interrupt
 
-#ifdef POLOLU_3PI
-	TCCR2A &= ~0x03;	// phase correct PWM, TOP = 0xFF
-	TCCR2A |= 0x01;
-	TCCR2B &= 0xF0;
-	TCCR2B |= 0x01;		// timer2 ticks at 20 MHz (prescaler = 1)
-#else
-	TCCR2A |= 0x03;		// fast PWM, TOP = 0xFF
-	TCCR2B &= 0xF0;
-	TCCR2B |= 0x02;		// timer 2 ticks at 2.5 MHz (prescaler = 8)
-#endif
+	if(use_40khz)
+	{
+		us_over_10_increment = 255;
+		TCCR2A &= ~0x03;	// phase correct PWM, TOP = 0xFF
+		TCCR2A |= 0x01;
+		TCCR2B &= 0xF0;
+		TCCR2B |= 0x01;		// timer2 ticks at 20 MHz (prescaler = 1)
+	}
+	else
+	{
+		us_over_10_increment = 1024;
+		TCCR2A |= 0x03;		// fast PWM, TOP = 0xFF
+		TCCR2B &= 0xF0;
+		TCCR2B |= 0x02;		// timer 2 ticks at 2.5 MHz (prescaler = 8)
+	}
 
 	TIFR2 |= 1 << TOV2;	// clear timer2 overflow flag
 	TIMSK2 |= 1 << TOIE2;	// enable timer2 overflow interrutp
 	sei();				// enable global interrupts
 }
 
-extern "C" void delay(unsigned int milliseconds)
+void OrangutanTime::reset()
 {
-	while (milliseconds--)
-	  _delay_ms(1);
+	msCounter = 0;
+	us_over_10 = 0;
 }
 
-
-extern "C" unsigned long millis()
-{
-	if (!initialized)
-		initTime();
-	return msCounter;
-}
-
-extern "C" unsigned long microseconds()
-{
-	if (!initialized)
-		initTime();
-	return msCounter * 1000 + us_time_10 / 10;
-}
-#endif // LIB_POLOLU
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

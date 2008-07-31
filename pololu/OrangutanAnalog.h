@@ -1,1 +1,1 @@
-../Arduino/OrangutanAnalog/OrangutanAnalog.h
+../src/OrangutanAnalog/OrangutanAnalog.h

@@ -1,1 +1,1 @@
-../Arduino/PololuQTRSensors/PololuQTRSensors.h
+../src/PololuQTRSensors/PololuQTRSensors.h

@@ -11,17 +11,17 @@ CPP=avr-g++
 CC=avr-gcc
 
 LIBRARY_OBJECT_FILES=\
-	Arduino/OrangutanMotors/OrangutanMotors.o \
-	Arduino/OrangutanBuzzer/OrangutanBuzzer.o \
-	Arduino/OrangutanPushbuttons/OrangutanPushbuttons.o \
-	Arduino/OrangutanLCD/OrangutanLCD.o \
-	Arduino/OrangutanLEDs/OrangutanLEDs.o \
-	Arduino/OrangutanAnalog/OrangutanAnalog.o \
-	Arduino/PololuQTRSensors/PololuQTRSensors.o \
-	Arduino/Pololu3pi/Pololu3pi.o \
-	Arduino/PololuQTRSensors/PololuQTRSensors.o \
-	Arduino/OrangutanResources/OrangutanResources.o \
-	OrangutanDelay.o
+	src/OrangutanMotors/OrangutanMotors.o \
+	src/OrangutanBuzzer/OrangutanBuzzer.o \
+	src/OrangutanPushbuttons/OrangutanPushbuttons.o \
+	src/OrangutanLCD/OrangutanLCD.o \
+	src/OrangutanLEDs/OrangutanLEDs.o \
+	src/OrangutanAnalog/OrangutanAnalog.o \
+	src/PololuQTRSensors/PololuQTRSensors.o \
+	src/Pololu3pi/Pololu3pi.o \
+	src/PololuQTRSensors/PololuQTRSensors.o \
+	src/OrangutanResources/OrangutanResources.o \
+	src/OrangutanTime/OrangutanTime.o
 
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lpololu -lm

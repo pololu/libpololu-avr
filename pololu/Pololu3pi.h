@@ -1,1 +1,1 @@
-../Arduino/Pololu3pi/Pololu3pi.h
+../src/Pololu3pi/Pololu3pi.h
