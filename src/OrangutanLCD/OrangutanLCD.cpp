@@ -683,7 +683,6 @@ void OrangutanLCD::moveCursor(unsigned char direction,
 void OrangutanLCD::scroll(unsigned char direction, unsigned char num, 
 						   unsigned int delay_time)
 {
-	unsigned int i;
 	while(num--)
 	{
 		if (direction == LCD_LEFT)
