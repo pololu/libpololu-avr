@@ -39,7 +39,7 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 
 #ifdef LIB_POLOLU
 
-#include "OrangutanTime.h"
+#include "../OrangutanTime/OrangutanTime.h"
 
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {
@@ -68,7 +68,7 @@ void OrangutanPushbuttons::init2()
 {
 	DDRB &= ~ALL_BUTTONS;	// set the pushbutton pins to be inputs
 	PORTB |= ALL_BUTTONS;	// enable pullups on the pushbutton pins
-	delayMicrosecond(1);	// give pullups time to stabilize
+	delayMicroseconds(1);	// give pullups time to stabilize
 }
 
 // wait for any of the specified buttons to be pressed, at which point

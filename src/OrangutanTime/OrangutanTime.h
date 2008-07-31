@@ -43,10 +43,10 @@ class OrangutanTime
 	static void reset();
 
 	// Returns the number of elapsed milliseconds.
-	static inline unsigned long ms();
+	static unsigned long ms();
 
 	// Returns the number of elapsed microseconds.
-	static inline unsigned long us();
+	static unsigned long us();
 
 	// Delays for the specified number of milliseconds.
 	static void delayMilliseconds(unsigned int milliseconds);
@@ -81,6 +81,7 @@ inline unsigned long micros() { return OrangutanTime::ms(); }
 inline void delay(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
 inline void delay_ms(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
 inline void delay_us(unsigned int microseconds) { OrangutanTime::delayMicroseconds(microseconds); }
+inline void delayMicroseconds(unsigned int microseconds) { OrangutanTime::delayMicroseconds(microseconds); }
 #endif
 
 #endif
