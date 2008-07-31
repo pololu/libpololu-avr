@@ -27,7 +27,6 @@
 #endif //!F_CPU
 
 #include <avr/io.h>
-#include <util/delay.h>
 #include "OrangutanPushbuttons.h"
 
 
@@ -39,6 +38,8 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 }
 
 #ifdef LIB_POLOLU
+
+#include "OrangutanTime.h"
 
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {
@@ -67,7 +68,7 @@ void OrangutanPushbuttons::init2()
 {
 	DDRB &= ~ALL_BUTTONS;	// set the pushbutton pins to be inputs
 	PORTB |= ALL_BUTTONS;	// enable pullups on the pushbutton pins
-	_delay_us(1);			// give pullups time to stabilize
+	delayMicrosecond(1);	// give pullups time to stabilize
 }
 
 // wait for any of the specified buttons to be pressed, at which point
@@ -83,7 +84,7 @@ unsigned char OrangutanPushbuttons::waitForPress(unsigned char buttons)
 	{
 		while (!(~PINB & buttons))	// wait for a button to be pressed
 			;
-		_delay_ms(10);				// debounce the button press
+			delay(10);				// debounce the button press
 	}
 	while (!(~PINB & buttons));	// if button isn't still pressed, loop
 	return ~PINB & buttons;		// return the pressed button(s)
@@ -103,7 +104,7 @@ unsigned char OrangutanPushbuttons::waitForRelease(unsigned char buttons)
 	{
 		while (!(PINB & buttons))	// wait for a button to be released
 			;
-		_delay_ms(10);				// debounce the button release
+			delay(10);				// debounce the button release
 	}
 	while (!(PINB & buttons));		// if button isn't still released, loop
 	return PINB & buttons;			// return the released button(s)

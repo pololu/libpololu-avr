@@ -34,7 +34,6 @@
 #ifndef F_CPU
 #define F_CPU 20000000UL
 #endif
-#include <util/delay.h>
 #include <avr/io.h>
 #include <stdlib.h>
 #include "PololuQTRSensors.h"
@@ -44,6 +43,7 @@
 
 #ifdef LIB_POLOLU
 
+#include "OrangutanTime.h"
 // two options for our sensors
 
 // one pointer to the type in use
@@ -540,7 +540,7 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	PORTC |= _portCMask;
 	PORTD |= _portDMask;
 	
-	_delay_us(10);
+	delayMicrosecond(10);
 	
 	// set all ports to inputs
 	DDRB &= ~_portBMask;

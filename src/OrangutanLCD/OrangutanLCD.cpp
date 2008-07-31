@@ -109,7 +109,6 @@
 #ifndef F_CPU
 #define F_CPU 20000000UL	// the Orangutan LV-168 runs at 20 MHz
 #endif //!F_CPU
-#include <util/delay.h>
 #include "private/OrangutanLCDPrivate.h"	// contains all of the macros
 #include "OrangutanLCD.h"
 
@@ -127,6 +126,7 @@ OrangutanLCD::OrangutanLCD()
 
 #ifdef LIB_POLOLU
 
+#include "OrangutanTime.h"
 #include <stdio.h>
 
 /* define putchar and getchar functions for the LCD */
@@ -294,32 +294,31 @@ void OrangutanLCD::init2()
 	LCD_RW_DDR |= (1 << LCD_RW);
 
 	// Wait >15ms
-	_delay_ms(10);
-	_delay_ms(10);
+	delay(20);
 
 	// Send 0x3 (last four bits ignored)
 	send_cmd(0x30);
 
 	// Wait >4.1ms
-	_delay_ms(5);
+	delay(6);
 
 	// Send 0x3 (last four bits ignored)
 	send_cmd(0x30);
 
 	// Wait >120us
-	_delay_ms(1);
+	delay(2);
 
 	// Send 0x3 (last four bits ignored)
 	send_cmd(0x30);
 
 	// Wait >120us
-	_delay_ms(1);
+	delay(2);
 
 	// Send 0x2 (last four bits ignored)  Sets 4-bit mode
 	send_cmd(0x20);
 
 	// Wait >120us
-	_delay_ms(1);
+	delay(2);
 
 	// Send 0x28 = 4-bit, 2-line, 5x8 dots per char
 	send_cmd(0x28);
@@ -366,7 +365,7 @@ void OrangutanLCD::busyWait()
 		LCD_RS_E_PORT |= (1 << LCD_E);
 
 		// Wait at least 120ns (1us is excessive)
-		_delay_us(1);
+		delayMicrosecond(1);
 
 		// Get the data back from the LCD
 		data = PIND & LCD_PORTD_MASK;
@@ -379,7 +378,7 @@ void OrangutanLCD::busyWait()
 		LCD_RS_E_PORT &= ~(1 << LCD_E);
 
 		// Wait a small bit
-		_delay_us(1);
+		delayMicrosecond(1);
 
 		// Strobe out the 4 bits we don't care about:
 
@@ -387,7 +386,7 @@ void OrangutanLCD::busyWait()
 		LCD_RS_E_PORT |= (1 << LCD_E);
 
 		// Wait at least 120ns (1us is excessive)
-		_delay_us(1);
+		delayMicrosecond(1);
 
 		// Bring E low
 		LCD_RS_E_PORT &= ~(1 << LCD_E);
@@ -416,12 +415,12 @@ void OrangutanLCD::sendNibble(unsigned char nibble)
 	LCD_RS_E_PORT |= (1 << LCD_E);
 	
 	// Wait => 450ns (1us is excessive)
-	_delay_us(1);
+	delayMicrosecond(1);
 
 	// Bring E low
 	LCD_RS_E_PORT &= ~(1 << LCD_E);
 
-	_delay_us(1);
+	delayMicrosecond(1);
 
 	// Dropping out of the routine will take at least 10ns, the time
 	// given by the datasheet for the LCD controller to read the
@@ -691,9 +690,7 @@ void OrangutanLCD::scroll(unsigned char direction, unsigned char num,
 			send_cmd(LCD_SHIFT_L);
 		else
 			send_cmd(LCD_SHIFT_R);
-		i = delay_time;
-		while (i--)
-			_delay_ms(1);	// argument to _delay_ms() must be < 13
+		delay(delay_time);
 	}
 }
 
