@@ -66,6 +66,24 @@ class OrangutanTime
 						  : "0" ( microseconds )
 						  );  
 	}
+	
+	
+  private:
+
+	static inline void init()
+	{
+		static unsigned char initialized = 0;
+
+		if (!initialized)
+		{
+			initialized = 1;	// this MUST be set before init2() is called
+			init2();			// or else infinite recursion ensues
+		}
+	}
+  	
+	// initializes timer 2 for timing (in a way that is compatible with 
+	// other Orangutan libraries)
+	static void init2();
 
 };
 

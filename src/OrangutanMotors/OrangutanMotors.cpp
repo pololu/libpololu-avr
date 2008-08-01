@@ -91,7 +91,7 @@ void OrangutanMotors::init2()
 	// we intentionally do not call sei() here
 #endif
 
-#ifdef POLOLU_3PI
+/*  40 kHz operation (3pi and Baby Orangutan B can handle this) 
 	// configure for inverted phase-correct PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
     //  Timer0 and Timer2 count up from 0 to 255 and then counts back down to 0  
@@ -100,7 +100,8 @@ void OrangutanMotors::init2()
     // use the system clock (=20 MHz) as the timer clock,
 	// which will produce a PWM frequency of 39 kHz (because of phase-correct mode)
     TCCR0B = TCCR2B = 0x01;
-#else
+*/
+
 	// configure for inverted fast PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
     //  Timer0 and Timer2 count up from 0 to 255 and then overflows directly to 0   
@@ -109,7 +110,6 @@ void OrangutanMotors::init2()
     // use the system clock/8 (=2.5 MHz) as the timer clock,
 	// which will produce a PWM frequency of 10 kHz
     TCCR0B = TCCR2B = 0x02;
-#endif
 
 	// use the system clock (=20 MHz) as the timer clock,
 	// which will produce a PWM frequency of 78 kHz.  The Baby Orangutan B
