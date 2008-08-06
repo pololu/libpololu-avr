@@ -32,13 +32,13 @@ void test_buzzer()
 
   // buzzer.play a long note but cut it off at 250 ms
   buzzer.play("o4 a2");
-  OrangutanDelay::ms(250);
+  delay(250);
   buzzer.stopPlaying();
-  OrangutanDelay::ms(250);
+  delay(250);
 
   buzzer.play("ml t240 o4 b t120 l8 >c "); // these notes should take 250 ms, like the others
   buzzer.playMode(PLAY_CHECK); // should just buzzer.play the first note until we check
-  OrangutanDelay::ms(500);
+  delay(500);
 
   while(buzzer.isPlaying()) // should terminate correctly
     buzzer.playCheck();

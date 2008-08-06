@@ -32,13 +32,6 @@ class OrangutanTime
     // Constructor (doesn't do anything).
 	OrangutanTime();
 
-	// Initializes the timer.  This must be called before the
-	// milliseconds/microseconds elapsed time functions are used.  It
-	// is not required for the delay functions.
-	// Set use_40khz to 1 to use the high-frequency-PWM-compatible
-	// timer settings.
-	static void init(char use_40khz);
-
 	// Resets the ms and us counters to zero.
 	static void reset();
 
@@ -70,6 +63,10 @@ class OrangutanTime
 	
   private:
 
+	// Initializes the timer.  This must be called before the
+	// milliseconds/microseconds elapsed time functions are used.  It
+	// is not required for the delay functions.
+
 	static inline void init()
 	{
 		static unsigned char initialized = 0;
@@ -93,8 +90,6 @@ class OrangutanTime
 // another C++ file.
 inline unsigned long get_ms() { return OrangutanTime::ms(); }
 inline unsigned long millis() { return OrangutanTime::ms(); }
-inline unsigned long get_us() { return OrangutanTime::ms(); }
-inline unsigned long micros() { return OrangutanTime::ms(); }
 
 inline void delay(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
 inline void delay_ms(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }

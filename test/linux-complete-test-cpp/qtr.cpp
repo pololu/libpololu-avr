@@ -67,7 +67,7 @@ void test_qtr()
   OrangutanLCD::clear();
 
   OrangutanLCD::print(sizeof(PololuQTRSensorsAnalog));
-  OrangutanDelay::ms(1000);
+  delay_ms(1000);
 
   OrangutanLCD::clear();
 
@@ -104,7 +104,7 @@ void test_qtr()
 
     OrangutanLCD::gotoXY(5,1);
     //    OrangutanLCD::print(qtr.calibratedMinimumOn[0]);
-    OrangutanDelay::ms(50);
+    delay_ms(50);
   }
  
   OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
@@ -118,7 +118,7 @@ void test_qtr()
     printf("C + %4ud",values[0]);
 
     display_values(values,1000);
-    OrangutanDelay::ms(50);
+    delay_ms(50);
   }
 
   OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
@@ -142,7 +142,7 @@ void test_qtr()
 
     OrangutanLCD::gotoXY(5,1);
     OrangutanLCD::print(qtr.calibratedMinimumOff[0]);
-    OrangutanDelay::ms(50);
+    delay_ms(50);
   }
 
   OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
@@ -156,7 +156,7 @@ void test_qtr()
     printf("C - %4ud",values[0]);
 
     display_values(values,1000);
-    OrangutanDelay::ms(50);
+    delay_ms(50);
   }
 
   OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
@@ -170,7 +170,7 @@ void test_qtr()
     printf("IR+-%4ud",values[0]);
 
     display_values(values,2000);
-    OrangutanDelay::ms(50);
+    delay_ms(50);
   }
 
   OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
@@ -184,7 +184,7 @@ void test_qtr()
     printf("C +-%4ud",values[0]);
 
     display_values(values,1000);
-    OrangutanDelay::ms(50);
+    delay_ms(50);
   }
 
   OrangutanPushbuttons::waitForButton(ALL_BUTTONS);
@@ -213,7 +213,7 @@ void test_qtr()
     else OrangutanLCD::print((char)7);
 
     display_values(values,1000);
-    OrangutanDelay::ms(50);
+    delay_ms(50);
   }
 
   OrangutanPushbuttons::waitForButton(ALL_BUTTONS);

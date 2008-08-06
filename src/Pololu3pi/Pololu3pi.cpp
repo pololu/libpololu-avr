@@ -1,5 +1,29 @@
+/*
+  Pololu3pi.cpp - Library for using the 3pi robot.
+*/
+
+/*
+ * Written by Paul Grayson, 2008.
+ * Copyright (c) 2008 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J18/6
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
+ 
 #include <avr/io.h>
 #include "Pololu3pi.h"
+
 #include "../PololuQTRSensors/PololuQTRSensors.h"
 #include "../OrangutanAnalog/OrangutanAnalog.h"
 
@@ -8,14 +32,12 @@ static PololuQTRSensorsRC qtr3pi;
 
 #ifdef LIB_POLOLU
 
+// only needed for lib-pololu
+#include "../OrangutanTime/OrangutanTime.h"
+
 extern "C" void pololu_3pi_init(unsigned int line_sensor_timeout)
 {
 	Pololu3pi::init(line_sensor_timeout);
-}
-
-extern "C" unsigned int battery_millivolts()
-{
-	return Pololu3pi::batteryMillivolts();
 }
 
 extern "C" void read_line_sensors(unsigned int *sensor_values)
@@ -62,6 +84,11 @@ void Pololu3pi::init(unsigned int line_sensor_timeout_us)
 	unsigned char pins[5] = {14,15,16,17,18};
 	qtr3pi.init(pins,5,line_sensor_timeout_us,19);
 	qtr3pi.emittersOff();
+
+#ifdef LIB_POLOLU
+	// reset the time in lib-pololu mode only 
+	OrangutanTime::reset();
+#endif
 }
 
 void Pololu3pi::readLineSensors(unsigned int *sensor_values, unsigned char readMode)
@@ -92,11 +119,6 @@ void Pololu3pi::readLineSensorsCalibrated(unsigned int *sensor_values, unsigned 
 unsigned int Pololu3pi::readLine(unsigned int *sensor_values, unsigned char readMode, unsigned char white_line)
 {
 	return qtr3pi.readLine(sensor_values, readMode, white_line);
-}
-
-unsigned int Pololu3pi::batteryMillivolts()
-{
-	return OrangutanAnalog::readAverage(6,10)*5000L*3/2/1023;
 }
 
 // Local Variables: **

@@ -10,6 +10,7 @@ unsigned int analog_read_average(unsigned char channel, unsigned int samples);
 unsigned int read_trimpot();
 int read_temperature_f();
 int read_temperature_c();
+unsigned int read_battery_millivolts();
 void start_analog_conversion(unsigned char channel);
 unsigned char analog_is_converting();
 unsigned int analog_conversion_result();

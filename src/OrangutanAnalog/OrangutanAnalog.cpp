@@ -59,14 +59,19 @@ extern "C" int read_temperature_f()
 	return OrangutanAnalog::readTemperatureF();
 }
 
-extern "C" int read_temperature_c()
-{
-	return OrangutanAnalog::readTemperatureC();
-}
-
 extern "C" void start_analog_conversion(unsigned char channel)
 {
 	OrangutanAnalog::startConversion(channel);
+}
+
+extern "C" unsigned int read_battery_millivolts()
+{
+	return OrangutanAnalog::readBatteryMillivolts();
+}
+
+extern "C" unsigned int read_temperature_c()
+{
+	return OrangutanAnalog::readTemperatureC();
 }
 
 extern "C" unsigned char analog_is_converting()
@@ -212,6 +217,11 @@ unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 	if (getMode())							// if 8-bit mode
 		return (temp + 127) / 255;
 	return (temp + 511) / 1023;
+}
+
+unsigned int OrangutanAnalog::readBatteryMillivolts()
+{
+	return readAverage(6,10)*5000L*3/2/1023;
 }
 
 // Local Variables: **

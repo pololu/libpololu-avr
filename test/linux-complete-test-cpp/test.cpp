@@ -16,7 +16,7 @@ static OrangutanBuzzer buzzer;
 int main()
 {
 	OrangutanBuzzer::play(">>a16");
-	OrangutanDelay::ms(500); // warming up
+	delay(500); // warming up
 
 	lcd.initPrintf();
 

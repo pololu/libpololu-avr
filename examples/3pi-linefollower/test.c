@@ -134,7 +134,7 @@ void initialize()
 	// Display battery voltage and wait for button press
 	while(!button_is_pressed(BUTTON_B))
 	{
-		int bat = battery_millivolts();
+		int bat = read_battery_millivolts();
 
 		clear();
 		print_long(bat);

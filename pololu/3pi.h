@@ -1,3 +1,26 @@
+/*
+  3pi.h - Library for using the 3pi robot.
+*/
+
+/*
+ * Written by Paul Grayson, 2008.
+ * Copyright (c) 2008 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J18/6
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
+ 
 #include <pololu/analog.h>
 #include <pololu/buzzer.h>
 #include <pololu/time.h>
@@ -6,16 +29,11 @@
 #include <pololu/leds.h>
 #include <pololu/pushbuttons.h>
 
-#define BUTTON_C	(1 << 5)		// Arduino pin 13
-#define BUTTON_B	(1 << 4)		// Arduino pin 12
-#define BUTTON_A	(1 << 1)		// Arduino pin 9
-
 #define IR_EMITTERS_OFF 0
 #define IR_EMITTERS_ON 1
 #define IR_EMITTERS_ON_AND_OFF 2
 
-void pololu_3pi_init(unsigned int line_sensor_timeout_us);
-unsigned int battery_millivolts();
+void pololu_3pi_init(unsigned int line_sensor_timeout);
 void read_line_sensors(unsigned int *sensor_values, unsigned char readMode);
 void emitters_on();
 void emitters_off();

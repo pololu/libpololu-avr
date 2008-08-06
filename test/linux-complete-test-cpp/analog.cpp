@@ -21,7 +21,7 @@ void test_analog()
   int x1 = analog.read(7);
 
   analog.setMode(MODE_8_BIT);
-  OrangutanDelay::ms(1); // required for readings to stabilize
+  delay_ms(1); // required for readings to stabilize
 
   int x2 = OrangutanAnalog::read(7);
 
@@ -68,7 +68,7 @@ void test_analog()
 
   // try temp in 8bit mode
   analog.setMode(MODE_8_BIT);
-  OrangutanDelay::ms(1); // required for readings to stabilize?
+  OrangutanTime::delayMilliseconds(1); // required for readings to stabilize?
   temp_f = analog.readTemperatureF();
   temp_c = analog.readTemperatureC();
 
@@ -80,7 +80,7 @@ void test_analog()
 
   // test background conversion
   analog.setMode(MODE_10_BIT);
-  OrangutanDelay::ms(1); // required for readings to stabilize
+  delay_ms(1); // required for readings to stabilize
   x1 = analog.readAverage(6,100);
   
   analog.startConversion(6);

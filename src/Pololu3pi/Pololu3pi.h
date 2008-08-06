@@ -1,5 +1,32 @@
+/*
+  Pololu3pi.h - Library for using the 3pi robot.
+*/
+
+/*
+ * Written by Paul Grayson, 2008.
+ * Copyright (c) 2008 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J18/6
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
+ 
 #ifndef Pololu3pi_h
 #define Pololu3pi_h
+
+#define IR_EMITTERS_OFF 0
+#define IR_EMITTERS_ON 1
+#define IR_EMITTERS_ON_AND_OFF 2
 
 class Pololu3pi
 {
@@ -9,26 +36,23 @@ public:
 	Pololu3pi() { }
 
 	// Initializes 3pi.  Currently all that this does is set up the
-	// line sensors pins and turn off the line sensor emitter LEDs to
-	// conserve power.
+	// line sensors pins, turn off the line sensor emitter LEDs to
+	// conserve power, and reset the system timer.  Note: the system
+	// timer is not used in the Arduino environment.
 	//
 	// You may choose a timeout for the line sensors, specified here
 	// in microseconds.
-	static void init(unsigned int line_sensor_timeout_us = 1000);
+	static void init(unsigned int line_sensor_timeout = 1000);
 
 	// Reads values into the array sensor_values.  This must have
 	// space for five unsigned int values and be called AFTER init.
-	static void readLineSensors(unsigned int *sensor_values, unsigned char readMode);
+	static void readLineSensors(unsigned int *sensor_values, unsigned char readMode = IR_EMITTERS_ON);
 
 	void emittersOn();
 	void emittersOff();
 	void calibrateLineSensors(unsigned char readMode);
 	void readLineSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode);
 	unsigned int readLine(unsigned int *sensor_values, unsigned char readMode, unsigned char white_line);
-
-	// Returns the voltage of the battery in millivolts, using 10
-	// averaged samples.
-	static unsigned int batteryMillivolts();
 };
 
 #endif

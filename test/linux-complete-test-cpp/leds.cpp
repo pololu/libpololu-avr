@@ -15,13 +15,13 @@ void test_leds()
 
     leds.red(1);
     OrangutanBuzzer::playFrequency(440,50,15);
-    OrangutanDelay::ms(250);
+    delay_ms(250);
 
     if(buttons.isPressed(ALL_BUTTONS))
       break;
 
     leds.red(0);
-    OrangutanDelay::ms(250);
+    delay_ms(250);
 
     if(buttons.isPressed(ALL_BUTTONS))
       break;
@@ -32,15 +32,15 @@ void test_leds()
 
     leds.green(1);
     OrangutanBuzzer::playFrequency(880,50,15);
-    OrangutanDelay::ms(250);
+    delay_ms(250);
 
     if(buttons.isPressed(ALL_BUTTONS))
       break;
 
     leds.green(0);
-    OrangutanDelay::ms(250);
+    delay_ms(250);
   }
 
   while(buttons.isPressed(ALL_BUTTONS));
-  OrangutanDelay::ms(100);
+  delay_ms(100);
 }

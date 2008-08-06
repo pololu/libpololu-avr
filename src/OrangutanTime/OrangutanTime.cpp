@@ -55,7 +55,6 @@ ISR(TIMER2_OVF_vect)
 
 extern "C" {
 	unsigned long get_ms() { return OrangutanTime::ms(); }
-	unsigned long get_us() { return OrangutanTime::us(); }
 	void delay_ms(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
 
 	void time_reset() { OrangutanTime::reset(); }
@@ -67,22 +66,8 @@ unsigned long OrangutanTime::ms()
 	unsigned long value;
 	TIMSK2 &= ~(1 << TOIE2);	// disable timer2 overflow interrupt
 	value = msCounter;
-	TIFR2 |= 1 << TOV2;	// clear timer2 overflow flag
 	TIMSK2 |= 1 << TOIE2;	// enable timer2 overflow interrupt
 	return value;
-}
-
-unsigned long OrangutanTime::us()
-{
-	init();
-	unsigned long msVal;
-	unsigned int usVal;
-	TIMSK2 &= ~(1 << TOIE2);	// disable timer2 overflow interrupt
-	msVal = msCounter;
-	usVal = us_over_10;
-	TIFR2 |= 1 << TOV2;	// clear timer2 overflow flag
-	TIMSK2 |= 1 << TOIE2;	// enable timer2 overflow interrupt
-	return msVal * 1000 + usVal / 10;
 }
 
 void OrangutanTime::delayMilliseconds(unsigned int milliseconds)
@@ -114,6 +99,7 @@ void OrangutanTime::init2()
 
 void OrangutanTime::reset()
 {
+	init();
 	TIMSK2 &= ~(1 << TOIE2);	// disable timer2 overflow interrupt
 	msCounter = 0;
 	us_over_10 = 0;

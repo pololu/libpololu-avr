@@ -84,6 +84,10 @@ class OrangutanAnalog
 	
 	// converts the specified ADC result to millivolts
 	static unsigned int toMillivolts(unsigned int adcResult);
+
+	// 3pi only: returns the voltage of the battery in millivolts,
+	// using 10 averaged samples.
+	static unsigned int readBatteryMillivolts();
 };
 
 #endif
