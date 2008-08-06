@@ -24,6 +24,32 @@
 #ifndef Pololu3pi_h
 #define Pololu3pi_h
 
+#ifndef LIB_POLOLU
+
+#ifdef wiring_h
+
+// arduino include files
+#include <OrangutanAnalog.h>
+#include <OrangutanBuzzer.h>
+#include <OrangutanMotors.h>
+#include <OrangutanLCD.h>
+#include <OrangutanLEDs.h>
+#include <OrangutanPushbuttons.h>
+
+#else
+
+#include <pololu/OrangutanAnalog.h>
+#include <pololu/OrangutanBuzzer.h>
+#include <pololu/OrangutanMotors.h>
+#include <pololu/OrangutanLCD.h>
+#include <pololu/OrangutanLEDs.h>
+#include <pololu/OrangutanPushbuttons.h>
+#include <pololu/OrangutanTime.h>
+
+#endif
+
+#endif
+
 #define IR_EMITTERS_OFF 0
 #define IR_EMITTERS_ON 1
 #define IR_EMITTERS_ON_AND_OFF 2
