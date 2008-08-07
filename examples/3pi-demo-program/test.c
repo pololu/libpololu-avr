@@ -42,6 +42,8 @@ const char menu_lcd_test[] PROGMEM = "LCD";
 const char menu_ir_test[] PROGMEM = "Sensors";
 const char menu_motor_test[] PROGMEM = "Motors";
 const char menu_music_test[] PROGMEM = "Music";
+const char menu_pot_test[] PROGMEM = "Trimpot";
+
 const char menu_line2[] PROGMEM = "\x7f" "A    C\x7e";
 const char back_line2[] PROGMEM = "\x7f" "B";
 
@@ -51,9 +53,10 @@ void lcd_test();
 void ir_test();
 void motor_test();
 void music_test();
+void pot_test();
 typedef void (*function)();
-const function main_menu_functions[] = { bat_test, led_test, ir_test, motor_test, music_test };
-const char *main_menu_options[] = { menu_bat_test, menu_led_test, menu_ir_test, menu_motor_test, menu_music_test };
+const function main_menu_functions[] = { bat_test, led_test, pot_test, ir_test, motor_test, music_test };
+const char *main_menu_options[] = { menu_bat_test, menu_led_test, menu_pot_test, menu_ir_test, menu_motor_test, menu_music_test };
 const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
 
 // A couple of simple tunes, stored in program space.
@@ -293,6 +296,34 @@ void music_test()
 	delay_ms(100);
 }
 
+void pot_test()
+{
+	long start = get_ms();
+	char elapsed_ms;
+	int value;
+
+	set_analog_mode(MODE_10_BIT);
+	print_long(read_trimpot());
+	print("   "); // to clear the display
+
+	while((elapsed_ms = get_ms() - start) < 100)
+	{
+		value = read_trimpot();
+		play_frequency(value, 200, 15);
+		
+		if(value < elapsed_ms*10)
+		{
+			red_led(0);
+			green_led(1);
+		}
+		else
+		{
+			red_led(1);
+			green_led(0);
+		}
+	}
+}
+
 void print_two_lines_delay_1s(const char *line1, const char *line2)
 {
 	// Play welcome music and display a message
@@ -391,6 +422,8 @@ void menu_select()
 			stop_playing();
 			m1_speed = 0;
 			m2_speed = 0;
+			red_led(0);
+			green_led(0);
 			return;
 		}
 		else if(button & BUTTON_C)
