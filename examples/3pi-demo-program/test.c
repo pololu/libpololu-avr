@@ -23,7 +23,18 @@ const char welcome_line1[] PROGMEM = " Pololu";
 const char welcome_line2[] PROGMEM = "3\xf7 Robot"; // \xf7 is a greek
 													// pi character
 const char demo_name_line1[] PROGMEM = "Demo";
-const char demo_name_line2[] PROGMEM = "program";
+const char demo_name_line2[] PROGMEM = "Program";
+
+const char instructions_line1[] PROGMEM = "Use B to";
+const char instructions_line2[] PROGMEM = "select.";
+const char instructions_line3[] PROGMEM = "Press B";
+const char instructions_line4[] PROGMEM = "-try it!";
+
+const char thank_you_line1[] PROGMEM = " Thank ";
+const char thank_you_line2[] PROGMEM = "  you!";
+
+const char main_menu_intro_line1[] PROGMEM = "  Main";
+const char main_menu_intro_line2[] PROGMEM = "  Menu";
 
 const char menu_bat_test[] PROGMEM = "Battery";
 const char menu_led_test[] PROGMEM = "LEDs";
@@ -47,6 +58,7 @@ const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options
 
 // A couple of simple tunes, stored in program space.
 const char welcome[] PROGMEM = ">g32>>c32";
+const char thank_you_music[] PROGMEM = ">>c32>g32";
 const char beep_button_a[] PROGMEM = "c32";
 const char beep_button_b[] PROGMEM = "e32";
 const char beep_button_c[] PROGMEM = "g32";
@@ -281,6 +293,33 @@ void music_test()
 	delay_ms(100);
 }
 
+void print_two_lines_delay_1s(const char *line1, const char *line2)
+{
+	// Play welcome music and display a message
+	clear();
+	print_from_program_space(line1);
+	lcd_goto_xy(0,1);
+	print_from_program_space(line2);
+	delay_ms(1000);
+}
+
+// waits for a button, plays the appropriate beep, and returns the
+// button or buttons that were pressed
+char wait_for_button_and_beep()
+{
+	char button = wait_for_button_press(ALL_BUTTONS);
+	
+	if(button & BUTTON_A)
+		play_from_program_space(beep_button_a);
+	else if(button & BUTTON_B)
+		play_from_program_space(beep_button_b);
+	else
+		play_from_program_space(beep_button_c);
+
+	wait_for_button_release(button);
+	return button;
+}
+
 // Initializes the 3pi, displays a welcome message, calibrates, and
 // plays the initial music.
 void initialize()
@@ -291,23 +330,28 @@ void initialize()
 	pololu_3pi_init(2000);
 	load_custom_characters(); // load the custom characters
 	
-	// Play welcome music and display a message
-	print_from_program_space(welcome_line1);
-	lcd_goto_xy(0,1);
-	print_from_program_space(welcome_line2);
 	play_from_program_space(welcome);
-	delay_ms(1000);
+	print_two_lines_delay_1s(welcome_line1,welcome_line2);
+	print_two_lines_delay_1s(demo_name_line1,demo_name_line2);
+	print_two_lines_delay_1s(instructions_line1,instructions_line2);
 
 	clear();
-	print_from_program_space(demo_name_line1);
+	print_from_program_space(instructions_line3);
 	lcd_goto_xy(0,1);
-	print_from_program_space(demo_name_line2);
-	delay_ms(1000);
+	print_from_program_space(instructions_line4);
+
+	while(!(wait_for_button_and_beep() & BUTTON_B));
+
+	play_from_program_space(thank_you_music);
+
+	print_two_lines_delay_1s(thank_you_line1,thank_you_line2);
 }
 
 void menu_select()
 {
-	int menu_index = 0;
+	static int menu_index = 0;
+
+	print_two_lines_delay_1s(main_menu_intro_line1,main_menu_intro_line2);
 
 	while(1)
 	{
@@ -317,6 +361,7 @@ void menu_select()
 		lcd_goto_xy(0,0);
 		print_from_program_space(main_menu_options[menu_index]);
 		lcd_show_cursor(CURSOR_BLINKING);
+		// the cursor will be blinking at the end of the option name
 	
 		char button = wait_for_button_press(ALL_BUTTONS);
 
@@ -333,6 +378,7 @@ void menu_select()
 			play_from_program_space(beep_button_b);
 			wait_for_button_release(button);
 
+
 			while(!button_is_pressed(BUTTON_B))
 			{
 				lcd_goto_xy(0,1);
@@ -345,6 +391,7 @@ void menu_select()
 			stop_playing();
 			m1_speed = 0;
 			m2_speed = 0;
+			return;
 		}
 		else if(button & BUTTON_C)
 		{
