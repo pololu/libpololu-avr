@@ -382,8 +382,8 @@ void time_test()
 	print_long((elapsed_time/1000/60/10)%10); // tens of minutes
 	print_long((elapsed_time/1000/60)%10); // minutes
 	print_character(':');
-	print_long((elapsed_time/1000/10)%10); // tens of seconds
-	char seconds = (elapsed_time/1000)%10;
+	print_long((elapsed_time/1000)%60/10); // tens of seconds
+	char seconds = ((elapsed_time/1000)%60)%10;
 	print_long(seconds); // seconds
 	print_character('.');
 	print_long((elapsed_time/100)%10); // tenths of seconds
