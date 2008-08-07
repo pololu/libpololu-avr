@@ -45,7 +45,7 @@ const char menu_music_test[] PROGMEM = "Music";
 const char menu_pot_test[] PROGMEM = "Trimpot";
 const char menu_time_test[] PROGMEM = "Timer";
 
-const char menu_line2[] PROGMEM = "\x7f" "A    C\x7e";
+const char menu_line2[] PROGMEM = "\x7f" "A \xa5" "B C\x7e";
 const char back_line2[] PROGMEM = "\6B";
 
 void bat_test();
