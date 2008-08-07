@@ -43,9 +43,10 @@ const char menu_ir_test[] PROGMEM = "Sensors";
 const char menu_motor_test[] PROGMEM = "Motors";
 const char menu_music_test[] PROGMEM = "Music";
 const char menu_pot_test[] PROGMEM = "Trimpot";
+const char menu_time_test[] PROGMEM = "Timer";
 
 const char menu_line2[] PROGMEM = "\x7f" "A    C\x7e";
-const char back_line2[] PROGMEM = "\x7f" "B";
+const char back_line2[] PROGMEM = "\6B";
 
 void bat_test();
 void led_test();
@@ -53,19 +54,20 @@ void lcd_test();
 void ir_test();
 void motor_test();
 void music_test();
+void time_test();
 void pot_test();
 typedef void (*function)();
-const function main_menu_functions[] = { bat_test, led_test, pot_test, ir_test, motor_test, music_test };
-const char *main_menu_options[] = { menu_bat_test, menu_led_test, menu_pot_test, menu_ir_test, menu_motor_test, menu_music_test };
+const function main_menu_functions[] = { bat_test, led_test, pot_test, ir_test, motor_test, music_test, time_test };
+const char *main_menu_options[] = { menu_bat_test, menu_led_test, menu_pot_test, menu_ir_test, menu_motor_test, menu_music_test, menu_time_test };
 const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
 
 // A couple of simple tunes, stored in program space.
 const char welcome[] PROGMEM = ">g32>>c32";
 const char thank_you_music[] PROGMEM = ">>c32>g32";
-const char beep_button_a[] PROGMEM = "c32";
-const char beep_button_b[] PROGMEM = "e32";
-const char beep_button_c[] PROGMEM = "g32";
-const char go[] PROGMEM = "L16 cdegreg4";
+const char beep_button_a[] PROGMEM = "!c32";
+const char beep_button_b[] PROGMEM = "!e32";
+const char beep_button_c[] PROGMEM = "!g32";
+const char timer_tick[] PROGMEM = "!v8>>c32";
 
 // Data for generating the characters used in load_custom_characters
 // and display_readings.  By reading levels[] starting at various
@@ -100,6 +102,18 @@ const prog_char note[] PROGMEM = {
 	0b00000,
 };
 
+// This character is a back arrow.
+const prog_char back_arrow[] PROGMEM = {
+	0b00000,
+	0b00010,
+	0b00001,
+	0b00101,
+	0b01001,
+	0b11110,
+	0b01000,
+	0b00100,
+};
+
 // This function loads custom characters into the LCD.  Up to 8
 // characters can be loaded; we use them for 7 levels of a bar graph
 // plus the "pi" character.
@@ -108,16 +122,16 @@ void load_custom_characters()
 	lcd_load_custom_character(levels+0,0); // no offset, e.g. one bar
 	lcd_load_custom_character(levels+1,1); // two bars
 	lcd_load_custom_character(levels+2,2); // etc...
-	lcd_load_custom_character(levels+3,3);
-	lcd_load_custom_character(levels+4,4);
-	lcd_load_custom_character(levels+5,5);
-	lcd_load_custom_character(levels+6,6);
+	lcd_load_custom_character(levels+4,3); // skip level 3
+	lcd_load_custom_character(levels+5,4);
+	lcd_load_custom_character(levels+6,5);
+	lcd_load_custom_character(back_arrow,6);
 	lcd_load_custom_character(note,7);
 	clear(); // the LCD must be cleared for the characters to take effect
 }
 
 // 10 levels of bar graph characters
-const char bar_graph_characters[10] = {' ',0,0,1,2,3,4,5,6,255};
+const char bar_graph_characters[10] = {' ',0,0,1,2,3,3,4,5,255};
 
 // Displays the battery voltage.
 void bat_test()
@@ -256,7 +270,7 @@ void motor_test()
 }
 
 const char fugue[] PROGMEM = 
-  "T120O5L16agafaea dac+adaea fa<aa<bac#a dac#adaea f"
+  "! T120O5L16agafaea dac+adaea fa<aa<bac#a dac#adaea f"
   "O6dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad"
   "L8MS<b-d<b-d MLe-<ge-<g MSc<ac<a MLd<fd<f O5MSb-gb-g"
   "ML>c#e>c#e MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"
@@ -322,6 +336,63 @@ void pot_test()
 			green_led(0);
 		}
 	}
+}
+
+void time_test()
+{
+	static long elapsed_time = 0;
+	static long last_read = 0;
+	static long is_ticking = 0;
+	static char a_is_pressed = 0;
+	static char c_is_pressed = 0;
+	static char last_seconds = 0;
+
+	long current_time = get_ms();
+	if(is_ticking)
+		elapsed_time += current_time - last_read;
+
+	last_read = current_time;
+
+	if(button_is_pressed(BUTTON_A) && !a_is_pressed)
+	{
+		// reset
+		a_is_pressed = 1;
+		is_ticking = 0;
+		elapsed_time = 0;
+		if(!is_playing()) // only play once
+			play_from_program_space(beep_button_a);
+	}
+
+	// find the end of the button press without stopping
+	if(!button_is_pressed(BUTTON_A))
+		a_is_pressed = 0;
+
+	if(button_is_pressed(BUTTON_C) && !c_is_pressed)
+	{
+		// start/stop
+		c_is_pressed = 1;
+		is_ticking = !is_ticking;
+		play_from_program_space(beep_button_c);
+	}
+
+	// find the end of the button press without stopping
+	if(!button_is_pressed(BUTTON_C))
+		c_is_pressed = 0;
+
+	print_long((elapsed_time/1000/60/10)%10); // tens of minutes
+	print_long((elapsed_time/1000/60)%10); // minutes
+	print_character(':');
+	print_long((elapsed_time/1000/10)%10); // tens of seconds
+	char seconds = (elapsed_time/1000)%10;
+	print_long(seconds); // seconds
+	print_character('.');
+	print_long((elapsed_time/100)%10); // tenths of seconds
+	print_long((elapsed_time/10)%10); // hundredths of seconds
+
+	// beep every second
+	if(seconds != last_seconds && elapsed_time != 0 && !is_playing())
+		play_from_program_space(timer_tick);
+	last_seconds = seconds;
 }
 
 void print_two_lines_delay_1s(const char *line1, const char *line2)
