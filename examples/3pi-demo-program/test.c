@@ -144,34 +144,41 @@ void bat_test()
 	delay_ms(100);
 }
 
+char wait_for_250_ms_or_button_b()
+{
+	int i;
+	for(i=0;i<25;i++)
+	{
+		delay_ms(10);
+		if(button_is_pressed(BUTTON_B))
+			return 1;
+	}
+	return 0;
+}
+
 // Blinks the LEDs
 void led_test()
 {
 	play("c32");
 	print("Red  ");
+
 	red_led(1);
-	delay_ms(250);
-	red_led(0);
-
-    if(button_is_pressed(BUTTON_B))
+	if(wait_for_250_ms_or_button_b())
 		return;
-
-    delay_ms(250);
-
-    if(button_is_pressed(BUTTON_B))
+	red_led(0);
+	if(wait_for_250_ms_or_button_b())
 		return;
 
 	play(">c32");
 	lcd_goto_xy(0,0);
 	print("Green");
+
 	green_led(1);
-	delay_ms(250);
-	green_led(0);
-
-	if(button_is_pressed(BUTTON_B))
+	if(wait_for_250_ms_or_button_b())
 		return;
-
-	delay_ms(250);
+	green_led(0);
+	if(wait_for_250_ms_or_button_b())
+		return;
 }
 
 void ir_test()
@@ -298,7 +305,7 @@ void music_test()
 		last_shift = get_ms();
 
 		fugue_title_pos ++;
-		if(c == 0)
+		if(fugue_title_pos + 8 >= sizeof(fugue_title))
 			fugue_title_pos = 0;
 	}
 
