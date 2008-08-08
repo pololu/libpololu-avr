@@ -20,6 +20,8 @@ void test_qtr()
 	unsigned char i;
 	unsigned int values[5];
 
+	clear();
+
 	// Wait for each sensor to be > 750 while the others are < 250.
 	unsigned int passed_sensors[5] = {0,0,0,0,0};
 
@@ -45,8 +47,7 @@ void test_qtr()
 		if(num_above == 1 && num_below == 4)
 			passed_sensors[sensor_above] = 1;
 
-		clear();
-
+		lcd_goto_xy(0,0);
 		for(i=0;i<5;i++)
 		{
 			if(passed_sensors[i])
@@ -65,15 +66,15 @@ void test_qtr()
 	for(i=0;i<5;i++)
 		assert(passed_sensors[i]);
 
+	clear();
+
 	// off values
 	while(!button_is_pressed(ALL_BUTTONS))
 	{
-		clear();
-
 		read_line_sensors(values,IR_EMITTERS_OFF);
 
-		lcd_goto_xy(0,1);
-		print("IR-");
+		lcd_goto_xy(0,0);
+		print("IR- ");
 		display_values(values,1000);
 
 		for(i=0;i<5;i++)
