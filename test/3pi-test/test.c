@@ -73,14 +73,13 @@ int main()
 
 	printf("\nAssert");
 	assert(1 == 1); // make sure assert works
-
+pushbuttons:
+	test_pushbuttons();
 	test_lcd();
 	test_pot();
 	test_outputs();
 	test_leds();
- pushbuttons:
-	test_pushbuttons();
-	test_battery();
+ 	test_battery();
 	test_motors();
 	test_qtr();
 
