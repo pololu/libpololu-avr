@@ -40,9 +40,9 @@ extern "C" void pololu_3pi_init(unsigned int line_sensor_timeout)
 	Pololu3pi::init(line_sensor_timeout);
 }
 
-extern "C" void read_line_sensors(unsigned int *sensor_values)
+extern "C" void read_line_sensors(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr3pi.read(sensor_values);
+	return qtr3pi.read(sensor_values, readMode);
 }
 
 extern "C" void emitters_on()

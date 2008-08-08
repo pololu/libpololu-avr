@@ -4,6 +4,7 @@
 #include "qtr.h"
 #include "motors.h"
 #include "pot.h"
+#include "battery.h"
 
 #include <avr/pgmspace.h>
 #include <avr/eeprom.h>
@@ -98,6 +99,7 @@ int main()
 	printf("\nAssert");
 	assert(1 == 1); // make sure assert works
 
+	test_battery();
 	test_pot();
 	test_motors();
 	test_qtr();

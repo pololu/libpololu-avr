@@ -9,7 +9,7 @@ LDFLAGS=-Wl,-gc-sections -lpololu
 PORT=/dev/ttyUSB0
 AVRDUDE=avrdude
 TARGET=test
-OBJECT_FILES=test.o qtr.o assert.o motors.o pot.o
+OBJECT_FILES=test.o qtr.o assert.o motors.o pot.o battery.o
 
 all: $(TARGET).hex
 
@@ -19,7 +19,7 @@ clean:
 %.hex: %.obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
 
-test.o: test.c assert.h qtr.h motors.h pot.h
+test.o: test.c assert.h qtr.h motors.h pot.h battery.h
 
 %.obj: $(OBJECT_FILES)
 	$(CC) $(CFLAGS) $(OBJECT_FILES) $(LDFLAGS) -o $@

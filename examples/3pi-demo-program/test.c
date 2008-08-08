@@ -115,8 +115,8 @@ const prog_char back_arrow[] PROGMEM = {
 };
 
 // This function loads custom characters into the LCD.  Up to 8
-// characters can be loaded; we use them for 7 levels of a bar graph
-// plus the "pi" character.
+// characters can be loaded; we use them for 6 levels of a bar graph
+// plus a back arrow and a musical note character.
 void load_custom_characters()
 {
 	lcd_load_custom_character(levels+0,0); // no offset, e.g. one bar
