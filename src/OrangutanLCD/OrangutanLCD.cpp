@@ -157,10 +157,14 @@ extern "C" int lcd_putchar(char c, FILE *f) {
 	if(nextline) {
 		if(row==1) {
 			/******* scroll! *******/
-			OrangutanLCD::clear(); /* clear display */
+			OrangutanLCD::gotoXY(0,0); /* draw top row */
 			for(i=0;i<8;i++) {
 				OrangutanLCD::print(row1[i]);
 				row1[i]=' ';
+			}
+			OrangutanLCD::gotoXY(0,1); /* erase bottom row */
+			for(i=0;i<8;i++) {
+				OrangutanLCD::print(' ');
 			}
 		}
 
