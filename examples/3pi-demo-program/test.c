@@ -472,6 +472,8 @@ void menu_select()
 		lcd_show_cursor(CURSOR_BLINKING);
 		// the cursor will be blinking at the end of the option name
 	
+		// wait for all buttons to be released, then a press
+		while(button_is_pressed(ALL_BUTTONS));
 		char button = wait_for_button_press(ALL_BUTTONS);
 
 		if(button & BUTTON_A)
@@ -487,7 +489,6 @@ void menu_select()
 			play_from_program_space(beep_button_b);
 			wait_for_button_release(button);
 
-
 			while(!button_is_pressed(BUTTON_B))
 			{
 				lcd_goto_xy(0,1);
@@ -502,6 +503,8 @@ void menu_select()
 			m2_speed = 0;
 			red_led(0);
 			green_led(0);
+			play_from_program_space(beep_button_b);
+
 			return;
 		}
 		else if(button & BUTTON_C)
@@ -509,8 +512,6 @@ void menu_select()
 			play_from_program_space(beep_button_c);
 			menu_index ++;
 		}
-
-		wait_for_button_release(button);	
 
 		if(menu_index < 0)
 			menu_index = main_menu_length-1;
