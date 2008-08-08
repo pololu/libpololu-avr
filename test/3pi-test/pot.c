@@ -37,7 +37,7 @@ void test_pot()
 		}
 	}
 
-	while(button_is_pressed(ALL_BUTTONS));
+	while(button_is_pressed(BUTTON_B));
 }
 
 // Local Variables: **

@@ -5,9 +5,12 @@
 #include "motors.h"
 #include "pot.h"
 #include "battery.h"
+#include "pushbuttons.h"
+#include "outputs.h"
+#include "leds.h"
+#include "lcd.h"
 
 #include <avr/pgmspace.h>
-#include <avr/eeprom.h>
 
 // Introductory messages.
 const char welcome[] PROGMEM = ">g32>>c32";
@@ -59,48 +62,25 @@ int main()
 	pololu_3pi_init(1000);
 	lcd_init_printf();
 
-	// test the reset button five times using EEPROM
-	int reset_count = eeprom_read_byte(0);
+	if(test_pushbutton_tries())
+		goto pushbuttons;
 
-	if(reset_count > 10)
-		reset_count = 0;
-
-	if(reset_count == 0)
-	{
-		play_from_program_space(welcome);
-		print_two_lines_delay_1s(welcome_line1,welcome_line2);
-		print_two_lines_delay_1s(demo_name_line1,demo_name_line2);
-	}
+	play_from_program_space(welcome);
+	print_two_lines_delay_1s(welcome_line1,welcome_line2);
+	print_two_lines_delay_1s(demo_name_line1,demo_name_line2);
 
 	clear();
-
-	if(reset_count < 5)
-	{
-		print("Press");
-		lcd_goto_xy(0,1);
-		print("Reset ");
-		print_long(reset_count);
-		reset_count ++;
-		eeprom_write_byte(0,reset_count);
-		while(1);
-	}
-	else if(reset_count < 10)
-	{
-		print("Press");
-		lcd_goto_xy(0,1);
-		print("Power ");
-		print_long(reset_count-5);
-		reset_count ++;
-		eeprom_write_byte(0,reset_count);
-		while(1);
-	}
-	eeprom_write_byte(0,0);
 
 	printf("\nAssert");
 	assert(1 == 1); // make sure assert works
 
-	test_battery();
+	test_lcd();
 	test_pot();
+	test_outputs();
+	test_leds();
+ pushbuttons:
+	test_pushbuttons();
+	test_battery();
 	test_motors();
 	test_qtr();
 
