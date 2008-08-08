@@ -88,6 +88,10 @@ void test_qtr()
  
   wait_for_button(ALL_BUTTONS);
 
+  // check that we got them all
+  for(i=0;i<5;i++)
+    assert(passed_sensors[i]);
+
   // off values
   while(!button_is_pressed(ALL_BUTTONS))
   {
@@ -99,6 +103,9 @@ void test_qtr()
     print("IR-");
     display_values(values,1000);
 
+    for(i=0;i<5;i++)
+      assert(values[i] == 1000);
+    
     delay_ms(50);
   }
 
