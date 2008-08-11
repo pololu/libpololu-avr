@@ -7,7 +7,7 @@
  * characters, and music playback, making it a good starting point for
  * developing your own more competitive line follower.
  *
- * http://www.pololu.com/docs/0J20
+ * http://www.pololu.com/docs/0J21
  * http://www.pololu.com
  * http://forum.pololu.com
  *
