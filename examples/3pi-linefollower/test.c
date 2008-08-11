@@ -25,7 +25,7 @@
 // Introductory messages.  The "PROGMEM" identifier causes the data to
 // go into program space.
 const char welcome_line1[] PROGMEM = " Pololu";
-const char welcome_line2[] PROGMEM = "3\7 Robot";
+const char welcome_line2[] PROGMEM = "3\xf7 Robot";
 const char demo_name_line1[] PROGMEM = "Line";
 const char demo_name_line2[] PROGMEM = "follower";
 
@@ -54,22 +54,8 @@ const char levels[] PROGMEM = {
 	0b11111
 };
 
-// This character is a lower-case greek letter "pi", for displaying
-// the name "3pi" at the beginning.
-const prog_char pi[] PROGMEM = {
-	0b00000,
-	0b00000,
-	0b11111,
-	0b01010,
-	0b01010,
-	0b01010,
-	0b10011,
-	0b00000,
-};
-
 // This function loads custom characters into the LCD.  Up to 8
-// characters can be loaded; we use them for 7 levels of a bar graph
-// plus the "pi" character.
+// characters can be loaded; we use them for 7 levels of a bar graph.
 void load_custom_characters()
 {
 	lcd_load_custom_character(levels+0,0); // no offset, e.g. one bar
@@ -79,7 +65,6 @@ void load_custom_characters()
 	lcd_load_custom_character(levels+4,4);
 	lcd_load_custom_character(levels+5,5);
 	lcd_load_custom_character(levels+6,6);
-	lcd_load_custom_character(pi,7);
 	clear(); // the LCD must be cleared for the characters to take effect
 }
 
