@@ -185,7 +185,10 @@ void ir_test()
 {
 	unsigned int sensors[5]; // an array to hold sensor values
 
-	read_line_sensors(sensors,IR_EMITTERS_ON);
+	if(button_is_pressed(BUTTON_C))
+		read_line_sensors(sensors, IR_EMITTERS_OFF);
+	else
+		read_line_sensors(sensors,IR_EMITTERS_ON);
 
 	unsigned char i;
 
@@ -200,9 +203,16 @@ void ir_test()
 		// with integer math.
 		char c = bar_graph_characters[sensors[i]/201];
 
-		// Display the bar graph character.
+		// Display the bar graph characters.
 		print_character(c);
+
 	}
+
+	// Display an indicator of whether IR is on or off
+	if(button_is_pressed(BUTTON_C))
+		print("IR-");
+	else
+		print("  C");
 
 	delay_ms(100);
 }
