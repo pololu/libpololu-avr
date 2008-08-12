@@ -210,6 +210,9 @@ int main()
 		int derivative = last_proportional - proportional;
 		integral += proportional;
 
+		// Remember the last position.
+		last_proportional = proportional;
+
 		// Compute the difference between the two motor power settings,
 		// m1 - m2.  If this is a positive number the robot will turn
 		// to the right.  If it is a negative number, the robot will
@@ -219,18 +222,16 @@ int main()
 
 		// Compute the actual motor settings.  We never set either motor
 		// to a negative value.
-		if(power_difference > 100)
-			power_difference = 100;
-		if(power_difference < -100)
-			power_difference = -100;
+		const int max = 100;
+		if(power_difference > max)
+			power_difference = max;
+		if(power_difference < -max)
+			power_difference = -max;
 
 		if(power_difference < 0)
-			set_motors(100+power_difference, 100);
+			set_motors(max+power_difference, max);
 		else
-			set_motors(100, 100-power_difference);
-
-		// Remember the last position.
-		last_proportional = proportional;
+			set_motors(max, max-power_difference);
 	}
 
 	// This part of the code is never reached.  A robot should
