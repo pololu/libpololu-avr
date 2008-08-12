@@ -28,7 +28,7 @@ void test_pushbuttons()
 	if(reset_count < TRIES)
 	{
 		play("g32");
-		printf("\nPress\nReset %d",TRIES-reset_count);
+		printf("\nPress\nPower %d",TRIES-reset_count);
 		reset_count ++;
 		cli();
 		eeprom_write_byte(&eeprom_reset_count,reset_count);
@@ -38,7 +38,7 @@ void test_pushbuttons()
 	else if(reset_count < TRIES*2)
 	{
 		play("g32");
-		printf("\nPress\nPower %d",2*TRIES-reset_count);
+		printf("\nPress\nReset %d",2*TRIES-reset_count);
 		reset_count ++;
 		cli();
 		eeprom_write_byte(&eeprom_reset_count,reset_count);
