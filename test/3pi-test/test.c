@@ -1,5 +1,4 @@
 #include <pololu/3pi.h>
-#include <stdio.h>
 #include "assert.h"
 #include "qtr.h"
 #include "motors.h"
@@ -60,7 +59,6 @@ int main()
 	clear();
 
 	pololu_3pi_init(1000);
-	lcd_init_printf();
 
 	if(test_pushbutton_tries())
 		goto pushbuttons;
@@ -71,20 +69,17 @@ int main()
 
 	clear();
 
-	printf("\nAssert");
-	assert(1 == 1); // make sure assert works
-pushbuttons:
-	test_pushbuttons();
-	test_lcd();
+ 	test_battery();
+	test_qtr();
+	test_motors();
 	test_pot();
 	test_outputs();
 	test_leds();
- 	test_battery();
-	test_motors();
-	test_qtr();
+pushbuttons:
+	test_pushbuttons();
 
 	clear();
-	printf("\nSuccess");
+	print("Success");
 	play("O5 c16");
 	
 	while(1);

@@ -1,11 +1,11 @@
 #include <pololu/orangutan.h>
-#include <stdio.h>
 #include <avr/io.h>
 #include "assert.h"
 
 void test_outputs()
 {
-	printf("\n500 PD0\n1000PD1");
+	clear();
+	print("PD0/PD1");
 
 	DDRD |= 3;
 	

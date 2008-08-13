@@ -1,5 +1,4 @@
 #include <pololu/orangutan.h>
-#include <stdio.h>
 #include "assert.h"
 #include <avr/eeprom.h>
 #include <avr/interrupt.h>
@@ -28,7 +27,9 @@ void test_pushbuttons()
 	if(reset_count < TRIES)
 	{
 		play("g32");
-		printf("\nPress\nPower %d",TRIES-reset_count);
+		clear();
+		print("Power ");
+		print_long(TRIES-reset_count);
 		reset_count ++;
 		cli();
 		eeprom_write_byte(&eeprom_reset_count,reset_count);
@@ -38,7 +39,9 @@ void test_pushbuttons()
 	else if(reset_count < TRIES*2)
 	{
 		play("g32");
-		printf("\nPress\nReset %d",2*TRIES-reset_count);
+		clear();
+		print("Reset ");
+		print_long(2*TRIES-reset_count);
 		reset_count ++;
 		cli();
 		eeprom_write_byte(&eeprom_reset_count,reset_count);
@@ -50,32 +53,34 @@ void test_pushbuttons()
 	eeprom_write_byte(&eeprom_reset_count,0);
 	sei();
 
+	play("g32");
 	for(i=0;i<TRIES;i++)
 	{
 		clear();
-		printf("\nPress A\n%d",TRIES-i);
+		print("A ");
+		print_long(TRIES-i);
 		unsigned char button = wait_for_button(BUTTON_A);
-		printf(" %d",button);
+		print_long(button);
 		assert(button == BUTTON_A);
 		play("g32");
 	}
-
 	for(i=0;i<TRIES;i++)
 	{
 		clear();
-		printf("\nPress B\n%d",TRIES-i);
+		print("B ");
+		print_long(TRIES-i);
 		unsigned char button = wait_for_button(BUTTON_B);
-		printf(" %d",button);
+		print_long(button);
 		assert(button == BUTTON_B);
 		play("g32");
 	}
-
 	for(i=0;i<TRIES;i++)
 	{
 		clear();
-		printf("\nPress C\n%d",TRIES-i);
+		print("C ");
+		print_long(TRIES-i);
 		unsigned char button = wait_for_button(BUTTON_C);
-		printf(" %d",button);
+		print_long(button);
 		assert(button == BUTTON_C);
 		play("g32");
 	}

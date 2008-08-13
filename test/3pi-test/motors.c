@@ -1,51 +1,50 @@
 #include <pololu/orangutan.h>
-#include <stdio.h>
 #include "assert.h"
 
 void test_motors()
 {
   clear();
-  printf("Motors\nready?");
+  print("Motors");
   wait_for_button(ALL_BUTTONS);
 
   clear();
-  printf("Left\nslow");
+  print("L slow");
   set_motors(60,0);
   wait_for_button(ALL_BUTTONS);
 
   clear();
-  printf("Left\nfast");
+  print("L fast");
   set_motors(255,0);
   wait_for_button(ALL_BUTTONS);
 
   clear();
-  printf("Left\nbk slow");
+  print("L- slow");
   set_motors(-60,0);
   wait_for_button(ALL_BUTTONS);
 
   clear();
-  printf("Left\nbk fast");
+  print("L- fast");
   set_motors(-255,0);
   wait_for_button(ALL_BUTTONS);
 
   /// right motor
   clear();
-  printf("Right\nslow");
+  print("R slow");
   set_motors(0,60);
   wait_for_button(ALL_BUTTONS);
 
   clear();
-  printf("Right\nfast");
+  print("R fast");
   set_motors(0,255);
   wait_for_button(ALL_BUTTONS);
 
   clear();
-  printf("Right\nbk slow");
+  print("R- slow");
   set_motors(0,-60);
   wait_for_button(ALL_BUTTONS);
 
   clear();
-  printf("Right\nbk fast");
+  print("R- fast");
   set_motors(0,-255);
   wait_for_button(ALL_BUTTONS);
 

@@ -76,9 +76,6 @@ void test_qtr()
 		lcd_goto_xy(0,0);
 		print("IR- ");
 		display_values(values,1000);
-
-		for(i=0;i<5;i++)
-			assert(values[i] == 1000);
     
 		delay_ms(50);
 	}

@@ -1,5 +1,4 @@
 #include <pololu/orangutan.h>
-#include <stdio.h>
 #include "assert.h"
 
 void test_leds()
@@ -7,8 +6,7 @@ void test_leds()
   while(!button_is_pressed(ALL_BUTTONS))
   {
     clear();
-    printf("Check\n");
-    printf("Red");
+    print("Red");
 
     red_led(1);
     play_frequency(440,50,15);
@@ -24,8 +22,7 @@ void test_leds()
       break;
     
     clear();
-    printf("Check\n");
-    printf("Green");
+    print("Green");
 
     green_led(1);
     play_frequency(880,50,15);
