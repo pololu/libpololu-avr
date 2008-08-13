@@ -62,10 +62,6 @@ void test_qtr()
  
 	wait_for_button(ALL_BUTTONS);
 
-	// check that we got them all
-	for(i=0;i<5;i++)
-		assert(passed_sensors[i]);
-
 	clear();
 
 	// off values
