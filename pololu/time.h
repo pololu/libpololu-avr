@@ -3,10 +3,6 @@ unsigned long get_ms();
 void delay_ms(unsigned int milliseconds);
 void time_reset();
 
-// These are alternative aliases:
-static inline void delay(unsigned int milliseconds) { delay_ms(milliseconds); }
-static inline unsigned long millis() { return get_ms(); }
-
 // This is inline for efficiency:
 static inline void delay_us(unsigned int microseconds)
 {
@@ -22,3 +18,8 @@ static inline void delay_us(unsigned int microseconds)
 		    : "0" ( microseconds )
 		    );  
 }
+
+// These are alternative aliases:
+static inline void delay(unsigned int milliseconds) { delay_ms(milliseconds); }
+static inline unsigned long millis() { return get_ms(); }
+static inline void delayMicroseconds(unsigned int microseconds) { delay_us(microseconds); }
