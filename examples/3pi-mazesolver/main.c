@@ -1,3 +1,18 @@
+/*
+ * 3pi-mazesolver - demo code for the Pololu 3pi Robot
+ * 
+ * This code will solve a line maze constructed with a black line on a
+ * white background, as long as there are no loops.  It has two
+ * phases: first, it learns the maze, with a "left hand on the wall"
+ * strategy, and computes the most efficient path to the finish.
+ * Second, it follows its most efficient solution.
+ *
+ * http://www.pololu.com/docs/0J21
+ * http://www.pololu.com
+ * http://forum.pololu.com
+ *
+ */
+
 // The 3pi include file must be at the beginning of any program that
 // uses the Pololu AVR library and 3pi.
 #include <pololu/3pi.h>
@@ -113,7 +128,7 @@ void initialize()
 	print("Go!");		
 
 	// Play music and wait for it to finish before we start driving.
-	//	play_from_program_space(go);
+	play_from_program_space(go);
 	while(is_playing());
 }
 
@@ -130,7 +145,13 @@ int main()
 		maze_solve();
 	}
 
-	return 0;
+	// This part of the code is never reached.  A robot should
+	// never reach the end of its program, or unpredictable behavior
+	// will result as random code starts getting executed.  If you
+	// really want to stop all actions at some point, set your motors
+	// to 0,0 and run the following command to loop forever:
+	//
+	// while(1);
 }
 
 // Local Variables: **

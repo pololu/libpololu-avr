@@ -1,3 +1,7 @@
+/*
+ * This file is responsible for drawing sensor bar graphs.
+ */
+
 #include <pololu/3pi.h>
 #include <avr/pgmspace.h>
 
