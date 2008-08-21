@@ -207,7 +207,7 @@ int main()
 
 		// Compute the derivative (change) and integral (sum) of the
 		// position.
-		int derivative = last_proportional - proportional;
+		int derivative = proportional - last_proportional;
 		integral += proportional;
 
 		// Remember the last position.
