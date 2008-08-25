@@ -6,7 +6,7 @@ LDFLAGS=-Wl,-gc-sections -lpololu
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_flt -lm
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_min
 
-PORT=COM6
+PORT=/dev/ttyUSB0
 AVRDUDE=avrdude
 TARGET=main
 OBJECT_FILES=main.o bargraph.o maze-solve.o
