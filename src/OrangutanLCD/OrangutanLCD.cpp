@@ -206,7 +206,7 @@ extern "C" void print(const char *str)
 
 extern "C" void print_from_program_space(const char *str)
 {
-	OrangutanLCD::print_from_program_space(str);
+	OrangutanLCD::printFromProgramSpace(str);
 }
 
 extern "C" void print_character(char c)
@@ -520,7 +520,7 @@ void OrangutanLCD::print(const char *str)
 // sends a string to the LCD.  The string is printed from 
 // wherever the cursor is and will not span lines.  (This lets you 
 // concatenate print statements.)
-void OrangutanLCD::print_from_program_space(const char *str)
+void OrangutanLCD::printFromProgramSpace(const char *str)
 {
 	char c;
 	while ((c = pgm_read_byte(str)) != 0)

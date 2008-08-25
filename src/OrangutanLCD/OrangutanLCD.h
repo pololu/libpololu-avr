@@ -69,7 +69,7 @@ class OrangutanLCD
 	static void print(const char *str);
 
 	// Sends a PROGMEM string to the LCD.
-	static void print_from_program_space(const char *str);
+	static void printFromProgramSpace(const char *str);
 
 #ifndef LIB_ORANGUTAN
 	static void printIn(const char *str);  // for compatibility with other libs

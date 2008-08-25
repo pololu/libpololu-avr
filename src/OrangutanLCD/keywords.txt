@@ -18,6 +18,7 @@ print	KEYWORD2
 printIn	KEYWORD2
 printHex	KEYWORD2
 printBinary	KEYWORD2
+printFromProgramSpace	KEYWORD2
 gotoXY	KEYWORD2
 showCursor	KEYWORD2
 hideCursor	KEYWORD2
