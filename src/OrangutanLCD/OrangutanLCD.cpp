@@ -126,7 +126,7 @@ OrangutanLCD::OrangutanLCD()
 
 #ifdef LIB_POLOLU
 
-#include "../OrangutanTime/OrangutanTime.h"
+#include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
 #include <stdio.h>
 
 /* define putchar and getchar functions for the LCD */
@@ -265,6 +265,8 @@ extern "C" void lcd_load_custom_character(const char *picture_p, unsigned char n
 	OrangutanLCD::loadCustomCharacter(picture_p, number);
 }
 
+#else
+#include "wiring.h"		// provides access to delay() and delayMicroseconds()
 #endif
 
 #define LCD_CGRAM   6

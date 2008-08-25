@@ -1,6 +1,6 @@
 /*
-  OrangutanDelay.cpp - Library for delay, calibrated for Orangutan.  This
-  should *NOT* be used as an Arduino library.
+  OrangutanTime.cpp - Library for timing routines, calibrated for Orangutan.
+  This should *NOT* be used as an Arduino library.
 */
 
 /*

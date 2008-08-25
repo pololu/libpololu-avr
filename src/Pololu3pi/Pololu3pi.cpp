@@ -21,7 +21,10 @@
  * to be responsible for all resulting costs and damages.
  */
  
-#include <avr/io.h>
+//#include <avr/io.h>
+#ifndef LIB_POLOLU
+#define ARDUINO
+#endif
 #include "Pololu3pi.h"
 
 #include "../PololuQTRSensors/PololuQTRSensors.h"

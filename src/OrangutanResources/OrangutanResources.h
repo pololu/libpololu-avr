@@ -1,6 +1,5 @@
 /*
-  OrangutanResources.h - Library for using the motor drivers on the
-      Orangutan LV-168 and Baby Orangutan B-48/B-168
+  OrangutanResources.cpp - Measures available RAM on the AVR
 */
 
 /*

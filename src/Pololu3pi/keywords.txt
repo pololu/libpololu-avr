@@ -1,0 +1,29 @@
+#######################################
+# Syntax Coloring Map Pololu3pi
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Pololu3pi	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init	KEYWORD2
+readLineSensors	KEYWORD2
+emittersOn	KEYWORD2
+emittersOff	KEYWORD2
+calibrateLineSensors	KEYWORD2
+readLineSensorsCalibrated	KEYWORD2
+readLine	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+IR_EMITTERS_OFF	LITERAL1
+IR_EMITTERS_ON	LITERAL1
+IR_EMITTERS_ON_AND_OFF	LITERAL1

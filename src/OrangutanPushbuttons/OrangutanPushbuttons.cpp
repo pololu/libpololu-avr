@@ -39,7 +39,7 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 
 #ifdef LIB_POLOLU
 
-#include "../OrangutanTime/OrangutanTime.h"
+#include "../OrangutanTime/OrangutanTime.h"	// provides access to delay routines
 
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {
@@ -61,6 +61,8 @@ extern "C" unsigned char button_is_pressed(unsigned char buttons)
 	return OrangutanPushbuttons::isPressed(buttons);
 }
 
+#else
+#include "wiring.h"		// provides access to delay() and delayMicroseconds()
 #endif
 
 // initializes I/O pins for use as button inputs

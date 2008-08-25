@@ -26,7 +26,11 @@
 
 #ifndef LIB_POLOLU
 
-#ifdef wiring_h
+#ifdef Wiring_h
+#define ARDUINO
+#endif
+
+#ifdef ARDUINO
 
 // arduino include files
 #include <OrangutanAnalog.h>

@@ -1,4 +1,4 @@
-Pololu Arduino Libraries
+Pololu AVR Libraries for the Arduino IDE
 
 Copyright (c) 2008 Pololu Corporation. For more information, see
 
@@ -57,8 +57,13 @@ Arduino IDE and go to File > Sketchbook > Examples >
 Library-Orangutan_____. The example sketches all have names that end
 with Example.
 
+Note that including the Pololu3pi library in your sketch will automatically include all of the Orangutan libraries, giving you access to the functions that control the on-board hardware such as the buzzer, LCD, and motors.
+
 
 == Change Log ==
+
+080825 -
+* Included the Pololu3pi library, which makes it easier to interface with the for the Pololu 3pi robot.
 
 080604 - 
 * Several bug fixes and minor improvements.

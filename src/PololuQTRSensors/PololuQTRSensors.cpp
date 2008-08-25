@@ -43,7 +43,7 @@
 
 #ifdef LIB_POLOLU
 
-#include "../OrangutanTime/OrangutanTime.h"
+#include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
 // two options for our sensors
 
 // one pointer to the type in use
@@ -105,6 +105,8 @@ extern "C" int qtr_read_line_white(unsigned int *sensor_values, unsigned char re
 	return qtr->readLine(sensor_values, true, readMode);
 }
 
+#else
+#include "wiring.h"		// provides access to delay() and delayMicroseconds()
 #endif
 
 // Base class data member initialization (called by derived class init())
