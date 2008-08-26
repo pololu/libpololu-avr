@@ -1,3 +1,8 @@
-void turn_left();
-void turn_right();
-void turn_around();
+void turn(unsigned char dir);
+
+// Local Variables: **
+// mode: C **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

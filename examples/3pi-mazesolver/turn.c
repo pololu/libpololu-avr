@@ -41,3 +41,30 @@ void turn_around()
 	delay_ms(100);
 }
 
+// Turns according to the parameter dir, which should be 'L', 'R', 'S'
+// (straight), or 'B' (back).
+void turn(unsigned char dir)
+{
+	switch(dir)
+	{
+	case 'L':
+		turn_left();
+		break;
+	case 'R':
+		turn_right();
+		break;
+	case 'S':
+		// Don't do anything!
+		break;
+	case 'B':
+		turn_around();
+		break;
+	}
+}
+
+// Local Variables: **
+// mode: C **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

@@ -41,51 +41,22 @@ void display_path()
 
 // This function processes the current intersection during the
 // learning phase of maze solving.  It uses the variables found_left,
-// found_straight, and found_right to decide which way to turn,
-// records that turn in path[], and makes the turn.
-// Debugging information is displayed before making the turn so that
-// you can confirm that the robot has correctly identified the
-// intersection.
-void learn_new_intersection(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
+// found_straight, and found_right, which indicate whether there is an
+// exit in each of the three directions, to decide which way to turn,
+// then records that turn in path[].
+unsigned char learn_new_intersection(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
 {
 	// Make a decision about how to turn.  The following code
 	// implements a left-hand-on-the-wall strategy, where we always
 	// turn as far to the left as possible.
 	if(found_left)
-		path[path_length] = 'L';
+		return 'L';
 	else if(found_straight)
-		path[path_length] = 'S';
+		return 'S';
 	else if(found_right)
-		path[path_length] = 'R';
+		return 'R';
 	else
-		path[path_length] = 'B';
-
-	path_length ++;
-
-	if(path_length > sizeof(path))
-	{
-		// For long mazes, if the number of intersections your robot
-		// crosses ever reaches 100, you need to do something about
-		// it.
-		//
-		// Some options for the { ... } are:
-		// - display an error and stop
-		// - stop recording the path
-		// - try to allocate more memory with malloc()
-		//
-		// What you should do depends on your contest format and
-		// programming skill level.  Most people will just set the
-		// size of the array to be big enough that they never have to
-		// worry about this situation.  Here we'll take the first
-		// option:
-		
-		clear();
-		print("Out of");
-		lcd_goto_xy(0,1);
-		print("memory!");
-		set_motors(0,0);
-		while(1);
-	}
+		return 'B';
 }
 
 // Path simplification.  The strategy is that whenever we encounter a
@@ -102,12 +73,14 @@ void simplify_path()
 
 		// Consider all of the possible cases, and product appropriate
 		// replacements.
-		if( (first == 'L' && last == 'R') || (first == 'R' && last == 'L') ||
+		if( (first == 'L' && last == 'R') ||
+			(first == 'R' && last == 'L') ||
 			(first == 'S' && last == 'S') )
 			replace = 'B';
 		else if(first == 'L' && last == 'L')
 			replace = 'S';
-		else if( (first == 'S' && last == 'L') || (first == 'L' && last == 'S') )
+		else if( (first == 'S' && last == 'L') ||
+				 (first == 'L' && last == 'S') )
 			replace = 'R';
 
 		if( replace != 0 )
@@ -176,30 +149,24 @@ void maze_solve()
 		// Intersection identification is complete.
 		// If the maze has been solved, we can follow the existing
 		// path.  Otherwise, we need to learn the solution.
-		learn_new_intersection(found_left, found_straight, found_right);
+		unsigned char dir = learn_new_intersection(found_left, found_straight, found_right);
+
+		// Make the turn indicated by the path.
+		turn(dir);
+
+		// Store the intersection in the path variable.
+		path[path_length] = dir;
+		path_length ++;
+
+		// You should check to make sure that the path_length does not
+		// exceed the bounds of the array.  We'll ignore that in this
+		// example.
+
+		// Simplify the learned path.
+		simplify_path();
 
 		// Display the path on the LCD.
 		display_path();
-
-		// Make the turn indicated by the path.
-		switch(path[path_length-1])
-		{
-		case 'L':
-			turn_left();
-			break;
-		case 'R':
-			turn_right();
-			break;
-		case 'S':
-			// just go straight
-			break;
-		case 'B':
-			turn_around();
-			break;
-		}
-
-		// Simply the learned path.
-		simplify_path();
 	}
 
 	// Solved the maze!
@@ -246,10 +213,7 @@ void maze_solve()
 
 			// Make a turn according to the instruction stored in
 			// path[i].
-			if(path[i] == 'L')
-				turn_left();
-			else if(path[i] == 'R')
-				turn_right();
+			turn(path[i]);
 		}
 		
 		// Follow the last segment up to the finish.
