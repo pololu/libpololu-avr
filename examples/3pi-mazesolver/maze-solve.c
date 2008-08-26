@@ -110,7 +110,7 @@ void simplify_path()
 	path_length -= 2;
 }
 
-// This function is called over and over from the main loop in main.c.
+// This function is called once, from main.c.
 void maze_solve()
 {
 	// Loop until we have solved the maze.
