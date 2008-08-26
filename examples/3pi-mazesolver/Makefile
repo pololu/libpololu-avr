@@ -9,7 +9,7 @@ LDFLAGS=-Wl,-gc-sections -lpololu
 PORT=/dev/ttyUSB0
 AVRDUDE=avrdude
 TARGET=main
-OBJECT_FILES=main.o bargraph.o maze-solve.o
+OBJECT_FILES=main.o bargraph.o maze-solve.o follow-segment.o turn.o
 
 all: $(TARGET).hex
 

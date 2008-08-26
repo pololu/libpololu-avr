@@ -1,46 +1,10 @@
 /*
- * This file contains the maze-sovling strategy.
+ * This file contains the maze-solving strategy.
  */
 
 #include <pololu/3pi.h>
-
-// Performs various types of turns.  The delays here had to be
-// calibrated for the 3pi's motors.
-void turn_left()
-{
-	set_motors(0,0);
-	delay_ms(100);
-
-	set_motors(-80,80);
-	delay_ms(200);
-
-	set_motors(0,0);
-	delay_ms(100);
-}
-
-void turn_right()
-{
-	set_motors(0,0);
-	delay_ms(100);
-
-	set_motors(80,-80);
-	delay_ms(200);
-
-	set_motors(0,0);
-	delay_ms(100);
-}
-
-void turn_around()
-{
-	set_motors(0,0);
-	delay_ms(100);
-
-	set_motors(80,-80);
-	delay_ms(400);
-
-	set_motors(0,0);
-	delay_ms(100);
-}
+#include "follow-segment.h"
+#include "turn.h"
 
 // The path variable will store the path that the robot has taken.  It
 // is stored as an array of characters, each of which represents the
@@ -56,22 +20,6 @@ void turn_around()
 // appropriately.
 char path[100] = "";
 unsigned char path_length = 0; // the length of the path
-unsigned char solved_maze = 0; // true after we have solved it
-unsigned char follow_pos = 0;  // an index for following the path
-
-// This function makes a turn according to the instruction stored in
-// path[follow_pos], then increments follow_pos.  It is a lot faster
-// than learn_new_intersection(), below, because it does not wait to
-// display informative messages.
-void follow_next_turn()
-{
-	if(path[follow_pos] == 'L')
-		turn_left();
-	else if(path[follow_pos] == 'R')
-		turn_right();
-
-	follow_pos ++;
-}
 
 // Displays the current path on the LCD, using two rows if necessary.
 void display_path()
@@ -91,13 +39,6 @@ void display_path()
 	}
 }
 
-// These variables record whether the robot has seen a line to the
-// left, straight ahead, and right, whil examining the current
-// intersection.
-unsigned char found_left=0;
-unsigned char found_straight=0;
-unsigned char found_right=0;
-
 // This function processes the current intersection during the
 // learning phase of maze solving.  It uses the variables found_left,
 // found_straight, and found_right to decide which way to turn,
@@ -105,7 +46,7 @@ unsigned char found_right=0;
 // Debugging information is displayed before making the turn so that
 // you can confirm that the robot has correctly identified the
 // intersection.
-void learn_new_intersection()
+void learn_new_intersection(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
 {
 	// Debugging: this displays the detected path nicely on the LCD.
 	clear();
@@ -223,91 +164,37 @@ void learn_new_intersection()
 // This function is called over and over from the main loop in main.c.
 void maze_solve()
 {
-	// Normally, we will be following a line.  The code below is
-	// similar to the 3pi-linefollower-pid example, but the maximum
-	// speed is turned down to 60 for reliability.
-
-	// Get the position of the line.
-	unsigned int sensors[5];
-	unsigned int position = read_line(sensors,IR_EMITTERS_ON);
-
-	// The "proportional" term should be 0 when we are on the line.
-	int proportional = ((int)position) - 2000;
-
-	// Compute the derivative (change) and integral (sum) of the
-	// position.
-	int last_proportional = 0;
-	int derivative = proportional - last_proportional;
-
-	// Remember the last position.
-	last_proportional = proportional;
-
-	// Compute the difference between the two motor power settings,
-	// m1 - m2.  If this is a positive number the robot will turn
-	// to the left.  If it is a negative number, the robot will
-	// turn to the right, and the magnitude of the number determines
-	// the sharpness of the turn.
-	int power_difference = proportional/80 + derivative/20;
-
-	// Compute the actual motor settings.  We never set either motor
-	// to a negative value.
-	const int max = 60; // the maximum speed
-	if(power_difference > max)
-		power_difference = max;
-	if(power_difference < -max)
-		power_difference = -max;
-		
-	if(power_difference < 0)
-		set_motors(max+power_difference,max);
-	else
-		set_motors(max,max-power_difference);
-
-	/////////////////////////////////////////////////////////////////
-	// The rest of the code deals with finding intersections, dead
-	// ends, and the ending spot.  We use the inner three sensors (1,
-	// 2, and 3) for determining whether there is a line straight
-	// ahead, and the sensors 0 and 4 for detecting lines going to the
-	// left and right.
-
-	// Reset the intersection detection variables.
-	found_left = 0;
-	found_right = 0;
-	found_straight = 0;
-
-	if(sensors[1] < 100 && sensors[2] < 100 && sensors[3] < 100)
+	// Loop until we have solved the maze.
+	while(1)
 	{
-		// There is no line visible ahead, and we didn't see any
-		// intersection.  Must be a dead end.
-
-		// Do a U-turn.  Drive a bit forward before turning, or
-		// else we might end up too close to the previous
-		// intersection.
-		set_motors(40,40);
-		delay_ms(250);
-
-		if(solved_maze)
-			follow_next_turn();
-		else
-			learn_new_intersection();
-	}
-	else if(sensors[0] > 200 || sensors[4] > 200)
-	{
-		// Found an intersection.
+		follow_segment();
 
 		// Drive straight a bit.  This helps us in case we entered the
 		// intersection at an angle.
+		// Note that we are slowing down - this prevents the robot
+		// from tipping forward too much.
 		set_motors(50,50);
 		delay_ms(50);
 
-		// Check for left and right exits.
+		// These variables record whether the robot has seen a line to the
+		// left, straight ahead, and right, whil examining the current
+		// intersection.
+		unsigned char found_left=0;
+		unsigned char found_straight=0;
+		unsigned char found_right=0;
+
+		// Now read the sensors and check the intersection type.
+		unsigned int sensors[5];
 		read_line(sensors,IR_EMITTERS_ON);
+
+		// Check for left and right exits.
 		if(sensors[0] > 100)
 			found_left = 1;
 		if(sensors[4] > 100)
 			found_right = 1;
 
-		// Drive straight a bit more.  Note that we are slowing down -
-		// this prevents the robot from tipping forward too much.
+		// Drive straight a bit more - this is enough to line up our
+		// wheels with the intersection.
 		set_motors(40,40);
 		delay_ms(200);
 
@@ -317,46 +204,71 @@ void maze_solve()
 			found_straight = 1;
 
 		// Check for the ending spot.
+		// If all three middle sensors are on dark black, we have
+		// solved the maze.
 		if(sensors[1] > 600 && sensors[2] > 600 && sensors[3] > 600)
-		{
-			// If all three middle sensors are on dark black, we have
-			// solved the maze.
-
-			set_motors(0,0);
-			play(">>a32");
-			solved_maze = 1;
-			follow_pos = 0;
-
-			// Wait for the user to press a button, while displaying
-			// the solution.
-			while(!button_is_pressed(BUTTON_B))
-			{
-				if(get_ms() % 2000 < 1000)
-				{
-					clear();
-					print("Solved!");
-					lcd_goto_xy(0,1);
-					print("Press B");
-				}
-				else
-					display_path();
-				delay_ms(30);
-			}
-			while(button_is_pressed(BUTTON_B));
-
-			delay_ms(1000);
-
-			return;
-		}
+			break;
 
 		// Intersection identification is complete.
-
 		// If the maze has been solved, we can follow the existing
 		// path.  Otherwise, we need to learn the solution.
-		if(solved_maze)
-			follow_next_turn();
-		else
-			learn_new_intersection();
+		learn_new_intersection(found_left, found_straight, found_right);
+	}
+
+	// Solved the maze!
+
+	// Now enter an infinite loop - we can re-run the maze as many
+	// times as we want to.
+	while(1)
+	{
+		// Beep to show that we solved the maze.
+		set_motors(0,0);
+		play(">>a32");
+
+		// Wait for the user to press a button, while displaying
+		// the solution.
+		while(!button_is_pressed(BUTTON_B))
+		{
+			if(get_ms() % 2000 < 1000)
+			{
+				clear();
+				print("Solved!");
+				lcd_goto_xy(0,1);
+				print("Press B");
+			}
+			else
+				display_path();
+			delay_ms(30);
+		}
+		while(button_is_pressed(BUTTON_B));
+	
+		delay_ms(1000);
+
+		// Re-run the maze.  It's not necessary to identify the
+		// intersections, so this loop is really simple.
+		int i;
+		for(i=0;i<path_length;i++)
+		{
+			follow_segment();
+
+			// Drive straight while slowing down, as before.
+			set_motors(50,50);
+			delay_ms(50);
+			set_motors(40,40);
+			delay_ms(200);
+
+			// Make a turn according to the instruction stored in
+			// path[i].
+			if(path[i] == 'L')
+				turn_left();
+			else if(path[i] == 'R')
+				turn_right();
+		}
+		
+		// Follow the last segment up to the finish.
+		follow_segment();
+
+		// Now we should be at the finish!  Restart the loop.
 	}
 }
 
