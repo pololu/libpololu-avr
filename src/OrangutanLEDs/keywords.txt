@@ -13,7 +13,9 @@ OrangutanLEDs	KEYWORD1
 #######################################
 
 red	KEYWORD2
-green	KEYWORD2	
+left	KEYWORD2
+green	KEYWORD2
+right	KEYWORD2	
 
 #######################################
 # Constants (LITERAL1)

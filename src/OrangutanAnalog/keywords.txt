@@ -19,6 +19,7 @@ readAvg	KEYWORD2
 readTrimpot	KEYWORD2
 readTemperatureF	KEYWORD2
 readTemperatureC	KEYWORD2
+readBatteryMillivolts	KEYWORD2
 startConversion	KEYWORD2
 isConverting	KEYWORD2
 conversionResult	KEYWORD2

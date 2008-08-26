@@ -33,12 +33,12 @@
 #ifdef ARDUINO
 
 // arduino include files
-#include <OrangutanAnalog.h>
-#include <OrangutanBuzzer.h>
-#include <OrangutanMotors.h>
-#include <OrangutanLCD.h>
-#include <OrangutanLEDs.h>
-#include <OrangutanPushbuttons.h>
+#include "../OrangutanAnalog/OrangutanAnalog.h"
+#include "../OrangutanBuzzer/OrangutanBuzzer.h"
+#include "../OrangutanMotors/OrangutanMotors.h"
+#include "../OrangutanLCD/OrangutanLCD.h"
+#include "../OrangutanLEDs/OrangutanLEDs.h"
+#include "../OrangutanPushbuttons/OrangutanPushbuttons.h"
 
 #else
 
@@ -80,9 +80,9 @@ public:
 
 	void emittersOn();
 	void emittersOff();
-	void calibrateLineSensors(unsigned char readMode);
-	void readLineSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode);
-	unsigned int readLine(unsigned int *sensor_values, unsigned char readMode, unsigned char white_line);
+	void calibrateLineSensors(unsigned char readMode = IR_EMITTERS_ON);
+	void readLineSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode = IR_EMITTERS_ON);
+	unsigned int readLine(unsigned int *sensor_values, unsigned char readMode = IR_EMITTERS_ON, unsigned char white_line = 0);
 };
 
 #endif

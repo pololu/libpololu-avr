@@ -101,7 +101,7 @@ class PololuQTRSensors
 	// black, set the optional second argument white_line to true.  In
 	// this case, each sensor value will be replaced by (1000-value)
 	// before the averaging.
-	int readLine(unsigned int *sensor_values, unsigned char white_line = 0, unsigned char readMode = QTR_EMITTERS_ON);
+	int readLine(unsigned int *sensor_values, unsigned char readMode = QTR_EMITTERS_ON, unsigned char white_line = 0);
 
 	// Calibrated minumum and maximum values. These start at 1000 and
 	// 0, respectively, so that the very first sensor reading will
