@@ -4,20 +4,39 @@
 
 #include <pololu/3pi.h>
 
-// Performs a turn.  m1 and m2 are set to -1 or 1, depending on
-// whether the corresponding motors should be rotating backward or
-// forward during the turn.
-void turn(char m1, char m2, unsigned char angle)
+// Performs various types of turns.  The delays here had to be
+// calibrated for the 3pi's motors.
+void turn_left()
 {
 	set_motors(0,0);
 	delay_ms(100);
 
-	set_motors(m1*80,m2*80);
+	set_motors(-80,80);
+	delay_ms(200);
 
-	if(angle == 90)
-		delay_ms(200);
-	else if(angle == 180)
-		delay_ms(400);
+	set_motors(0,0);
+	delay_ms(100);
+}
+
+void turn_right()
+{
+	set_motors(0,0);
+	delay_ms(100);
+
+	set_motors(80,-80);
+	delay_ms(200);
+
+	set_motors(0,0);
+	delay_ms(100);
+}
+
+void turn_around()
+{
+	set_motors(0,0);
+	delay_ms(100);
+
+	set_motors(80,-80);
+	delay_ms(400);
 
 	set_motors(0,0);
 	delay_ms(100);
@@ -47,9 +66,9 @@ unsigned char follow_pos = 0;  // an index for following the path
 void follow_next_turn()
 {
 	if(path[follow_pos] == 'L')
-		turn(-1,1,90);
+		turn_left();
 	else if(path[follow_pos] == 'R')
-		turn(1,-1,90);
+		turn_right();
 
 	follow_pos ++;
 }
@@ -115,7 +134,7 @@ void learn_new_intersection()
 	if(found_left)
 	{
 		// Turn left if possible.
-		turn(-1,1,90);
+		turn_left();
 		path[path_length] = 'L';
 	}
 	else if(found_straight)
@@ -126,13 +145,13 @@ void learn_new_intersection()
 	else if(found_right)
 	{
 		// Otherwise, turn right if possible.
-		turn(1,-1,90);
+		turn_right();
 		path[path_length] = 'R';
 	}
 	else
 	{
 		// This is a dead end - we have to go back.
-		turn(1,-1,180);
+		turn_around();
 		path[path_length] = 'B';
 	}    
 
