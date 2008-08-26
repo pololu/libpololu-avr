@@ -44,7 +44,7 @@ void display_path()
 // found_straight, and found_right, which indicate whether there is an
 // exit in each of the three directions, to decide which way to turn,
 // then records that turn in path[].
-unsigned char learn_new_intersection(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
+unsigned char select_turn(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
 {
 	// Make a decision about how to turn.  The following code
 	// implements a left-hand-on-the-wall strategy, where we always
@@ -65,37 +65,50 @@ unsigned char learn_new_intersection(unsigned char found_left, unsigned char fou
 // represented by LBL.
 void simplify_path()
 {
-	if(path[path_length-2] == 'B')
+	// only simplify the path if the second-to-last turn was a 'B'
+	if(path_length < 3 || path[path_length-2] != 'B')
+		return;
+
+	int total_angle = 0;
+	int i;
+	for(i=1;i<=3;i++)
 	{
-		char first = path[path_length-3];
-		char last = path[path_length-1];
-		char replace = 0;
-
-		// Consider all of the possible cases, and product appropriate
-		// replacements.
-		if( (first == 'L' && last == 'R') ||
-			(first == 'R' && last == 'L') ||
-			(first == 'S' && last == 'S') )
-			replace = 'B';
-		else if(first == 'L' && last == 'L')
-			replace = 'S';
-		else if( (first == 'S' && last == 'L') ||
-				 (first == 'L' && last == 'S') )
-			replace = 'R';
-
-		if( replace != 0 )
+		switch(path[path_length-i])
 		{
-			path[path_length - 3] = replace;
-			path_length -= 2;
+		case 'R':
+			total_angle += 90;
+			break;
+		case 'L':
+			total_angle += 270;
+			break;
+		case 'B':
+			total_angle += 180;
+			break;
 		}
-
-		// If replace was not set, something went wrong.  There are
-		// some impossible sequences, such as RBR that could only
-		// happen if the robot incorrectly measured an intersection or
-		// performed a turn badly.  You should think about doing
-		// something useful in this situation, like guessing what must
-		// have happened; we'll just ignore it in this example.
 	}
+
+	// Get the angle as a number between 0 and 360 degrees.
+	total_angle = total_angle % 360;
+
+	// Replace all of those turns with a single one.
+	switch(total_angle)
+	{
+	case 0:
+		path[path_length - 3] = 'S';
+		break;
+	case 90:
+		path[path_length - 3] = 'R';
+		break;
+	case 180:
+		path[path_length - 3] = 'B';
+		break;
+	case 270:
+		path[path_length - 3] = 'L';
+		break;
+	}
+
+	// The path is now two steps shorter.
+	path_length -= 2;
 }
 
 // This function is called over and over from the main loop in main.c.
@@ -149,7 +162,7 @@ void maze_solve()
 		// Intersection identification is complete.
 		// If the maze has been solved, we can follow the existing
 		// path.  Otherwise, we need to learn the solution.
-		unsigned char dir = learn_new_intersection(found_left, found_straight, found_right);
+		unsigned char dir = select_turn(found_left, found_straight, found_right);
 
 		// Make the turn indicated by the path.
 		turn(dir);
