@@ -39,11 +39,10 @@ void display_path()
 	}
 }
 
-// This function processes the current intersection during the
-// learning phase of maze solving.  It uses the variables found_left,
-// found_straight, and found_right, which indicate whether there is an
-// exit in each of the three directions, to decide which way to turn,
-// then records that turn in path[].
+// This function decides which way to turn during the learning phase of
+// maze solving.  It uses the variables found_left, found_straight, and
+// found_right, which indicate whether there is an exit in each of the
+// three directions, applying the "left hand on the wall" strategy.
 unsigned char select_turn(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
 {
 	// Make a decision about how to turn.  The following code
