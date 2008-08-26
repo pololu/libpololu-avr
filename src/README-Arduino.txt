@@ -57,8 +57,6 @@ Arduino IDE and go to File > Sketchbook > Examples >
 Library-Orangutan_____. The example sketches all have names that end
 with Example.
 
-Note that including the Pololu3pi library in your sketch will automatically include all of the Orangutan libraries, giving you access to the functions that control the on-board hardware such as the buzzer, LCD, and motors.
-
 
 == Change Log ==
 

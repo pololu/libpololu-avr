@@ -30,17 +30,7 @@
 #define ARDUINO
 #endif
 
-#ifdef ARDUINO
-
-// arduino include files
-#include "../OrangutanAnalog/OrangutanAnalog.h"
-#include "../OrangutanBuzzer/OrangutanBuzzer.h"
-#include "../OrangutanMotors/OrangutanMotors.h"
-#include "../OrangutanLCD/OrangutanLCD.h"
-#include "../OrangutanLEDs/OrangutanLEDs.h"
-#include "../OrangutanPushbuttons/OrangutanPushbuttons.h"
-
-#else
+#ifndef ARDUINO
 
 #include <pololu/OrangutanAnalog.h>
 #include <pololu/OrangutanBuzzer.h>
