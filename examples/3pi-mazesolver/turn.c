@@ -9,9 +9,6 @@
 // (straight), or 'B' (back).
 void turn(unsigned char dir)
 {
-	set_motors(0,0);
-	delay_ms(100);
-
 	switch(dir)
 	{
 	case 'L':
@@ -33,9 +30,6 @@ void turn(unsigned char dir)
 		// Don't do anything!
 		break;
 	}
-
-	set_motors(0,0);
-	delay_ms(100);
 }
 
 // Local Variables: **
