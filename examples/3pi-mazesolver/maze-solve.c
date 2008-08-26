@@ -48,53 +48,17 @@ void display_path()
 // intersection.
 void learn_new_intersection(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
 {
-	// Debugging: this displays the detected path nicely on the LCD.
-	clear();
-	if(found_straight)
-		print("   \xff\xff"); // print bars leading straight ahead
-	lcd_goto_xy(0,1);
-	if(found_left)
-		print("\xff\xff\xff"); // print bars leading left
-	else
-		print("   ");
-	print("\xff\xff"); // always display black under the robot
-	
-	if(found_right)
-		print("\xff\xff\xff"); // print bars leading left
-	else
-		print("   ");
-
-	// Stop the motors - this gives you a second to read the debugging
-	// information on the screen.
-	set_motors(0,0);
-	delay_ms(1000);
-
 	// Make a decision about how to turn.  The following code
 	// implements a left-hand-on-the-wall strategy, where we always
 	// turn as far to the left as possible.
 	if(found_left)
-	{
-		// Turn left if possible.
-		turn_left();
 		path[path_length] = 'L';
-	}
 	else if(found_straight)
-	{ 
-		// Otherwise, go straight if possible.  No turn necessary!
 		path[path_length] = 'S';
-	}
 	else if(found_right)
-	{
-		// Otherwise, turn right if possible.
-		turn_right();
 		path[path_length] = 'R';
-	}
 	else
-	{
-		// This is a dead end - we have to go back.
-		turn_around();
 		path[path_length] = 'B';
-	}    
 
 	path_length ++;
 
@@ -122,11 +86,14 @@ void learn_new_intersection(unsigned char found_left, unsigned char found_straig
 		set_motors(0,0);
 		while(1);
 	}
+}
 
-	// Path simplification.  The strategy is that whenever we
-	// encounter a sequence xBx, we can simplify it by cutting out the
-	// dead end.  For example, LBL -> S, because a single S bypasses
-	// the dead end represented by LBL.
+// Path simplification.  The strategy is that whenever we encounter a
+// sequence xBx, we can simplify it by cutting out the dead end.  For
+// example, LBL -> S, because a single S bypasses the dead end
+// represented by LBL.
+void simplify_path()
+{
 	if(path[path_length-2] == 'B')
 	{
 		char first = path[path_length-3];
@@ -156,9 +123,6 @@ void learn_new_intersection(unsigned char found_left, unsigned char found_straig
 		// something useful in this situation, like guessing what must
 		// have happened; we'll just ignore it in this example.
 	}
-
-	// Display the path on the LCD.
-	display_path();
 }
 
 // This function is called over and over from the main loop in main.c.
@@ -213,6 +177,29 @@ void maze_solve()
 		// If the maze has been solved, we can follow the existing
 		// path.  Otherwise, we need to learn the solution.
 		learn_new_intersection(found_left, found_straight, found_right);
+
+		// Display the path on the LCD.
+		display_path();
+
+		// Make the turn indicated by the path.
+		switch(path[path_length-1])
+		{
+		case 'L':
+			turn_left();
+			break;
+		case 'R':
+			turn_right();
+			break;
+		case 'S':
+			// just go straight
+			break;
+		case 'B':
+			turn_around();
+			break;
+		}
+
+		// Simply the learned path.
+		simplify_path();
 	}
 
 	// Solved the maze!
