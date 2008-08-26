@@ -5,61 +5,37 @@
 
 #include <pololu/3pi.h>
 
-void turn_left()
-{
-	set_motors(0,0);
-	delay_ms(100);
-
-	set_motors(-80,80);
-	delay_ms(200);
-
-	set_motors(0,0);
-	delay_ms(100);
-}
-
-void turn_right()
-{
-	set_motors(0,0);
-	delay_ms(100);
-
-	set_motors(80,-80);
-	delay_ms(200);
-
-	set_motors(0,0);
-	delay_ms(100);
-}
-
-void turn_around()
-{
-	set_motors(0,0);
-	delay_ms(100);
-
-	set_motors(80,-80);
-	delay_ms(400);
-
-	set_motors(0,0);
-	delay_ms(100);
-}
-
 // Turns according to the parameter dir, which should be 'L', 'R', 'S'
 // (straight), or 'B' (back).
 void turn(unsigned char dir)
 {
+	set_motors(0,0);
+	delay_ms(100);
+
 	switch(dir)
 	{
 	case 'L':
-		turn_left();
+		// Turn left.
+		set_motors(-80,80);
+		delay_ms(200);
 		break;
 	case 'R':
-		turn_right();
+		// Turn right.
+		set_motors(80,-80);
+		delay_ms(200);
+		break;
+	case 'B':
+		// Turn around.
+		set_motors(80,-80);
+		delay_ms(400);
 		break;
 	case 'S':
 		// Don't do anything!
 		break;
-	case 'B':
-		turn_around();
-		break;
 	}
+
+	set_motors(0,0);
+	delay_ms(100);
 }
 
 // Local Variables: **
