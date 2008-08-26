@@ -23,7 +23,7 @@
 // go into program space.
 const char welcome_line1[] PROGMEM = " Pololu";
 const char welcome_line2[] PROGMEM = "3\xf7 Robot";
-const char demo_name_line1[] PROGMEM = "Line";
+const char demo_name_line1[] PROGMEM = "PID Line";
 const char demo_name_line2[] PROGMEM = "follower";
 
 // A couple of simple tunes, stored in program space.
@@ -218,11 +218,11 @@ int main()
 		// to the right.  If it is a negative number, the robot will
 		// turn to the left, and the magnitude of the number determines
 		// the sharpness of the turn.
-		int power_difference = proportional/10 + integral/10000 + derivative*3/2;
+		int power_difference = proportional/20 + integral/10000 + derivative*3/2;
 
 		// Compute the actual motor settings.  We never set either motor
 		// to a negative value.
-		const int max = 100;
+		const int max = 60;
 		if(power_difference > max)
 			power_difference = max;
 		if(power_difference < -max)

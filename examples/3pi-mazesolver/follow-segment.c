@@ -11,6 +11,9 @@
 
 void follow_segment()
 {
+	int last_proportional = 0;
+	long integral=0;
+
 	while(1)
 	{
 		// Normally, we will be following a line.  The code below is
@@ -26,8 +29,8 @@ void follow_segment()
 
 		// Compute the derivative (change) and integral (sum) of the
 		// position.
-		int last_proportional = 0;
 		int derivative = proportional - last_proportional;
+		integral += proportional;
 
 		// Remember the last position.
 		last_proportional = proportional;
@@ -37,7 +40,7 @@ void follow_segment()
 		// to the left.  If it is a negative number, the robot will
 		// turn to the right, and the magnitude of the number determines
 		// the sharpness of the turn.
-		int power_difference = proportional/80 + derivative/20;
+		int power_difference = proportional/20 + integral/10000 + derivative*3/2;
 
 		// Compute the actual motor settings.  We never set either motor
 		// to a negative value.
