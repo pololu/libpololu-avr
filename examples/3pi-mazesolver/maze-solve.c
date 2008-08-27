@@ -43,7 +43,7 @@ void display_path()
 // maze solving.  It uses the variables found_left, found_straight, and
 // found_right, which indicate whether there is an exit in each of the
 // three directions, applying the "left hand on the wall" strategy.
-unsigned char select_turn(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
+char select_turn(unsigned char found_left, unsigned char found_straight, unsigned char found_right)
 {
 	// Make a decision about how to turn.  The following code
 	// implements a left-hand-on-the-wall strategy, where we always
@@ -116,6 +116,7 @@ void maze_solve()
 	// Loop until we have solved the maze.
 	while(1)
 	{
+		// FIRST MAIN LOOP BODY  
 		follow_segment();
 
 		// Drive straight a bit.  This helps us in case we entered the
@@ -187,7 +188,7 @@ void maze_solve()
 	// times as we want to.
 	while(1)
 	{
-		// Beep to show that we solved the maze.
+		// Beep to show that we finished the maze.
 		set_motors(0,0);
 		play(">>a32");
 
@@ -215,6 +216,7 @@ void maze_solve()
 		int i;
 		for(i=0;i<path_length;i++)
 		{
+			// SECOND MAIN LOOP BODY  
 			follow_segment();
 
 			// Drive straight while slowing down, as before.

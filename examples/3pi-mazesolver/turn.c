@@ -7,7 +7,7 @@
 
 // Turns according to the parameter dir, which should be 'L', 'R', 'S'
 // (straight), or 'B' (back).
-void turn(unsigned char dir)
+void turn(char dir)
 {
 	switch(dir)
 	{

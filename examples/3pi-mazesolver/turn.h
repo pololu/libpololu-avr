@@ -1,4 +1,4 @@
-void turn(unsigned char dir);
+void turn(char dir);
 
 // Local Variables: **
 // mode: C **
