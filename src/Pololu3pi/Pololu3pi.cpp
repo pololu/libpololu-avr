@@ -70,12 +70,12 @@ extern "C" void read_line_sensors_calibrated(unsigned int *sensor_values, unsign
 
 extern "C" unsigned int read_line(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr3pi.readLine(sensor_values, 0, readMode);
+	return qtr3pi.readLine(sensor_values, readMode, 0);
 }
 
 extern "C" unsigned int read_line_white(unsigned int *sensor_values, unsigned char readMode)
 {
-	return qtr3pi.readLine(sensor_values, 1, readMode);
+	return qtr3pi.readLine(sensor_values, readMode, 1);
 }
 
 #endif
