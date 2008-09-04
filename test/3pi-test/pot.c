@@ -22,17 +22,17 @@ void test_pot()
 		while((elapsed_ms = get_ms() - start) < 100)
 		{
 			value = read_trimpot();
-			play_frequency(1023-value, 200, 15);
+			play_frequency(value, 200, 15);
 		
 			if(value < elapsed_ms*10)
 			{
-				red_led(0);
-				green_led(1);
+				red_led(1);
+				green_led(0);
 			}
 			else
 			{
-				red_led(1);
-				green_led(0);
+				red_led(0);
+				green_led(1);
 			}
 		}
 	}

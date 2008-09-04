@@ -24,7 +24,7 @@ void test_qtr()
 	// Wait for each sensor to be > 750 while the others are < 250.
 	unsigned int passed_sensors[5] = {0,0,0,0,0};
 
-	while(!button_is_pressed(ALL_BUTTONS))
+	while(!button_is_pressed(BUTTON_B))
 	{
 		read_line_sensors(values,IR_EMITTERS_ON);
 
@@ -59,12 +59,12 @@ void test_qtr()
 		delay_ms(50);
 	}
  
-	wait_for_button(ALL_BUTTONS);
+	while(button_is_pressed(BUTTON_B));
 
 	clear();
 
 	// off values
-	while(!button_is_pressed(ALL_BUTTONS))
+	while(!button_is_pressed(BUTTON_B))
 	{
 		read_line_sensors(values,IR_EMITTERS_OFF);
 
@@ -75,7 +75,7 @@ void test_qtr()
 		delay_ms(50);
 	}
 
-	wait_for_button(ALL_BUTTONS);
+	while(button_is_pressed(BUTTON_B));
 }
 
 // Local Variables: **
