@@ -74,7 +74,6 @@ int main()
 	test_motors();
 	test_pot();
 	test_outputs();
-	test_leds();
 pushbuttons:
 	test_pushbuttons();
 
