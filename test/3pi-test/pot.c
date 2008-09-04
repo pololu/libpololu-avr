@@ -22,7 +22,7 @@ void test_pot()
 		while((elapsed_ms = get_ms() - start) < 100)
 		{
 			value = read_trimpot();
-			play_frequency(value, 200, 15);
+			play_frequency(1023-value, 200, 15);
 		
 			if(value < elapsed_ms*10)
 			{

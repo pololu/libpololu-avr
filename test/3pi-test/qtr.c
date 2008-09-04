@@ -17,7 +17,6 @@ void display_values(unsigned int *values, unsigned int max)
 
 void test_qtr()
 {
-	unsigned char i;
 	unsigned int values[5];
 
 	clear();
