@@ -56,26 +56,32 @@ void test_qtr()
 		}
 
 		display_values(values,1000);
+
+		lcd_goto_xy(6,1);
+		print("B");
+
 		delay_ms(50);
 	}
  
-	while(button_is_pressed(BUTTON_B));
+	while(button_is_pressed(ALL_BUTTONS));
 
 	clear();
 
 	// off values
-	while(!button_is_pressed(BUTTON_B))
+	while(!button_is_pressed(BUTTON_C))
 	{
 		read_line_sensors(values,IR_EMITTERS_OFF);
 
 		lcd_goto_xy(0,0);
 		print("IR- ");
 		display_values(values,1000);
+		lcd_goto_xy(6,1);
+		print("C");
     
 		delay_ms(50);
 	}
 
-	while(button_is_pressed(BUTTON_B));
+	while(button_is_pressed(ALL_BUTTONS));
 }
 
 // Local Variables: **

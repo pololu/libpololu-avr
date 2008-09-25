@@ -54,7 +54,7 @@ int main()
 		test_outputs();
 
 	// If button C is not pressed down, go to the demo.
-	if(!button_is_pressed(BUTTON_C))
+	if(!button_is_pressed(BUTTON_C) && !test_pushbutton_tries())
 		demo();
 
 	// Load bar graph characters.

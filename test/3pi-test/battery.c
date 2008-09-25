@@ -5,13 +5,15 @@ void test_battery()
 {
 	clear();
 
-	while(!button_is_pressed(BUTTON_B))
+	while(!button_is_pressed(BUTTON_A))
 	{
 		int bat = read_battery_millivolts();
 
 		lcd_goto_xy(0,0);
 		print_long(bat);
 		print(" mV");
+		lcd_goto_xy(0,1);
+		print("Press A");
 
 		delay_ms(100);
 	}

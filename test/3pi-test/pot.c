@@ -5,7 +5,7 @@ void test_pot()
 {
 	clear();
 
-	while(!button_is_pressed(BUTTON_B))
+	while(!button_is_pressed(BUTTON_A))
 	{
 		long start = get_ms();
 		char elapsed_ms;
@@ -18,6 +18,8 @@ void test_pot()
 		lcd_goto_xy(0,1);
 		print_long(read_trimpot());
 		print("   "); // to clear the display
+		lcd_goto_xy(6,1);
+		print("A");
 
 		while((elapsed_ms = get_ms() - start) < 100)
 		{
@@ -37,7 +39,7 @@ void test_pot()
 		}
 	}
 
-	while(button_is_pressed(BUTTON_B));
+	while(button_is_pressed(BUTTON_A));
 }
 
 // Local Variables: **
