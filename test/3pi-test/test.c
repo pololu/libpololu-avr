@@ -8,16 +8,17 @@
 #include "outputs.h"
 #include "leds.h"
 #include "lcd.h"
+#include "demo.h"
 
 #include <avr/pgmspace.h>
 
 // Introductory messages.
-const char welcome[] PROGMEM = ">g32>>c32";
-const char welcome_line1[] PROGMEM = " Pololu";
-const char welcome_line2[] PROGMEM = "3\xf7 Robot"; // \xf7 is a greek
+const char welcome_test[] PROGMEM = ">g32>>c32";
+const char welcome_test_line1[] PROGMEM = " Pololu";
+const char welcome_test_line2[] PROGMEM = "3\xf7 Robot"; // \xf7 is a greek
 													// pi character
-const char demo_name_line1[] PROGMEM = "Test";
-const char demo_name_line2[] PROGMEM = "Program";
+const char test_name_line1[] PROGMEM = "Test";
+const char test_name_line2[] PROGMEM = "Program";
 
 const prog_char bars[] PROGMEM = {
 	0b00000,
@@ -36,7 +37,7 @@ const prog_char bars[] PROGMEM = {
 	0b11111
 };
 
-void print_two_lines_delay_1s(const char *line1, const char *line2)
+void print_two_lines_delay_1s_test(const char *line1, const char *line2)
 {
 	// Play welcome music and display a message
 	clear();
@@ -48,6 +49,14 @@ void print_two_lines_delay_1s(const char *line1, const char *line2)
 
 int main()
 {
+    // If button A is pressed, test the PD0/PD1 outputs
+	if(button_is_pressed(BUTTON_A))
+		test_outputs();
+
+	// If button C is not pressed down, go to the demo.
+	if(!button_is_pressed(BUTTON_C))
+		demo();
+
 	// Load bar graph characters.
 	// Together with space and the solid block at 255, this makes almost
 	// all possible bar heights, with two to spare.
@@ -63,9 +72,9 @@ int main()
 	if(test_pushbutton_tries())
 		goto pushbuttons;
 
-	play_from_program_space(welcome);
-	print_two_lines_delay_1s(welcome_line1,welcome_line2);
-	print_two_lines_delay_1s(demo_name_line1,demo_name_line2);
+	play_from_program_space(welcome_test);
+	print_two_lines_delay_1s_test(welcome_test_line1,welcome_test_line2);
+	print_two_lines_delay_1s_test(test_name_line1,test_name_line2);
 
 	clear();
 
@@ -73,7 +82,6 @@ int main()
 	test_qtr();
 	test_motors();
 	test_pot();
-	test_outputs();
 pushbuttons:
 	test_pushbuttons();
 

@@ -9,7 +9,7 @@ LDFLAGS=-Wl,-gc-sections -lpololu
 PORT=/dev/ttyUSB0
 AVRDUDE=avrdude
 TARGET=test
-OBJECT_FILES=test.o qtr.o assert.o motors.o pot.o battery.o pushbuttons.o outputs.o leds.o lcd.o
+OBJECT_FILES=test.o qtr.o assert.o motors.o pot.o battery.o pushbuttons.o outputs.o leds.o lcd.o demo.o
 
 all: $(TARGET).hex
 
