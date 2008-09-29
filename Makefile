@@ -6,7 +6,7 @@ ZIPDIR=lib_zipfiles
 SRC_ZIPFILE=$(ZIPDIR)/libpololu-avr-$(shell date +%y%m%d).src.zip
 BIN_ZIPFILE=$(ZIPDIR)/libpololu-avr-$(shell date +%y%m%d).zip
 HEX_ZIPFILE=$(ZIPDIR)/libpololu-avr-example-hex-files-$(shell date +%y%m%d).zip
-ARDUINO_ZIPFILE=$(ZIPDIR)/libpololu-arduino-$(shell date +%y%m%d).zip
+ARDUINO_ZIPFILE=$(ZIPDIR)/PololuArdunoLibraries-$(shell date +%y%m%d).zip
 ARDUINO_QTR_ZIPFILE=$(ZIPDIR)/PololuQTRSensors-$(shell date +%y%m%d).zip
 
 CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -DLIB_POLOLU -ffunction-sections -Os
