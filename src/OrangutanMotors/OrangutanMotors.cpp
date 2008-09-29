@@ -1,11 +1,14 @@
 /*
   OrangutanMotors.cpp - Library for using the motor drivers on the
       Orangutan LV-168, Baby Orangutan B-48/B-168, or 3pi robot.
+	  The timer2 overflow ISR is designed to work with Arduino 12
+	  and will not work properly with earlier versions of the Arduino
+	  environment.
 */
 
 /*
  * Written by Ben Schmidel, May 15, 2008.
- * Last modified: July 30, 2008
+ * Last modified: September 29, 2008
  * Copyright (c) 2008 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
@@ -33,23 +36,19 @@
 
 
 #ifndef LIB_POLOLU
-// declared in wiring.c and used to drive millis()
-extern volatile unsigned long timer0_overflow_count;
+// declared in wiring.c of Arduino-0012 and used to drive millis()
+extern volatile unsigned long timer0_millis;
+unsigned int us_times_10 = 0;		// in units of 10^-7 s
 
-// declaring this global as static means it won't conflict
-// with globals in other .cpp files that share the same name
-static unsigned char miniCount = 0;	// only used in timer2 overflow ISR
 
-// this ISR is called every time timer2 overflows.
-// it replaces the timer0 overflow ISR that drives millis()
-// so that millis() and delay() will still work
+// this ISR is called every time timer2 overflows
 ISR(TIMER2_OVF_vect)
 {
-	miniCount++;
-	if (miniCount == 8)
+	us_times_10 += 1024;
+	if (us_times_10 >= 10000)
 	{
-		timer0_overflow_count++;
-		miniCount = 0;
+		timer0_millis++;
+		us_times_10 -= 10000;
 	}
 }
 #endif

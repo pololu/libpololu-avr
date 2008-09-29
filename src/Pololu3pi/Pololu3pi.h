@@ -25,12 +25,7 @@
 #define Pololu3pi_h
 
 #ifndef LIB_POLOLU
-
-#ifdef Wiring_h
-#define ARDUINO
-#endif
-
-#ifndef ARDUINO
+#ifdef NOT_ARDUINO
 
 #include <pololu/OrangutanAnalog.h>
 #include <pololu/OrangutanBuzzer.h>
@@ -41,7 +36,6 @@
 #include <pololu/OrangutanTime.h>
 
 #endif
-
 #endif
 
 #define IR_EMITTERS_OFF 0
