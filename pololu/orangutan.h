@@ -7,3 +7,4 @@
 #include <pololu/pushbuttons.h>
 #include <pololu/qtr.h>
 #include <pololu/resources.h>
+#include <pololu/serial.h>

@@ -24,7 +24,8 @@ LIBRARY_OBJECT_FILES=\
 	src/Pololu3pi/Pololu3pi.o \
 	src/PololuQTRSensors/PololuQTRSensors.o \
 	src/OrangutanResources/OrangutanResources.o \
-	src/OrangutanTime/OrangutanTime.o
+	src/OrangutanTime/OrangutanTime.o \
+	src/OrangutanSerial/OrangutanSerial.o
 
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lpololu -lm
