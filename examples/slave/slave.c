@@ -45,5 +45,33 @@ int main()
     }
     else if(buffer[0] == (char)0x86)
       send_sensor_values();
+    else if(buffer[0] == (char)0xC1)
+    {
+      delay_ms(1);
+      // motor 1 forward - wait for a data byte
+      while(serial_get_received_bytes() < 2)
+      {
+	if((unsigned char)buffer[1] >= 0x80)
+	  continue; // bad data byte
+	set_m1_speed(buffer[1]*2);
+	lcd_goto_xy(0,0);
+	print_long(buffer[1]*2);
+	print("  ");
+      }
+    }
+    else if(buffer[0] == (char)0xC5)
+    {
+      delay_ms(1);
+      // motor 1 forward - wait for a data byte
+      while(serial_get_received_bytes() < 2)
+      {
+	if((unsigned char)buffer[1] >= 0x80)
+	  continue; // bad data byte
+	set_m2_speed(buffer[1]*2);
+	lcd_goto_xy(0,1);
+	print_long(buffer[1]*2);
+	print("  ");
+      }
+    }
   }
 }

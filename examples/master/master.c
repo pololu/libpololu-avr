@@ -125,6 +125,18 @@ int main()
     // wait
     wait_for_button(ALL_BUTTONS);
 
+    unsigned char speed1 = 0, speed2 = 0;
+
+      serial_send("\xC1\x00",2); // m1 forward at that speed
+      while(!serial_send_buffer_empty());
+
+      delay_ms(1000);
+
+      serial_send("\xC5\x10",1); // m2 forward at higher speed
+      while(!serial_send_buffer_empty());
+
+      while(1);
+
     // read sensors in a loop
     while(1)
     {
@@ -144,6 +156,34 @@ int main()
       // display readings
       display_levels((unsigned int*)buffer);
       
+      delay_ms(10);
+
+      // if button A is pressed, increase motor1 speed
+      if(button_is_pressed(BUTTON_A) && speed1 < 127)
+	speed1 ++;
+      else if(speed1 > 1)
+	speed1 -= 2;
+      else if(speed1 > 0)
+	speed1 = 0;
+
+      // if button C is pressed, control motor2
+      if(button_is_pressed(BUTTON_C) && speed2 < 127)
+	speed2 ++;
+      else if(speed2 > 1)
+	speed2 -= 2;
+      else if(speed2 > 0)
+	speed2 = 0;
+
+      // set the motor speeds
+      char message[4] = {0xC1, speed1, 0xC5, speed2};
+      serial_send(message,2); // m1 forward at that speed
+      while(!serial_send_buffer_empty());
+
+      delay_ms(10);
+
+      serial_send(message+2,2); // m1 forward at that speed
+      while(!serial_send_buffer_empty());
+
       delay_ms(10);
     }
   }
