@@ -1,50 +1,49 @@
-#include <pololu/orangutan.h>
+#include <pololu/3pi.h>
 
 /*
  */
 
+void send_sensor_values()
+{
+  char message[10];
+
+  // read 10 bytes directly into the message
+  read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
+
+  // send the message
+  serial_send(message, 10);
+
+  // wait for sending before returning
+  while(!serial_send_buffer_empty());
+}
+
 int main()
 {
   char buffer[20];
+  pololu_3pi_init(2000);  
 
   clear();
-  delay_ms(1000);
+  print("Slave");
 
   // configure serial clock for 115.2 kbaud
   serial_set_baud_rate(115200);
 
-  // read up to 20 characters
-  serial_receive(buffer, 20);
-
   while(1)
   {
-    if(button_is_pressed(BUTTON_A))
-    {
-      serial_send("Button A\n", 9);
-      wait_for_button_release(BUTTON_A);
-    }
-    if(button_is_pressed(BUTTON_B))
-    {
-      serial_send("Button B\n", 9);
-      wait_for_button_release(BUTTON_B);
-    }
-    if(button_is_pressed(BUTTON_C))
-    {
-      serial_send("Button C\n", 9);
-      wait_for_button_release(BUTTON_C);
-    }
-    
-    // display the message from the other side, if any
-    if(serial_receive_buffer_full() || buffer[serial_get_received_bytes()-1] == '\n')
-    {
-      buffer[serial_get_received_bytes()-1] = 0;
-      clear();
-      print(buffer);
+    // read up to 20 characters
+    serial_receive(buffer, 20);
 
-      // read up to 20 characters
-      serial_receive(buffer, 20);
+    // wait for a command
+    while(serial_get_received_bytes() == 0);
 
+    if(buffer[0] == (char)0x81)
+    {
+      green_led(1);
+      delay_ms(500);
+      green_led(0);
+      serial_send("3pi0.9", 6);
     }
-
+    else if(buffer[0] == (char)0x86)
+      send_sensor_values();
   }
 }

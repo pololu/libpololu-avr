@@ -1,0 +1,10 @@
+0x81: get signature - "3pi1.0"
+0x84: status
+      bit 0: UART error
+0xC1: set motor 1 forward
+0xC2: set motor 1 backward
+0xC5: set motor 2 forward
+0xC6: set motor 2 backward
+      (1 data byte: speed)
+
+0x86: read all five sensors
