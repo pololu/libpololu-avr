@@ -1,77 +1,225 @@
 #include <pololu/3pi.h>
+#include <avr/io.h>
 
 /*
  */
 
+void send_blocking(char *message, char bytes)
+{
+	serial_send(message, bytes);
+
+	// wait for sending before returning
+	while(!serial_send_buffer_empty());
+}
+
 void send_sensor_values()
 {
-  char message[10];
+	char message[10];
+	read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
+	send_blocking(message, 10);
+}
 
-  // read 10 bytes directly into the message
-  read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
+// sends the batter voltage in millivolts
+void send_battery_millivolts()
+{
+	int message[1];
+	message[0] = read_battery_millivolts();
+	send_blocking((char *)message, 2);
+}
 
-  // send the message
-  serial_send(message, 10);
+// a ring buffer for data coming in
+char buffer[100];
 
-  // wait for sending before returning
-  while(!serial_send_buffer_empty());
+// a pointer to where we are reading from
+unsigned char read_index = 0;
+
+// Waits for the next byte and returns it
+char read_next_byte()
+{
+	while(serial_get_received_bytes() == read_index);
+	char ret = buffer[read_index];
+	read_index ++;
+	if(read_index >= 100)
+		read_index = 0;
+	return ret;
+}
+
+// Backs up by one byte in the ring buffer
+void previous_byte()
+{
+	read_index --;
+	if(read_index == 255)
+		read_index = 99;
+}
+
+char is_command(char byte)
+{
+	if (byte < 0)
+		return 1;
+	return 0;
+}
+
+char is_data(char byte)
+{
+	if (byte < 0)
+		return 0;
+	return 1;
+}
+
+// If it's not a data byte, beeps, backs up one, and returns true.
+char check_data_byte(char byte)
+{
+	if(is_data(byte))
+		return 0;
+	
+	play("o3c");
+
+	clear();
+	print("Bad data");
+	lcd_goto_xy(0,1);
+	print_hex_byte(byte);
+
+	previous_byte();
+	return 1;
+}
+
+void m1_forward()
+{
+	char byte = read_next_byte();
+	
+	if(check_data_byte(byte))
+		return;
+
+	set_m1_speed(byte*2);
+}
+
+void m2_forward()
+{
+	char byte = read_next_byte();
+	
+	if(check_data_byte(byte))
+		return;
+
+	set_m2_speed(byte*2);
+}
+
+void m1_backward()
+{
+	char byte = read_next_byte();
+	
+	if(check_data_byte(byte))
+		return;
+
+	set_m1_speed(-byte*2);
+}
+
+void m2_backward()
+{
+	char byte = read_next_byte();
+	
+	if(check_data_byte(byte))
+		return;
+
+	set_m2_speed(-byte*2);
+}
+
+char music_buffer[100];
+
+void do_play()
+{
+	unsigned char tune_length = read_next_byte();
+
+	if(check_data_byte(tune_length))
+		return;
+
+	unsigned char i;
+	for(i=0;i<tune_length;i++)
+	{
+		if(i > sizeof(music_buffer)) // avoid overflow
+			return;
+
+		music_buffer[i] = read_next_byte();
+
+		if(check_data_byte(music_buffer[i]))
+			return;
+	}
+
+	green_led(1);
+
+	// add the end of string character 0
+	music_buffer[i] = 0;
+	
+	play(music_buffer);
 }
 
 int main()
 {
-  char buffer[20];
-  pololu_3pi_init(2000);  
+	pololu_3pi_init(2000);  
 
-  clear();
-  print("Slave");
+	clear();
+	print("Slave");
 
-  // configure serial clock for 115.2 kbaud
-  serial_set_baud_rate(115200);
+	// configure serial clock for 115.2 kbaud
+	serial_set_baud_rate(115200);
 
-  while(1)
-  {
-    // read up to 20 characters
-    serial_receive(buffer, 20);
+	// start receiving into the ring buffer
+	serial_receive_ring(buffer, 100);
 
-    // wait for a command
-    while(serial_get_received_bytes() == 0);
+	while(1)
+	{
+		// wait for a command
+		char command = read_next_byte();
+		switch(command)
+		{
+		case (char)0x00:
+			// slient error - probable master resetting
+			break;
 
-    if(buffer[0] == (char)0x81)
-    {
-      green_led(1);
-      delay_ms(500);
-      green_led(0);
-      serial_send("3pi0.9", 6);
-    }
-    else if(buffer[0] == (char)0x86)
-      send_sensor_values();
-    else if(buffer[0] == (char)0xC1)
-    {
-      delay_ms(1);
-      // motor 1 forward - wait for a data byte
-      while(serial_get_received_bytes() < 2)
-      {
-	if((unsigned char)buffer[1] >= 0x80)
-	  continue; // bad data byte
-	set_m1_speed(buffer[1]*2);
-	lcd_goto_xy(0,0);
-	print_long(buffer[1]*2);
-	print("  ");
-      }
-    }
-    else if(buffer[0] == (char)0xC5)
-    {
-      delay_ms(1);
-      // motor 1 forward - wait for a data byte
-      while(serial_get_received_bytes() < 2)
-      {
-	if((unsigned char)buffer[1] >= 0x80)
-	  continue; // bad data byte
-	set_m2_speed(buffer[1]*2);
-	lcd_goto_xy(0,1);
-	print_long(buffer[1]*2);
-	print("  ");
-      }
-    }
-  }
+		case (char)0x81:
+			send_blocking("3pi0.9", 6);
+			break;
+		case (char)0x86:
+			send_sensor_values();
+			break;
+
+		case (char)0xB0:
+			//send_trimpot();
+			break;
+		case (char)0xB1:
+			send_battery_millivolts();
+			break;
+		case (char)0xB3:
+			do_play();
+			break;
+
+		case (char)0xC1:
+			m1_forward();
+			break;
+		case (char)0xC2:
+			m1_backward();
+			break;
+		case (char)0xC5:
+			m2_forward();
+			break;
+		case (char)0xC6:
+			m1_backward();
+			break;
+
+		default:
+			clear();
+			print("Bad cmd");
+			lcd_goto_xy(0,1);
+			print_hex_byte(command);
+
+			play("o7l16crcrc");
+			continue; // bad command
+		}
+	}
 }
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

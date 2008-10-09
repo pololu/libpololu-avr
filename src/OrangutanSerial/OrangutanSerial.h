@@ -35,6 +35,15 @@ public:
 	// stored.
 	static void receive(char *buffer, unsigned char size);
 
+	// Sets up a ring buffer for background receive.
+	// Data will go into this buffer, and when size bytes have been
+	// stored, it will wrap around to the beginning, with
+	// getReceivedBytes reset to 0.
+	static void receiveRing(char *buffer, unsigned char size);
+
+	// Stops receiving serial bytes.
+	static void cancelReceive();
+
 	// Gets the number of bytes that have been received since
 	// receive() was called.
 	static inline unsigned char getReceivedBytes() { return receivedBytes; }
@@ -58,6 +67,7 @@ public:
 	static unsigned char receivedBytes;
 	static unsigned char sendSize;
 	static unsigned char receiveSize;
+	static unsigned char receiveRingOn; // boolean
 
 	static char *sendBuffer;
 	static char *receiveBuffer;

@@ -122,20 +122,16 @@ int main()
     buffer[6] = 0;
     print(buffer);
 
+    // play a tune
+    char tune[] = "\xB3 l16o6gab>c";
+    tune[1] = sizeof(tune)-3;
+    serial_send(tune,sizeof(tune)-1);
+    while(!serial_send_buffer_empty());
+
     // wait
     wait_for_button(ALL_BUTTONS);
 
     unsigned char speed1 = 0, speed2 = 0;
-
-      serial_send("\xC1\x00",2); // m1 forward at that speed
-      while(!serial_send_buffer_empty());
-
-      delay_ms(1000);
-
-      serial_send("\xC5\x10",1); // m2 forward at higher speed
-      while(!serial_send_buffer_empty());
-
-      while(1);
 
     // read sensors in a loop
     while(1)
@@ -147,14 +143,26 @@ int main()
 
       // wait 100 ms for a response
       time_reset();
-      while(!serial_receive_buffer_full() && get_ms() < 1000);
+      while(!serial_receive_buffer_full() && get_ms() < 100);
 
       // break out of sensor loop if we don't get a response
       if(!serial_receive_buffer_full())
 	break;
 
+      // get the battery voltage
+      serial_send("\xB1",1);
+      
+      // read 2 bytes
+      int battery_millivolts[1];
+      serial_receive((char *)battery_millivolts, 2);
+      time_reset();
+      while(!serial_receive_buffer_full() && get_ms() < 100);
+
       // display readings
       display_levels((unsigned int*)buffer);
+      lcd_goto_xy(0,1);
+      print_long(battery_millivolts[0]);
+      print(" mV  ");
       
       delay_ms(10);
 
@@ -176,15 +184,8 @@ int main()
 
       // set the motor speeds
       char message[4] = {0xC1, speed1, 0xC5, speed2};
-      serial_send(message,2); // m1 forward at that speed
+      serial_send(message,4); // m1 forward at that speed
       while(!serial_send_buffer_empty());
-
-      delay_ms(10);
-
-      serial_send(message+2,2); // m1 forward at that speed
-      while(!serial_send_buffer_empty());
-
-      delay_ms(10);
     }
   }
 

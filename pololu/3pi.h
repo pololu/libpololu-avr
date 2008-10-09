@@ -28,6 +28,7 @@
 #include <pololu/lcd.h>
 #include <pololu/leds.h>
 #include <pololu/pushbuttons.h>
+#include <pololu/serial.h>
 
 #define IR_EMITTERS_OFF 0
 #define IR_EMITTERS_ON 1

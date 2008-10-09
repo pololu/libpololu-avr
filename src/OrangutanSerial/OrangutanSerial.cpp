@@ -41,6 +41,16 @@ extern "C" void serial_receive(char *buffer, unsigned char size)
 	OrangutanSerial::receive(buffer, size);
 }
 
+extern "C" void serial_receive_ring(char *buffer, unsigned char size)
+{
+	OrangutanSerial::receiveRing(buffer, size);
+}
+
+extern "C" void serial_cancel_receive(char *buffer, unsigned char size)
+{
+	OrangutanSerial::cancelReceive();
+}
+
 extern "C" unsigned char serial_get_received_bytes()
 {
 	return OrangutanSerial::getReceivedBytes();
@@ -72,6 +82,7 @@ unsigned char OrangutanSerial::sentBytes;
 unsigned char OrangutanSerial::receivedBytes;
 unsigned char OrangutanSerial::sendSize;
 unsigned char OrangutanSerial::receiveSize;
+unsigned char OrangutanSerial::receiveRingOn;
 
 char *OrangutanSerial::sendBuffer;
 char *OrangutanSerial::receiveBuffer;
@@ -98,6 +109,18 @@ void OrangutanSerial::receive(char *buffer, unsigned char size)
 	receiveBuffer = buffer;
 	receivedBytes = 0;
 	receiveSize = size;
+	receiveRingOn = 0;
+}
+
+void OrangutanSerial::receiveRing(char *buffer, unsigned char size)
+{
+	receive(buffer,size);
+	receiveRingOn = 1;
+}
+
+void OrangutanSerial::cancelReceive()
+{
+	receive(0,0);
 }
 
 ISR(SIG_USART_RECV)
@@ -107,6 +130,9 @@ ISR(SIG_USART_RECV)
 		OrangutanSerial::receiveBuffer[OrangutanSerial::receivedBytes] = UDR0;
 		OrangutanSerial::receivedBytes++; // the byte has been received
 	}
+	if(OrangutanSerial::receivedBytes == OrangutanSerial::receiveSize &&
+	   OrangutanSerial::receiveRingOn)
+		OrangutanSerial::receivedBytes = 0; // reset the ring
 }
 
 void OrangutanSerial::send(char *buffer, unsigned char size)

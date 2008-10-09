@@ -8,3 +8,6 @@
       (1 data byte: speed)
 
 0x86: read all five sensors
+
+0xB1: send battery millivolts as int (2 bytes)
+

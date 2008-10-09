@@ -451,6 +451,7 @@ void initialize()
 	
 	play_from_program_space(welcome);
 	print_two_lines_delay_1s(welcome_line1,welcome_line2);
+	while(1);
 	print_two_lines_delay_1s(demo_name_line1,demo_name_line2);
 	print_two_lines_delay_1s(instructions_line1,instructions_line2);
 
