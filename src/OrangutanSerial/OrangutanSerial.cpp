@@ -66,6 +66,11 @@ extern "C" void serial_send(char *buffer, unsigned char size)
 	OrangutanSerial::send(buffer, size);
 }
 
+extern "C" void serial_send_blocking(char *buffer, unsigned char size)
+{
+	OrangutanSerial::sendBlocking(buffer, size);
+}
+
 extern "C" unsigned char serial_get_sent_bytes()
 {
 	return OrangutanSerial::getSentBytes();
@@ -78,8 +83,8 @@ extern "C" char serial_send_buffer_empty()
 
 #endif
 
-unsigned char OrangutanSerial::sentBytes;
-unsigned char OrangutanSerial::receivedBytes;
+volatile unsigned char OrangutanSerial::sentBytes;
+volatile unsigned char OrangutanSerial::receivedBytes;
 unsigned char OrangutanSerial::sendSize;
 unsigned char OrangutanSerial::receiveSize;
 unsigned char OrangutanSerial::receiveRingOn;
@@ -130,6 +135,12 @@ ISR(SIG_USART_RECV)
 		OrangutanSerial::receiveBuffer[OrangutanSerial::receivedBytes] = UDR0;
 		OrangutanSerial::receivedBytes++; // the byte has been received
 	}
+	else
+	{
+		char a = UDR0;
+		a++; // to avoid warnings
+		// the byte has been lost
+	}
 	if(OrangutanSerial::receivedBytes == OrangutanSerial::receiveSize &&
 	   OrangutanSerial::receiveRingOn)
 		OrangutanSerial::receivedBytes = 0; // reset the ring
@@ -143,6 +154,14 @@ void OrangutanSerial::send(char *buffer, unsigned char size)
 
 	// send the first byte; the rest will be started by the ISR
 	UDR0 = buffer[0];
+}
+
+void OrangutanSerial::sendBlocking(char *message, unsigned char size)
+{
+	OrangutanSerial::send(message, size);
+
+	// wait for sending before returning
+	while(!OrangutanSerial::sendBufferEmpty());
 }
 
 ISR(SIG_USART_TRANS)

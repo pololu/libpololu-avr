@@ -4,19 +4,11 @@
 /*
  */
 
-void send_blocking(char *message, char bytes)
-{
-	serial_send(message, bytes);
-
-	// wait for sending before returning
-	while(!serial_send_buffer_empty());
-}
-
 void send_sensor_values()
 {
 	char message[10];
 	read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
-	send_blocking(message, 10);
+	serial_send_blocking(message, 10);
 }
 
 // sends the batter voltage in millivolts
@@ -24,7 +16,7 @@ void send_battery_millivolts()
 {
 	int message[1];
 	message[0] = read_battery_millivolts();
-	send_blocking((char *)message, 2);
+	serial_send_blocking((char *)message, 2);
 }
 
 // a ring buffer for data coming in
@@ -176,7 +168,7 @@ int main()
 			break;
 
 		case (char)0x81:
-			send_blocking("3pi0.9", 6);
+			serial_send_blocking("3pi0.9", 6);
 			break;
 		case (char)0x86:
 			send_sensor_values();

@@ -53,18 +53,28 @@ public:
 
 	// Sets up a buffer for background transmit.
 	// Data from this buffer will be transmitted until size bytes have
-	// been sent.
+	// been sent.  If send() is called before sendBufferEmpty()
+	// returns true (when transmission of the last byte has started),
+	// the old buffer will be discarded and tramission will be cut
+	// short.  This means that you should almost always wait until the
+	// data has been sent before calling this function again.  See
+	// sendBlocking(), below, for an easy way to do this.
 	static void send(char *buffer, unsigned char size);
+
+	// Same as send(), but waits until transmission of the last byte
+	// has started to return.  When this function returns, it is safe
+	// to call send() or sendBlocking() again.
+	static void sendBlocking(char *buffer, unsigned char size);
 
 	// Gets the number of bytes that have been sent since send() was
 	// called.
 	static inline unsigned char getSentBytes() { return sentBytes; }
 
 	// True when the receive buffer is empty.
-	static inline char sendBufferEmpty() { return getSentBytes() == sendSize; }
+	static char sendBufferEmpty() { return sentBytes == sendSize; }
 
-	static unsigned char sentBytes;
-	static unsigned char receivedBytes;
+	volatile static unsigned char sentBytes;
+	volatile static unsigned char receivedBytes;
 	static unsigned char sendSize;
 	static unsigned char receiveSize;
 	static unsigned char receiveRingOn; // boolean
