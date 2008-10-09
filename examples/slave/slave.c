@@ -25,10 +25,12 @@ char buffer[100];
 // a pointer to where we are reading from
 unsigned char read_index = 0;
 
-// Waits for the next byte and returns it
+// Waits for the next byte and returns it.  Runs play_check to keep
+// the music playing.
 char read_next_byte()
 {
-	while(serial_get_received_bytes() == read_index);
+	while(serial_get_received_bytes() == read_index)
+		play_check();
 	char ret = buffer[read_index];
 	read_index ++;
 	if(read_index >= 100)
@@ -63,7 +65,7 @@ char check_data_byte(char byte)
 {
 	if(is_data(byte))
 		return 0;
-	
+
 	play("o3c");
 
 	clear();
@@ -147,6 +149,7 @@ void do_play()
 int main()
 {
 	pololu_3pi_init(2000);  
+	play_mode(PLAY_CHECK);
 
 	clear();
 	print("Slave");

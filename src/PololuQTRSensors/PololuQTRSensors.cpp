@@ -105,6 +105,11 @@ extern "C" int qtr_read_line_white(unsigned int *sensor_values, unsigned char re
 	return qtr->readLine(sensor_values, readMode, true);
 }
 
+extern "C" void qtr_reset_calibration()
+{
+	qtr->resetCalibration();
+}
+
 #else
 #include "wiring.h"		// provides access to delay() and delayMicroseconds()
 #endif
@@ -212,6 +217,22 @@ void PololuQTRSensors::emittersOn()
 	*_emitterPORT |= _emitterBitmask;
 }
 
+// Resets the calibration.
+void PololuQTRSensors::resetCalibration()
+{
+	unsigned char i;
+	for(i=0;i<_numSensors;i++)
+	{
+		if(calibratedMinimumOn)
+			calibratedMinimumOn[i] = _maxValue;
+		if(calibratedMinimumOff)
+			calibratedMinimumOff[i] = _maxValue;
+		if(calibratedMaximumOn)
+			calibratedMaximumOn[i] = 0;
+		if(calibratedMaximumOff)
+			calibratedMaximumOff[i] = 0;
+	}
+}
 
 // Reads the sensors 10 times and uses the results for
 // calibration.  The sensor values are not returned; instead, the

@@ -75,6 +75,9 @@ class PololuQTRSensors
 	// readCalibrated() method.
 	void calibrate(unsigned char readMode = QTR_EMITTERS_ON);
 
+	// Resets all calibration that has been done.
+	void resetCalibration();
+
 	// Returns values calibrated to a value between 0 and 1000, where
 	// 0 corresponds to the minimum value read by calibrate() and 1000
 	// corresponds to the maximum value.  Calibration values are
