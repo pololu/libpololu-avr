@@ -94,6 +94,12 @@ void slave_calibrate()
 	serial_receive_blocking((char *)tmp_buffer, 10, 100);
 }
 
+// reset calibration
+void slave_reset_calibration()
+{
+	serial_send_blocking("\xB5",1);
+}
+
 void display_levels(unsigned int *sensors)
 {
 	clear();
@@ -150,8 +156,11 @@ int main()
 		// wait
 		wait_for_button(ALL_BUTTONS);
 
-		time_reset();
+		// reset calibration
+		slave_reset_calibration();
 		
+		time_reset();
+
 		slave_set_motors(30, -30);
 		while(get_ms() < 250)
 			slave_calibrate();
@@ -174,6 +183,13 @@ int main()
 			if(serial_receive_blocking(buffer, 10, 100))
 				break;
 
+			// get the line position
+			serial_send("\xB6", 1);
+
+			int line_position[1];
+			if(serial_receive_blocking((char *)line_position, 2, 100))
+				break;
+
 			// get the battery voltage
 			serial_send("\xB1",1);
       
@@ -184,6 +200,14 @@ int main()
 
 			// display readings
 			display_levels((unsigned int*)buffer);
+
+			lcd_goto_xy(5,0);
+			line_position[0] /= 4;
+			if(line_position[0] == 1000)
+				line_position[0] = 999; // to keep it to 3 characters
+			print_long(line_position[0]);
+			print("   ");
+
 			lcd_goto_xy(0,1);
 			print_long(battery_millivolts[0]);
 			print(" mV  ");

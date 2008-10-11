@@ -24,6 +24,16 @@ void send_calibrated_sensor_values()
 	send_sensor_values(1);
 }
 
+void send_line_position()
+{
+	int message[1];
+	unsigned int tmp_sensors[5];
+	int line_position = read_line(tmp_sensors, IR_EMITTERS_ON);
+	message[0] = line_position;
+
+	serial_send_blocking((char *)message, 2);
+}
+
 // sends the batter voltage in millivolts
 void send_battery_millivolts()
 {
@@ -207,6 +217,9 @@ int main()
 			break;
 		case (char)0xB5:
 			line_sensors_reset_calibration();
+			break;
+		case (char)0xB6:
+			send_line_position();
 			break;
 
 		case (char)0xC1:
