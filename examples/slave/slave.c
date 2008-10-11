@@ -203,7 +203,7 @@ int main()
 			break;
 		case (char)0xB4:
 			calibrate_line_sensors(IR_EMITTERS_ON);
-			send_sensor_values(1);
+			send_calibrated_sensor_values(1);
 			break;
 		case (char)0xB5:
 			line_sensors_reset_calibration();
@@ -219,7 +219,7 @@ int main()
 			m2_forward();
 			break;
 		case (char)0xC6:
-			m1_backward();
+			m2_backward();
 			break;
 
 		default:

@@ -67,11 +67,31 @@ void load_custom_characters()
 // 10 levels of bar graph characters
 const char bar_graph_characters[10] = {' ',0,0,1,2,3,3,4,5,255};
 
-void slave_set_motors()
+// set the motor speeds
+void slave_set_motors(int speed1, int speed2)
 {
-	// set the motor speeds
 	char message[4] = {0xC1, speed1, 0xC5, speed2};
-	serial_send_blocking(message,4); // m1 forward at that speed
+	if(speed1 < 0)
+	{
+		message[0] = 0xC2; // m1 backward
+		message[1] = -speed1;
+	}
+	if(speed2 < 0)
+	{
+		message[2] = 0xC6; // m2 backward
+		message[3] = -speed2;
+	}
+	serial_send_blocking(message,4);
+}
+
+// do calibration
+void slave_calibrate()
+{
+	serial_send("\xB4",1);
+	int tmp_buffer[5];
+
+	// read 10 characters (but we won't use them)
+	serial_receive_blocking((char *)tmp_buffer, 10, 100);
 }
 
 void display_levels(unsigned int *sensors)
@@ -85,9 +105,9 @@ void display_levels(unsigned int *sensors)
 		// characters in the array.
 
 		// The variable c will have values from 0 to 9, since
-		// values are in the range of 0 to 2000, and 2000/201 is 9
+		// values are in the range of 0 to 1000, and 1000/101 is 9
 		// with integer math.
-		char c = bar_graph_characters[sensors[i]/201];
+		char c = bar_graph_characters[sensors[i]/101];
 
 		// Display the bar graph characters.
 		print_character(c);
@@ -130,20 +150,25 @@ int main()
 		// wait
 		wait_for_button(ALL_BUTTONS);
 
-		// calibrate
 		time_reset();
 		
+		slave_set_motors(30, -30);
 		while(get_ms() < 250)
-		{
-			
-		}
+			slave_calibrate();
+		slave_set_motors(-30, 30);
+		while(get_ms() < 750)
+			slave_calibrate();
+		slave_set_motors(30, -30);
+		while(get_ms() < 1000)
+			slave_calibrate();
+		slave_set_motors(0, 0);
 
 		unsigned char speed1 = 0, speed2 = 0;
 
 		// read sensors in a loop
 		while(1)
 		{
-			serial_send("\x86",1);
+			serial_send("\x87",1); // returns calibrated sensor values
       
 			// read 10 characters
 			if(serial_receive_blocking(buffer, 10, 100))
@@ -181,7 +206,7 @@ int main()
 			else if(speed2 > 0)
 				speed2 = 0;
 
-			remote_set_motors(speed1, speed2);
+			slave_set_motors(speed1, speed2);
 		}
 	}
 
