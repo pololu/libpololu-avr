@@ -63,6 +63,11 @@ extern "C" void calibrate_line_sensors(unsigned char readMode)
 	qtr3pi.calibrate(readMode);
 }
 
+extern "C" void line_sensors_reset_calibration(unsigned char readMode)
+{
+	qtr3pi.resetCalibration();
+}
+
 extern "C" void read_line_sensors_calibrated(unsigned int *sensor_values, unsigned char readMode)
 {
 	qtr3pi.readCalibrated(sensor_values, readMode);

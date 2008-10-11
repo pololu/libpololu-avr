@@ -25,6 +25,7 @@
 #endif
 
 #include "OrangutanSerial.h"
+#include "../OrangutanTime/OrangutanTime.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -39,6 +40,11 @@ extern "C" void serial_set_baud_rate(unsigned long baud)
 extern "C" void serial_receive(char *buffer, unsigned char size)
 {
 	OrangutanSerial::receive(buffer, size);
+}
+
+extern "C" char serial_receive_blocking(char *buffer, unsigned char size, unsigned int timeout_ms)
+{
+	return OrangutanSerial::receiveBlocking(buffer, size, timeout_ms);
 }
 
 extern "C" void serial_receive_ring(char *buffer, unsigned char size)
@@ -115,6 +121,18 @@ void OrangutanSerial::receive(char *buffer, unsigned char size)
 	receivedBytes = 0;
 	receiveSize = size;
 	receiveRingOn = 0;
+}
+
+char OrangutanSerial::receiveBlocking(char *buffer, unsigned char size, unsigned int timeout)
+{
+	receive(buffer, size);
+
+	unsigned long start_time = get_ms();
+	while(!serial_receive_buffer_full() && (get_ms()-start_time) < timeout);
+
+	if(!serial_receive_buffer_full())
+		return 1;
+	return 0;
 }
 
 void OrangutanSerial::receiveRing(char *buffer, unsigned char size)

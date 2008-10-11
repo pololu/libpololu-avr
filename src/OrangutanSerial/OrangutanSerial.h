@@ -35,6 +35,11 @@ public:
 	// stored.
 	static void receive(char *buffer, unsigned char size);
 
+	// Same as receive(), but waits until the buffer is full or the
+	// timeout has elapsed to return.  Returns true on timeout, false
+	// on buffer fill.
+	static char receiveBlocking(char *buffer, unsigned char size, unsigned int timeout_ms);
+
 	// Sets up a ring buffer for background receive.
 	// Data will go into this buffer, and when size bytes have been
 	// stored, it will wrap around to the beginning, with

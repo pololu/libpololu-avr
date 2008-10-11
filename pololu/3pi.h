@@ -39,6 +39,7 @@ void read_line_sensors(unsigned int *sensor_values, unsigned char readMode);
 void emitters_on();
 void emitters_off();
 void calibrate_line_sensors(unsigned char readMode);
+void line_sensors_reset_calibration();
 void read_line_sensors_calibrated(unsigned int *sensor_values, unsigned char readMode);
 unsigned int read_line(unsigned int *sensor_values, unsigned char readMode);
 unsigned int read_line_white(unsigned int *sensor_values, unsigned char readMode);

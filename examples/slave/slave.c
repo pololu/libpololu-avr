@@ -4,11 +4,24 @@
 /*
  */
 
-void send_sensor_values()
+void send_sensor_values(char calibrated)
 {
 	char message[10];
-	read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
+	if(calibrated)
+		read_line_sensors_calibrated((unsigned int *)message, IR_EMITTERS_ON);
+	else
+		read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
 	serial_send_blocking(message, 10);
+}
+
+void send_raw_sensor_values()
+{
+	send_sensor_values(0);
+}
+
+void send_calibrated_sensor_values()
+{
+	send_sensor_values(1);
 }
 
 // sends the batter voltage in millivolts
@@ -174,9 +187,11 @@ int main()
 			serial_send_blocking("3pi0.9", 6);
 			break;
 		case (char)0x86:
-			send_sensor_values();
+			send_raw_sensor_values();
 			break;
-
+		case (char)0x87:
+			send_calibrated_sensor_values(1);
+			break;
 		case (char)0xB0:
 			//send_trimpot();
 			break;
@@ -185,6 +200,13 @@ int main()
 			break;
 		case (char)0xB3:
 			do_play();
+			break;
+		case (char)0xB4:
+			calibrate_line_sensors(IR_EMITTERS_ON);
+			send_sensor_values(1);
+			break;
+		case (char)0xB5:
+			line_sensors_reset_calibration();
 			break;
 
 		case (char)0xC1:
@@ -206,7 +228,7 @@ int main()
 			lcd_goto_xy(0,1);
 			print_hex_byte(command);
 
-			play("o7l16crcrc");
+			play("o7l16crc");
 			continue; // bad command
 		}
 	}
