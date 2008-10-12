@@ -2,8 +2,23 @@
 #include <avr/io.h>
 
 /*
+ * 3pi-serial-slave - An example serial slave program for the Pololu
+ * 3pi Robot.  See README.txt for a complete description.
+ *
+ * http://www.pololu.com/docs/0J21
+ * http://www.pololu.com/docs/0J20
+ * http://www.poolu.com/
+ * 
  */
 
+// Sends the version of the slave code that is running.
+void send_signature()
+{
+	serial_send_blocking("3pi0.9", 6);
+}
+
+// Reads the line sensors and sends their values.  This function can
+// do either calibrated or uncalibrated readings.
 void send_sensor_values(char calibrated)
 {
 	char message[10];
@@ -14,16 +29,20 @@ void send_sensor_values(char calibrated)
 	serial_send_blocking(message, 10);
 }
 
+// Sends the raw (uncalibrated) sensor values.
 void send_raw_sensor_values()
 {
 	send_sensor_values(0);
 }
 
+// Sends the calibated sensor values.
 void send_calibrated_sensor_values()
 {
 	send_sensor_values(1);
 }
 
+// Computes the position of a black line using the read_line()
+// function, and sends the value.
 void send_line_position()
 {
 	int message[1];
@@ -34,7 +53,15 @@ void send_line_position()
 	serial_send_blocking((char *)message, 2);
 }
 
-// sends the batter voltage in millivolts
+// Sends the trimpot value, 0-1023.
+void send_trimpot()
+{
+	int message[1];
+	message[0] = read_trimpot();
+	serial_send_blocking((char *)message, 2);
+}
+
+// Sends the batter voltage in millivolts
 void send_battery_millivolts()
 {
 	int message[1];
@@ -42,10 +69,11 @@ void send_battery_millivolts()
 	serial_send_blocking((char *)message, 2);
 }
 
-// a ring buffer for data coming in
+// A global ring buffer for data coming in.  This is used by the
+// read_next_byte() and previous_byte() functions, below.
 char buffer[100];
 
-// a pointer to where we are reading from
+// A pointer to where we are reading from.
 unsigned char read_index = 0;
 
 // Waits for the next byte and returns it.  Runs play_check to keep
@@ -61,7 +89,7 @@ char read_next_byte()
 	return ret;
 }
 
-// Backs up by one byte in the ring buffer
+// Backs up by one byte in the ring buffer.
 void previous_byte()
 {
 	read_index --;
@@ -69,6 +97,7 @@ void previous_byte()
 		read_index = 99;
 }
 
+// Returns true if and only if the byte is a command byte (>= 0x80).
 char is_command(char byte)
 {
 	if (byte < 0)
@@ -76,6 +105,7 @@ char is_command(char byte)
 	return 0;
 }
 
+// Returns true if and only if the byte is a data byte (< 0x80).
 char is_data(char byte)
 {
 	if (byte < 0)
@@ -100,6 +130,7 @@ char check_data_byte(char byte)
 	return 1;
 }
 
+// Drives m1 forward.
 void m1_forward()
 {
 	char byte = read_next_byte();
@@ -107,9 +138,10 @@ void m1_forward()
 	if(check_data_byte(byte))
 		return;
 
-	set_m1_speed(byte*2);
+	set_m1_speed(byte == 127 ? 255 : byte*2);
 }
 
+// Drives m2 forward.
 void m2_forward()
 {
 	char byte = read_next_byte();
@@ -117,9 +149,10 @@ void m2_forward()
 	if(check_data_byte(byte))
 		return;
 
-	set_m2_speed(byte*2);
+	set_m2_speed(byte == 127 ? 255 : byte*2);
 }
 
+// Drives m1 backward.
 void m1_backward()
 {
 	char byte = read_next_byte();
@@ -127,9 +160,10 @@ void m1_backward()
 	if(check_data_byte(byte))
 		return;
 
-	set_m1_speed(-byte*2);
+	set_m1_speed(byte == 127 ? -255 : -byte*2);
 }
 
+// Drives m2 backward.
 void m2_backward()
 {
 	char byte = read_next_byte();
@@ -137,11 +171,13 @@ void m2_backward()
 	if(check_data_byte(byte))
 		return;
 
-	set_m2_speed(-byte*2);
+	set_m2_speed(byte == 127 ? -255 : -byte*2);
 }
 
+// A buffer to store the music that will play in the background.
 char music_buffer[100];
 
+// Plays a musical sequence.
 void do_play()
 {
 	unsigned char tune_length = read_next_byte();
@@ -187,6 +223,10 @@ int main()
 	{
 		// wait for a command
 		char command = read_next_byte();
+
+		// The list of commands is below: add your own simply by
+		// choosing a command byte and introducing another case
+		// statement.
 		switch(command)
 		{
 		case (char)0x00:
@@ -194,7 +234,7 @@ int main()
 			break;
 
 		case (char)0x81:
-			serial_send_blocking("3pi0.9", 6);
+			send_signature();
 			break;
 		case (char)0x86:
 			send_raw_sensor_values();
@@ -203,7 +243,7 @@ int main()
 			send_calibrated_sensor_values(1);
 			break;
 		case (char)0xB0:
-			//send_trimpot();
+			send_trimpot();
 			break;
 		case (char)0xB1:
 			send_battery_millivolts();
