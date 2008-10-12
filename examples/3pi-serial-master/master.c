@@ -1,6 +1,12 @@
 #include <pololu/orangutan.h>
 
 /*
+ * 3pi-serial-slave - An example serial master program for the Pololu
+ * 3pi Robot.  See README.txt for a complete description.
+ *
+ * http://www.pololu.com/docs/0J21
+ * http://www.pololu.com/docs/0J20
+ * http://www.poolu.com/
  */
 
 // Data for generating the characters used in load_custom_characters
