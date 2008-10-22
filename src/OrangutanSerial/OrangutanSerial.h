@@ -20,15 +20,30 @@
  * to be responsible for all resulting costs and damages.
  */
 
+#define SERIAL_AUTOMATIC 0
+#define SERIAL_CHECK 1
+
 class OrangutanSerial
 {
 public:
 
-    // Constructor (doesn't do anything).
+	// Constructor (doesn't do anything).
 	OrangutanSerial();
 	
 	// Sets the serial library to a given baudrate.
 	static void setBaudRate(unsigned long baud);
+
+	// Sets the serial library to use either a polling scheme
+	// (SERIAL_CHECK) or interrupts (SERIAL_AUTOMATIC; the default)
+	// for sending and receiving serial data.  If the mode is set to
+	// SERIAL_CHECK, the function serialCheck() must be called
+	// periodically to trigger reception and transmission of new
+	// bytes.
+	static void setMode(unsigned char mode);
+
+	// This function should be called periodically when in
+	// SERIAL_CHECK mode.
+	static void check();
 
 	// Sets up a buffer for background receive.
 	// Data will go into this buffer until size bytes have been
@@ -75,7 +90,7 @@ public:
 	// called.
 	static inline unsigned char getSentBytes() { return sentBytes; }
 
-	// True when the send buffer is empty.
+	// True when the receive buffer is empty.
 	static char sendBufferEmpty() { return sentBytes == sendSize; }
 
 	volatile static unsigned char sentBytes;
@@ -89,6 +104,7 @@ public:
 
 private:
 	static void init();
+	static unsigned char mode;
 };
 
 

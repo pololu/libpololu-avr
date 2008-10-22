@@ -32,6 +32,16 @@
 
 #ifdef LIB_POLOLU
 
+extern "C" void serial_set_mode(unsigned char mode)
+{
+	OrangutanSerial::setMode(mode);
+}
+
+extern "C" void serial_check()
+{
+	OrangutanSerial::check();
+}
+
 extern "C" void serial_set_baud_rate(unsigned long baud)
 {
 	OrangutanSerial::setBaudRate(baud);
@@ -98,10 +108,42 @@ unsigned char OrangutanSerial::receiveRingOn;
 char *OrangutanSerial::sendBuffer;
 char *OrangutanSerial::receiveBuffer;
 
+// Inner function to be called by the ISR and by serial_check
+inline void serial_rx()
+{
+	// It's important to read the byte out of the register, or else
+	// the interrupt will be called again right after it executes.
+	char a = UDR0;
+	if(OrangutanSerial::receiveBuffer && OrangutanSerial::receivedBytes < OrangutanSerial::receiveSize)
+	{
+		OrangutanSerial::receiveBuffer[OrangutanSerial::receivedBytes] = a;
+		OrangutanSerial::receivedBytes++; // the byte has been received
+	}
+	if(OrangutanSerial::receivedBytes == OrangutanSerial::receiveSize &&
+	   OrangutanSerial::receiveRingOn)
+		OrangutanSerial::receivedBytes = 0; // reset the ring
+}
+
+// Inner function to be called by the ISR and by serial_check
+inline void serial_tx()
+{
+	OrangutanSerial::sentBytes ++; // we started sending a byte
+
+	if(OrangutanSerial::sendBuffer && OrangutanSerial::sentBytes < OrangutanSerial::sendSize)
+	{
+		UDR0 = OrangutanSerial::sendBuffer[OrangutanSerial::sentBytes];
+	}
+}
+
 void OrangutanSerial::init()
 {
-	// Enable receiver and transmitter, and interrupts
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0)|(1<<TXCIE0);
+	// Enable receiver and transmitter
+	UCSR0B = (1<<RXEN0)|(1<<TXEN0);
+
+	// Enable interrupts if desired
+	if(mode == SERIAL_AUTOMATIC)
+		UCSR0B |= (1<<RXCIE0)|(1<<TXCIE0);
+
 	sei();
 }
 
@@ -113,6 +155,20 @@ void OrangutanSerial::setBaudRate(unsigned long baud)
 
 	UBRR0H = ubbr0 >> 8;
 	UBRR0L = (unsigned char)ubbr0;
+}
+
+void OrangutanSerial::setMode(unsigned char m)
+{
+	mode = m;
+	init(); // reset the interrupt status
+}
+
+void OrangutanSerial::check()
+{
+	if(UCSR0A & (1<<UDRE0)) // a byte has been sent
+		serial_tx();
+	if(UCSR0A & (1<<RXC0)) // a byte has been received
+		serial_rx();
 }
 
 void OrangutanSerial::receive(char *buffer, unsigned char size)
@@ -146,22 +202,9 @@ void OrangutanSerial::cancelReceive()
 	receive(0,0);
 }
 
-ISR(SIG_USART_RECV)
+ISR(USART_RX_vect)
 {
-	if(OrangutanSerial::receiveBuffer && OrangutanSerial::receivedBytes < OrangutanSerial::receiveSize)
-	{
-		OrangutanSerial::receiveBuffer[OrangutanSerial::receivedBytes] = UDR0;
-		OrangutanSerial::receivedBytes++; // the byte has been received
-	}
-	else
-	{
-		char a = UDR0;
-		a++; // to avoid warnings
-		// the byte has been lost
-	}
-	if(OrangutanSerial::receivedBytes == OrangutanSerial::receiveSize &&
-	   OrangutanSerial::receiveRingOn)
-		OrangutanSerial::receivedBytes = 0; // reset the ring
+	serial_rx();
 }
 
 void OrangutanSerial::send(char *buffer, unsigned char size)
@@ -182,14 +225,9 @@ void OrangutanSerial::sendBlocking(char *message, unsigned char size)
 	while(!OrangutanSerial::sendBufferEmpty());
 }
 
-ISR(SIG_USART_TRANS)
+ISR(USART_UDRE_vect)
 {
-	OrangutanSerial::sentBytes ++; // we finished sending a byte
-
-	if(OrangutanSerial::sendBuffer && OrangutanSerial::sentBytes < OrangutanSerial::sendSize)
-	{
-		UDR0 = OrangutanSerial::sendBuffer[OrangutanSerial::sentBytes];
-	}
+	serial_tx();
 }
 
 // Local Variables: **
