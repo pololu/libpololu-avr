@@ -52,7 +52,7 @@ extern "C" void serial_receive_ring(char *buffer, unsigned char size)
 	OrangutanSerial::receiveRing(buffer, size);
 }
 
-extern "C" void serial_cancel_receive(char *buffer, unsigned char size)
+extern "C" void serial_cancel_receive()
 {
 	OrangutanSerial::cancelReceive();
 }

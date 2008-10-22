@@ -75,7 +75,7 @@ public:
 	// called.
 	static inline unsigned char getSentBytes() { return sentBytes; }
 
-	// True when the receive buffer is empty.
+	// True when the send buffer is empty.
 	static char sendBufferEmpty() { return sentBytes == sendSize; }
 
 	volatile static unsigned char sentBytes;
