@@ -154,11 +154,10 @@ int main()
 		lcd_goto_xy(0,1);
 		buffer[6] = 0;
 		print(buffer);
-		
+
 		// play a tune
-		char tune[] = "\xB3 "; //l16o6gab>c";
-		//		tune[1] = sizeof(tune)-3;
-		tune[1] = 1;
+		char tune[] = "\xB3 l16o6gab>c";
+		tune[1] = sizeof(tune)-3;
 		serial_send_blocking(tune,sizeof(tune)-1);
 
 		// wait
@@ -210,9 +209,9 @@ int main()
 			display_levels((unsigned int*)buffer);
 
 			lcd_goto_xy(5,0);
-			line_position[0] /= 4;
+			line_position[0] /= 4; // to get it into the range of 0-1000
 			if(line_position[0] == 1000)
-				line_position[0] = 999; // to keep it to 3 characters
+				line_position[0] = 999; // to keep it to a maximum of 3 characters 
 			print_long(line_position[0]);
 			print("   ");
 

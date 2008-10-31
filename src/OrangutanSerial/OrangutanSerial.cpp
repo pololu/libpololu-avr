@@ -139,18 +139,14 @@ inline void serial_update_tx_interrupt()
 // Inner function to be called by the ISR and by serial_check
 inline void serial_tx()
 {
-	OrangutanSerial::sentBytes ++; // we started sending a byte
-
 	if(OrangutanSerial::sendBuffer && OrangutanSerial::sentBytes < OrangutanSerial::sendSize)
 	{
 		UDR0 = OrangutanSerial::sendBuffer[OrangutanSerial::sentBytes];
-	}
-	else
-	{
-		// this disables the interrupt, so we won't be called repeatedly
-		serial_update_tx_interrupt();
+		OrangutanSerial::sentBytes ++; // we started sending a byte
 	}
 
+	// this disables the interrupt when we're done, so we won't be called repeatedly
+	serial_update_tx_interrupt();
 }
 
 void OrangutanSerial::init()
@@ -185,9 +181,10 @@ void OrangutanSerial::setMode(unsigned char m)
 void OrangutanSerial::check()
 {
 	cli();
-	if(UCSR0A & (1<<UDRE0)) // a byte has been sent
+	// check if a byte has been sent, and there is more to send
+	if(OrangutanSerial::sendBuffer && OrangutanSerial::sentBytes < OrangutanSerial::sendSize && UCSR0A & (1<<UDRE0))
 		serial_tx();
-	if(UCSR0A & (1<<RXC0)) // a byte has been received
+	if(OrangutanSerial::receiveBuffer && OrangutanSerial::receivedBytes < OrangutanSerial::receiveSize && UCSR0A & (1<<RXC0)) // a byte has been received
 		serial_rx();
 	sei();
 }
