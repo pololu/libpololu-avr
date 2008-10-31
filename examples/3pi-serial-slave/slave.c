@@ -1,5 +1,4 @@
 #include <pololu/3pi.h>
-#include <avr/io.h>
 
 /*
  * 3pi-serial-slave - An example serial slave program for the Pololu
