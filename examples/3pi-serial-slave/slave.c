@@ -10,64 +10,6 @@
  * 
  */
 
-// Sends the version of the slave code that is running.
-void send_signature()
-{
-	serial_send_blocking("3pi0.9", 6);
-}
-
-// Reads the line sensors and sends their values.  This function can
-// do either calibrated or uncalibrated readings.
-void send_sensor_values(char calibrated)
-{
-	char message[10];
-	if(calibrated)
-		read_line_sensors_calibrated((unsigned int *)message, IR_EMITTERS_ON);
-	else
-		read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
-	serial_send_blocking(message, 10);
-}
-
-// Sends the raw (uncalibrated) sensor values.
-void send_raw_sensor_values()
-{
-	send_sensor_values(0);
-}
-
-// Sends the calibated sensor values.
-void send_calibrated_sensor_values()
-{
-	send_sensor_values(1);
-}
-
-// Computes the position of a black line using the read_line()
-// function, and sends the value.
-void send_line_position()
-{
-	int message[1];
-	unsigned int tmp_sensors[5];
-	int line_position = read_line(tmp_sensors, IR_EMITTERS_ON);
-	message[0] = line_position;
-
-	serial_send_blocking((char *)message, 2);
-}
-
-// Sends the trimpot value, 0-1023.
-void send_trimpot()
-{
-	int message[1];
-	message[0] = read_trimpot();
-	serial_send_blocking((char *)message, 2);
-}
-
-// Sends the batter voltage in millivolts
-void send_battery_millivolts()
-{
-	int message[1];
-	message[0] = read_battery_millivolts();
-	serial_send_blocking((char *)message, 2);
-}
-
 // A global ring buffer for data coming in.  This is used by the
 // read_next_byte() and previous_byte() functions, below.
 char buffer[100];
@@ -130,6 +72,71 @@ char check_data_byte(char byte)
 
 	previous_byte();
 	return 1;
+}
+
+/////////////////////////////////////////////////////////////////////
+// COMMAND FUNCTIONS
+//
+// Each function in this section corresponds to a single serial
+// command.  The functions are expected to do their own argument
+// handling using read_next_byte() and check_data_byte().
+
+// Sends the version of the slave code that is running.
+void send_signature()
+{
+	serial_send_blocking("3pi0.9", 6);
+}
+
+// Reads the line sensors and sends their values.  This function can
+// do either calibrated or uncalibrated readings.
+void send_sensor_values(char calibrated)
+{
+	char message[10];
+	if(calibrated)
+		read_line_sensors_calibrated((unsigned int *)message, IR_EMITTERS_ON);
+	else
+		read_line_sensors((unsigned int *)message, IR_EMITTERS_ON);
+	serial_send_blocking(message, 10);
+}
+
+// Sends the raw (uncalibrated) sensor values.
+void send_raw_sensor_values()
+{
+	send_sensor_values(0);
+}
+
+// Sends the calibated sensor values.
+void send_calibrated_sensor_values()
+{
+	send_sensor_values(1);
+}
+
+// Computes the position of a black line using the read_line()
+// function, and sends the value.
+void send_line_position()
+{
+	int message[1];
+	unsigned int tmp_sensors[5];
+	int line_position = read_line(tmp_sensors, IR_EMITTERS_ON);
+	message[0] = line_position;
+
+	serial_send_blocking((char *)message, 2);
+}
+
+// Sends the trimpot value, 0-1023.
+void send_trimpot()
+{
+	int message[1];
+	message[0] = read_trimpot();
+	serial_send_blocking((char *)message, 2);
+}
+
+// Sends the batter voltage in millivolts
+void send_battery_millivolts()
+{
+	int message[1];
+	message[0] = read_battery_millivolts();
+	serial_send_blocking((char *)message, 2);
 }
 
 // Drives m1 forward.
@@ -206,6 +213,8 @@ void do_play()
 	
 	play(music_buffer);
 }
+
+/////////////////////////////////////////////////////////////////////
 
 int main()
 {

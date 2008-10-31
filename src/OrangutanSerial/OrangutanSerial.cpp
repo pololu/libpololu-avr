@@ -168,8 +168,7 @@ void OrangutanSerial::setBaudRate(unsigned long baud)
 
 	unsigned int ubbr0 = F_CPU/(16*baud);
 
-	UBRR0H = ubbr0 >> 8;
-	UBRR0L = (unsigned char)ubbr0;
+	UBRR0 = ubbr0;
 }
 
 void OrangutanSerial::setMode(unsigned char m)
