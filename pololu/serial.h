@@ -12,3 +12,5 @@ void serial_send_blocking(char *buffer, unsigned char size);
 unsigned char serial_get_sent_bytes();
 char serial_send_buffer_empty();
 
+#define SERIAL_AUTOMATIC 0
+#define SERIAL_CHECK 1

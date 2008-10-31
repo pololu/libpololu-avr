@@ -41,6 +41,9 @@ public:
 	// bytes.
 	static void setMode(unsigned char mode);
 
+	// Returns the current serial mode
+	static inline unsigned char getMode() { return mode; }
+
 	// This function should be called periodically when in
 	// SERIAL_CHECK mode.
 	static void check();

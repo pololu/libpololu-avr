@@ -143,22 +143,22 @@ int main()
 	{
 		clear();
 		print("Master");
-
+		delay_ms(100);
 		serial_send("\x81",1);
 
-		// read up to 20 characters
-		if(serial_receive_blocking(buffer, 6, 100))
+		if(serial_receive_blocking(buffer, 6, 1000))
 			continue;
-
+		
 		clear();
 		print("Connect");
 		lcd_goto_xy(0,1);
 		buffer[6] = 0;
 		print(buffer);
-
+		
 		// play a tune
-		char tune[] = "\xB3 l16o6gab>c";
-		tune[1] = sizeof(tune)-3;
+		char tune[] = "\xB3 "; //l16o6gab>c";
+		//		tune[1] = sizeof(tune)-3;
+		tune[1] = 1;
 		serial_send_blocking(tune,sizeof(tune)-1);
 
 		// wait

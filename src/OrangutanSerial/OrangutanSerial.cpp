@@ -108,6 +108,8 @@ unsigned char OrangutanSerial::receiveRingOn;
 char *OrangutanSerial::sendBuffer;
 char *OrangutanSerial::receiveBuffer;
 
+unsigned char OrangutanSerial::mode = SERIAL_AUTOMATIC;
+
 // Inner function to be called by the ISR and by serial_check
 inline void serial_rx()
 {
@@ -124,6 +126,16 @@ inline void serial_rx()
 		OrangutanSerial::receivedBytes = 0; // reset the ring
 }
 
+// Enable the UDRE-empty interrupt if there is data to be sent and we
+// are requesting interrupts.  Otherwise, disable it.
+inline void serial_update_tx_interrupt()
+{
+	if(OrangutanSerial::sendBuffer && OrangutanSerial::sentBytes < OrangutanSerial::sendSize && OrangutanSerial::getMode())
+		UCSR0B |= (1<<UDRIE0);
+	else
+		UCSR0B &= ~(1<<UDRIE0);
+}
+
 // Inner function to be called by the ISR and by serial_check
 inline void serial_tx()
 {
@@ -133,6 +145,12 @@ inline void serial_tx()
 	{
 		UDR0 = OrangutanSerial::sendBuffer[OrangutanSerial::sentBytes];
 	}
+	else
+	{
+		// this disables the interrupt, so we won't be called repeatedly
+		serial_update_tx_interrupt();
+	}
+
 }
 
 void OrangutanSerial::init()
@@ -142,7 +160,8 @@ void OrangutanSerial::init()
 
 	// Enable interrupts if desired
 	if(mode == SERIAL_AUTOMATIC)
-		UCSR0B |= (1<<RXCIE0)|(1<<TXCIE0);
+		UCSR0B |= (1<<RXCIE0);
+	serial_update_tx_interrupt();
 
 	sei();
 }
@@ -165,10 +184,12 @@ void OrangutanSerial::setMode(unsigned char m)
 
 void OrangutanSerial::check()
 {
+	cli();
 	if(UCSR0A & (1<<UDRE0)) // a byte has been sent
 		serial_tx();
 	if(UCSR0A & (1<<RXC0)) // a byte has been received
 		serial_rx();
+	sei();
 }
 
 void OrangutanSerial::receive(char *buffer, unsigned char size)
@@ -184,7 +205,8 @@ char OrangutanSerial::receiveBlocking(char *buffer, unsigned char size, unsigned
 	receive(buffer, size);
 
 	unsigned long start_time = get_ms();
-	while(!serial_receive_buffer_full() && (get_ms()-start_time) < timeout);
+	while(!serial_receive_buffer_full() && (get_ms()-start_time) < timeout)
+	  OrangutanSerial::check();
 
 	if(!serial_receive_buffer_full())
 		return 1;
@@ -213,8 +235,9 @@ void OrangutanSerial::send(char *buffer, unsigned char size)
 	sentBytes = 0;
 	sendSize = size;
 
-	// send the first byte; the rest will be started by the ISR
-	UDR0 = buffer[0];
+	// enable the interrupts, and everything will be started by the
+	// ISR
+	serial_update_tx_interrupt();
 }
 
 void OrangutanSerial::sendBlocking(char *message, unsigned char size)
@@ -222,7 +245,8 @@ void OrangutanSerial::sendBlocking(char *message, unsigned char size)
 	OrangutanSerial::send(message, size);
 
 	// wait for sending before returning
-	while(!OrangutanSerial::sendBufferEmpty());
+	while(!OrangutanSerial::sendBufferEmpty())
+	  OrangutanSerial::check();
 }
 
 ISR(USART_UDRE_vect)

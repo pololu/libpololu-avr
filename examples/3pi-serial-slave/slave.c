@@ -77,11 +77,14 @@ char buffer[100];
 unsigned char read_index = 0;
 
 // Waits for the next byte and returns it.  Runs play_check to keep
-// the music playing.
+// the music playing and serial_check to keep receiving bytes.
 char read_next_byte()
 {
 	while(serial_get_received_bytes() == read_index)
+	{
+		serial_check();
 		play_check();
+	}
 	char ret = buffer[read_index];
 	read_index ++;
 	if(read_index >= 100)
@@ -208,13 +211,16 @@ void do_play()
 int main()
 {
 	pololu_3pi_init(2000);  
-	play_mode(PLAY_CHECK);
+	//	play_mode(PLAY_CHECK);
 
 	clear();
 	print("Slave");
 
 	// configure serial clock for 115.2 kbaud
 	serial_set_baud_rate(115200);
+
+	// set the mode to SERIAL_CHECK
+	serial_set_mode(SERIAL_CHECK);
 
 	// start receiving into the ring buffer
 	serial_receive_ring(buffer, 100);
