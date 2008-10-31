@@ -211,7 +211,7 @@ void do_play()
 int main()
 {
 	pololu_3pi_init(2000);  
-	//	play_mode(PLAY_CHECK);
+	play_mode(PLAY_CHECK);
 
 	clear();
 	print("Slave");
