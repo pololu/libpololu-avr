@@ -84,7 +84,7 @@ char check_data_byte(char byte)
 // Sends the version of the slave code that is running.
 void send_signature()
 {
-	serial_send_blocking("3pi0.9", 6);
+	serial_send_blocking("3pi1.0", 6);
 }
 
 // Reads the line sensors and sends their values.  This function can
@@ -206,12 +206,41 @@ void do_play()
 			return;
 	}
 
-	green_led(1);
-
 	// add the end of string character 0
 	music_buffer[i] = 0;
 	
 	play(music_buffer);
+}
+
+// Clears the LCD
+void do_clear()
+{
+	clear();
+}
+
+// Displays data to the screen
+void do_print()
+{
+	unsigned char string_length = read_next_byte();
+	
+	if(check_data_byte(string_length))
+		return;
+
+	unsigned char i;
+	for(i=0;i<string_length;i++)
+	{
+		unsigned char character;
+		character = read_next_byte();
+
+		if(check_data_byte(character))
+			return;
+
+		// Before printing to the LCD we need to go to AUTOMATIC mode.
+		// Otherwise, we might miss characters during the lengthy LCD routines.
+		serial_set_mode(SERIAL_AUTOMATIC);
+ 		print_character(character);
+		serial_set_mode(SERIAL_CHECK);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -274,6 +303,12 @@ int main()
 			break;
 		case (char)0xB6:
 			send_line_position();
+			break;
+		case (char)0xB7:
+			do_clear();
+			break;
+		case (char)0xB8:
+			do_print();
 			break;
 
 		case (char)0xC1:

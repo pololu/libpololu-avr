@@ -155,6 +155,12 @@ int main()
 		buffer[6] = 0;
 		print(buffer);
 
+		// clear the slave's LCD and display "Connect"
+		serial_send_blocking("\xB7",1);
+		char string[] = "\xB8 Connect";
+		string[1] = sizeof(string)-3;
+		serial_send_blocking(string, sizeof(string)-1);
+
 		// play a tune
 		char tune[] = "\xB3 l16o6gab>c";
 		tune[1] = sizeof(tune)-3;
