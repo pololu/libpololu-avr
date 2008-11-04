@@ -108,6 +108,31 @@ void slave_reset_calibration()
 	serial_send_blocking("\xB5",1);
 }
 
+// calibrate (waits for a 1-byte response to indicate completion)
+void slave_auto_calibrate()
+{
+	int tmp_buffer[1];
+	serial_send_blocking("\xB9",1);
+	serial_receive_blocking((char *)tmp_buffer, 1, 10000);
+}
+
+// sets up the pid constants on the 3pi for line following
+void slave_set_pid(char max_speed, char p_num, char p_den, char d_num, char d_den)
+{
+	serial_send_blocking("\xBA", 1);
+	serial_send_blocking(&max_speed, 1);
+	serial_send_blocking(&p_num, 1);
+	serial_send_blocking(&p_den, 1);
+	serial_send_blocking(&d_num, 1);
+	serial_send_blocking(&d_den, 1);
+}
+
+// stops the pid line following
+void slave_stop_pid()
+{
+	serial_send_blocking("\xBB", 1);
+}
+
 void display_levels(unsigned int *sensors)
 {
 	clear();
@@ -146,7 +171,7 @@ int main()
 		delay_ms(100);
 		serial_send("\x81",1);
 
-		if(serial_receive_blocking(buffer, 6, 1000))
+		if(serial_receive_blocking(buffer, 6, 50))
 			continue;
 		
 		clear();
@@ -174,34 +199,25 @@ int main()
 		
 		time_reset();
 
-		slave_set_motors(30, -30);
-		while(get_ms() < 250)
-			slave_calibrate();
-		slave_set_motors(-30, 30);
-		while(get_ms() < 750)
-			slave_calibrate();
-		slave_set_motors(30, -30);
-		while(get_ms() < 1000)
-			slave_calibrate();
-		slave_set_motors(0, 0);
+		slave_auto_calibrate();
 
 		unsigned char speed1 = 0, speed2 = 0;
 
 		// read sensors in a loop
 		while(1)
 		{
-			serial_send("\x87",1); // returns calibrated sensor values
+			//serial_send("\x87",1); // returns calibrated sensor values
       
 			// read 10 characters
-			if(serial_receive_blocking(buffer, 10, 100))
-				break;
+			//if(serial_receive_blocking(buffer, 10, 100))
+			//	break;
 
 			// get the line position
-			serial_send("\xB6", 1);
+			//serial_send("\xB6", 1);
 
 			int line_position[1];
-			if(serial_receive_blocking((char *)line_position, 2, 100))
-				break;
+			//if(serial_receive_blocking((char *)line_position, 2, 100))
+			//	break;
 
 			// get the battery voltage
 			serial_send("\xB1",1);
@@ -243,7 +259,14 @@ int main()
 			else if(speed2 > 0)
 				speed2 = 0;
 
-			slave_set_motors(speed1, speed2);
+			// if button B is pressed, do PID control
+			if(button_is_pressed(BUTTON_B))
+				slave_set_pid(40, 1, 20, 3, 2);
+			else
+			{
+				slave_stop_pid();
+				slave_set_motors(speed1, speed2);
+			}
 		}
 	}
 
