@@ -320,6 +320,20 @@ void do_print()
 	}
 }
 
+// Goes to the x,y coordinates on the lcd specified by the two data bytes
+void do_lcd_goto_xy()
+{
+	unsigned char x = read_next_byte();
+	if(check_data_byte(x))
+		return;
+
+	unsigned char y = read_next_byte();
+	if(check_data_byte(y))
+		return;
+
+	lcd_goto_xy(x,y);
+}
+
 // Runs through an automatic calibration sequence
 void auto_calibrate()
 {
@@ -434,12 +448,15 @@ int main()
 			do_print();
 			break;
 		case (char)0xB9:
-			auto_calibrate();
+			do_lcd_goto_xy();
 			break;
 		case (char)0xBA:
-			set_pid();
+			auto_calibrate();
 			break;
 		case (char)0xBB:
+			set_pid();
+			break;
+		case (char)0xBC:
 			stop_pid();
 			break;
 

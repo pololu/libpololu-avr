@@ -1,4 +1,5 @@
 #include <pololu/orangutan.h>
+#include <string.h>
 
 /*
  * 3pi-serial-master - An example serial master program for the Pololu
@@ -49,6 +50,26 @@ void load_custom_characters()
 // 10 levels of bar graph characters
 const char bar_graph_characters[10] = {' ',0,0,1,2,3,3,4,5,255};
 
+void display_levels(unsigned int *sensors)
+{
+	clear();
+	int i;
+	for(i=0;i<5;i++) {
+		// Initialize the array of characters that we will use for the
+		// graph.  Using the space, an extra copy of the one-bar
+		// character, and character 255 (a full black box), we get 10
+		// characters in the array.
+
+		// The variable c will have values from 0 to 9, since
+		// values are in the range of 0 to 1000, and 1000/101 is 9
+		// with integer math.
+		char c = bar_graph_characters[sensors[i]/101];
+
+		// Display the bar graph characters.
+		print_character(c);
+	}
+}
+
 // set the motor speeds
 void slave_set_motors(int speed1, int speed2)
 {
@@ -86,14 +107,14 @@ void slave_reset_calibration()
 void slave_auto_calibrate()
 {
 	int tmp_buffer[1];
-	serial_send_blocking("\xB9",1);
+	serial_send_blocking("\xBA",1);
 	serial_receive_blocking((char *)tmp_buffer, 1, 10000);
 }
 
 // sets up the pid constants on the 3pi for line following
 void slave_set_pid(char max_speed, char p_num, char p_den, char d_num, char d_den)
 {
-	char string[6] = "\xBA";
+	char string[6] = "\xBB";
 	string[1] = max_speed;
 	string[2] = p_num;
 	string[3] = p_den;
@@ -105,27 +126,30 @@ void slave_set_pid(char max_speed, char p_num, char p_den, char d_num, char d_de
 // stops the pid line following
 void slave_stop_pid()
 {
-	serial_send_blocking("\xBB", 1);
+	serial_send_blocking("\xBC", 1);
 }
 
-void display_levels(unsigned int *sensors)
+// clear the slave LCD
+void slave_clear()
 {
-	clear();
-	int i;
-	for(i=0;i<5;i++) {
-		// Initialize the array of characters that we will use for the
-		// graph.  Using the space, an extra copy of the one-bar
-		// character, and character 255 (a full black box), we get 10
-		// characters in the array.
+	serial_send_blocking("\xB7",1);
+}
 
-		// The variable c will have values from 0 to 9, since
-		// values are in the range of 0 to 1000, and 1000/101 is 9
-		// with integer math.
-		char c = bar_graph_characters[sensors[i]/101];
+// print to the slave LCD
+void slave_print(char *string)
+{
+	serial_send_blocking("\xB8", 1);
+	char length = strlen(string);
+	serial_send_blocking(&length, 1); // send the string length
+	serial_send_blocking(string, length);
+}
 
-		// Display the bar graph characters.
-		print_character(c);
-	}
+// go to coordinates x,y on the slave LCD
+void slave_lcd_goto_xy(char x, char y)
+{
+	serial_send_blocking("\xB9",1);
+	serial_send_blocking(&x,1);
+	serial_send_blocking(&y,1);
 }
 
 int main()
@@ -155,11 +179,12 @@ int main()
 		buffer[6] = 0;
 		print(buffer);
 
-		// clear the slave's LCD and display "Connect"
-		serial_send_blocking("\xB7",1);
-		char string[] = "\xB8 Connect";
-		string[1] = sizeof(string)-3;
-		serial_send_blocking(string, sizeof(string)-1);
+		// clear the slave's LCD and display "Connect" and "OK" on two lines
+		// Put OK in the center to test x-y positioning
+		slave_clear();
+		slave_print("Connect");
+		slave_lcd_goto_xy(3,1);
+		slave_print("OK");
 
 		// play a tune
 		char tune[] = "\xB3 l16o6gab>c";
