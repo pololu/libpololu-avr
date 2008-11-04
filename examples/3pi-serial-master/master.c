@@ -32,30 +32,6 @@ const char levels[] PROGMEM = {
 	0b11111
 };
 
-// This character is a musical note.
-const prog_char note[] PROGMEM = {
-	0b00100,
-	0b00110,
-	0b00101,
-	0b00101,
-	0b00100,
-	0b11100,
-	0b11100,
-	0b00000,
-};
-
-// This character is a back arrow.
-const prog_char back_arrow[] PROGMEM = {
-	0b00000,
-	0b00010,
-	0b00001,
-	0b00101,
-	0b01001,
-	0b11110,
-	0b01000,
-	0b00100,
-};
-
 // This function loads custom characters into the LCD.  Up to 8
 // characters can be loaded; we use them for 6 levels of a bar graph
 // plus a back arrow and a musical note character.
@@ -67,8 +43,6 @@ void load_custom_characters()
 	lcd_load_custom_character(levels+4,3); // skip level 3
 	lcd_load_custom_character(levels+5,4);
 	lcd_load_custom_character(levels+6,5);
-	lcd_load_custom_character(back_arrow,6);
-	lcd_load_custom_character(note,7);
 	clear(); // the LCD must be cleared for the characters to take effect
 }
 
@@ -268,7 +242,6 @@ int main()
 				slave_stop_pid();
 				slave_set_motors(speed1, speed2);
 			}
-			delay_ms(100);
 		}
 	}
 

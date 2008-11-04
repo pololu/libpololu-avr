@@ -31,13 +31,11 @@ void pid_check()
 	{
 		set_motors(0,0);
 		return;
-	}
+	}	
 
+	// Read the line position, with serial interrupts running in the background.
 	serial_set_mode(SERIAL_AUTOMATIC);
-
-	// Read the line position.
 	unsigned int position = read_line(sensors, IR_EMITTERS_ON);
-
 	serial_set_mode(SERIAL_CHECK);
 
 	// The "proportional" term should be 0 when we are on the line.
@@ -382,13 +380,9 @@ int main()
 	clear();
 	print("Slave");
 
-	// configure serial clock for 115.2 kbaud
+	// start receiving data at 115.2 kbaud
 	serial_set_baud_rate(115200);
-
-	// set the mode to SERIAL_CHECK
 	serial_set_mode(SERIAL_CHECK);
-
-	// start receiving into the ring buffer
 	serial_receive_ring(buffer, 100);
 
 	while(1)
