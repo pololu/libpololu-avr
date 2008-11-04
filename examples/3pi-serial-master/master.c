@@ -119,12 +119,13 @@ void slave_auto_calibrate()
 // sets up the pid constants on the 3pi for line following
 void slave_set_pid(char max_speed, char p_num, char p_den, char d_num, char d_den)
 {
-	serial_send_blocking("\xBA", 1);
-	serial_send_blocking(&max_speed, 1);
-	serial_send_blocking(&p_num, 1);
-	serial_send_blocking(&p_den, 1);
-	serial_send_blocking(&d_num, 1);
-	serial_send_blocking(&d_den, 1);
+	char string[6] = "\xBA" "abcde";
+	/*	string[1] = max_speed;
+	string[2] = p_num;
+	string[3] = p_den;
+	string[4] = d_num;
+	string[5] = d_den;*/
+	serial_send_blocking(string,6);
 }
 
 // stops the pid line following
@@ -220,12 +221,12 @@ int main()
 			//	break;
 
 			// get the battery voltage
-			serial_send("\xB1",1);
+			//			serial_send("\xB1",1);
       
 			// read 2 bytes
 			int battery_millivolts[1];
-			if(serial_receive_blocking((char *)battery_millivolts, 2, 100))
-				break;
+			//			if(serial_receive_blocking((char *)battery_millivolts, 2, 100))
+			//				break;
 
 			// display readings
 			display_levels((unsigned int*)buffer);

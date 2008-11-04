@@ -185,12 +185,14 @@ void send_calibrated_sensor_values()
 // Returns the last value computed if PID is running.
 void send_line_position()
 {
-	if(pid_enabled)
-		return last_proportional+2000;
-
 	int message[1];
 	unsigned int tmp_sensors[5];
-	int line_position = read_line(tmp_sensors, IR_EMITTERS_ON);
+	int line_position;
+
+	if(pid_enabled)
+		line_position = last_proportional+2000;
+	else line_position = read_line(tmp_sensors, IR_EMITTERS_ON);
+
 	message[0] = line_position;
 
 	serial_send_blocking((char *)message, 2);
@@ -342,8 +344,13 @@ void set_pid()
 	for(i=0;i<5;i++)
 	{
 		constants[i] = read_next_byte();
-		if(check_data_byte(constants[i]))
-			return;
+		clear();
+		print_long(constants[i]);
+		lcd_goto_xy(0,1);
+		print_long(i);
+		delay_ms(500);
+		//		if(check_data_byte(constants[i]))
+		//			return;
 	}
 
 	// make the max speed 2x of the first one, so that it can reach 255
