@@ -119,12 +119,12 @@ void slave_auto_calibrate()
 // sets up the pid constants on the 3pi for line following
 void slave_set_pid(char max_speed, char p_num, char p_den, char d_num, char d_den)
 {
-	char string[6] = "\xBA" "abcde";
-	/*	string[1] = max_speed;
+	char string[6] = "\xBA";
+	string[1] = max_speed;
 	string[2] = p_num;
 	string[3] = p_den;
 	string[4] = d_num;
-	string[5] = d_den;*/
+	string[5] = d_den;
 	serial_send_blocking(string,6);
 }
 
@@ -207,26 +207,26 @@ int main()
 		// read sensors in a loop
 		while(1)
 		{
-			//serial_send("\x87",1); // returns calibrated sensor values
+			serial_send("\x87",1); // returns calibrated sensor values
       
 			// read 10 characters
-			//if(serial_receive_blocking(buffer, 10, 100))
-			//	break;
+			if(serial_receive_blocking(buffer, 10, 100))
+				break;
 
 			// get the line position
-			//serial_send("\xB6", 1);
+			serial_send("\xB6", 1);
 
 			int line_position[1];
-			//if(serial_receive_blocking((char *)line_position, 2, 100))
-			//	break;
+			if(serial_receive_blocking((char *)line_position, 2, 100))
+				break;
 
 			// get the battery voltage
-			//			serial_send("\xB1",1);
+						serial_send("\xB1",1);
       
 			// read 2 bytes
 			int battery_millivolts[1];
-			//			if(serial_receive_blocking((char *)battery_millivolts, 2, 100))
-			//				break;
+			if(serial_receive_blocking((char *)battery_millivolts, 2, 100))
+				break;
 
 			// display readings
 			display_levels((unsigned int*)buffer);
@@ -268,6 +268,7 @@ int main()
 				slave_stop_pid();
 				slave_set_motors(speed1, speed2);
 			}
+			delay_ms(100);
 		}
 	}
 

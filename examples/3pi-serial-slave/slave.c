@@ -33,8 +33,12 @@ void pid_check()
 		return;
 	}
 
+	serial_set_mode(SERIAL_AUTOMATIC);
+
 	// Read the line position.
 	unsigned int position = read_line(sensors, IR_EMITTERS_ON);
+
+	serial_set_mode(SERIAL_CHECK);
 
 	// The "proportional" term should be 0 when we are on the line.
 	int proportional = ((int)position) - 2000;
@@ -344,13 +348,8 @@ void set_pid()
 	for(i=0;i<5;i++)
 	{
 		constants[i] = read_next_byte();
-		clear();
-		print_long(constants[i]);
-		lcd_goto_xy(0,1);
-		print_long(i);
-		delay_ms(500);
-		//		if(check_data_byte(constants[i]))
-		//			return;
+		if(check_data_byte(constants[i]))
+			return;
 	}
 
 	// make the max speed 2x of the first one, so that it can reach 255
