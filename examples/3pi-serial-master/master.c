@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * 3pi-serial-slave - An example serial master program for the Pololu
+ * 3pi-serial-master - An example serial master program for the Pololu
  * 3pi Robot.  This can run on any board supported by the library;
  * it is intended as an example of how to use the master/slave
  * routines.  See README.txt for a complete description.
