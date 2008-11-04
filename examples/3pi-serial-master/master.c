@@ -4,7 +4,7 @@
  * 3pi-serial-master - An example serial master program for the Pololu
  * 3pi Robot.  This can run on any board supported by the library;
  * it is intended as an example of how to use the master/slave
- * routines.  See README.txt for a complete description.
+ * routines.
  *
  * http://www.pololu.com/docs/0J21
  * http://www.pololu.com/docs/0J20

@@ -2,7 +2,7 @@
 
 /*
  * 3pi-serial-slave - An example serial slave program for the Pololu
- * 3pi Robot.  See README.txt for a complete description.
+ * 3pi Robot.  See the following pages for more information:
  *
  * http://www.pololu.com/docs/0J21
  * http://www.pololu.com/docs/0J20
