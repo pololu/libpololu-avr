@@ -130,7 +130,7 @@ inline void serial_rx()
 // are requesting interrupts.  Otherwise, disable it.
 inline void serial_update_tx_interrupt()
 {
-	if(OrangutanSerial::sendBuffer && OrangutanSerial::sentBytes < OrangutanSerial::sendSize && OrangutanSerial::getMode())
+	if(OrangutanSerial::sendBuffer && OrangutanSerial::sentBytes < OrangutanSerial::sendSize && OrangutanSerial::getMode() == SERIAL_AUTOMATIC)
 		UCSR0B |= (1<<UDRIE0);
 	else
 		UCSR0B &= ~(1<<UDRIE0);

@@ -52,7 +52,7 @@ install: libpololu.a
 
 ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map \*/test/\* \*/ArduinoReadMe.txt
 
-ARDUINO_EXCLUDES=libpololu-arduino/OrangutanTime/\*
+ARDUINO_EXCLUDES=libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSerial/\*
 
 zip: libpololu.a hex-files
 	mkdir -p $(ZIPDIR)

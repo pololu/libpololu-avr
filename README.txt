@@ -30,7 +30,7 @@ Additionally, this library supports:
 
 * Pololu QTR-1A and QTR-8A reflectance sensors for use with analog inputs
 * Pololu QTR-1RC and QTR-8RC reflectance sensors for use with digital inputs
-* The Pololu 3pi Robot, a complete robot kit to be released in August 2008
+* The Pololu 3pi Robot, a complete robot kit based on the Orangutan line
 
 
 == Prerequisites ==
