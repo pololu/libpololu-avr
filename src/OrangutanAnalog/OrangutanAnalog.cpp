@@ -161,8 +161,12 @@ void OrangutanAnalog::startConversion(unsigned char channel)
 // take a single analog reading of the specified channel
 unsigned int OrangutanAnalog::read(unsigned char channel)
 {
+	unsigned char tempDDRC = DDRC;	// store current I/O state of ADC pin
+	unsigned char tempPORTC = PORTC;
 	startConversion(channel);
 	while (isConverting());	// wait for conversion to finish
+	PORTC = tempPORTC;			// restore I/O state of the pin
+	DDRC = tempDDRC;
 	return conversionResult();
 }
 
@@ -173,7 +177,9 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 {
 	unsigned int i = samples;
 	unsigned long sum = 0;
-	
+	unsigned char tempDDRC = DDRC;	// store current I/O state of ADC pin
+	unsigned char tempPORTC = PORTC;
+
 	startConversion(channel);	// call this first to set the channel
 	do
 	{
@@ -182,6 +188,9 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 		sum += conversionResult();	// sum the results
 	} while (--i);
 	
+	PORTC = tempPORTC;			// restore I/O state of the pin
+	DDRC = tempDDRC;
+
 	if (samples < 64)			// can do the division much faster
 		return ((unsigned int)sum + (samples >> 1)) / (unsigned char)samples;
 	return (sum + (samples >> 1)) / samples;	// compute the rounded avg
