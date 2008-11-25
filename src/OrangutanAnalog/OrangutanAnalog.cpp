@@ -138,8 +138,14 @@ inline unsigned int OrangutanAnalog::conversionResult()
 // conversion on a channel with startConversion(channel), and then
 // poll isConverting in your main loop.  Once isConverting() returns
 // a zero, the result can be obtained through a call to conversionResult().
+// Note: this function will set the pin corresponding to the specified
+// channel as an input with the internal pull-up disabled.
 void OrangutanAnalog::startConversion(unsigned char channel)
 {
+	if (channel > 7)
+		return;
+	PORTC &= ~(1 << channel);	// turn off any pull-ups
+	DDRC &= ~(1 << channel);	// set I/O line to be an input
 	ADCSRA = 0x87;		// bit 7 set: ADC enabled
 						// bit 6 clear: don't start conversion
 						// bit 5 clear: disable autotrigger
