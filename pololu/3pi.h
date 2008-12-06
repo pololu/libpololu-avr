@@ -43,3 +43,8 @@ void line_sensors_reset_calibration();
 void read_line_sensors_calibrated(unsigned int *sensor_values, unsigned char readMode);
 unsigned int read_line(unsigned int *sensor_values, unsigned char readMode);
 unsigned int read_line_white(unsigned int *sensor_values, unsigned char readMode);
+
+unsigned int *get_line_sensors_calibrated_minimum_on();
+unsigned int *get_line_sensors_calibrated_maximum_on();
+unsigned int *get_line_sensors_calibrated_minimum_off();
+unsigned int *get_line_sensors_calibrated_maximum_off();

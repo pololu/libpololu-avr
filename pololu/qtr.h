@@ -14,3 +14,8 @@ void qtr_reset_calibration();
 void qtr_read_calibrated(unsigned int *sensor_values, unsigned char readMode);
 unsigned int qtr_read_line(unsigned int *sensor_values, unsigned char readMode);
 unsigned int qtr_read_line_white(unsigned int *sensor_values, unsigned char readMode);
+
+unsigned int *get_calibrated_minimum_on();
+unsigned int *get_calibrated_maximum_on();
+unsigned int *get_calibrated_minimum_off();
+unsigned int *get_calibrated_maximum_off();

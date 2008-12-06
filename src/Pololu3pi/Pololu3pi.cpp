@@ -83,6 +83,26 @@ extern "C" unsigned int read_line_white(unsigned int *sensor_values, unsigned ch
 	return qtr3pi.readLine(sensor_values, readMode, 1);
 }
 
+extern "C" unsigned int *get_line_sensors_calibrated_minimum_on()
+{
+	return qtr3pi.calibratedMinimumOn;
+}
+
+extern "C" unsigned int *get_line_sensors_calibrated_maximum_on()
+{
+	return qtr3pi.calibratedMaximumOn;
+}
+
+extern "C" unsigned int *get_line_sensors_calibrated_minimum_off()
+{
+	return qtr3pi.calibratedMinimumOff;
+}
+
+extern "C" unsigned int *get_line_sensors_calibrated_maximum_off()
+{
+	return qtr3pi.calibratedMaximumOff;
+}
+
 #endif
 
 void Pololu3pi::init(unsigned int line_sensor_timeout_us)
