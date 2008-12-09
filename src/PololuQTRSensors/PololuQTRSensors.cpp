@@ -110,22 +110,22 @@ extern "C" void qtr_reset_calibration()
 	qtr->resetCalibration();
 }
 
-extern "C" unsigned int *get_calibrated_minimum_on()
+extern "C" unsigned int *qtr_calibrated_minimum_on()
 {
 	return qtr->calibratedMinimumOn;
 }
 
-extern "C" unsigned int *get_calibrated_maximum_on()
+extern "C" unsigned int *qtr_calibrated_maximum_on()
 {
 	return qtr->calibratedMaximumOn;
 }
 
-extern "C" unsigned int *get_calibrated_minimum_off()
+extern "C" unsigned int *qtr_calibrated_minimum_off()
 {
 	return qtr->calibratedMinimumOff;
 }
 
-extern "C" unsigned int *get_calibrated_maximum_off()
+extern "C" unsigned int *qtr_calibrated_maximum_off()
 {
 	return qtr->calibratedMaximumOff;
 }
