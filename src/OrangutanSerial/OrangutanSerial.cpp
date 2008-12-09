@@ -166,7 +166,7 @@ void OrangutanSerial::setBaudRate(unsigned long baud)
 {
 	init();
 
-	unsigned int ubbr0 = F_CPU/(16*baud);
+	unsigned int ubbr0 = F_CPU/(16*baud) - 1;
 
 	UBRR0 = ubbr0;
 }
