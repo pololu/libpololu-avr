@@ -67,6 +67,11 @@ public:
 	void calibrateLineSensors(unsigned char readMode = IR_EMITTERS_ON);
 	void readLineSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode = IR_EMITTERS_ON);
 	unsigned int readLine(unsigned int *sensor_values, unsigned char readMode = IR_EMITTERS_ON, unsigned char white_line = 0);
+
+	unsigned int *getLineSensorsCalibratedMinimumOn();
+	unsigned int *getLineSensorsCalibratedMaximumOn();
+	unsigned int *getLineSensorsCalibratedMinimumOff();
+	unsigned int *getLineSensorsCalibratedMaximumOff();
 };
 
 #endif

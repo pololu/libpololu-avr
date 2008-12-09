@@ -149,6 +149,28 @@ unsigned int Pololu3pi::readLine(unsigned int *sensor_values, unsigned char read
 	return qtr3pi.readLine(sensor_values, readMode, white_line);
 }
 
+unsigned int *Pololu3pi::getLineSensorsCalibratedMinimumOn()
+{
+	return qtr3pi.calibratedMinimumOn;
+}
+
+unsigned int *Pololu3pi::getLineSensorsCalibratedMaximumOn()
+{
+	return qtr3pi.calibratedMaximumOn;
+}
+
+unsigned int *Pololu3pi::getLineSensorsCalibratedMinimumOff()
+{
+	return qtr3pi.calibratedMinimumOff;
+}
+
+unsigned int *Pololu3pi::getLineSensorsCalibratedMaximumOff()
+{
+	return qtr3pi.calibratedMaximumOff;
+}
+
+
+
 // Local Variables: **
 // mode: C++ **
 // c-basic-offset: 4 **
