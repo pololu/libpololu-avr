@@ -20,25 +20,54 @@ unsigned long prevMillis = 0;
 
 int main()
 {
+  int last_proportional=0;
+
+  red_led(1);
+  delay_ms(500);
+  red_led(0);
+  delay_ms(500);
+  red_led(1);
+  delay_ms(500);
+  red_led(0);
+  delay_ms(500);
+
+  int up = 327;
+  int integral = 0;
+
+  long loopcount = 0;
+
   while(1)
   {
-    // note that the following line could also be accomplished with:
-    // int pot = analogRead(7);
-    int pot = read_trimpot();    // determine the trimpot position
-    int motorSpeed = pot/2-256;  // turn pot reading into number between -256 and 255
-	if(motorSpeed == -256)
-		motorSpeed = -255; // 256 is out of range
+    set_analog_mode(MODE_10_BIT);
+    int proportional = - (int)analog_read_average(5,200) + up; // determine the proportional reading
+
+    integral += proportional;
+    if(integral > 200)
+      integral = 200;
+    if(integral < -200)
+      integral = -200;
+
+    int derivative = proportional - last_proportional;
+    last_proportional = proportional;
+
+    int motorSpeed;
+    motorSpeed = 6*proportional + 10 * derivative + integral;
+
+    if(proportional > 100)
+      motorSpeed = 0;
+
+    if(motorSpeed < -255)
+      motorSpeed = -255; // 256 is out of range
+    if(motorSpeed > 255)
+      motorSpeed = 255; // 256 is out of range
     set_motors(motorSpeed, motorSpeed);
-  
-    int ledDelay = motorSpeed;
-	if(ledDelay < 0)
-	  ledDelay = -ledDelay;  // make the delay a non-negative number
-	ledDelay = 256-ledDelay; // the delay should be short when the speed is high
 
-    red_led(1);       // turn red LED on
-    delay_ms(ledDelay);
+    loopcount ++;
 
-    red_led(0);       // turn red LED off
-	delay_ms(ledDelay);
+    if(proportional > 0)
+      red_led(1);
+    else
+      red_led(0);
+
   }
 }
