@@ -42,16 +42,16 @@ int main()
     int proportional = - (int)analog_read_average(5,200) + up; // determine the proportional reading
 
     integral += proportional;
-    if(integral > 200)
-      integral = 200;
-    if(integral < -200)
-      integral = -200;
+    if(integral > 300)
+      integral = 300;
+    if(integral < -300)
+      integral = -300;
 
     int derivative = proportional - last_proportional;
     last_proportional = proportional;
 
     int motorSpeed;
-    motorSpeed = 6*proportional + 10 * derivative + integral;
+    motorSpeed = 4*proportional + 12 * derivative + integral;
 
     if(proportional > 100)
       motorSpeed = 0;
