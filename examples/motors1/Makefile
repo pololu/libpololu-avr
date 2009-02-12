@@ -1,4 +1,4 @@
-CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega48 -Os
+CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -Os
 CC=/usr/bin/avr-gcc
 OBJ2HEX=/usr/bin/avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -lpololu
@@ -22,4 +22,4 @@ test.o: test.c
 	$(CC) $(CFLAGS) $(OBJECT_FILES) $(LDFLAGS) -o $@
 
 program: $(TARGET).hex
-	$(AVRDUDE) -p m48 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
+	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
