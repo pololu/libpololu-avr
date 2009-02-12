@@ -51,7 +51,7 @@ int main()
     last_proportional = proportional;
 
     int motorSpeed;
-    motorSpeed = 4*proportional + 12 * derivative + integral;
+    motorSpeed = 4*proportional + 12 * derivative + integral + 20;
 
     if(proportional > 100)
       motorSpeed = 0;
