@@ -561,7 +561,7 @@ void PololuQTRSensorsRC::init(unsigned char* pins,
 void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 {
 	unsigned char i;
-	unsigned char start_time;
+	unsigned char last_time;
 	unsigned char delta_time;
 	unsigned int time = 0;
 
@@ -601,16 +601,15 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	TCCR2B = 0x02;		// run timer2 in normal mode at 2.5 MHz
 						// this is compatible with OrangutanMotors
 
-
-	start_time = TCNT2;
+	last_time = TCNT2;
 	while (time < _maxValue)
 	{
 		// Keep track of the total time.
-		// This explicitly casts the difference to unsigned char, so
+		// This implicitly casts the difference to unsigned char, so
 		// we don't add negative values.
-		delta_time = TCNT2 - start_time;
+		delta_time = TCNT2 - last_time;
 		time += delta_time;
-		start_time += delta_time;
+		last_time += delta_time;
 
 		// continue immediately if there is no change
 		if (PINB == last_b && PINC == last_c && PIND == last_d)
