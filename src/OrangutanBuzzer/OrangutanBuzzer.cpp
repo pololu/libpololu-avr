@@ -34,6 +34,8 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "OrangutanBuzzer.h"
+#include "atmega328p_pins.h"
+
 
 #define TIMER1_OFF					0x00	// timer1 disconnected
 #define TIMER1_CLK_1				0x01	// 20 MHz

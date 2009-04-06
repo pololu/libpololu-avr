@@ -25,6 +25,7 @@
 
 #include <avr/io.h>
 #include "OrangutanAnalog.h"
+#include "atmega328p_pins.h"
 
 
 #ifdef LIB_POLOLU

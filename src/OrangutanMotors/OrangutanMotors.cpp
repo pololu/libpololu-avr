@@ -33,7 +33,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include "OrangutanMotors.h"
-
+#include "atmega328p_pins.h"
 
 #ifndef LIB_POLOLU
 // declared in wiring.c of Arduino-0012 and used to drive millis()

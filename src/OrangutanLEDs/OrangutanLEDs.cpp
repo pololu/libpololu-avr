@@ -24,6 +24,8 @@
  
 #include <avr/io.h>
 #include "OrangutanLEDs.h"
+#include "atmega328p_pins.h"
+
 
 #define RED_LED		PD1
 #define GREEN_LED	PD7

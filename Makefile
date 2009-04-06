@@ -1,4 +1,4 @@
-devices = atmega48 atmega168 # atmega328
+devices = atmega48 atmega168 atmega328
 
 all:
 	$(foreach device,$(devices),$(MAKE) -C devices/$(device); )

@@ -1,2 +1,2 @@
-DEVICE = atmega328
+DEVICE = atmega328p
 include ../template.mk
