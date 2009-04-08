@@ -66,7 +66,7 @@ class OrangutanAnalog
 	// is on ADC channel 6.
 	static int readTemperatureF();
 	static int readTemperatureC();
-	
+
 	// the following methods can be used to initiate an ADC conversion
 	// that runs in the background, allowing the CPU to perform other tasks
 	// while the conversion is in progress.  The procedure is to start a
@@ -85,9 +85,22 @@ class OrangutanAnalog
 	// converts the specified ADC result to millivolts
 	static unsigned int toMillivolts(unsigned int adcResult);
 
-	// 3pi only: returns the voltage of the battery in millivolts,
+	// 3pi: returns the voltage of the battery in millivolts,
 	// using 10 averaged samples.
-	static unsigned int readBatteryMillivolts();
+	static unsigned int readBatteryMillivolts_3pi();
+
+	// SV-168: returns the voltage of the battery in millivolts,
+	// using 10 averaged samples.
+	static unsigned int readBatteryMillivolts_SV168();
+
+	// This version of the function is included because the 3pi was
+	// originally the only supported board with battery voltage
+	// sensing.  Instead of using this one, reading the battery
+	// voltage should be done with the board-specific functions above.
+	static inline unsigned int readBatteryMillivolts()
+	{
+		return readBatteryMillivolts_3pi();
+	}
 };
 
 #endif

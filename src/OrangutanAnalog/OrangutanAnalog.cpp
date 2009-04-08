@@ -65,9 +65,14 @@ extern "C" void start_analog_conversion(unsigned char channel)
 	OrangutanAnalog::startConversion(channel);
 }
 
-extern "C" unsigned int read_battery_millivolts()
+extern "C" unsigned int read_battery_millivolts_3pi()
 {
-	return OrangutanAnalog::readBatteryMillivolts();
+	return OrangutanAnalog::readBatteryMillivolts_3pi();
+}
+
+extern "C" unsigned int read_battery_millivolts_sv168()
+{
+	return OrangutanAnalog::readBatteryMillivolts_SV168();
 }
 
 extern "C" unsigned int read_temperature_c()
@@ -235,9 +240,14 @@ unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 	return (temp + 511) / 1023;
 }
 
-unsigned int OrangutanAnalog::readBatteryMillivolts()
+unsigned int OrangutanAnalog::readBatteryMillivolts_3pi()
 {
 	return readAverage(6,10)*5000L*3/2/1023;
+}
+
+unsigned int OrangutanAnalog::readBatteryMillivolts_SV168()
+{
+	return readAverage(6,10)*5000L*3/1023;
 }
 
 // Local Variables: **
