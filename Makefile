@@ -6,7 +6,8 @@ all:
 clean:
 	$(foreach device,$(devices),$(MAKE) clean -C devices/$(device); )
 
-PREFIX=/usr/avr
+# set the PREFIX to point to the location of avr-gcc
+PREFIX=$(shell type avr-gcc | sed 's/\/bin\/avr-gcc//' | sed 's/avr-gcc is //')/avr
 INCLUDE=$(PREFIX)/include
 INCLUDE_POLOLU=$(INCLUDE)/pololu
 LIB=$(PREFIX)/lib
