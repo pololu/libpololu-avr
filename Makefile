@@ -5,6 +5,7 @@ all:
 
 clean:
 	$(foreach device,$(devices),$(MAKE) clean -C devices/$(device); )
+	$(foreach example,$(shell ls examples),$(MAKE) clean -C examples/$(example);)
 
 # set the PREFIX to point to the location of avr-gcc
 PREFIX=$(shell type avr-gcc | sed 's/\/bin\/avr-gcc//' | sed 's/avr-gcc is //')/avr
