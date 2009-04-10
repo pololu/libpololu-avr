@@ -8,8 +8,8 @@
  *
  */
 
-// The 3pi include file must be at the beginning of any program that
-// uses the Pololu AVR library and 3pi.
+// The Orangutan include file must be at the beginning of any program that
+// uses the Pololu AVR library on an Orangutan.
 #include <pololu/orangutan.h>
 
 // This include file allows data to be stored in program space.  The
