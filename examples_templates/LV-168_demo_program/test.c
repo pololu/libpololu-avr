@@ -1,5 +1,5 @@
 /*
- * 3pi-demo-program - demo code for the Pololu 3pi Robot
+ * LV-168_demo_program - demo code for the Pololu LV-168 Robot Controller
  * 
  *
  * http://www.pololu.com/docs/0J20
@@ -20,8 +20,8 @@
 // Introductory messages.  The "PROGMEM" identifier causes the data to
 // go into program space.
 const char welcome_line1[] PROGMEM = " Pololu";
-const char welcome_line2[] PROGMEM = "3\xf7 Robot"; // \xf7 is a greek
-													// pi character
+const char welcome_line2[] PROGMEM = " LV-168";
+
 const char demo_name_line1[] PROGMEM = "Demo";
 const char demo_name_line2[] PROGMEM = "Program";
 
@@ -36,10 +36,9 @@ const char thank_you_line2[] PROGMEM = "  you!";
 const char main_menu_intro_line1[] PROGMEM = "  Main";
 const char main_menu_intro_line2[] PROGMEM = "  Menu";
 
-const char menu_bat_test[] PROGMEM = "Battery";
+const char menu_temp_test[] PROGMEM = "Temp";
 const char menu_led_test[] PROGMEM = "LEDs";
 const char menu_lcd_test[] PROGMEM = "LCD";
-const char menu_ir_test[] PROGMEM = "Sensors";
 const char menu_motor_test[] PROGMEM = "Motors";
 const char menu_music_test[] PROGMEM = "Music";
 const char menu_pot_test[] PROGMEM = "Trimpot";
@@ -48,17 +47,16 @@ const char menu_time_test[] PROGMEM = "Timer";
 const char menu_line2[] PROGMEM = "\x7f" "A \xa5" "B C\x7e";
 const char back_line2[] PROGMEM = "\6B";
 
-void bat_test();
+void temp_test();
 void led_test();
 void lcd_test();
-void ir_test();
 void motor_test();
 void music_test();
 void time_test();
 void pot_test();
 typedef void (*function)();
-const function main_menu_functions[] = { bat_test, led_test, pot_test, ir_test, motor_test, music_test, time_test };
-const char *main_menu_options[] = { menu_bat_test, menu_led_test, menu_pot_test, menu_ir_test, menu_motor_test, menu_music_test, menu_time_test };
+const function main_menu_functions[] = { temp_test, led_test, pot_test, motor_test, music_test, time_test };
+const char *main_menu_options[] = { menu_temp_test, menu_led_test, menu_pot_test, menu_motor_test, menu_music_test, menu_time_test };
 const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
 
 // A couple of simple tunes, stored in program space.
@@ -133,13 +131,35 @@ void load_custom_characters()
 // 10 levels of bar graph characters
 const char bar_graph_characters[10] = {' ',0,0,1,2,3,3,4,5,255};
 
-// Displays the battery voltage.
-void bat_test()
+// Displays the temperature, in C or F.
+void temp_test()
 {
-	int bat = read_battery_millivolts();
+	static int display_c = 0; // 0 for F, 1 for C
+	int temperature;
 
-	print_long(bat);
-	print("mV");
+	if(display_c)
+		temperature = read_temperature_c();
+	else
+		temperature = read_temperature_f();
+
+	// display temperature; it is in tenths of a degree
+	print_long(temperature/10);
+	print(".");
+	print_long(temperature%10);
+
+	// character 0xDF is the degree symbol
+	print_character('\xdf');
+
+	if(display_c)
+		print_character('C');
+	else
+		print_character('F');
+
+	// allow the user to switch between modes
+	if(button_is_pressed(BUTTON_A))
+		display_c = 1;
+	if(button_is_pressed(BUTTON_C))
+		display_c = 0;
 
 	delay_ms(100);
 }
@@ -179,42 +199,6 @@ void led_test()
 	green_led(0);
 	if(wait_for_250_ms_or_button_b())
 		return;
-}
-
-void ir_test()
-{
-	unsigned int sensors[5]; // an array to hold sensor values
-
-	if(button_is_pressed(BUTTON_C))
-		read_line_sensors(sensors, IR_EMITTERS_OFF);
-	else
-		read_line_sensors(sensors,IR_EMITTERS_ON);
-
-	unsigned char i;
-
-	for(i=0;i<5;i++) {
-		// Initialize the array of characters that we will use for the
-		// graph.  Using the space, an extra copy of the one-bar
-		// character, and character 255 (a full black box), we get 10
-		// characters in the array.
-
-		// The variable c will have values from 0 to 9, since
-		// values are in the range of 0 to 2000, and 2000/201 is 9
-		// with integer math.
-		char c = bar_graph_characters[sensors[i]/201];
-
-		// Display the bar graph characters.
-		print_character(c);
-
-	}
-
-	// Display an indicator of whether IR is on or off
-	if(button_is_pressed(BUTTON_C))
-		print("IR-");
-	else
-		print("  C");
-
-	delay_ms(100);
 }
 
 int m1_speed = 0;
@@ -286,22 +270,18 @@ void motor_test()
 	delay_ms(50);
 }
 
-const char fugue[] PROGMEM = 
-  "! T120O5L16agafaea dac+adaea fa<aa<bac#a dac#adaea f"
-  "O6dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad"
-  "L8MS<b-d<b-d MLe-<ge-<g MSc<ac<a MLd<fd<f O5MSb-gb-g"
-  "ML>c#e>c#e MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"
-  "O6L16ragafaea dac#adaea fa<aa<bac#a dac#adaea faeadaca"
-  "<b-acadg<b-g egdgcg<b-g <ag<b-gcf<af dfcf<b-f<af"
-  "<gf<af<b-e<ge c#e<b-e<ae<ge <fe<ge<ad<fd"
-  "O5e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d"
-  "e>d>c#>db>d>c#b >c#agaegfe fO6dc#dfdc#<b c#4";
+const char rhapsody[] PROGMEM = "O6 T40 L16 d#<b<f#<d#<f#<bd#f#"
+  "T80 c#<b-<f#<c#<f#<b-c#8"
+  "T180 d#b<f#d#f#>bd#f#c#b-<f#c#f#>b-c#8 c>c#<c#>c#<b>c#<c#>c#c>c#<c#>c#<b>c#<c#>c#"
+  "c>c#<c#>c#<b->c#<c#>c#c>c#<c#>c#<b->c#<c#>c#"
+  "c>c#<c#>c#f>c#<c#>c#c>c#<c#>c#f>c#<c#>c#"
+  "c>c#<c#>c#f#>c#<c#>c#c>c#<c#>c#f#>c#<c#>c#d#bb-bd#bf#d#c#b-ab-c#b-f#d#";
 
-const char fugue_title[] PROGMEM = "       \7 Fugue in D Minor - by J.S. Bach \7       ";
+const char rhapsody_title[] PROGMEM = "       \7 Hungarian Rhapsody No. 2 - by Franz Liszt \7       ";
 
 void music_test()
 {
-	static char fugue_title_pos = 0;
+	static char rhapsody_title_pos = 0;
 	static long last_shift = 0;
 	char c,i;
 
@@ -309,19 +289,19 @@ void music_test()
 	{
 		for(i=0;i<8;i++)
 		{
-			c = pgm_read_byte(fugue_title + fugue_title_pos + i);
+			c = pgm_read_byte(rhapsody_title + rhapsody_title_pos + i);
 			print_character(c);
 		}
 		last_shift = get_ms();
 
-		fugue_title_pos ++;
-		if(fugue_title_pos + 8 >= sizeof(fugue_title))
-			fugue_title_pos = 0;
+		rhapsody_title_pos ++;
+		if(rhapsody_title_pos + 8 >= sizeof(rhapsody_title))
+			rhapsody_title_pos = 0;
 	}
 
 	if(!is_playing())
 	{
-		play_from_program_space(fugue);
+		play_from_program_space(rhapsody);
 	}
 
 	delay_ms(100);
