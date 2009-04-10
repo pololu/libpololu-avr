@@ -1,17 +1,17 @@
 #include <pololu/orangutan.h>
 
 /*
- * analog2: for the Orangutan LV-168
+ * analog2: for the Orangutan LV/SV-xx8
  *
  * This example uses the OrangutanAnalog functions to read the voltage
  * output of the trimpot (in millivolts) and to read the Orangutan
  * LV-168's temperature sensor in degrees Farenheit.  These values are
  * printed to the LCD 10 times per second.  This example is intended
- * for use with the Orangutan LV-168 only.
+ * for use with the Orangutan LV/SV-xx8 only.
  *
  * You should see the trimpot voltage change as you turn it, and you can
  * get the temperature reading to slowly increase by holding a finger on the
- * underside of the Orangutan LV-168's PCB near the center of the board.
+ * underside of the Orangutan LV/SV-xx8's PCB near the center of the board.
  * Be careful not to zap the board with electrostatic discharge if you
  * try this!
  *

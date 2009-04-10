@@ -1,9 +1,9 @@
 #include <pololu/orangutan.h>
 
 /*
- * motors1: for the Orangutan LV-168 or Baby Orangutan B
+ * motors1: for the Orangutan LV/SV-xx8 or Baby Orangutan B
  *
- * This example program is indended for use on the Orangutan LV-168 or
+ * This example program is indended for use on the Orangutan LV/SV-xx8 or
  * Baby Orangutan B.  It uses the OrangutanMotors functions to drive
  * motors in response to the position of user trimmer potentiometer
  * and blinks the red user LED at a rate determined by the trimmer

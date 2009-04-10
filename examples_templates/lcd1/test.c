@@ -1,10 +1,9 @@
 #include <pololu/orangutan.h>
 
 /*
- * OrangutanLCDExample for the Orangutan LV-168
+ * OrangutanLCDExample for the Orangutan LV/SV-xx8
  *
- * This example program is intended for use on the Orangutan LV-168.
- * It uses the OrangutanLCD library to display things on the LCD.
+ * Uses the OrangutanLCD library to display things on the LCD.
  *
  * http://www.pololu.com/docs/0J20/6.e
  * http://www.pololu.com

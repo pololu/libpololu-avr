@@ -1,10 +1,10 @@
 #include <pololu/orangutan.h>
 
 /*
- * led1: for the Orangutan LV-168 or Baby Orangutan B
+ * led1: for the Orangutan LV/SV-xx8 or Baby Orangutan B
  *
  * This program uses the OrangutanLEDs functions to control the red and green
- * LEDs on the Orangutan LV-168.  It will also work to control the red LED
+ * LEDs on the Orangutan LV/SV-xx8.  It will also work to control the red LED
  * on the Baby Orangutan B (which lacks a second, green LED).
  *
  * http://www.pololu.com/docs/0J20/6.f

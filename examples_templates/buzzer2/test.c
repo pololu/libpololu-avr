@@ -1,12 +1,11 @@
 #include <pololu/orangutan.h>
 
 /*
- * buzzer2: for the Orangutan LV-168
+ * buzzer2: for the Orangutan LV/SV-xx8
  *
- * This example program is indended for use on the Orangutan LV-168.
- * It uses the OrangutanBuzzer functions to play a series of notes on
- * the Orangutan LV-168's buzzer.  It uses the OrangutanPushbuttons
- * library to allow the user select which melody plays.
+ * Uses the OrangutanBuzzer functions to play a series of notes on the
+ * Orangutan's buzzer.  It uses the OrangutanPushbuttons library to
+ * allow the user select which melody plays.
  *
  * This example demonstrates the use of the play() method,
  * which plays the specified melody entirely in the background, requiring
