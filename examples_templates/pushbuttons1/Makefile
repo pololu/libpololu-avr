@@ -1,10 +1,14 @@
-CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -Os
-CC=/usr/bin/avr-gcc
-OBJ2HEX=/usr/bin/avr-objcopy 
-LDFLAGS=-Wl,-gc-sections -lpololu
+DEVICE ?= atmega168
+AVRDUDE_DEVICE ?= m168
 
-PORT=/dev/ttyUSB0
-AVRDUDE=/usr/bin/avrdude
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(DEVICE) -Os
+CC=avr-gcc
+OBJ2HEX=avr-objcopy 
+LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax
+
+PORT ?= /dev/ttyUSB0
+AVRDUDE=avrdude
+
 TARGET=test
 OBJECT_FILES=test.o
 
@@ -22,4 +26,4 @@ test.o: test.c
 	$(CC) $(CFLAGS) $(OBJECT_FILES) $(LDFLAGS) -o $@
 
 program: $(TARGET).hex
-	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
+	$(AVRDUDE) -p $(AVRDUDE_DEVICE) -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex

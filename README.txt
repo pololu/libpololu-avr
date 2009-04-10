@@ -1,6 +1,6 @@
 Pololu AVR Library
 
-Copyright (c) 2008 Pololu Corporation. For more information, see
+Copyright (c) 2008-2009 Pololu Corporation. For more information, see
 
 http://www.pololu.com/docs/0J20
 http://www.pololu.com
@@ -24,7 +24,9 @@ of robot controllers:
 
 * Pololu Baby Orangutan B-48
 * Pololu Baby Orangutan B-168
+* Pololu Baby Orangutan B-328
 * Pololu Orangutan LV-168
+* Pololu Orangutan SV-168
 
 Additionally, this library supports:
 

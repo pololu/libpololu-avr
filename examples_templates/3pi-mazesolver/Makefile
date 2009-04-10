@@ -1,12 +1,12 @@
-CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -Os
-CPP=avr-g++
+DEVICE ?= atmega168
+AVRDUDE_DEVICE ?= m168
+
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(DEVICE) -Os
 CC=avr-gcc
 OBJ2HEX=avr-objcopy 
-LDFLAGS=-Wl,-gc-sections -lpololu
-#LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_flt -lm
-#LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_min
+LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax
 
-PORT=/dev/ttyUSB0
+PORT ?= /dev/ttyUSB0
 AVRDUDE=avrdude
 TARGET=main
 OBJECT_FILES=main.o bargraph.o maze-solve.o follow-segment.o turn.o
@@ -23,4 +23,4 @@ clean:
 	$(CC) $(CFLAGS) $(OBJECT_FILES) $(LDFLAGS) -o $@
 
 program: $(TARGET).hex
-	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
+	$(AVRDUDE) -p $(AVRDUDE_DEVICE) -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex

@@ -18,7 +18,7 @@ unsigned int analog_conversion_result();
 unsigned int to_millivolts(unsigned int analog_result);
 
 unsigned int read_battery_millivolts_3pi();
-inline unsigned int read_battery_millivolts()
+static inline unsigned int read_battery_millivolts()
 {
   return read_battery_millivolts_3pi();
 }
