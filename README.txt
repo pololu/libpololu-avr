@@ -104,9 +104,9 @@ typing "sudo make install" from within the directory that is created.)
 
 If you currently have an older version of the Pololu AVR Library, your
 first step should be to delete all of the old include files and the
-libpololu.a file that you installed previously.
+libpololu*.a files that you installed previously.
 
-Next, copy libpololu.a into the "lib" subdirectory.
+Next, copy libpololu_*.a into the "lib" subdirectory.
 
 Finally, copy the entire "pololu" subfolder into the "include"
 subdirectory.

@@ -1,3 +1,5 @@
+# NOTE: to compile with avr-gcc less than verson 4.2.3, you must
+# remove the atmega328p from the list of target devices below:
 devices := atmega48 atmega168 atmega328p
 
 .PHONY: all
@@ -17,7 +19,7 @@ clean:
 
 
 # set the PREFIX to point to the location of avr-gcc
-PREFIX := $(shell type avr-gcc | sed 's/\/bin\/avr-gcc//' | sed 's/avr-gcc is //')/avr
+PREFIX := $(shell which avr-gcc | sed 's/\/bin\/avr-gcc//')/avr
 INCLUDE := $(PREFIX)/include
 INCLUDE_POLOLU := $(INCLUDE)/pololu
 LIB := $(PREFIX)/lib
@@ -36,7 +38,7 @@ install: $(LIBRARY_FILES)
 # concatenated together with &&.
 
 examples_3pi := 3pi-demo-program 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave simple-test-3pi 
-examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 buzzer2 lcd1 motors2 simple-test 3pi-serial-master
+examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 buzzer2 lcd1 motors2 simple-test 3pi-serial-master SV-168_demo_program LV-168_demo_program
 
 # The 48 examples are the only ones that will work on the mega48.
 # They will also work on the orangutans, which could have either a 168
