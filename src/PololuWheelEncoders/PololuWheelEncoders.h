@@ -1,0 +1,91 @@
+/*
+  PololuWheelEncoders.h - Library for using Pololu Wheel Encoders.
+*/
+	
+/*
+ * Copyright (c) 2009 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J18
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
+
+#ifndef PololuWheelEncoders_h
+#define PololuWheelEncoders_h
+
+class PololuWheelEncoders
+{
+  public:
+	/*
+	 * Constructor: does nothing.
+	 */
+	PololuWheelEncoders() { }
+
+	/*
+	 * Initializes the wheel encoders.  The four arguments are the
+	 * four pins that the wheel encoders are connected to, according
+	 * to the Arduino numbering: Arduino digital pins 0 - 7 correpsond
+	 * to port D pins PD0 - PD7, respectively.  Arduino digital pins 8
+	 * - 13 correspond to port B pins PB0 - PB5.  Arduino analog
+	 * inputs 0 - 5 are referred to as digital pins 14 - 19 (these are
+	 * the enumerations you should use for this library) and
+	 * correspond to port C pins PC0 - PC5.
+	 *
+	 * The arguments are named a1, a2, etc. with the intention
+	 * that when motor A is spinning forward, pin a1 will
+	 * change before pin a2.  However, it is difficult to get them
+	 * all correct on the first try, and you might have to
+	 * experiment.
+	 * 
+	 * init() may be called multiple times.
+	 */
+	static void init(unsigned char a1, unsigned char a2, unsigned char b1, unsigned char b2);
+
+	/*
+	 * Encoder counts are returned as integers.  For the Pololu wheel
+	 * encoders, the resolution is about 3mm/count, so this allows a
+	 * maximum distance of 32767*3mm or about 100m.  For longer
+	 * distances, you will need to occasionally reset the counts using
+	 * the functions below.
+	 */
+	static int getCountsA();
+	static int getCountsB();
+
+	/*
+	 * These functions get the number of counts and reset the stored
+	 * number to zero.
+	 */
+	static int getCountsAndResetA();
+	static int getCountsAndResetB();
+
+	/*
+	 * These functions check whether there has been an error on A or
+	 * B; that is, if both a1/a2 or b1/b2 changed simultaneously.
+	 * They return 1 if there was an error, then reset the error
+	 * flag.
+	 */
+	static unsigned char checkErrorA();
+	static unsigned char checkErrorB();
+};
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#endif
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

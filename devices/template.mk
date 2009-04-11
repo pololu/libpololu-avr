@@ -16,7 +16,8 @@ LIBRARY_OBJECT_FILES=\
 	PololuQTRSensors.o \
 	OrangutanResources.o \
 	OrangutanTime.o \
-	OrangutanSerial.o
+	OrangutanSerial.o \
+	PololuWheelEncoders.o
 
 LIBRARY = ../../libpololu_$(DEVICE).a
 
