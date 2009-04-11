@@ -29,29 +29,41 @@
 
 #ifdef LIB_POLOLU
 
+#include "../OrangutanLEDs/OrangutanLEDs.h"
+
 extern "C" void encoders_init(unsigned char a1, unsigned char a2, unsigned char b1, unsigned char b2)
 {
 	PololuWheelEncoders::init(a1,a2,b1,b2);
 }
 
-extern "C" int get_encoder_counts_a()
+extern "C" int encoders_get_counts_a()
 {
 	return PololuWheelEncoders::getCountsA();
 }
 
-extern "C" int get_encoder_counts_b()
+extern "C" int encoders_get_counts_b()
 {
 	return PololuWheelEncoders::getCountsB();
 }
 
-extern "C" int get_encoder_counts_and_reset_a()
+extern "C" int encoders_get_counts_and_reset_a()
 {
 	return PololuWheelEncoders::getCountsAndResetA();
 }
 
-extern "C" int get_encoder_counts_and_reset_b()
+extern "C" int encoders_get_counts_and_reset_b()
 {
 	return PololuWheelEncoders::getCountsAndResetB();
+}
+
+extern "C" int encoders_check_error_a()
+{
+	return PololuWheelEncoders::checkErrorA();
+}
+
+extern "C" int encoders_check_error_b()
+{
+	return PololuWheelEncoders::checkErrorB();
 }
 
 #endif
@@ -169,6 +181,8 @@ void PololuWheelEncoders::init(unsigned char a1, unsigned char a2, unsigned char
 	enable_interrupts_for_pin(b1);
 	enable_interrupts_for_pin(b2);
 
+	sei();
+
 	// initialize the global state
 	global_counts_a = 0;
 	global_counts_b = 0;
@@ -182,7 +196,7 @@ void PololuWheelEncoders::init(unsigned char a1, unsigned char a2, unsigned char
 }
 
 int PololuWheelEncoders::getCountsA() {	return global_counts_a; }
-int PololuWheelEncoders::getCountsB() {	return global_counts_a; }
+int PololuWheelEncoders::getCountsB() {	return global_counts_b; }
 
 int PololuWheelEncoders::getCountsAndResetA()
 {
