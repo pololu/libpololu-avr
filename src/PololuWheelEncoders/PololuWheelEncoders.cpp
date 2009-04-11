@@ -90,8 +90,8 @@ static char global_a2;
 static char global_b1;
 static char global_b2;
 
-static char global_counts_a;
-static char global_counts_b;
+static int global_counts_a;
+static int global_counts_b;
 
 static char global_error_a;
 static char global_error_b;
@@ -132,9 +132,9 @@ ISR(PCINT0_vect)
 	if(minus_b)
 		global_counts_b -= 1;
 
-	if(a1_val != global_last_a1_val && b1_val != global_last_b1_val)
+	if(a1_val != global_last_a1_val && a2_val != global_last_a2_val)
 		global_error_a = 1;
-	if(a1_val != global_last_a1_val && b1_val != global_last_b1_val)
+	if(b1_val != global_last_b1_val && b2_val != global_last_b2_val)
 		global_error_b = 1;
 
 	global_last_a1_val = a1_val;

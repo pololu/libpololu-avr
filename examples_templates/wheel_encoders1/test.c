@@ -10,6 +10,7 @@
  */
 
 #include <pololu/orangutan.h>
+#include <avr/interrupt.h>
 
 int main()
 {
@@ -17,11 +18,24 @@ int main()
 
   while(1)
   {
-    clear();
+    lcd_goto_xy(0,0);
     print_long(encoders_get_counts_a());
+    print(" ");
 
-    lcd_goto_xy(0,4);
+    lcd_goto_xy(4,0);
     print_long(encoders_get_counts_b());
+    print(" ");
+
+    if(encoders_check_error_a())
+    {
+      lcd_goto_xy(0,1);
+      print("Error A");
+    }
+    if(encoders_check_error_b())
+    {
+      lcd_goto_xy(0,1);
+      print("Error B");
+    }
 
     delay_ms(50);
   }
