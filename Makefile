@@ -18,8 +18,10 @@ clean:
 	fi
 
 
-# set the PREFIX to point to the location of avr-gcc
-PREFIX := $(shell which avr-gcc | sed 's/\/bin\/avr-gcc//')/avr
+# Set the PREFIX to point to the location of avr-gcc.
+# This can be overridden by setting the environment variable before compiling, e.g.:
+# PREFIX=/usr/local/bin make
+PREFIX ?= $(shell type avr-gcc | sed 's/\/bin\/avr-gcc//' | sed 's/avr-gcc is //' | sed 's/hashed //' | sed 's/[\\(\\)]//g')/avr
 INCLUDE := $(PREFIX)/include
 INCLUDE_POLOLU := $(INCLUDE)/pololu
 LIB := $(PREFIX)/lib
