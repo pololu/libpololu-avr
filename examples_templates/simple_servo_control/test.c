@@ -1,12 +1,19 @@
 /*
  * simple_servo_program - demo code for controlling servos with the
- * Pololu SV-128/328 Robot Controllers.  If the 5 V jumper option is
- * selected, the servos can be connected directly to the three-pin
- * port headers, since the SV-xx8 is able to supply 3 A of current
- * directly from its 5 V regulator.  Similar code could also be used
- * to control one or two servos on the 3pi robot.
+ * Pololu Baby Orangutan B and Orangutan SV-128/328 Robot Controllers.
+ * 
+ * Uses 8 ports: PD0, PD1, and PC0-5.
  *
- * The structure here is the easiest way to control servos
+ * On the SV-xx8, if the 5 V jumper option is selected, the servos can
+ * be connected directly to the three-pin port headers, since the
+ * regulator is able to supply 3 A of current.  Similar code could
+ * also be used to control one or two servos on the 3pi robot.
+ *
+ * The structure here is the easiest way to control servos, but it is
+ * complicated to do other things at the same time with this method.
+ * For more complicated programs, you will need to replace the
+ * delay_us calls with routines that use the timers on the AVR, either
+ * with interrupts or with some other method.
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
@@ -90,9 +97,10 @@ int main()
 			inc(&s[i],increment[i]);
 		}
 
-		// display the position of servo 0 on the LCD
-		clear();
-		print_long(s[0]);
+		/* for an Orangutan with LCD, uncomment this code to display
+		   the position of servo 0: */
+		//		clear();
+		//		print_long(s[0]);
 
 		// The FOR loop above took 16 ms, so we need 4 more ms to
 		// complete the 20 ms period.
