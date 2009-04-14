@@ -1,5 +1,5 @@
 /*
- * SV-168_demo_program - demo code for the Pololu SV-168 Robot Controller
+ * SV-xx8_demo_program - demo code for the Pololu SV-xx8 Robot Controller
  * 
  *
  * http://www.pololu.com/docs/0J20
