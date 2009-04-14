@@ -176,12 +176,13 @@ void PololuWheelEncoders::init(unsigned char a1, unsigned char a2, unsigned char
 	global_b1 = b1;
 	global_b2 = b2;
 
+	// disable interrupts while initializing
+	cli();
+
 	enable_interrupts_for_pin(a1);
 	enable_interrupts_for_pin(a2);
 	enable_interrupts_for_pin(b1);
 	enable_interrupts_for_pin(b2);
-
-	sei();
 
 	// initialize the global state
 	global_counts_a = 0;
@@ -193,22 +194,45 @@ void PololuWheelEncoders::init(unsigned char a1, unsigned char a2, unsigned char
 	global_last_a2_val = get_val(global_a2);
 	global_last_b1_val = get_val(global_b1);
 	global_last_b2_val = get_val(global_b2);
+
+	// clear the interrupt flags in case they were set before for some reason
+	PCIFR &= ~(1 << PCIF0 | 1 << PCIF1 | 1 << PCIF2);
+
+	// enable interrupts
+	sei();
 }
 
-int PololuWheelEncoders::getCountsA() {	return global_counts_a; }
-int PololuWheelEncoders::getCountsB() {	return global_counts_b; }
+int PololuWheelEncoders::getCountsA()
+{
+	cli();
+	int tmp = global_counts_a;
+	sei();
+	return tmp;
+}
+
+int PololuWheelEncoders::getCountsB()
+{
+	cli();
+	int tmp = global_counts_b;
+	sei();
+	return tmp;
+}
 
 int PololuWheelEncoders::getCountsAndResetA()
 {
+	cli();
 	int tmp = global_counts_a;
 	global_counts_a = 0;
+	sei();
 	return tmp;
 }
 
 int PololuWheelEncoders::getCountsAndResetB()
 {
+	cli();
 	int tmp = global_counts_b;
 	global_counts_b = 0;
+	sei();
 	return tmp;
 }
 
