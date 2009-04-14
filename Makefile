@@ -65,7 +65,8 @@ make_example = $(foreach example,$(value examples_$(device)), \
 		mkdir -p $(example_dir) && \
 		cp -a $(example_template)/*.[ch] $(example_dir)/ && \
 		cat examples_templates/template_$(device).mk $(example_template)/Makefile > $(example_dir)/Makefile && \
-		cat $(example_template)/*.aps | sed 's/<PART>.*<\/PART>/<PART>$(device)<\/PART>/' > $(example_dir)/$(example).aps && \
+		cat $(example_template)/*.aps | sed 's/<PART>[^<]*<\/PART>/<PART>$(device)<\/PART>/' \
+			| sed 's/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$(device).a<\/LIB>/' > $(example_dir)/$(example).aps && \
 		)
 
 .PHONY: examples
