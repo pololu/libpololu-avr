@@ -2,9 +2,12 @@
 # remove the atmega328p from the list of target devices below:
 devices := atmega48 atmega168 atmega328p
 
-.PHONY: all
+# We need to do our recursive make with cd, since WinAVR does not support make -C.
+# See WinAVR bug 1932584, "recursive make call fails"
+.PHONY: library_files
 library_files:
-	$(foreach device,$(devices),$(MAKE) -C devices/$(device); )
+	echo $(SHELL)
+	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) ; cd ../.. ;)
 
 .PHONY: clean
 clean:
@@ -31,9 +34,9 @@ LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
 install: $(LIBRARY_FILES)
 	install -d $(LIB)
 	install -d $(INCLUDE_POLOLU)
-	install -t $(LIB) $(foreach device,$(devices),libpololu_$(device).a)
-	install -t $(INCLUDE_POLOLU) pololu/*.h
-	install -t $(INCLUDE_POLOLU) pololu/orangutan
+	install $(foreach device,$(devices),libpololu_$(device).a) $(LIB)
+	install pololu/*.h $(INCLUDE_POLOLU)
+	install pololu/orangutan $(INCLUDE_POLOLU)
 
 # We make all of the examples from templates in the examples_templates
 # directory (which is not distributed), by running a bunch of commands
