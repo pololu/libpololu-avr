@@ -11,7 +11,7 @@ library_files:
 
 .PHONY: clean
 clean:
-	$(foreach device,$(devices),$(MAKE) clean -C devices/$(device); )
+	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) clean ; cd ../.. ;)
 	if [ -e examples_templates -a -e examples ]; then \
 		for dir in examples/*/*; \
 		do \
@@ -28,6 +28,10 @@ PREFIX ?= $(shell type avr-gcc | sed 's/\/bin\/avr-gcc//' | sed 's/avr-gcc is //
 INCLUDE := $(PREFIX)/include
 INCLUDE_POLOLU := $(INCLUDE)/pololu
 LIB := $(PREFIX)/lib
+
+.PHONY: show_prefix
+show_prefix:
+	@echo The Pololu AVR Library will be installed in $(PREFIX).
 
 .PHONY: install
 LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
