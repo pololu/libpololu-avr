@@ -22,7 +22,14 @@
 // Introductory messages.  The "PROGMEM" identifier causes the data to
 // go into program space.
 const char welcome_line1[] PROGMEM = " Pololu";
+
+#if defined __AVR_ATmega328P__
+const char welcome_line2[] PROGMEM = " LV-328";
+#elif defined __AVR_ATmega168__
 const char welcome_line2[] PROGMEM = " LV-168";
+#else
+#error "Unrecognized device type"
+#endif
 
 const char demo_name_line1[] PROGMEM = "Demo";
 const char demo_name_line2[] PROGMEM = "Program";
@@ -791,7 +798,15 @@ void test()
 	print("Orangutn");	// print to the top line of the LCD
 	delay_ms(400);		// delay 200 ms
 	lcd_goto_xy(0, 1);	// go to the start of the second LCD line
+
+#if defined __AVR_ATmega328P__
+	print(" LV-328");	// print to the bottom line of the LCD
+#elif defined __AVR_ATmega168__
 	print(" LV-168");	// print to the bottom line of the LCD
+#else
+#error "Unrecognized device type"
+#endif
+
 	delay_ms(1000);		// delay 700 ms
 
 	clear();			// clear the LCD, move cursor to start of top line
