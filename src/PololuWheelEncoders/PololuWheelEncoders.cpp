@@ -31,39 +31,39 @@
 
 #include "../OrangutanLEDs/OrangutanLEDs.h"
 
-extern "C" void encoders_init(unsigned char a1, unsigned char a2, unsigned char b1, unsigned char b2)
+extern "C" void encoders_init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b)
 {
-	PololuWheelEncoders::init(a1,a2,b1,b2);
+	PololuWheelEncoders::init(m1a,m1b,m2a,m2b);
 }
 
-extern "C" int encoders_get_counts_a()
+extern "C" int encoders_get_counts_m1()
 {
-	return PololuWheelEncoders::getCountsA();
+	return PololuWheelEncoders::getCountsM1();
 }
 
-extern "C" int encoders_get_counts_b()
+extern "C" int encoders_get_counts_m2()
 {
-	return PololuWheelEncoders::getCountsB();
+	return PololuWheelEncoders::getCountsM2();
 }
 
-extern "C" int encoders_get_counts_and_reset_a()
+extern "C" int encoders_get_counts_and_reset_m1()
 {
-	return PololuWheelEncoders::getCountsAndResetA();
+	return PololuWheelEncoders::getCountsAndResetM1();
 }
 
-extern "C" int encoders_get_counts_and_reset_b()
+extern "C" int encoders_get_counts_and_reset_m2()
 {
-	return PololuWheelEncoders::getCountsAndResetB();
+	return PololuWheelEncoders::getCountsAndResetM2();
 }
 
-extern "C" int encoders_check_error_a()
+extern "C" int encoders_check_error_m1()
 {
-	return PololuWheelEncoders::checkErrorA();
+	return PololuWheelEncoders::checkErrorM1();
 }
 
-extern "C" int encoders_check_error_b()
+extern "C" int encoders_check_error_m2()
 {
-	return PololuWheelEncoders::checkErrorB();
+	return PololuWheelEncoders::checkErrorM2();
 }
 
 #endif
@@ -85,21 +85,21 @@ extern "C" int encoders_check_error_b()
  *
  */
 
-static char global_a1;
-static char global_a2;
-static char global_b1;
-static char global_b2;
+static char global_m1a;
+static char global_m2a;
+static char global_m1b;
+static char global_m2b;
 
-static int global_counts_a;
-static int global_counts_b;
+static int global_counts_m1;
+static int global_counts_m2;
 
-static char global_error_a;
-static char global_error_b;
+static char global_error_m1;
+static char global_error_m2;
 
-static char global_last_a1_val;
-static char global_last_a2_val;
-static char global_last_b1_val;
-static char global_last_b2_val;
+static char global_last_m1a_val;
+static char global_last_m2a_val;
+static char global_last_m1b_val;
+static char global_last_m2b_val;
 
 inline unsigned char get_val(unsigned char pin)
 {
@@ -112,35 +112,35 @@ inline unsigned char get_val(unsigned char pin)
 
 ISR(PCINT0_vect)
 {
-	unsigned char a1_val = get_val(global_a1);
-	unsigned char a2_val = get_val(global_a2);
-	unsigned char b1_val = get_val(global_b1);
-	unsigned char b2_val = get_val(global_b2);
+	unsigned char m1a_val = get_val(global_m1a);
+	unsigned char m2a_val = get_val(global_m2a);
+	unsigned char m1b_val = get_val(global_m1b);
+	unsigned char m2b_val = get_val(global_m2b);
 
-	char plus_a = a1_val ^ global_last_a2_val;
-	char minus_a = a2_val ^ global_last_a1_val;
-	char plus_b = b1_val ^ global_last_b2_val;
-	char minus_b = b2_val ^ global_last_b1_val;
+	char plus_m1 = m1a_val ^ global_last_m1b_val;
+	char minus_m1 = m1b_val ^ global_last_m1a_val;
+	char plus_m2 = m2a_val ^ global_last_m2b_val;
+	char minus_m2 = m2b_val ^ global_last_m2a_val;
 
-	if(plus_a)
-		global_counts_a += 1;
-	if(minus_a)
-		global_counts_a -= 1;
+	if(plus_m1)
+		global_counts_m1 += 1;
+	if(minus_m1)
+		global_counts_m1 -= 1;
 
-	if(plus_b)
-		global_counts_b += 1;
-	if(minus_b)
-		global_counts_b -= 1;
+	if(plus_m2)
+		global_counts_m2 += 1;
+	if(minus_m2)
+		global_counts_m2 -= 1;
 
-	if(a1_val != global_last_a1_val && a2_val != global_last_a2_val)
-		global_error_a = 1;
-	if(b1_val != global_last_b1_val && b2_val != global_last_b2_val)
-		global_error_b = 1;
+	if(m1a_val != global_last_m1a_val && m1b_val != global_last_m1b_val)
+		global_error_m1 = 1;
+	if(m2a_val != global_last_m2a_val && m2b_val != global_last_m2b_val)
+		global_error_m2 = 1;
 
-	global_last_a1_val = a1_val;
-	global_last_a2_val = a2_val;
-	global_last_b1_val = b1_val;
-	global_last_b2_val = b2_val;
+	global_last_m1a_val = m1a_val;
+	global_last_m1b_val = m1b_val;
+	global_last_m2a_val = m2a_val;
+	global_last_m2b_val = m2b_val;
 }
 
 ISR(PCINT1_vect,ISR_ALIASOF(PCINT0_vect));
@@ -169,84 +169,86 @@ static void enable_interrupts_for_pin(unsigned char p)
 	}
 }
 
-void PololuWheelEncoders::init(unsigned char a1, unsigned char a2, unsigned char b1, unsigned char b2)
+void PololuWheelEncoders::init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b)
 {
-	global_a1 = a1;
-	global_a2 = a2;
-	global_b1 = b1;
-	global_b2 = b2;
+	global_m1a = m1a;
+	global_m1b = m1b;
+	global_m2a = m2a;
+	global_m2b = m2b;
 
 	// disable interrupts while initializing
 	cli();
 
-	enable_interrupts_for_pin(a1);
-	enable_interrupts_for_pin(a2);
-	enable_interrupts_for_pin(b1);
-	enable_interrupts_for_pin(b2);
+	enable_interrupts_for_pin(m1a);
+	enable_interrupts_for_pin(m1b);
+	enable_interrupts_for_pin(m2a);
+	enable_interrupts_for_pin(m2b);
 
 	// initialize the global state
-	global_counts_a = 0;
-	global_counts_b = 0;
-	global_error_a = 0;
-	global_error_b = 0;
+	global_counts_m1 = 0;
+	global_counts_m2 = 0;
+	global_error_m1 = 0;
+	global_error_m2 = 0;
 
-	global_last_a1_val = get_val(global_a1);
-	global_last_a2_val = get_val(global_a2);
-	global_last_b1_val = get_val(global_b1);
-	global_last_b2_val = get_val(global_b2);
+	global_last_m1a_val = get_val(global_m1a);
+	global_last_m1b_val = get_val(global_m1b);
+	global_last_m2a_val = get_val(global_m2a);
+	global_last_m2b_val = get_val(global_m2b);
 
-	// clear the interrupt flags in case they were set before for some reason
-	PCIFR &= ~(1 << PCIF0 | 1 << PCIF1 | 1 << PCIF2);
+	// Clear the interrupt flags in case they were set before for any reason.
+	// On the AVR, interrupt flags are cleared by writing a logical 1
+	// to them.
+	PCIFR |= (1 << PCIF0) | (1 << PCIF1) | (1 << PCIF2);
 
 	// enable interrupts
 	sei();
 }
 
-int PololuWheelEncoders::getCountsA()
+int PololuWheelEncoders::getCountsM1()
 {
 	cli();
-	int tmp = global_counts_a;
+	int tmp = global_counts_m1;
 	sei();
 	return tmp;
 }
 
-int PololuWheelEncoders::getCountsB()
+int PololuWheelEncoders::getCountsM2()
 {
 	cli();
-	int tmp = global_counts_b;
+	int tmp = global_counts_m2;
 	sei();
 	return tmp;
 }
 
-int PololuWheelEncoders::getCountsAndResetA()
+int PololuWheelEncoders::getCountsAndResetM1()
 {
 	cli();
-	int tmp = global_counts_a;
-	global_counts_a = 0;
+	int tmp = global_counts_m1;
+	global_counts_m1 = 0;
 	sei();
 	return tmp;
 }
 
-int PololuWheelEncoders::getCountsAndResetB()
+int PololuWheelEncoders::getCountsAndResetM2()
 {
 	cli();
-	int tmp = global_counts_b;
-	global_counts_b = 0;
+	int tmp = global_counts_m2;
+	global_counts_m2 = 0;
 	sei();
 	return tmp;
 }
 
-unsigned char PololuWheelEncoders::checkErrorA()
+unsigned char PololuWheelEncoders::checkErrorM1()
 {
-	unsigned char tmp = global_error_a;
-	global_error_a = 0;
+	unsigned char tmp = global_error_m1;
+	global_error_m1 = 0;
 	return tmp;
 }
 
-unsigned char PololuWheelEncoders::checkErrorB()
+unsigned char PololuWheelEncoders::checkErrorM2()
 {
-	unsigned char tmp = global_error_b;
-	global_error_b = 0;
+	unsigned char tmp = global_error_m2;
+	global_error_m2 = 0;
 	return tmp;
 }
 

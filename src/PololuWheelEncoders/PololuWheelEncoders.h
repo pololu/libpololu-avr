@@ -41,15 +41,15 @@ class PololuWheelEncoders
 	 * the enumerations you should use for this library) and
 	 * correspond to port C pins PC0 - PC5.
 	 *
-	 * The arguments are named a1, a2, etc. with the intention
-	 * that when motor A is spinning forward, pin a1 will
-	 * change before pin a2.  However, it is difficult to get them
+	 * The arguments are named m1a, m2a, etc. with the intention
+	 * that when motor M1 is spinning forward, pin m1a will
+	 * change before pin m1b.  However, it is difficult to get them
 	 * all correct on the first try, and you might have to
 	 * experiment.
 	 * 
 	 * init() may be called multiple times.
 	 */
-	static void init(unsigned char a1, unsigned char a2, unsigned char b1, unsigned char b2);
+	static void init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b);
 
 	/*
 	 * Encoder counts are returned as integers.  For the Pololu wheel
@@ -58,15 +58,15 @@ class PololuWheelEncoders
 	 * distances, you will need to occasionally reset the counts using
 	 * the functions below.
 	 */
-	static int getCountsA();
-	static int getCountsB();
+	static int getCountsM1();
+	static int getCountsM2();
 
 	/*
 	 * These functions get the number of counts and reset the stored
 	 * number to zero.
 	 */
-	static int getCountsAndResetA();
-	static int getCountsAndResetB();
+	static int getCountsAndResetM1();
+	static int getCountsAndResetM2();
 
 	/*
 	 * These functions check whether there has been an error on A or
@@ -74,8 +74,8 @@ class PololuWheelEncoders
 	 * They return 1 if there was an error, then reset the error
 	 * flag.
 	 */
-	static unsigned char checkErrorA();
-	static unsigned char checkErrorB();
+	static unsigned char checkErrorM1();
+	static unsigned char checkErrorM2();
 };
 
 #include <avr/io.h>
