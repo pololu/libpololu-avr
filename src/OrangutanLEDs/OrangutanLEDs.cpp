@@ -24,11 +24,10 @@
  
 #include <avr/io.h>
 #include "OrangutanLEDs.h"
-#include "atmega328p_pins.h"
 
 
-#define RED_LED		PD1
-#define GREEN_LED	PD7
+#define RED_LED		PORT1
+#define GREEN_LED	PORT7
 
 #ifdef LIB_POLOLU
 

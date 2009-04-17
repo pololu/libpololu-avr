@@ -103,6 +103,10 @@ static char global_last_m2b_val;
 
 inline unsigned char get_val(unsigned char pin)
 {
+	// Note: get_val will work (i.e. always return the same value)
+	// even with invalid pin values, since the bit shift on the final
+	// return will cause the port value to be shifted all the way to
+	// 0.
 	if(pin <= 7)
 		return (PIND >> pin) & 1;
 	if(pin <= 13)
@@ -167,6 +171,8 @@ static void enable_interrupts_for_pin(unsigned char p)
 		DDRC &= ~(1 << (p - 14));
 		PCMSK1 |= 1 << (p - 14);
 	}
+	// Note: this will work with invalid port numbers, since there is
+	// no final "else" clause.
 }
 
 void PololuWheelEncoders::init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b)

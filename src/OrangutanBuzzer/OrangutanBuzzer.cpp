@@ -34,7 +34,6 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "OrangutanBuzzer.h"
-#include "atmega328p_pins.h"
 
 
 #define TIMER1_OFF					0x00	// timer1 disconnected
@@ -78,7 +77,7 @@ ISR (TIMER1_OVF_vect)
 		TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 		OCR1A = F_CPU / 1000;			// set TOP for freq = 1 kHz
 		OCR1B = 0;						// 0% duty cycle
-		DDRB &= ~(1 << PB2);	// silence buz, pin->input
+		DDRB &= ~(1 << DD2);	// silence buz, pin->input
 		buzzerFinished = 1;
 		DISABLE_TIMER1_INTERRUPT();
 		if (sequence && (play_mode_setting == PLAY_AUTOMATIC))
@@ -144,7 +143,7 @@ void OrangutanBuzzer::init2()
 {
 	DISABLE_TIMER1_INTERRUPT();				// disable all timer1 interrupts
 	
-	DDRB &= ~(1 << PB2);		// buzzer pin set as input
+	DDRB &= ~(1 << DD2);		// buzzer pin set as input
 	
 	TCCR1A = 0x23;	// bits 6 and 7 clear: normal port op., OC1A disconnected
 					// bit 4 clear, 5 set: clear OC1B on compare match
@@ -242,9 +241,9 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 		timeout = (unsigned int)((long)dur * freq / 1000);
 
 	if (volume == 0)
-		DDRB &= ~(1 << PB2);		// buzzer pin->input (silence buz.)
+		DDRB &= ~(1 << DD2);		// buzzer pin->input (silence buz.)
 	else
-		DDRB |= 1 << PB2;			// buzzer pin->output
+		DDRB |= 1 << DD2;			// buzzer pin->output
 
 	if (volume > 15)
 		volume = 15;
@@ -466,7 +465,7 @@ void OrangutanBuzzer::stopPlaying()
 	TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 	OCR1A = F_CPU / 1000;						// set TOP for freq = 1 kHz
 	OCR1B = 0;									// 0% duty cycle
-	DDRB &= ~(1 << PB2);						// silence buz, pin->input
+	DDRB &= ~(1 << DD2);						// silence buz, pin->input
 	buzzerFinished = 1;
 	sequence = 0;
 }

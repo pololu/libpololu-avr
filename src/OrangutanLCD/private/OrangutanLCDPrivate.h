@@ -17,12 +17,12 @@
 #define LCD_RS_E_PORT		PORTD
 #define LCD_RW_DDR			DDRB
 #define LCD_RW_PORT			PORTB
-#define LCD_RW				PB0
-#define LCD_RS				PD2
-#define LCD_E				PD4
+#define LCD_RW				PORT0
+#define LCD_RS				PORT2
+#define LCD_E				PORT4
 
-#define LCD_PORTB_MASK		((1 << PB1) | (1 << PB4) | (1 << PB5))
-#define LCD_PORTD_MASK		(1 << PD7)
+#define LCD_PORTB_MASK		((1 << PORT1) | (1 << PORT4) | (1 << PORT5))
+#define LCD_PORTD_MASK		(1 << PORT7)
 
 // Since we're only using four data lines, and since the pins they're
 // wired up to don't start with 0, we need to shift them into

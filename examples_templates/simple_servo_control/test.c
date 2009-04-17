@@ -26,9 +26,6 @@
 // we need io.h for the port definitions
 #include <avr/io.h>
 
-// compatibility with the mega328p requires these definitions
-#include <pololu/atmega328p_pins.h>
-
 /*
  * This function adds a given amount to the integer pointed to by s.
  */
@@ -42,14 +39,14 @@ void inc(int *s, char increment)
 int main()
 {
 	// set all of the ports to outputs
-	DDRD |= 1 << PD0;
-	DDRD |= 1 << PD1;
-	DDRC |= 1 << PC0;
-	DDRC |= 1 << PC1;
-	DDRC |= 1 << PC2;
-	DDRC |= 1 << PC3;
-	DDRC |= 1 << PC4;
-	DDRC |= 1 << PC5;
+	DDRD |= 1 << DD0;
+	DDRD |= 1 << DD1;
+	DDRC |= 1 << DD0;
+	DDRC |= 1 << DD1;
+	DDRC |= 1 << DD2;
+	DDRC |= 1 << DD3;
+	DDRC |= 1 << DD4;
+	DDRC |= 1 << DD5;
 
 	// the positions of the servos, which are given by an integer
 	// from 1200 to 1800 representing a delay in us

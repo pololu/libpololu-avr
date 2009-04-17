@@ -33,7 +33,6 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include "OrangutanMotors.h"
-#include "atmega328p_pins.h"
 
 #ifndef LIB_POLOLU
 // declared in wiring.c of Arduino-0012 and used to drive millis()
@@ -121,8 +120,8 @@ void OrangutanMotors::init2()
   
     // set PWM pins as digital outputs (the PWM signals will not   
     // appear on the lines if they are digital inputs)   
-    DDRD |= (1 << PD3) | (1 << PD5) | (1 << PD6);   
-    DDRB |= (1 << PB3);
+    DDRD |= (1 << DD3) | (1 << DD5) | (1 << DD6);   
+    DDRB |= (1 << PORT3);
 }
 
 

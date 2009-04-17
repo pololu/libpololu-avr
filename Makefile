@@ -9,6 +9,8 @@ library_files:
 	echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) ; cd ../.. ;)
 
+LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
+
 .PHONY: clean
 clean:
 	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) clean ; cd ../.. ;)
@@ -19,7 +21,13 @@ clean:
 		done; \
 		rm -rf examples; \
 	fi
-
+	if [ -e examples_templates ]; then \
+		for dir in examples_templates/*/; \
+		do \
+			$(MAKE) clean -C $$dir; \
+		done; \
+	fi
+	rm $(LIBRARY_FILES)
 
 # Set the PREFIX to point to the location of avr-gcc.
 # This can be overridden by setting the environment variable before compiling, e.g.:
@@ -34,7 +42,6 @@ show_prefix:
 	@echo The Pololu AVR Library will be installed in $(PREFIX).
 
 .PHONY: install
-LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
 install: $(LIBRARY_FILES)
 	install -d $(LIB)
 	install -d $(INCLUDE_POLOLU)
@@ -91,9 +98,10 @@ HEX_ZIPFILE := $(ZIPDIR)/libpololu-avr-example-hex-files-$(DATE).zip
 ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
-ZIP_EXCLUDES=\*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
+ZIP_EXCLUDES := \*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
 
-ARDUINO_EXCLUDES=libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSerial/\*
+ARDUINO_EXCLUDES := libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSerial/\*
+NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
 zip: library_files examples hex_files
@@ -104,7 +112,7 @@ zip: library_files examples hex_files
 	rm -f $(ARDUINO_QTR_ZIPFILE)
 	rm -f $(HEX_ZIPFILE)
 	ln -s . libpololu-avr
-	zip -rq $(LIB_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES)
+	zip -rq $(LIB_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) $(NON_ARDUINO_EXCLUDES)
 	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex
 	rm libpololu-avr
 	#

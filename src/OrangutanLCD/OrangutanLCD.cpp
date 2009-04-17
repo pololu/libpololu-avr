@@ -111,7 +111,6 @@
 #endif //!F_CPU
 #include "private/OrangutanLCDPrivate.h"	// contains all of the macros
 #include "OrangutanLCD.h"
-#include "atmega328p_pins.h"
 
 
 // *************************************************************************
