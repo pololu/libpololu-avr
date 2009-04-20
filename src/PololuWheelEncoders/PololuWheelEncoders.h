@@ -33,7 +33,7 @@ class PololuWheelEncoders
 
 	/*
 	 * Initializes the wheel encoders.  The four arguments are the
-	 * four pins that the wheel encoders are connected to, according
+	 * four pins that the two wheel encoders are connected to, according
 	 * to the Arduino numbering: Arduino digital pins 0 - 7 correpsond
 	 * to port D pins PD0 - PD7, respectively.  Arduino digital pins 8
 	 * - 13 correspond to port B pins PB0 - PB5.  Arduino analog
@@ -69,8 +69,8 @@ class PololuWheelEncoders
 	static int getCountsAndResetM2();
 
 	/*
-	 * These functions check whether there has been an error on A or
-	 * B; that is, if both a1/a2 or b1/b2 changed simultaneously.
+	 * These functions check whether there has been an error on M1 or
+	 * M2; that is, if both m1a/m1b or m2a/m2b changed simultaneously.
 	 * They return 1 if there was an error, then reset the error
 	 * flag.
 	 */
