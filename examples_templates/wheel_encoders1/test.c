@@ -19,22 +19,22 @@ int main()
   while(1)
   {
     lcd_goto_xy(0,0);
-    print_long(encoders_get_counts_a());
+    print_long(encoders_get_counts_m1());
     print(" ");
 
     lcd_goto_xy(4,0);
-    print_long(encoders_get_counts_b());
+    print_long(encoders_get_counts_m2());
     print(" ");
 
-    if(encoders_check_error_a())
+    if(encoders_check_error_m1())
     {
       lcd_goto_xy(0,1);
-      print("Error A");
+      print("Error 1");
     }
-    if(encoders_check_error_b())
+    if(encoders_check_error_m2())
     {
       lcd_goto_xy(0,1);
-      print("Error B");
+      print("Error 2");
     }
 
     delay_ms(50);

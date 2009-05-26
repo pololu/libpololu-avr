@@ -157,6 +157,11 @@ void OrangutanAnalog::startConversion(unsigned char channel)
 						// bit 4: ADC interrupt flag
 						// bit 3 clear: disable ADC interrupt
 						// bits 0-2 set: ADC clock prescaler is 128
+
+	// use AVCC as a reference
+    ADMUX |= 1 << 6;
+    ADMUX &= ~(1 << 7);
+
 	ADMUX &= 0xF0;				// set the conversion channel
 	ADMUX |= channel & 0x0F;
 	ADCSRA |= 1 << ADSC;		// start the conversion

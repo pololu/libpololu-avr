@@ -1,8 +1,8 @@
-CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega168 -Os
+CFLAGS=-g -Wall -mcall-prologues -mmcu=atmega328p -Os
 CPP=avr-g++
 CC=avr-gcc
 OBJ2HEX=avr-objcopy 
-LDFLAGS=-Wl,-gc-sections -lpololu
+LDFLAGS=-Wl,-gc-sections -lpololu_atmega328p
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_flt -lm
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_min
 

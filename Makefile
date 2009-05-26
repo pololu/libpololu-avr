@@ -54,7 +54,7 @@ install: $(LIBRARY_FILES)
 # concatenated together with &&.
 
 examples_3pi := 3pi-demo-program 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
-examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 buzzer2 lcd1 motors2 simple-test 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program wheel_encoders1 simple_servo_control
+examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 buzzer2 lcd1 motors2 simple-test 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program wheel_encoders1
 
 # The 48 examples are the only ones that will work on the mega48.
 # They will also work on the orangutans, which could have either a 168
