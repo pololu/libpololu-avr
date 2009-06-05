@@ -48,6 +48,7 @@ install: $(LIBRARY_FILES)
 	install $(foreach device,$(devices),libpololu_$(device).a) $(LIB)
 	install pololu/*.h $(INCLUDE_POLOLU)
 	install pololu/orangutan $(INCLUDE_POLOLU)
+	@echo "Installation is complete."
 
 # We make all of the examples from templates in the examples_templates
 # directory (which is not distributed), by running a bunch of commands
