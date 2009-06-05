@@ -495,7 +495,7 @@ PololuQTRSensorsRC::PololuQTRSensorsRC(unsigned char* pins,
 
 // 'numSensors' specifies the length of the 'pins' array (i.e. the
 // number of QTR-RC sensors you are using).  numSensors must be 
-// no greater than 8.
+// no greater than 16.
 
 // 'timeout' specifies the length of time in timer2 counts beyond
 // which you consider the sensor reading completely black.  That is to say,
@@ -655,7 +655,7 @@ PololuQTRSensorsAnalog::PololuQTRSensorsAnalog(unsigned char* analogPins,
 
 // 'numSensors' specifies the length of the 'analogPins' array (i.e. the
 // number of QTR-A sensors you are using).  numSensors must be 
-// no greater than 8.
+// no greater than 16.
 
 // 'numSamplesPerSensor' indicates the number of 10-bit analog samples
 // to average per channel (i.e. per sensor) for each reading.  The total
