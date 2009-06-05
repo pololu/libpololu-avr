@@ -143,8 +143,8 @@ void PololuQTRSensors::init(unsigned char numSensors,
 	calibratedMinimumOff=0;
 	calibratedMaximumOff=0;
 
-	if (numSensors > 8)
-		_numSensors = 8;
+	if (numSensors > 16)
+		_numSensors = 16;
 	else
 		_numSensors = numSensors;
 		
@@ -281,9 +281,9 @@ void PololuQTRSensors::calibrateOnOrOff(unsigned int **calibratedMinimum,
 										unsigned char readMode)
 {
 	int i;
-	unsigned int sensor_values[8];
-	unsigned int max_sensor_values[8];
-	unsigned int min_sensor_values[8];
+	unsigned int sensor_values[16];
+	unsigned int max_sensor_values[16];
+	unsigned int min_sensor_values[16];
 
 	// Allocate the arrays if necessary.
 	if(*calibratedMaximum == 0)
