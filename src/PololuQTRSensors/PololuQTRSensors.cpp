@@ -204,7 +204,7 @@ void PololuQTRSensors::read(unsigned int *sensor_values, unsigned char readMode)
 		((PololuQTRSensorsAnalog*)this)->readPrivate(sensor_values);
 		emittersOff();
 		if(readMode == QTR_EMITTERS_ON_AND_OFF)
-			((PololuQTRSensorsRC*)this)->readPrivate(off_values);
+			((PololuQTRSensorsAnalog*)this)->readPrivate(off_values);
 	}
 
 	if(readMode == QTR_EMITTERS_ON_AND_OFF)
