@@ -35,6 +35,7 @@
 #define IR_EMITTERS_ON_AND_OFF 2
 
 void pololu_3pi_init(unsigned int line_sensor_timeout);
+void pololu_3pi_init_disable_emitter_pin(unsigned int line_sensor_timeout);
 void read_line_sensors(unsigned int *sensor_values, unsigned char readMode);
 void emitters_on();
 void emitters_off();

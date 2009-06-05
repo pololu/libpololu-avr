@@ -56,7 +56,10 @@ public:
 	//
 	// You may choose a timeout for the line sensors, specified here
 	// in microseconds.
-	static void init(unsigned int line_sensor_timeout = 1000);
+	//
+	// Setting disable_emitter_pin = 1 causes PC5 not to be used to
+	// control the emitters, so that you can use it for other things.
+	static void init(unsigned int line_sensor_timeout = 1000, unsigned char disable_emitter_pin = 0);
 
 	// Reads values into the array sensor_values.  This must have
 	// space for five unsigned int values and be called AFTER init.

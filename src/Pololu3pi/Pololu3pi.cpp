@@ -43,6 +43,11 @@ extern "C" void pololu_3pi_init(unsigned int line_sensor_timeout)
 	Pololu3pi::init(line_sensor_timeout);
 }
 
+extern "C" void pololu_3pi_init_disable_emitter_pin(unsigned int line_sensor_timeout)
+{
+	Pololu3pi::init(line_sensor_timeout, 1);
+}
+
 extern "C" void read_line_sensors(unsigned int *sensor_values, unsigned char readMode)
 {
 	return qtr3pi.read(sensor_values, readMode);
@@ -105,12 +110,16 @@ extern "C" unsigned int *get_line_sensors_calibrated_maximum_off()
 
 #endif
 
-void Pololu3pi::init(unsigned int line_sensor_timeout_us)
+void Pololu3pi::init(unsigned int line_sensor_timeout_us, unsigned char disable_emitter_pin)
 {
 	// Set up the line sensor and turn off the emitters.
 	// The sensors are on PC0..4, and the emitter is on PC5.
 	unsigned char pins[5] = {14,15,16,17,18};
-	qtr3pi.init(pins,5,line_sensor_timeout_us,19);
+	if(disable_emitter_pin)
+		qtr3pi.init(pins,5,line_sensor_timeout_us,255);
+	else
+		qtr3pi.init(pins,5,line_sensor_timeout_us,19);
+
 	qtr3pi.emittersOff();
 
 #ifdef LIB_POLOLU
