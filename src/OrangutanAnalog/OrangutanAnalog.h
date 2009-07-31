@@ -73,7 +73,10 @@ class OrangutanAnalog
 	// conversion on a channel with startConversion(channel), and then
 	// poll isConverting in your main loop.  Once isConverting() returns
 	// a zero, the result can be obtained through a call to conversionResult().
-	static void startConversion(unsigned char channel);
+	// If use_internal_reference is set to true, the function will use
+	// the internal 1.1V voltage reference on the AVR; otherwise it
+	// uses the AVCC pin as a reference.
+	static void startConversion(unsigned char channel, unsigned char use_internal_reference = 0);
 
 	// returns 1 if the ADC is in the middle of an conversion, otherwise
 	// returns 0

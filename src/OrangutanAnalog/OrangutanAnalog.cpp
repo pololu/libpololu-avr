@@ -64,6 +64,11 @@ extern "C" void start_analog_conversion(unsigned char channel)
 	OrangutanAnalog::startConversion(channel);
 }
 
+extern "C" void start_analog_conversion_using_internal_reference(unsigned char channel)
+{
+	OrangutanAnalog::startConversion(channel,1);
+}
+
 extern "C" unsigned int read_battery_millivolts_3pi()
 {
 	return OrangutanAnalog::readBatteryMillivolts_3pi();
@@ -145,9 +150,9 @@ inline unsigned int OrangutanAnalog::conversionResult()
 // a zero, the result can be obtained through a call to conversionResult().
 // Note: this function will set the pin corresponding to the specified
 // channel as an input with the internal pull-up disabled.
-void OrangutanAnalog::startConversion(unsigned char channel)
+void OrangutanAnalog::startConversion(unsigned char channel, unsigned char use_internal_reference)
 {
-	if (channel > 7)
+	if (channel > 15)
 		return;
 	PORTC &= ~(1 << channel);	// turn off any pull-ups
 	DDRC &= ~(1 << channel);	// set I/O line to be an input
@@ -158,9 +163,17 @@ void OrangutanAnalog::startConversion(unsigned char channel)
 						// bit 3 clear: disable ADC interrupt
 						// bits 0-2 set: ADC clock prescaler is 128
 
-	// use AVCC as a reference
-    ADMUX |= 1 << 6;
-    ADMUX &= ~(1 << 7);
+	ADMUX |= 1 << 6;
+	if(use_internal_reference)
+	{
+		// use the internal voltage reference
+		ADMUX |= 1 << 7;
+	}
+	else
+	{
+		// use AVCC as a reference
+		ADMUX &= ~(1 << 7);
+	}
 
 	ADMUX &= 0xF0;				// set the conversion channel
 	ADMUX |= channel & 0x0F;

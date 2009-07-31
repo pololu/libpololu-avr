@@ -1,0 +1,2 @@
+DEVICE = atmega324p
+AVRDUDE_DEVICE = m324p

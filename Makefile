@@ -1,6 +1,6 @@
 # NOTE: to compile with avr-gcc less than verson 4.2.3, you must
 # remove the atmega328p from the list of target devices below:
-devices := atmega48 atmega168 atmega328p
+devices := atmega48 atmega168 atmega328p atmega324p
 
 # We need to do our recursive make with cd, since WinAVR does not support make -C.
 # See WinAVR bug 1932584, "recursive make call fails"
@@ -55,7 +55,7 @@ install: $(LIBRARY_FILES)
 # concatenated together with &&.
 
 examples_3pi := 3pi-demo-program 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
-examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 buzzer2 lcd1 motors2 simple-test 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program wheel_encoders1
+examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 analog3 buzzer2 lcd1 motors2 simple-test 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program wheel_encoders1
 
 # The 48 examples are the only ones that will work on the mega48.
 # They will also work on the orangutans, which could have either a 168
@@ -64,6 +64,7 @@ examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 buzzer2 lcd1 mot
 examples_atmega48 := analog1 motors1 led1 simple_servo_control
 examples_atmega168 := $(examples_atmega48) $(examples_3pi) $(examples_orangutan)
 examples_atmega328p := $(examples_atmega48) $(examples_3pi) $(examples_orangutan)
+examples_atmega324p := $(examples_atmega48) $(examples_orangutan)
 
 example_template = examples_templates/$(example)
 example_dir = examples/$(device)/$(example)
