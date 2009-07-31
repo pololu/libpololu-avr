@@ -37,16 +37,24 @@ class OrangutanLEDs
 	// turns the LED on.  Note that the Baby Orangutan B only has
 	// one LED (the red one), so green() will just drive I/O line PD7
 	// high or low, depending on the argument.
-	static void left(unsigned char on);				// same as red()
-	static inline void red(unsigned char on)
+	static void red(unsigned char on);
+	static inline void left(unsigned char on)
 	{
-		left(on);
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+		green(on);
+#else
+		red(on);
+#endif
 	}
 	
-	static void right(unsigned char on);				// same as green()
-	static inline void green(unsigned char on)
+	static void green(unsigned char on);
+	static inline void right(unsigned char on)
 	{
-		right(on);
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+		red(on);
+#else
+		green(on);
+#endif
 	}
 };
 

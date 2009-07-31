@@ -26,8 +26,19 @@
 #include "OrangutanLEDs.h"
 
 
-#define RED_LED		PORT1
-#define GREEN_LED	PORT7
+#define RED_LED			PORT1
+#define RED_LED_PORT	PORTD
+#define RED_LED_DDR		DDRD
+
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#define GREEN_LED		PORT4
+#define GREEN_LED_PORT	PORTC
+#define GREEN_LED_DDR	DDRC
+#else
+#define GREEN_LED		PORT7
+#define GREEN_LED_PORT	PORTD
+#define GREEN_LED_DDR	DDRD
+#endif
 
 #ifdef LIB_POLOLU
 
@@ -65,23 +76,27 @@ OrangutanLEDs::OrangutanLEDs()
 // turns the LED on.  Note that the Baby Orangutan B only has
 // one LED (the red one), so green() will just drive I/O line PD7
 // high or low, depending on the argument.
-void OrangutanLEDs::left(unsigned char on)
+void OrangutanLEDs::red(unsigned char on)
 {
-	DDRD |= 1 << RED_LED;
+	RED_LED_DDR |= 1 << RED_LED;
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)	// red LED turns on when driven low
 	if (on)
-		PORTD |= 1 << RED_LED;
+#else																// red LED turns on when driven high
+	if (!on)
+#endif
+		RED_LED_PORT &= ~(1 << RED_LED);
 	else
-		PORTD &= ~(1 << RED_LED);
+		RED_LED_PORT |= 1 << RED_LED;
 }
 
 
-void OrangutanLEDs::right(unsigned char on)
+void OrangutanLEDs::green(unsigned char on)
 {
-	DDRD |= 1 << GREEN_LED;
+	GREEN_LED_DDR |= 1 << GREEN_LED;
 	if (on)
-		PORTD |= 1 << GREEN_LED;
+		GREEN_LED_PORT |= 1 << GREEN_LED;
 	else
-		PORTD &= ~(1 << GREEN_LED);
+		GREEN_LED_PORT &= ~(1 << GREEN_LED);
 }
 
 // Local Variables: **
