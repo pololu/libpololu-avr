@@ -1,10 +1,10 @@
 /*
-  OrangutanLCD.cpp - Library for using the LCD on the Orangutan LV-168 or 3pi robot.
-  Originally written by Tom Benedict and Ben Schmidel as part of Orangutan-Lib.
+  OrangutanLCD.cpp - Library for using the LCD on the Orangutan LV, SV, SVP, or 3pi robot.
+  This library incorporates some code originally written by Tom Benedict as part of Orangutan-Lib.
+  Released into the public domain.
 */
 
 /*
- * Modified by Ben Schmidel, May 14, 2008.
  * Copyright (c) 2008 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
@@ -85,36 +85,22 @@
 // above, even though we're discarding the contents of the second
 // 4-bit read.
 // 
-// The Orangutan LV-168 drives the LCD in 4-bit mode with E, R/W, and
-// RS control lines.
-// 
-// AVR		LCD		Direction		Function
-// ------	------	--------------	----------------------------
-// PD4		E		Out				Dedicated to LCD Enable
-// PD2		RS		Out				Dedicated to LCD ???
-// PB0		R/W		Out				Dedicated to LCD Read/Write
-// PD7		DB7		In/Out			Dedicated to LCD I/O
-// PB5		DB6		Out				LCD I/O and Orangutan Button 2
-// PB4		DB5		Out				LCD I/O and Orangutan Button 1
-// PB1		DB4		Out				LCD I/O and Orangutan Button 0
-// N/C		DB3
-// N/C		DB2
-// N/C		DB1
-// N/C		DB0
+// The Orangutan LV, SV, SVP and 3pi the LCD in 4-bit mode with E,
+// R/W, and RS control lines.
 
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 
 #ifndef F_CPU
-#define F_CPU 20000000UL	// the Orangutan LV-168 runs at 20 MHz
+#define F_CPU 20000000UL	// Orangutans run at 20 MHz
 #endif //!F_CPU
-#include "private/OrangutanLCDPrivate.h"	// contains all of the macros
+#include "private/OrangutanLCDPrivate.h"	// contains all of the macros and pin defines
 #include "OrangutanLCD.h"
 
 
 // *************************************************************************
-// *       Functions specifically tailored for the Orangutan LV-168        *
+// *       Functions specifically tailored for the Orangutan               *
 // *************************************************************************
 
 
@@ -296,8 +282,9 @@ void OrangutanLCD::loadCustomCharacter(const char *picture_p, unsigned char numb
 void OrangutanLCD::init2()
 {
 	// Set up the DDR for the LCD control lines
-	LCD_RS_E_DDR |= (1 << LCD_RS) | (1 << LCD_E);
-	LCD_RW_DDR |= (1 << LCD_RW);
+	LCD_RS_DDR |= 1 << LCD_RS;
+	LCD_RW_DDR |= 1 << LCD_RW;
+	LCD_E_DDR |= 1 << LCD_E;
 
 	// Wait >15ms
 	delay(20);
@@ -352,36 +339,35 @@ void OrangutanLCD::init2()
 // of them.
 void OrangutanLCD::busyWait()
 {
-
 	uint8_t temp_ddr, data;
 
 	// Save our DDR information
-	temp_ddr = DDRD;
+	temp_ddr = LCD_BF_DDR;
 
 	// Set up the data DDR for input
-	DDRD &= ~(LCD_PORTD_MASK);
+	LCD_BF_DDR &= ~LCD_BF_MASK;
 
 	// Set up RS and RW to read the state of the LCD's busy flag
-	LCD_RS_E_PORT &= ~(1 << LCD_RS);
-	LCD_RW_PORT |= (1 << LCD_RW);
+	LCD_RS_PORT &= ~(1 << LCD_RS);
+	LCD_RW_PORT |= 1 << LCD_RW;
 
 	do
 	{
 		// Bring E high
-		LCD_RS_E_PORT |= (1 << LCD_E);
+		LCD_E_PORT |= 1 << LCD_E;
 
 		// Wait at least 120ns (1us is excessive)
 		delayMicroseconds(1);
 
 		// Get the data back from the LCD
-		data = PIND & LCD_PORTD_MASK;
+		data = LCD_BF_PIN;
 
 		// That excessive delay means our cycle time on E cannot be
 		// shorter than 1000ns (500ns being the spec), so no further
 		// delays are required
 
 		// Bring E low
-		LCD_RS_E_PORT &= ~(1 << LCD_E);
+		LCD_E_PORT &= ~(1 << LCD_E);
 
 		// Wait a small bit
 		delayMicroseconds(1);
@@ -389,20 +375,20 @@ void OrangutanLCD::busyWait()
 		// Strobe out the 4 bits we don't care about:
 
 		// Bring E high
-		LCD_RS_E_PORT |= (1 << LCD_E);
+		LCD_E_PORT |= 1 << LCD_E;
 
 		// Wait at least 120ns (1us is excessive)
 		delayMicroseconds(1);
 
 		// Bring E low
-		LCD_RS_E_PORT &= ~(1 << LCD_E);
+		LCD_E_PORT &= ~(1 << LCD_E);
 	}
-	while (data & (1 << LCD_BF));
+	while (data & LCD_BF_MASK);
 
 	// To reach here our busy flag must be zero, meaning the LCD is free
 
 	// Restore our DDR information
-	DDRD = temp_ddr;
+	LCD_BF_DDR = temp_ddr;
 }
 
 
@@ -411,20 +397,24 @@ void OrangutanLCD::busyWait()
 // line up the bits and shove them out the appropriate I/O lines.
 void OrangutanLCD::sendNibble(unsigned char nibble)
 {
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+	PORTC = (PORTC & ~LCD_PORTC_MASK) | LCD_PORTC_DATA(nibble);
+#else
 	PORTB = (PORTB & ~LCD_PORTB_MASK) | LCD_PORTB_DATA(nibble);
 	PORTD = (PORTD & ~LCD_PORTD_MASK) | LCD_PORTD_DATA(nibble);
+#endif
 
 	// At this point the four data lines are set, so the Enable pin 
 	// is strobed to let the LCD latch them.
 
 	// Bring E high
-	LCD_RS_E_PORT |= (1 << LCD_E);
+	LCD_E_PORT |= 1 << LCD_E;
 	
 	// Wait => 450ns (1us is excessive)
 	delayMicroseconds(1);
 
 	// Bring E low
-	LCD_RS_E_PORT &= ~(1 << LCD_E);
+	LCD_E_PORT &= ~(1 << LCD_E);
 
 	delayMicroseconds(1);
 
@@ -438,30 +428,39 @@ void OrangutanLCD::sendNibble(unsigned char nibble)
 
 // Send either data or a command on a 4-bit interface
 void OrangutanLCD::send(unsigned char data, unsigned char rs)
-{
-	unsigned char temp_ddrb, temp_portb, temp_ddrd, temp_portd;
-	
+{	
 	init();  // initialize the LCD if we haven't already
 
 	// Wait until the busy flag clears
 	busyWait();
 
 	// Save our DDR and port information
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+	unsigned char temp_ddrc, temp_portc;
+	temp_ddrc = DDRC;
+	temp_portc = PORTC;
+#else
+	unsigned char temp_ddrb, temp_portb, temp_ddrd, temp_portd;
 	temp_ddrb = DDRB;
 	temp_portb = PORTB;
 	temp_ddrd = DDRD;
 	temp_portd = PORTD;
+#endif
 
 	// Clear RW and RS
-	LCD_RS_E_PORT &= ~(1 << LCD_RS);
+	LCD_RS_PORT &= ~(1 << LCD_RS);
 	LCD_RW_PORT &= ~(1 << LCD_RW);
 
 	// Set RS according to what this routine was told to do
-	LCD_RS_E_PORT |= (rs << LCD_RS);
+	LCD_RS_PORT |= (rs << LCD_RS);
 
 	// Set the data pins as outputs
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+	DDRC |= LCD_PORTC_MASK;
+#else
 	DDRB |= LCD_PORTB_MASK;
 	DDRD |= LCD_PORTD_MASK;
+#endif
 
 	// Send the high 4 bits
 	sendNibble(data >> 4);
@@ -470,10 +469,15 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 	sendNibble(data & 0x0F);
 
 	// Restore our DDR and port information
-	PORTD = temp_portd;
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+	DDRC = temp_ddrc;
+	PORTC = temp_portc;
+#else
 	DDRD = temp_ddrd;
-	PORTB = temp_portb;
+	PORTD = temp_portd;
 	DDRB = temp_ddrb;
+	PORTB = temp_portb;
+#endif
 }
 
 
