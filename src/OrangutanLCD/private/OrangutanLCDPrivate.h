@@ -50,12 +50,6 @@
 #define LCD_PORTC_MASK			((1 << LCD_DB4) | (1 << LCD_DB5) | (1 << LCD_DB6) | (1 << LCD_DB7))
 #define LCD_PORTC_DATA(data)	((data & 0x0F) << LCD_DB4)
 
-// Size of the LCD (each starts at zero, so a 16x2 display would use
-// the numbers 15 and 1.)
-
-#define LCD_MAX_X			15
-#define LCD_MAX_Y			1
-
 
 #else
 
@@ -105,12 +99,7 @@
 #define LCD_PORTB_DATA(data)	(((data & 0x01) <<1 ) | ((data & 0x06) << 3))
 #define LCD_PORTD_DATA(data)	((data & 0x08) << 4)
 
-// Size of the LCD (each starts at zero, so an 8x2 display would use
-// the numbers 7 and 1.)
 
-#define LCD_MAX_X			7
-#define LCD_MAX_Y			1
- 
 #endif
 
 

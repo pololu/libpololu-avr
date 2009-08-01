@@ -637,10 +637,6 @@ void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 
 	unsigned char line_mem[] = {0x80, 0xC0};
 
-	// Make sure our X and Y are within bounds
-	x = (x < LCD_MAX_X ? x : LCD_MAX_X);
-	y = (y < LCD_MAX_Y ? y : LCD_MAX_Y);
-
 	// Grab the location in the LCD's memory of the start of line y,
 	// and add X to it to get the right character location.
 	send_cmd(line_mem[y] + x);
