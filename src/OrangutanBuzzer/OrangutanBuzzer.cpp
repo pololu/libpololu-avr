@@ -1,6 +1,6 @@
 /*
-  OrangutanBuzzer.cpp - Library for controlling the buzzer on the Orangutan
-    LV-168 or 3pi robot. This library uses a timer1 PWM to generate the note
+  OrangutanBuzzer.cpp - Library for controlling the buzzer on the Orangutan LV,
+    SV, SVP, or 3pi robot. This library uses a timer1 PWM to generate the note
 	frequencies and timer1 overflow interrupt to time the duration of the
 	notes, so the buzzer can be playing a melody in the background while
 	the rest of your code executes.
@@ -77,7 +77,7 @@ ISR (TIMER1_OVF_vect)
 		TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 		OCR1A = F_CPU / 1000;			// set TOP for freq = 1 kHz
 		OCR1B = 0;						// 0% duty cycle
-		DDRB &= ~(1 << DD2);	// silence buz, pin->input
+		BUZZER_DDR &= ~BUZZER;	// silence buz, pin->input
 		buzzerFinished = 1;
 		DISABLE_TIMER1_INTERRUPT();
 		if (sequence && (play_mode_setting == PLAY_AUTOMATIC))
@@ -143,7 +143,7 @@ void OrangutanBuzzer::init2()
 {
 	DISABLE_TIMER1_INTERRUPT();				// disable all timer1 interrupts
 	
-	DDRB &= ~(1 << DD2);		// buzzer pin set as input
+	BUZZER_DDR &= ~BUZZER;		// buzzer pin set as input
 	
 	TCCR1A = 0x23;	// bits 6 and 7 clear: normal port op., OC1A disconnected
 					// bit 4 clear, 5 set: clear OC1B on compare match
@@ -241,9 +241,9 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 		timeout = (unsigned int)((long)dur * freq / 1000);
 
 	if (volume == 0)
-		DDRB &= ~(1 << DD2);		// buzzer pin->input (silence buz.)
+		BUZZER_DDR &= ~BUZZER;			// buzzer pin->input (silence buz.)
 	else
-		DDRB |= 1 << DD2;			// buzzer pin->output
+		BUZZER_DDR |= BUZZER;			// buzzer pin->output
 
 	if (volume > 15)
 		volume = 15;
@@ -465,7 +465,7 @@ void OrangutanBuzzer::stopPlaying()
 	TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 	OCR1A = F_CPU / 1000;						// set TOP for freq = 1 kHz
 	OCR1B = 0;									// 0% duty cycle
-	DDRB &= ~(1 << DD2);						// silence buz, pin->input
+	BUZZER_DDR &= ~BUZZER;						// silence buz, pin->input
 	buzzerFinished = 1;
 	sequence = 0;
 }
