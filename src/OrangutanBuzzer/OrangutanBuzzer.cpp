@@ -75,9 +75,9 @@ ISR (TIMER1_OVF_vect)
 	if (buzzerTimeout-- == 0)
 	{
 		TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
-		OCR1A = F_CPU / 1000;			// set TOP for freq = 1 kHz
+		OCR1A = (F_CPU/2) / 1000;			// set TOP for freq = 1 kHz
 		OCR1B = 0;						// 0% duty cycle
-		BUZZER_DDR &= ~BUZZER;	// silence buz, pin->input
+		//BUZZER_DDR &= ~BUZZER;	// silence buz, pin->input
 		buzzerFinished = 1;
 		DISABLE_TIMER1_INTERRUPT();
 		if (sequence && (play_mode_setting == PLAY_AUTOMATIC))
@@ -141,20 +141,21 @@ extern "C" unsigned char play_check()
 // initializes timer1 for buzzer control
 void OrangutanBuzzer::init2()
 {
-	DISABLE_TIMER1_INTERRUPT();				// disable all timer1 interrupts
+	DISABLE_TIMER1_INTERRUPT();	// disable all timer1 interrupts
 	
-	BUZZER_DDR &= ~BUZZER;		// buzzer pin set as input
+	//BUZZER_DDR &= ~BUZZER;	// buzzer pin set as input
 	
 	TCCR1A = 0x23;	// bits 6 and 7 clear: normal port op., OC1A disconnected
-					// bit 4 clear, 5 set: clear OC1B on compare match
+					// bit 4 clear, 5 set: clear OC1B on comp match when upcounting, 
+					//                     set OC1B on comp match when downcounting
 					// bits 2 and 3: not used
 					// bits 0 & 1 set: combine with bits 3 & 4 of TCCR1B...
 
-	TCCR1B = 0x19;	// bit 7 clear: input capture noise canceler disabled
+	TCCR1B = 0x11;	// bit 7 clear: input capture noise canceler disabled
 					// bit 6 clear: input capture triggers on falling edge
 					// bit 5: not used
-					// bits 3 and 4 set: combine with bits 0 & 1 of TCCR1A to
-					// 		select waveform generation mode 14, fast PWM,
+					// bit 3 clear and 4 set: combine with bits 0 & 1 of TCCR1A to
+					// 		select waveform generation mode 11, phase-correct PWM,
 					//		TOP = OCR1A, OCR1B set at TOP, TOV1 flag set at TOP
 					// bit 0 set, 1-2 clear: timer clock = IO clk (prescaler 1)
 
@@ -169,8 +170,10 @@ void OrangutanBuzzer::init2()
 	//   cycle of the new frequency will be at the old duty cycle, since
 	//   the duty cycle (OCR1A) is not updated until TOP.
 
-	OCR1A = F_CPU / 1000;					// set TOP for freq = 1 kHz
-	OCR1B = 0;								// set 0% duty cycle
+	OCR1A = (F_CPU/2) / 1000;	// set TOP for freq = 1 kHz
+	OCR1B = 0;					// set 0% duty cycle
+	
+	BUZZER_DDR |= BUZZER;		// buzzer pin set as an output
 }
 
 
@@ -203,12 +206,12 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 	newTCCR1B = TCCR1B & 0xF8;	// clear clock select bits
 
 	// calculate necessary clock source and counter top value to get freq
-	if (freq > 400 * ((unsigned int)multiplier))	// clock prescaler = 1
+	if (freq > 200 * ((unsigned int)multiplier))	// clock prescaler = 1
 	{
 		if (freq > 10000)
 			freq = 10000;			// max frequency allowed is 10kHz
 
-		newOCR1A = (unsigned int)(20000000UL / freq);
+		newOCR1A = (unsigned int)((10000000UL + (freq >> 1)) / freq);
 
 		// timer1 clock select:
 		newTCCR1B |= TIMER1_CLK_1;	// select IO clk (prescaler = 1)
@@ -222,9 +225,9 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 
 		// set top (frequency):
 		if (multiplier == 10)
-			newOCR1A = (unsigned int)(25000000UL / freq);
+			newOCR1A = (unsigned int)((12500000UL + (freq >> 1))/ freq);
 		else
-			newOCR1A = (unsigned int)(2500000UL / freq);
+			newOCR1A = (unsigned int)((1250000UL + (freq >> 1)) / freq);
 
 		// timer1 clock select
 		newTCCR1B |= TIMER1_CLK_8;	// select IO clk / 8
@@ -240,11 +243,13 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 	else
 		timeout = (unsigned int)((long)dur * freq / 1000);
 
+	/*	now that we're using a phase-correct PWM, we get a glitch-free 0V at volume 0
 	if (volume == 0)
 		BUZZER_DDR &= ~BUZZER;			// buzzer pin->input (silence buz.)
 	else
 		BUZZER_DDR |= BUZZER;			// buzzer pin->output
-
+	*/
+	
 	if (volume > 15)
 		volume = 15;
 
@@ -463,9 +468,9 @@ void OrangutanBuzzer::stopPlaying()
 {
 	DISABLE_TIMER1_INTERRUPT();					// disable interrupts
 	TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
-	OCR1A = F_CPU / 1000;						// set TOP for freq = 1 kHz
+	OCR1A = (F_CPU/2) / 1000;					// set TOP for freq = 1 kHz
 	OCR1B = 0;									// 0% duty cycle
-	BUZZER_DDR &= ~BUZZER;						// silence buz, pin->input
+	//BUZZER_DDR &= ~BUZZER;						// silence buz, pin->input
 	buzzerFinished = 1;
 	sequence = 0;
 }
