@@ -1,6 +1,6 @@
 /*
   OrangutanPushbuttons.h - Library for using the three user pushbuttons on the
-      Orangutan LV-168 or 3pi robot.
+      Orangutan LV, SV, SVP, or 3pi robot.
 */
 
 /*
@@ -25,15 +25,36 @@
 #ifndef OrangutanPushbuttons_h
 #define OrangutanPushbuttons_h
 
-// LV-168 definitions
-#define TOP_BUTTON		(1 << 5)	// PB1; Arduino pin 13
-#define MIDDLE_BUTTON	(1 << 4)	// PB4; Arduino pin 12
-#define BOTTOM_BUTTON	(1 << 1)	// PB5; Arduino pin 9
 
-// 3pi definitions
-#define BUTTON_C	(1 << 5)		// PB1; Arduino pin 13
-#define BUTTON_B	(1 << 4)		// PB4; Arduino pin 12
-#define BUTTON_A	(1 << 1)		// PB5; Arduino pin 9
+#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+
+// Orangutan SVP definitions
+#define TOP_BUTTON		(1 << PORTC5)
+#define MIDDLE_BUTTON	(1 << PORTC3)
+#define BOTTOM_BUTTON	(1 << PORTC2)
+
+#define BUTTON_DDR		DDRC
+#define BUTTON_PORT		PORTC
+#define BUTTON_PIN		PINC
+
+#else
+
+
+// Orangutan LV, SV, and 3pi definitions
+#define TOP_BUTTON		(1 << PORTB5)
+#define MIDDLE_BUTTON	(1 << PORTB4)
+#define BOTTOM_BUTTON	(1 << PORTB1)
+
+#define BUTTON_PORT		PORTB
+#define BUTTON_DDR		DDRB
+#define BUTTON_PIN		PINB
+
+#endif
+
+
+#define BUTTON_C		TOP_BUTTON
+#define BUTTON_B		MIDDLE_BUTTON
+#define BUTTON_A		BOTTOM_BUTTON
 
 #define ALL_BUTTONS		(TOP_BUTTON | MIDDLE_BUTTON | BOTTOM_BUTTON)
 
