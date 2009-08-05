@@ -1,6 +1,6 @@
 /*
   OrangutanMotors.cpp - Library for using the motor drivers on the
-      Orangutan LV-168, Baby Orangutan B-48/B-168, or 3pi robot.
+      Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.
 	  The timer2 overflow ISR is designed to work with Arduino 12
 	  and will not work properly with earlier versions of the Arduino
 	  environment.
@@ -89,7 +89,8 @@ void OrangutanMotors::init2()
 	// we intentionally do not call sei() here
 #endif
 
-/*  40 kHz operation (3pi and Baby Orangutan B can handle this) 
+/*  40 kHz operation (3pi, Orangutan SV and SVP, and Baby Orangutan B can handle this, Orangutan LV cannot)
+	*** Note that using these settings will break OrangutanTime and QTRsensors ***
 	// configure for inverted phase-correct PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
     //  Timer0 and Timer2 count up from 0 to 255 and then counts back down to 0  
@@ -120,8 +121,8 @@ void OrangutanMotors::init2()
   
     // set PWM pins as digital outputs (the PWM signals will not   
     // appear on the lines if they are digital inputs)   
-    DDRD |= (1 << DD3) | (1 << DD5) | (1 << DD6);   
-    DDRB |= (1 << PORT3);
+    DDRD |= (1 << PORTD3) | (1 << PORTD5) | (1 << PORTD6);   
+    DDRB |= (1 << PORTB3);
 }
 
 

@@ -1,6 +1,6 @@
 /*
   OrangutanMotors.h - Library for using the motor drivers on the
-      Orangutan LV-168, Baby Orangutan B-48/B-168, or 3pi robot
+      Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot
 */
 
 /*
