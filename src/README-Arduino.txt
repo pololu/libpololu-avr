@@ -45,7 +45,7 @@ directory.
 You should now be able to use these libraries in your sketches by
 selecting Sketch > Import Library > Orangutan_____ from your Arduino
 0012 IDE (or simply type #include <Orangutan_____.h> at the top of
-your sketch). Note that you might need to restart your Arduino 0011
+your sketch). Note that you might need to restart your Arduino
 IDE before it sees the new libraries. If you do not need the
 functionality of a specific library, you should leave it out of your
 sketch or, if you've already added it, remove it from your sketch by
@@ -66,7 +66,7 @@ with Example.
 * Updated the library so that it would be compatible with the new Arduino-0012 environment.  These changes mean that the library will not work correctly under older versions of the Arduino environment.
 
 080825 -
-* Included the Pololu3pi library, which makes it easier to interface with the for the Pololu 3pi robot.
+* Included the Pololu3pi library, which makes it easier to interface with the Pololu 3pi robot.
 
 080604 - 
 * Several bug fixes and minor improvements.
