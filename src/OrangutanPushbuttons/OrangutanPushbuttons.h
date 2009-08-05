@@ -26,7 +26,7 @@
 #define OrangutanPushbuttons_h
 
 
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 
 // Orangutan SVP definitions
 #define TOP_BUTTON		(1 << PORTC5)

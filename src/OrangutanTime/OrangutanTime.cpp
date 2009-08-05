@@ -1,5 +1,5 @@
 /*
-  OrangutanTime.cpp - Library for timing routines, calibrated for Orangutan.
+  OrangutanTime.cpp - Library for timing routines, calibrated for Orangutan, which runs at 20 MHz.
   This should *NOT* be used as an Arduino library.
 */
 

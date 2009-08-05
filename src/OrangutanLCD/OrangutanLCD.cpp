@@ -397,7 +397,7 @@ void OrangutanLCD::busyWait()
 // line up the bits and shove them out the appropriate I/O lines.
 void OrangutanLCD::sendNibble(unsigned char nibble)
 {
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 	PORTC = (PORTC & ~LCD_PORTC_MASK) | LCD_PORTC_DATA(nibble);
 #else
 	PORTB = (PORTB & ~LCD_PORTB_MASK) | LCD_PORTB_DATA(nibble);
@@ -435,7 +435,7 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 	busyWait();
 
 	// Save our DDR and port information
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 	unsigned char temp_ddrc, temp_portc;
 	temp_ddrc = DDRC;
 	temp_portc = PORTC;
@@ -455,7 +455,7 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 	LCD_RS_PORT |= (rs << LCD_RS);
 
 	// Set the data pins as outputs
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 	DDRC |= LCD_PORTC_MASK;
 #else
 	DDRB |= LCD_PORTB_MASK;
@@ -469,7 +469,7 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 	sendNibble(data & 0x0F);
 
 	// Restore our DDR and port information
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 	DDRC = temp_ddrc;
 	PORTC = temp_portc;
 #else

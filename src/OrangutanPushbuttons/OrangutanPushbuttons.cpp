@@ -1,6 +1,6 @@
 /*
   OrangutanPushbuttons.cpp - Library for using the three user pushbuttons on the
-      Orangutan LV-168 or 3pi robot.
+      Orangutan LV, SV, SVP, or 3pi robot.
 */
 
 /*

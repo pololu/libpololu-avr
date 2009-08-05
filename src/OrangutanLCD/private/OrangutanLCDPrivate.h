@@ -12,7 +12,7 @@
 // On the Orangutan LV-168 and 3pi robot, the LCD control lines are split between
 // ports B and D:
 
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 
 #define LCD_DB4				PORTC2		// PC2
 #define LCD_DB5				PORTC3		// PC3

@@ -12,7 +12,7 @@ unsigned char wait_for_button_release(unsigned char buttons);
 unsigned char wait_for_button(unsigned char buttons);
 unsigned char button_is_pressed(unsigned char buttons);
 
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 
 // Orangutan SVP definitions
 #define TOP_BUTTON		(1 << PORTC5)

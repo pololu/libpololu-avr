@@ -1,6 +1,6 @@
 /*
   OrangutanLEDs.cpp - Library for using the LED(s) on the
-      Orangutan LV-168, Baby Orangutan B-48/B-168, or 3pi robot.
+      Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.
 */
 
 /*
@@ -30,7 +30,7 @@
 #define RED_LED_PORT	PORTD
 #define RED_LED_DDR		DDRD
 
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 #define GREEN_LED		PORT4
 #define GREEN_LED_PORT	PORTC
 #define GREEN_LED_DDR	DDRC
@@ -79,7 +79,7 @@ OrangutanLEDs::OrangutanLEDs()
 void OrangutanLEDs::red(unsigned char on)
 {
 	RED_LED_DDR |= 1 << RED_LED;
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)	// red LED turns on when driven low
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)	// red LED turns on when driven low
 	if (on)
 #else																// red LED turns on when driven high
 	if (!on)

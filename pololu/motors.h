@@ -1,6 +1,6 @@
 /*
   OrangutanMotors.h - C Library for using the motor drivers on the
-      Orangutan LV-168 and Baby Orangutan B-48/B-168
+      Orangutan LV, SV, SVP, and Baby Orangutan B, or 3pi robot.
   Written by Ben Schmidel and Paul Grayson, 2008.
 */
 #ifndef orangutan_motors_h

@@ -1,6 +1,6 @@
 /*
   OrangutanAnalog.h - Library for using the handling analog inputs on the
-	Orangutan LV-168, Baby Orangutan B, or 3pi robot.  This library also
+	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library also
 	provides a method for reading the temperature sensor on the LV-168.
 */
 
@@ -58,14 +58,8 @@ class OrangutanAnalog
 									  unsigned int samples);
 	
 	// returns the position of the trimpot (20 readings averaged together).
-	// The trimpot is on ADC channel 7
+	// The trimpot is on ADC channel 7 (this does not work for the Orangutan SVP)
 	static unsigned int readTrimpot();
-	
-	// returns the output of the LV-168's temperature sensor in tenths of a 
-	// degree F or C (20 readings averaged together).  The temperature sensor 
-	// is on ADC channel 6.
-	static int readTemperatureF();
-	static int readTemperatureC();
 
 	// the following methods can be used to initiate an ADC conversion
 	// that runs in the background, allowing the CPU to perform other tasks
@@ -87,14 +81,17 @@ class OrangutanAnalog
 	
 	// converts the specified ADC result to millivolts
 	static unsigned int toMillivolts(unsigned int adcResult);
+	
+
+#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
 
 	// 3pi: returns the voltage of the battery in millivolts,
 	// using 10 averaged samples.
 	static unsigned int readBatteryMillivolts_3pi();
 
-	// SV-168: returns the voltage of the battery in millivolts,
+	// SV-168/SV-328: returns the voltage of the battery in millivolts,
 	// using 10 averaged samples.
-	static unsigned int readBatteryMillivolts_SV168();
+	static unsigned int readBatteryMillivolts_SV();
 
 	// This version of the function is included because the 3pi was
 	// originally the only supported board with battery voltage
@@ -104,6 +101,13 @@ class OrangutanAnalog
 	{
 		return readBatteryMillivolts_3pi();
 	}
+	
+	// returns the output of the Orangutan LV's temperature sensor in tenths of a 
+	// degree F or C (20 readings averaged together).  The temperature sensor 
+	// is on ADC channel 6.
+	static int readTemperatureF();
+	static int readTemperatureC();
+#endif
 };
 
 #endif

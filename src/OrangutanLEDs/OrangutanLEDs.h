@@ -1,6 +1,6 @@
 /*
   OrangutanLEDs.h - Library for using the LED(s) on the
-      Orangutan LV-168, Baby Orangutan B-48/B-168, or 3pi robot.
+      Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.
 */
 
 /*
@@ -40,7 +40,7 @@ class OrangutanLEDs
 	static void red(unsigned char on);
 	static inline void left(unsigned char on)
 	{
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 		green(on);
 #else
 		red(on);
@@ -50,7 +50,7 @@ class OrangutanLEDs
 	static void green(unsigned char on);
 	static inline void right(unsigned char on)
 	{
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 		red(on);
 #else
 		green(on);

@@ -65,7 +65,7 @@
 #define DIV_BY_10		(1 << 15)		// frequency bit that indicates Hz/10
 
 
-#if defined (__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 
 #define BUZZER_DDR		DDRD
 #define BUZZER			(1 << PORTD4)

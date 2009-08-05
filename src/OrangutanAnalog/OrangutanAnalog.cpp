@@ -1,6 +1,6 @@
 /*
   OrangutanAnalog.cpp - Library for using the handling analog inputs on the
-	Orangutan LV-168, Baby Orangutan B, or 3pi robot.  This library also 
+	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library also 
 	provides a method for reading the temperature sensor on the LV-168.
 */
 
@@ -49,16 +49,6 @@ extern "C" unsigned int analog_read_average(unsigned char channel, unsigned int 
 	return OrangutanAnalog::readAverage(channel, samples);
 }
 
-extern "C" unsigned int read_trimpot()
-{
-	return OrangutanAnalog::readTrimpot();
-}
-
-extern "C" int read_temperature_f()
-{
-	return OrangutanAnalog::readTemperatureF();
-}
-
 extern "C" void start_analog_conversion(unsigned char channel)
 {
 	OrangutanAnalog::startConversion(channel);
@@ -67,21 +57,6 @@ extern "C" void start_analog_conversion(unsigned char channel)
 extern "C" void start_analog_conversion_using_internal_reference(unsigned char channel)
 {
 	OrangutanAnalog::startConversion(channel,1);
-}
-
-extern "C" unsigned int read_battery_millivolts_3pi()
-{
-	return OrangutanAnalog::readBatteryMillivolts_3pi();
-}
-
-extern "C" unsigned int read_battery_millivolts_sv168()
-{
-	return OrangutanAnalog::readBatteryMillivolts_SV168();
-}
-
-extern "C" unsigned int read_temperature_c()
-{
-	return OrangutanAnalog::readTemperatureC();
 }
 
 extern "C" unsigned char analog_is_converting()
@@ -98,6 +73,35 @@ extern "C" unsigned int to_millivolts(unsigned int analog_result)
 {
 	return OrangutanAnalog::toMillivolts(analog_result);
 }
+
+#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
+
+extern "C" unsigned int read_trimpot()
+{
+	return OrangutanAnalog::readTrimpot();
+}
+
+extern "C" unsigned int read_battery_millivolts_3pi()
+{
+	return OrangutanAnalog::readBatteryMillivolts_3pi();
+}
+
+extern "C" unsigned int read_battery_millivolts_sv()
+{
+	return OrangutanAnalog::readBatteryMillivolts_SV();
+}
+
+extern "C" int read_temperature_f()
+{
+	return OrangutanAnalog::readTemperatureF();
+}
+
+extern "C" unsigned int read_temperature_c()
+{
+	return OrangutanAnalog::readTemperatureC();
+}
+
+#endif
 
 #endif
 
@@ -220,15 +224,27 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 }
 
 
+// converts the specified ADC result to millivolts
+unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
+{
+	unsigned long temp = adcResult * 5000UL;
+	if (getMode())							// if 8-bit mode
+		return (temp + 127) / 255;
+	return (temp + 511) / 1023;
+}
+
+
+#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
+
 // returns the position of the trimpot (20 readings averaged together).
-// The trimpot is on ADC channel 7
+// The trimpot is on ADC channel 7 (does not work on the Orangutan SVP)
 unsigned int OrangutanAnalog::readTrimpot()
 {
 	return readAverage(TRIMPOT, 20);
 }
 
 
-// The temperature sensor reading can be converted into degrees C as follows:
+// The temperature sensor reading (on the Orangutan LV) can be converted into degrees C as follows:
 //   T = (Vout - 0.4) / 0.0195 Celcius
 // The return value of this function is tenths of a degree Farenheit, although
 // the accuracy of the temperature sensor is +/- 2 C.
@@ -241,31 +257,24 @@ int OrangutanAnalog::readTemperatureF()
 }
 
 
-// The return value of this function is tenths of a degree Celcius.
+// Orangutan LV only: The return value of this function is tenths of a degree Celcius.
 int OrangutanAnalog::readTemperatureC()
 {
 	return ((readTemperatureF() - 320) * 5 + 4) / 9;
 }
 
 
-// converts the specified ADC result to millivolts
-unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
-{
-	unsigned long temp = adcResult * 5000UL;
-	if (getMode())							// if 8-bit mode
-		return (temp + 127) / 255;
-	return (temp + 511) / 1023;
-}
-
 unsigned int OrangutanAnalog::readBatteryMillivolts_3pi()
 {
 	return readAverage(6,10)*5000L*3/2/1023;
 }
 
-unsigned int OrangutanAnalog::readBatteryMillivolts_SV168()
+unsigned int OrangutanAnalog::readBatteryMillivolts_SV()
 {
 	return readAverage(6,10)*5000L*3/1023;
 }
+
+#endif
 
 // Local Variables: **
 // mode: C++ **

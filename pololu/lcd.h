@@ -1,7 +1,6 @@
 /*
-  OrangutanLCD.h - Library for using the LCD on the Orangutan LV-168
+  OrangutanLCD.h - Library for using the LCD on the Orangutan LV, SV, SVP, or 3pi robot.
   Originally written by Tom Benedict as part of Orangutan-Lib.
-  Modified by Ben Schmidel, May 14, 2008.
 */
 #ifndef OrangutanLCD_h
 #define OrangutanLCD_h
