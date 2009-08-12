@@ -1,0 +1,112 @@
+/*
+  OrangutanServo.cpp - Library for generating servo control pulses with digital
+	outputs on the Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  Note
+	that only the Orangutan SV and SVP can supply enough current to power servos
+	off of their regulated voltage.  All other devices can supply the control
+	signals only (you must power the servos from a separate source).  This
+	library relies on Timer1, so it will conflict with any other libraries that
+	use Timer1 (e.g. OrangutanBuzzer).  You cannot use the OrangutanBuzzer
+	library to play music while using the OrangutanServo library to control
+	servos.
+*/
+
+/*
+ * Written by Ben Schmidel, August 11, 2009.
+ * Copyright (c) 2009 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J18
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
+
+
+#ifndef OrangutanServos_h
+#define OrangutanServos_h
+
+#include "../OrangutanDigital/OrangutanDigital.h"	// digital I/O routines
+
+// Structure for storing the port register and approrpiate bitmask for an I/O pin.
+// This lets us easily change the output value of the pin represented by the struct.
+struct PortStruct
+{
+	unsigned char* portRegister;
+	unsigned char bitmask;
+};
+
+class OrangutanServos
+{
+  private:
+  
+	// helper function that initializes the specified index of the global servo pin array
+	inline static void initPortPin(struct PortStruct *port, unsigned char pin)
+	{
+		struct IOStruct io;
+		OrangutanDigital::getIORegisters(&io, pin);
+		OrangutanDigital::setOutputValue(&io, 0);
+		OrangutanDigital::setDataDirection(&io, 1);
+		port->portRegister = io.portRegister;
+		port->bitmask = io.bitmask;
+	}
+
+
+  public:
+
+    // constructor (doesn't do anything)
+	OrangutanServos();
+	
+	// initializes the global servo pin array with the specified pins, and configures the
+	// timer1 hardware module for generating the appropriate servo pulse signals.
+	// The Orangutan SVP version of this function takes three arguments (mux selection pins; the
+	// servo signal is output on pin PD5, which is the output of the mux)
+	// and uses only one interrupt (when TCNT1 = TOP) while the Orangutan SV, LV, Baby Orangutan, and 3pi version
+	// of this function take an array representing up to 8 pins (the pins on which to output
+	// the servo signals) and uses two interrupts (when TCNT1 = TOP and when TCNT1 = ICR1).
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	static void initServos(unsigned char SA, unsigned char SB, unsigned char SC);
+#else
+	static void initServos(const unsigned char servoPins[], unsigned char numServos);
+#endif
+
+	// get the current width of the pulse (in us) being supplied to the specified servo.
+	// This method does not rely on feedback from the servo, so if the servo
+	// is being restrained or overly torqued, it might not return the actual
+	// position of the servo.  If you have speed limiting enabled, you can
+	// use this method to determine when the servo pulse signals have reached
+	// their desired target widths.
+	static unsigned int getServoPosition(unsigned char servoNum);
+	
+	// send a position value of 0 to turn off the specified servo.  Otherwise, valid
+	// target positions are between 400 and 2450 us.
+	static void setServoTarget(unsigned char servoNum, unsigned int pos_us);
+	
+	// get the target position (pulse width in us) of the specified servo.
+	static unsigned int getServoTarget(unsigned char servoNum);
+	
+	// speed parameter is in units of 100ns (1/10th of a microsecond)
+	// the servo position will be incremented or decremented by "speed"
+	// every 20 ms.
+	static void setServoSpeed(unsigned char servoNum, unsigned int speed);
+	
+	// get the speed of the specified servo (the amount in tenths of a microsecond
+	// that the servo position is incremented or decremented every 20 ms).
+	static unsigned int getServoSpeed(unsigned char servoNum);
+};
+
+#endif
+
+// Local Variables: **
+// mode: C++ **
+// c-basic-offset: 4 **
+// tab-width: 4 **
+// indent-tabs-mode: t **
+// end: **

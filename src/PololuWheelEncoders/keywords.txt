@@ -1,0 +1,26 @@
+#######################################
+# Syntax Coloring Map PololuWheelEncoders
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+PololuWheelEncoders	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init	KEYWORD2
+getCountsA	KEYWORD2
+getCountsB	KEYWORD2	
+getCountsAndResetA	KEYWORD2
+getCoutnsAndResetB	KEYWORD2
+checkErrorA	KEYWORD2
+checkErrorB	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

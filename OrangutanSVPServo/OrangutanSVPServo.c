@@ -2,6 +2,126 @@
 #include <avr/interrupt.h>
 
 
+//#include <pololu/orangutan.h>
+#include <avr/io.h>
+
+
+struct IOStruct
+{
+	unsigned char* pinRegister;
+	unsigned char* portRegister;
+	unsigned char* ddrRegister;
+	unsigned char bitmask;
+};
+
+
+inline static void getIORegisters(struct IOStruct* io, unsigned char pin)
+{
+	io->pinRegister = 0;
+	io->portRegister = 0;
+	io->ddrRegister = 0;
+	io->bitmask = 0;
+
+	if (pin < 8)			// pin 0 = PD0, ..., 7 = PD7
+	{
+		io->pinRegister = (unsigned char*)&PIND;
+		io->portRegister = (unsigned char*)&PORTD;
+		io->ddrRegister = (unsigned char*)&DDRD;
+		io->bitmask = 1 << pin;
+	}
+
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	else if (pin < 16)		// pin 8 = PB0, ..., 15 = PB7
+	{
+		io->pinRegister = (unsigned char*)&PINB;
+		io->portRegister = (unsigned char*)&PORTB;
+		io->ddrRegister = (unsigned char*)&DDRB;
+		io->bitmask = 1 << (pin - 8);
+	}
+	else if (pin < 24)		// pin 16 = PC0, ..., 23 = PC7
+	{
+		io->pinRegister = (unsigned char*)&PINC;
+		io->portRegister = (unsigned char*)&PORTC;
+		io->ddrRegister = (unsigned char*)&DDRC;
+		io->bitmask = 1 << (pin - 16);
+	}
+	else if (pin < 32)		// pin 24 = PA7, ..., 31 = PA0
+	{
+		io->pinRegister = (unsigned char*)&PINA;
+		io->portRegister = (unsigned char*)&PORTA;
+		io->ddrRegister = (unsigned char*)&DDRA;
+		io->bitmask = 1 << (31 - pin);
+	}
+
+#else
+
+	else if (pin < 14)		// pin 8 = PB0, ..., 13 = PB5 (PB6 and PB7 reserved for external clock)
+	{
+		io->pinRegister = (unsigned char*)&PINB;
+		io->portRegister = (unsigned char*)&PORTB;
+		io->ddrRegister = (unsigned char*)&DDRB;
+		io->bitmask = 1 << (pin - 8);
+	}
+	else if (pin < 20)		// pin 14 = PC0, ..., 19 = PC5 (PC6 is reset, PC7 doesn't exist)
+	{
+		io->pinRegister = (unsigned char*)&PINC;
+		io->portRegister = (unsigned char*)&PORTC;
+		io->ddrRegister = (unsigned char*)&DDRC;
+		io->bitmask = 1 << (pin - 14);
+	}
+#endif
+}
+
+
+inline static void setDataDirection(struct IOStruct* ioPin, unsigned char val)
+{
+	if (val)
+		*(ioPin->ddrRegister) |= ioPin->bitmask;
+	else
+		*(ioPin->ddrRegister) &= ~ioPin->bitmask;
+}
+
+
+inline static void setOutputValue(struct IOStruct* ioPin, unsigned char val)
+{
+	if (val)
+		*(ioPin->portRegister) |= ioPin->bitmask;
+	else
+		*(ioPin->portRegister) &= ~ioPin->bitmask;
+}
+
+
+inline static unsigned char getInputValue(struct IOStruct* ioPin)
+{
+	return *(ioPin->pinRegister) & ioPin->bitmask;
+}
+
+
+inline static void setOutput(unsigned char pin, unsigned char outputState)
+{
+	struct IOStruct registers;
+	getIORegisters(&registers, pin);
+	setOutputValue(&registers, outputState);
+	setDataDirection(&registers, 1);
+}
+
+
+inline static void setInput(unsigned char pin, unsigned char inputState)
+{
+	struct IOStruct registers;
+	getIORegisters(&registers, pin);
+	setDataDirection(&registers, 0);
+	setOutputValue(&registers, inputState);
+}
+
+
+inline static unsigned char isInputHigh(unsigned char pin)
+{
+	struct IOStruct registers;
+	getIORegisters(&registers, pin);
+	return getInputValue(&registers);
+}
+
 #define BUZZER		(1 << PORTD4)
 #define M1PWM		(1 << PORTD7)
 #define M1DIR		(1 << PORTC6)
@@ -31,7 +151,7 @@ struct PortStruct portPin[8];		// one pin for each servo
 ISR(TIMER1_CAPT_vect)
 {
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
-	*(portPin[0].portRegister) ^= portPin[0].bitmask;
+/*	*(portPin[0].portRegister) ^= portPin[0].bitmask;
 	if (idx & 1)
 	{
 		*(portPin[1].portRegister) ^= portPin[1].bitmask;
@@ -39,7 +159,21 @@ ISR(TIMER1_CAPT_vect)
 		{
 			*(portPin[2].portRegister) ^= portPin[2].bitmask;
 		}
+	}*/
+	unsigned char i, temp = idx;
+	for (i = 0; i < 3; i++)
+	{
+		if (temp & 1)
+		{
+			*portPin[i].portRegister |= portPin[i].bitmask;
+		}
+		else
+		{
+			*portPin[i].portRegister &= ~portPin[i].bitmask;
+		}
+		temp >>= 1;
 	}
+
 #endif
 	
 	idx = (idx + 1) & 7;
@@ -122,80 +256,12 @@ int getServoSpeed(unsigned char servoNum)
 	return servoSpeed[servoNum & 7];
 }
 
-struct IOStruct
-{
-	unsigned char* pinRegister;
-	unsigned char* portRegister;
-	unsigned char* ddrRegister;
-	unsigned char bitmask;
-};
-
-
-struct IOStruct getIORegisters(unsigned char pin)
-{
-	struct IOStruct io;
-
-	io.pinRegister = 0;
-	io.portRegister = 0;
-	io.ddrRegister = 0;
-	io.bitmask = 0;
-
-	if (pin < 8)			// pin 0 = PD0, ..., 7 = PD7
-	{
-		io.pinRegister = (unsigned char*)&PIND;
-		io.portRegister = (unsigned char*)&PORTD;
-		io.ddrRegister = (unsigned char*)&DDRD;
-		io.bitmask = 1 << pin;
-	}
-
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
-	else if (pin < 16)		// pin 8 = PB0, ..., 15 = PB7
-	{
-		io.pinRegister = (unsigned char*)&PINB;
-		io.portRegister = (unsigned char*)&PORTB;
-		io.ddrRegister = (unsigned char*)&DDRB;
-		io.bitmask = 1 << (pin - 8);
-	}
-	else if (pin < 24)		// pin 16 = PC0, ..., 23 = PC7
-	{
-		io.pinRegister = (unsigned char*)&PINC;
-		io.portRegister = (unsigned char*)&PORTC;
-		io.ddrRegister = (unsigned char*)&DDRC;
-		io.bitmask = 1 << (pin - 16);
-	}
-	else if (pin < 32)		// pin 24 = PA7, ..., 31 = PA0
-	{
-		io.pinRegister = (unsigned char*)&PINA;
-		io.portRegister = (unsigned char*)&PORTA;
-		io.ddrRegister = (unsigned char*)&DDRA;
-		io.bitmask = 1 << (31 - pin);
-	}
-
-#else
-
-	else if (pin < 14)		// pin 8 = PB0, ..., 13 = PB5 (PB6 and PB7 reserved for external clock)
-	{
-		io.pinRegister = (unsigned char*)&PINB;
-		io.portRegister = (unsigned char*)&PORTB;
-		io.ddrRegister = (unsigned char*)&DDRB;
-		io.bitmask = 1 << (pin - 8);
-	}
-	else if (pin < 20)		// pin 14 = PC0, ..., 19 = PC5 (PC6 is reset, PC7 doesn't exist)
-	{
-		io.pinRegister = (unsigned char*)&PINC;
-		io.portRegister = (unsigned char*)&PORTC;
-		io.ddrRegister = (unsigned char*)&DDRC;
-		io.bitmask = 1 << (pin - 14);
-	}
-#endif
-
-	return io;
-}
 
 
 void initPortPin(unsigned char pinIdx, unsigned char pin)
 {
-	struct IOStruct io = getIORegisters(pin);
+	struct IOStruct io;
+	getIORegisters(&io, pin);
 	*(io.portRegister) &= ~io.bitmask;			// PORT pin -> low output or high-impedance input
 	*(io.ddrRegister) |= io.bitmask;			// pin -> output
 	portPin[pinIdx].portRegister = io.portRegister;
@@ -248,7 +314,9 @@ int main()
 	DDRD |= 1 << PORTD5;
 	DDRD |= (1 << PORTD0) | (1 << PORTD1) | (1 << PORTD2);
 
+	initServos(0, 1, 2);
 
+/*
 	TCCR1A = 0b10000010;	// clear OC1A on comp match when upcounting, set OC1A on comp match when downcounting
 	TCCR1B = 0b00010001;	// phase correct PWM with TOP = ICR1, clock prescaler = 1 (freq = FCPU / (2 * ICR1))
 
@@ -274,7 +342,7 @@ int main()
 		setServoTarget(7, 1750 - ((i * 3) & 511));
 		//delay_ms(2);
 		i = (i + 1) & 511;
-	}
+	}*/
 }
 
 

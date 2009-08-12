@@ -1,5 +1,5 @@
 /*
-  OrangutanAnalog.cpp - Library for using the handling analog inputs on the
+  OrangutanAnalog.cpp - Library for using the analog inputs on the
 	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library also 
 	provides a method for reading the temperature sensor on the LV-168.
 */

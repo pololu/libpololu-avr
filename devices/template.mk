@@ -11,6 +11,8 @@ LIBRARY_OBJECT_FILES=\
 	OrangutanLCD.o \
 	OrangutanLEDs.o \
 	OrangutanAnalog.o \
+	OrangutanDigital.o \
+	OrangutanServos.o \
 	PololuQTRSensors.o \
 	Pololu3pi.o \
 	PololuQTRSensors.o \
