@@ -9,7 +9,7 @@
 	
 	compiles to the assembly:
 	
-		sbi	0x0b, 3  ;i.e. PORTD |= 1 << 3;
+		sbi 0x0b, 3  ;i.e. PORTD |= 1 << 3;
 		sbi 0x0a, 3  ;i.e. DDRD  |= 1 << 3;
 	
 	In short, if your inputs are constants, you can use this library in

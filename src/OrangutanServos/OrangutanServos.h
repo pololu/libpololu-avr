@@ -8,6 +8,11 @@
 	use Timer1 (e.g. OrangutanBuzzer).  You cannot use the OrangutanBuzzer
 	library to play music while using the OrangutanServo library to control
 	servos.
+	
+	This library can generate up to 16 servo control pulses.  On the Orangutan
+	SVP, eight of these pulses must be via the servo pulse mux output.  The other
+	eight are optional servo pulse outputs on digital I/O pins themselves.  On
+	all other devices, all sixteen servo outputs are on digital I/O pins.
 */
 
 /*
@@ -64,18 +69,23 @@ class OrangutanServos
     // constructor (doesn't do anything)
 	OrangutanServos();
 	
+	// frees allocated memory
+	~OrangutanServos();
+	
 	// initializes the global servo pin array with the specified pins, and configures the
 	// timer1 hardware module for generating the appropriate servo pulse signals.
-	// The Orangutan SVP version of this function takes three arguments (mux selection pins; the
+	// The Orangutan SVP version of this function takes an array of mux selection pins; the
 	// servo signal is output on pin PD5, which is the output of the mux)
-	// and uses only one interrupt (when TCNT1 = TOP) while the Orangutan SV, LV, Baby Orangutan, and 3pi version
+	// and uses only one interrupt (when TCNT1 = TOP (ICR1)) while the Orangutan SV, LV, Baby Orangutan, and 3pi version
 	// of this function take an array representing up to 8 pins (the pins on which to output
-	// the servo signals) and uses two interrupts (when TCNT1 = TOP and when TCNT1 = ICR1).
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
-	static void initServos(unsigned char SA, unsigned char SB, unsigned char SC);
-#else
-	static void initServos(const unsigned char servoPins[], unsigned char numServos);
-#endif
+	// the servo signals) and uses two interrupts (when TCNT1 = TOP (ICR1) and when TCNT1 = OCR1A).
+	// since the servo code can control up to 16 servos using timer 1, there is an optional second
+	// set of parameters that allows the user to specify up to 8 more servos.  The servoPinsB array
+	// represents a set of up to eight digital I/O pins on which the servo signals should be output.
+	// If you don't want this second set of eight servos, use a numPinsB value of 0 (and you can pass in NULL for servoPinsB).
+	// A nonzero return value indicates that memory for the desired arrays could not be allocated
+	static unsigned char initServos(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB);
+
 
 	// get the current width of the pulse (in us) being supplied to the specified servo.
 	// This method does not rely on feedback from the servo, so if the servo
@@ -100,6 +110,31 @@ class OrangutanServos
 	// get the speed of the specified servo (the amount in tenths of a microsecond
 	// that the servo position is incremented or decremented every 20 ms).
 	static unsigned int getServoSpeed(unsigned char servoNum);
+	
+	
+		// get the current width of the pulse (in us) being supplied to the specified servo.
+	// This method does not rely on feedback from the servo, so if the servo
+	// is being restrained or overly torqued, it might not return the actual
+	// position of the servo.  If you have speed limiting enabled, you can
+	// use this method to determine when the servo pulse signals have reached
+	// their desired target widths.
+	static unsigned int getServoPositionB(unsigned char servoNum);
+	
+	// send a position value of 0 to turn off the specified servo.  Otherwise, valid
+	// target positions are between 400 and 2450 us.
+	static void setServoTargetB(unsigned char servoNum, unsigned int pos_us);
+	
+	// get the target position (pulse width in us) of the specified servo.
+	static unsigned int getServoTargetB(unsigned char servoNum);
+	
+	// speed parameter is in units of 100ns (1/10th of a microsecond)
+	// the servo position will be incremented or decremented by "speed"
+	// every 20 ms.
+	static void setServoSpeedB(unsigned char servoNum, unsigned int speed);
+	
+	// get the speed of the specified servo (the amount in tenths of a microsecond
+	// that the servo position is incremented or decremented every 20 ms).
+	static unsigned int getServoSpeedB(unsigned char servoNum);
 };
 
 #endif
