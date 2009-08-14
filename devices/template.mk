@@ -5,20 +5,20 @@ CPP=avr-g++
 CC=avr-gcc
 
 LIBRARY_OBJECT_FILES=\
-	OrangutanMotors.o \
+	OrangutanAnalog.o \
 	OrangutanBuzzer.o \
-	OrangutanPushbuttons.o \
+	OrangutanDigital.o \
 	OrangutanLCD.o \
 	OrangutanLEDs.o \
-	OrangutanAnalog.o \
-	OrangutanDigital.o \
+	OrangutanMotors.o \
+	OrangutanPulseIn.o \
+	OrangutanPushbuttons.o \
+	OrangutanResources.o \
+	OrangutanSerial.o \
 	OrangutanServos.o \
-	PololuQTRSensors.o \
+	OrangutanTime.o \
 	Pololu3pi.o \
 	PololuQTRSensors.o \
-	OrangutanResources.o \
-	OrangutanTime.o \
-	OrangutanSerial.o \
 	PololuWheelEncoders.o
 
 LIBRARY = ../../libpololu_$(DEVICE).a
