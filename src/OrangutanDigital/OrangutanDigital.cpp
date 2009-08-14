@@ -9,7 +9,7 @@
 	
 	compiles to the assembly:
 	
-		sbi	0x0b, 3  ;i.e. PORTD |= 1 << 3;
+		sbi 0x0b, 3  ;i.e. PORTD |= 1 << 3;
 		sbi 0x0a, 3  ;i.e. DDRD  |= 1 << 3;
 	
 	In short, if your inputs are constants, you can use this library in
@@ -48,40 +48,6 @@
 
 #ifdef LIB_POLOLU
 
-extern "C" void get_io_registers(struct IOStruct* ioPin, unsigned char pin)
-{
-	OrangutanDigital::getIORegisters(ioPin, pin);
-}
-
-extern "C" void set_data_direction(struct IOStruct* ioPin, unsigned char val)
-{
-	OrangutanDigital::setDataDirection(ioPin, val);
-}
-
-extern "C" void set_digital_output_value(struct IOStruct* ioPin, unsigned char val)
-{
-	OrangutanDigital::setOutputValue(ioPin, val);
-}
-
-extern "C" unsigned char get_digital_input_value(struct IOStruct* ioPin)
-{
-	return OrangutanDigital::getInputValue(ioPin);
-}
-
-extern "C" void set_digital_output(unsigned char pin, unsigned char val)
-{
-	OrangutanDigital::setOutput(pin, val);
-}
-
-extern "C" void set_digital_input(unsigned char pin, unsigned char val)
-{
-	OrangutanDigital::setInput(pin, val);
-}
-
-extern "C" unsigned char is_digital_input_high(unsigned char pin)
-{
-	return OrangutanDigital::isInputHigh(pin);
-}
 
 #endif
 

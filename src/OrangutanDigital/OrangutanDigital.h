@@ -48,68 +48,68 @@
 
 #include <avr/io.h>
 
-const unsigned char INPUT = 0;
-const unsigned char OUTPUT = 1;
-const unsigned char LOW = 0;
-const unsigned char HIGH = 1;
-const unsigned char TOGGLE = 0xFF;
-const unsigned char HIGH_IMPEDANCE = 0;
-const unsigned char PULL_UP_ENABLED = 1;
+#define INPUT 				0
+#define OUTPUT				1
+#define LOW					0
+#define HIGH				1
+#define TOGGLE				0xFF
+#define HIGH_IMPEDANCE		0
+#define PULL_UP_ENABLED		1
 
 // port D pins
-const unsigned char	IO_D0 = 0;
-const unsigned char IO_D1 = 1;
-const unsigned char IO_D2 = 2;
-const unsigned char IO_D3 = 3;
-const unsigned char IO_D4 = 4;
-const unsigned char IO_D5 = 5;
-const unsigned char IO_D6 = 6;
-const unsigned char IO_D7 = 7;
+#define IO_D0				0
+#define IO_D1				1
+#define IO_D2				2
+#define IO_D3				3
+#define IO_D4				4
+#define IO_D5				5
+#define IO_D6				6
+#define IO_D7				7
 
 // port B pins
-const unsigned char IO_B0 = 8;
-const unsigned char IO_B1 = 9;
-const unsigned char IO_B2 = 10;
-const unsigned char IO_B3 = 11;
-const unsigned char IO_B4 = 12;
-const unsigned char IO_B5 = 13;
+#define IO_B0				8
+#define IO_B1				9
+#define IO_B2				10
+#define IO_B3				11
+#define IO_B4				12
+#define IO_B5				13
 
 
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
 
-const unsigned char IO_B6 = 14;
-const unsigned char IO_B7 = 15;
+#define IO_B6				14
+#define IO_B7				15
 
 // port C pins
-const unsigned char IO_C0 = 16;
-const unsigned char IO_C1 = 17;
-const unsigned char IO_C2 = 18;
-const unsigned char IO_C3 = 19;
-const unsigned char IO_C4 = 20;
-const unsigned char IO_C5 = 21;
-const unsigned char IO_C6 = 22;
-const unsigned char IO_C7 = 23;
+#define IO_C0				16
+#define IO_C1				17
+#define IO_C2				18
+#define IO_C3				19
+#define IO_C4				20
+#define IO_C5				21
+#define IO_C6				22
+#define IO_C7				23
 
 // port A pins
-const unsigned char IO_A0 = 31;
-const unsigned char IO_A1 = 30;
-const unsigned char IO_A2 = 29;
-const unsigned char IO_A3 = 28;
-const unsigned char IO_A4 = 27;
-const unsigned char IO_A5 = 26;
-const unsigned char IO_A6 = 25;
-const unsigned char IO_A7 = 24;
+#define IO_A0				31
+#define IO_A1				30
+#define IO_A2				29
+#define IO_A3				28
+#define IO_A4				27
+#define IO_A5				26
+#define IO_A6				25
+#define IO_A7				24
 
 #else
 
 // port C pins
-const unsigned char IO_C0 = 14;
-const unsigned char IO_C1 = 15;
-const unsigned char IO_C2 = 16;
-const unsigned char IO_C3 = 17;
-const unsigned char IO_C4 = 18;
-const unsigned char IO_C5 = 19;
-const unsigned char IO_C6 = 20;	// only used if RESET pin is changed to be a digital I/O
+#define IO_C0				14
+#define IO_C1				15
+#define IO_C2				16
+#define IO_C3				17
+#define IO_C4				18
+#define IO_C5				19
+#define IO_C6				20	// only used if RESET pin is changed to be a digital I/O
 
 #endif
 
