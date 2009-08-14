@@ -27,7 +27,7 @@ $(LIBRARY): $(LIBRARY_OBJECT_FILES)
 	avr-ar rs $(LIBRARY) $(LIBRARY_OBJECT_FILES)
 
 .SECONDEXPANSION:
-%.o:$(SRC)/$$*/%.cpp
+%.o:$(SRC)/$$*/%.cpp $(SRC)/$$*/%.h
 	$(CPP) $(CFLAGS) $(SRC)/$*/$< -c -o $@
 
 clean:
