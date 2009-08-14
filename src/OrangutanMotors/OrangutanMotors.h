@@ -9,7 +9,7 @@
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
- *   http://www.pololu.com/docs/0J18/7
+ *   http://www.pololu.com/docs/0J18
  *
  * You may freely modify and share this code, as long as you keep this
  * notice intact (including the two links above).  Licensed under the

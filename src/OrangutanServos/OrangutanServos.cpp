@@ -39,14 +39,6 @@
 #include <stdlib.h>
 #include "OrangutanServos.h"
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
-#define MAX_PINS_A		3		// Orangutan SVP uses a mux, so we have 3 selector pins for 8 servos
-#else
-#define MAX_PINS_A		8		// one pin per servo used (50 Hz signals limits us to 8 servos)
-#endif
-
-#define MAX_PINS_B		8		// one pin per servo used (50 Hz signals limits us to 8 servos)
-
 
 // global arrays for storing state data for each of the 8 possible servos
 
@@ -333,6 +325,9 @@ OrangutanServos::~OrangutanServos()
 // A nonzero return value indicates that memory for the desired arrays could not be allocated
 unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsigned char numPins, const unsigned char *servoPinsB, unsigned char numPinsB)
 {
+	TCCR1B = 0;
+	TIMSK1 = 0;					// disable all timer1 interrupts
+
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 	if (numPins > 3)
 		numPins = 3;
@@ -443,10 +438,7 @@ void OrangutanServos::setServoTarget(unsigned char servoNum, unsigned int pos_us
 		return;
 	if (pos_us > 2450)			// will get bad results if pulse is 100% duty cycle (2500)
 		pos_us = 2450;
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
-	if (pos_us < 400)
-		pos_us = 400;
-#endif
+
 	TIMSK1 &= ~(1 << ICIE1);	// make sure we don't get interrupted in the middle of an update	
 	servoTargetPos[servoNum & 7] = pos_us * 10;
 	TIMSK1 |= 1 << ICIE1;
@@ -511,10 +503,7 @@ void OrangutanServos::setServoTargetB(unsigned char servoNum, unsigned int pos_u
 		return;
 	if (pos_us > 2450)			// will get bad results if pulse is 100% duty cycle (2500)
 		pos_us = 2450;
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
-	if (pos_us < 400)
-		pos_us = 400;
-#endif
+
 	TIMSK1 &= ~(1 << ICIE1);	// make sure we don't get interrupted in the middle of an update	
 	servoTargetPosB[servoNum & 7] = pos_us * 10;
 	TIMSK1 |= 1 << ICIE1;

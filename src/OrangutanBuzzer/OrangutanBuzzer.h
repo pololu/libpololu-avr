@@ -1,5 +1,5 @@
 /*
-  OrangutanBuzzer.cpp - Library for controlling the buzzer on the Orangutan LV,
+  OrangutanBuzzer.h - Library for controlling the buzzer on the Orangutan LV,
     SV, SVP, or 3pi robot. This library uses a timer1 PWM to generate the note
 	frequencies and timer1 overflow interrupt to time the duration of the
 	notes, so the buzzer can be playing a melody in the background while
@@ -15,7 +15,7 @@
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
- *   http://www.pololu.com/docs/0J18/4
+ *   http://www.pololu.com/docs/0J18
  *
  * You may freely modify and share this code, as long as you keep this
  * notice intact (including the two links above).  Licensed under the

@@ -1,5 +1,5 @@
 /*
-  PololuWheelEncoders.h - Library for using Pololu Wheel Encoders.
+  PololuWheelEncoders.cpp - Library for using Pololu Wheel Encoders.
 */
 	
 /*

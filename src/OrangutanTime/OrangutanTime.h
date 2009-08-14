@@ -1,5 +1,5 @@
 /*
-  OrangutanTime.cpp - Library for timing routines, calibrated for Orangutan, which runs at 20 MHz.
+  OrangutanTime.h - Library for timing routines, calibrated for Orangutan, which runs at 20 MHz.
   This should *NOT* be used as an Arduino library.
 */
 
@@ -9,7 +9,7 @@
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
- *   http://www.pololu.com/docs/0J18/2
+ *   http://www.pololu.com/docs/0J18
  *
  * You may freely modify and share this code, as long as you keep this
  * notice intact (including the two links above).  Licensed under the
