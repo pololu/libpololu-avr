@@ -1,3 +1,6 @@
+#ifndef OrangutanTime_h
+#define OrangutanTime_h
+
 // these are defined in the .cpp file:
 unsigned long get_ms();
 void delay_ms(unsigned int milliseconds);
@@ -23,3 +26,5 @@ static inline void delay_us(unsigned int microseconds)
 static inline void delay(unsigned int milliseconds) { delay_ms(milliseconds); }
 static inline unsigned long millis() { return get_ms(); }
 static inline void delayMicroseconds(unsigned int microseconds) { delay_us(microseconds); }
+
+#endif

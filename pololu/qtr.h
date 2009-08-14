@@ -1,3 +1,6 @@
+#ifndef PololuQTRSensors_h
+#define PololuQTRSensors_h
+
 #define QTR_EMITTERS_OFF 0
 #define QTR_EMITTERS_ON 1
 #define QTR_EMITTERS_ON_AND_OFF 2
@@ -19,3 +22,5 @@ unsigned int *qtr_calibrated_minimum_on();
 unsigned int *qtr_calibrated_maximum_on();
 unsigned int *qtr_calibrated_minimum_off();
 unsigned int *qtr_calibrated_maximum_off();
+
+#endif

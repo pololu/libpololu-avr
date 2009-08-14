@@ -8,7 +8,7 @@
 #include <avr/pgmspace.h>
 
 #define LCD_LEFT	0
-#define	LCD_RIGHT	1
+#define LCD_RIGHT	1
 #define CURSOR_SOLID	0
 #define CURSOR_BLINKING	1
 

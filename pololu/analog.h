@@ -1,3 +1,6 @@
+#ifndef OrangutanAnalog_h
+#define OrangutanAnalog_h
+
 #define MODE_8_BIT		1
 #define MODE_10_BIT		0
 #define TRIMPOT			7
@@ -30,3 +33,4 @@ unsigned int read_battery_millivolts_sv();
 
 #endif
 
+#endif

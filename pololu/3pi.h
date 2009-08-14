@@ -20,7 +20,10 @@
  * without any warranty.  It might be defective, in which case you agree
  * to be responsible for all resulting costs and damages.
  */
- 
+
+#ifndef Pololu3pi_h
+#define Pololu3pi_h
+
 #include <pololu/analog.h>
 #include <pololu/buzzer.h>
 #include <pololu/time.h>
@@ -49,3 +52,5 @@ unsigned int *get_line_sensors_calibrated_minimum_on();
 unsigned int *get_line_sensors_calibrated_maximum_on();
 unsigned int *get_line_sensors_calibrated_minimum_off();
 unsigned int *get_line_sensors_calibrated_maximum_off();
+
+#endif

@@ -1,5 +1,5 @@
 /*
-  OrangutanPulseIn.h - Library for reading digital pulses with the
+  pulsein.h - Library for reading digital pulses with the
 	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library
 	can be used to read RC inputs.  To use this library, you must
 	repeatedly call the update() function in your main loop more often
@@ -30,7 +30,6 @@
  * to be responsible for all resulting costs and damages.
  */
  
-
 #ifndef OrangutanPulseIn_h
 #define OrangutanPulseIn_h
 
@@ -62,32 +61,9 @@ struct PulseInputStruct
 };
 
 
-
-class OrangutanPulseIn
-{
-  public:
-
-    // constructor (doesn't do anything)
-	OrangutanPulseIn();
-	
-	// destructor (frees allocated memory)
-	~OrangutanPulseIn();
-	
-	static unsigned char init(const unsigned char *pulsePins, unsigned char numPins);
-	
-	static void update();
-	
-	static void setMaxPulseLength(unsigned char maxLengthEnum);
-	
-	static struct PulseInputStruct getPulseInfo(unsigned char idx);
-
-};
+unsigned char init_pulse_in(const unsigned char *pulsePins, unsigned char numPins);
+void update_pulse_in();
+void set_max_pulse_length(unsigned char maxLengthEnum);
+struct PulseInputStruct get_pulse_info(unsigned char idx);
 
 #endif
-
-// Local Variables: **
-// mode: C++ **
-// c-basic-offset: 4 **
-// tab-width: 4 **
-// indent-tabs-mode: t **
-// end: **

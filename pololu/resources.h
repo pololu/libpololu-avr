@@ -3,8 +3,8 @@
   on the Orangutan.
   Written by Ben Schmidel and Paul Grayson, 2008.
 */
-#ifndef orangutan_resources_h
-#define orangutan_resources_h
+#ifndef OrangutanResources_h
+#define OrangutanResources_h
 
 int get_free_ram();
 

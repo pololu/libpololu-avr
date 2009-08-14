@@ -1,3 +1,9 @@
+#ifndef OrangutanSerial_h
+#define OrangutanSerial_h
+
+#define SERIAL_AUTOMATIC 0
+#define SERIAL_CHECK 1
+
 void serial_set_baud_rate(unsigned long baud);
 void serial_set_mode(unsigned char mode);
 void serial_check();
@@ -12,5 +18,4 @@ void serial_send_blocking(char *buffer, unsigned char size);
 unsigned char serial_get_sent_bytes();
 char serial_send_buffer_empty();
 
-#define SERIAL_AUTOMATIC 0
-#define SERIAL_CHECK 1
+#endif

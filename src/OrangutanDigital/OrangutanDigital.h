@@ -48,6 +48,71 @@
 
 #include <avr/io.h>
 
+const unsigned char INPUT = 0;
+const unsigned char OUTPUT = 1;
+const unsigned char LOW = 0;
+const unsigned char HIGH = 1;
+const unsigned char TOGGLE = 0xFF;
+const unsigned char HIGH_IMPEDANCE = 0;
+const unsigned char PULL_UP_ENABLED = 1;
+
+// port D pins
+const unsigned char D0 = 0;
+const unsigned char D1 = 1;
+const unsigned char D2 = 2;
+const unsigned char D3 = 3;
+const unsigned char D4 = 4;
+const unsigned char D5 = 5;
+const unsigned char D6 = 6;
+const unsigned char D7 = 7;
+
+// port B pins
+const unsigned char B0 = 8;
+const unsigned char B1 = 9;
+const unsigned char B2 = 10;
+const unsigned char B3 = 11;
+const unsigned char B4 = 12;
+const unsigned char B5 = 13;
+
+
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
+
+const unsigned char B6 = 14;
+const unsigned char B7 = 15;
+
+// port C pins
+const unsigned char C0 = 16;
+const unsigned char C1 = 17;
+const unsigned char C2 = 18;
+const unsigned char C3 = 19;
+const unsigned char C4 = 20;
+const unsigned char C5 = 21;
+const unsigned char C6 = 22;
+const unsigned char C7 = 23;
+
+// port A pins
+const unsigned char A0 = 31;
+const unsigned char A1 = 30;
+const unsigned char A2 = 29;
+const unsigned char A3 = 28;
+const unsigned char A4 = 27;
+const unsigned char A5 = 26;
+const unsigned char A6 = 25;
+const unsigned char A7 = 24;
+
+#else
+
+// port C pins
+const unsigned char C0 = 14;
+const unsigned char C1 = 15;
+const unsigned char C2 = 16;
+const unsigned char C3 = 17;
+const unsigned char C4 = 18;
+const unsigned char C5 = 19;
+const unsigned char C6 = 20;	// only used if RESET pin is changed to be a digital I/O
+
+#endif
+
 
 struct IOStruct
 {
@@ -117,7 +182,7 @@ class OrangutanDigital
 			io->ddrRegister = (unsigned char*)&DDRB;
 			io->bitmask = 1 << (pin - 8);
 		}
-		else if (pin < 20)		// pin 14 = PC0, ..., 19 = PC5 (PC6 is reset, PC7 doesn't exist)
+		else if (pin < 21)		// pin 14 = PC0, ..., 19 = PC5 (PC6 is reset, PC7 doesn't exist)
 		{
 			io->pinRegister = (unsigned char*)&PINC;
 			io->portRegister = (unsigned char*)&PORTC;

@@ -9,3 +9,6 @@
 #include <pololu/encoders.h>
 #include <pololu/resources.h>
 #include <pololu/serial.h>
+#include <pololu/digital.h>
+#include <pololu/servos.h>
+#include <pololu/pulsein.h>

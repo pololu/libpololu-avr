@@ -3,8 +3,8 @@
       Orangutan LV, SV, SVP, and Baby Orangutan B, or 3pi robot.
   Written by Ben Schmidel and Paul Grayson, 2008.
 */
-#ifndef orangutan_motors_h
-#define orangutan_motors_h
+#ifndef OrangutanMotors_h
+#define OrangutanMotors_h
 
 void motors_init();
 void set_m1_speed(int speed);
