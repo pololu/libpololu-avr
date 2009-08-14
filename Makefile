@@ -9,6 +9,9 @@ library_files:
 	echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) ; cd ../.. ;)
 
+# Change the path to allow make within sh to work: see WinAVR bug 1915456 "make ignores parameters when executed from sh"
+PATH := $(shell echo $$PATH | sed 's/\(WinAVR-[0-9]*\)\/bin/\\1\/utils\/bin/g'):$(PATH)
+
 LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
 
 .PHONY: clean
@@ -27,7 +30,7 @@ clean:
 			$(MAKE) clean -C $$dir; \
 		done; \
 	fi
-	rm $(LIBRARY_FILES)
+	rm -f $(LIBRARY_FILES)
 
 # Set the PREFIX to point to the location of avr-gcc.
 # This can be overridden by setting the environment variable before compiling, e.g.:
