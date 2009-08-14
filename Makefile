@@ -2,10 +2,13 @@
 # remove the atmega328p from the list of target devices below:
 devices := atmega48 atmega168 atmega328p atmega324p
 
+SHELL = sh
+
 # We need to do our recursive make with cd, since WinAVR does not support make -C.
 # See WinAVR bug 1932584, "recursive make call fails"
 .PHONY: library_files
 library_files:
+	echo making library files
 	echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) ; cd ../.. ;)
 
@@ -14,8 +17,11 @@ PATH := $(shell echo $$PATH | sed 's/\(WinAVR-[0-9]*\)\/bin/\\1\/utils\/bin/g'):
 
 LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
 
+SHELL=sh
+
 .PHONY: clean
 clean:
+	echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) clean ; cd ../.. ;)
 	if [ -e examples_templates -a -e examples ]; then \
 		for dir in examples/*/*; \

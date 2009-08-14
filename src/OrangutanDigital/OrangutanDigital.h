@@ -57,59 +57,59 @@ const unsigned char HIGH_IMPEDANCE = 0;
 const unsigned char PULL_UP_ENABLED = 1;
 
 // port D pins
-const unsigned char D0 = 0;
-const unsigned char D1 = 1;
-const unsigned char D2 = 2;
-const unsigned char D3 = 3;
-const unsigned char D4 = 4;
-const unsigned char D5 = 5;
-const unsigned char D6 = 6;
-const unsigned char D7 = 7;
+const unsigned char	IO_D0 = 0;
+const unsigned char IO_D1 = 1;
+const unsigned char IO_D2 = 2;
+const unsigned char IO_D3 = 3;
+const unsigned char IO_D4 = 4;
+const unsigned char IO_D5 = 5;
+const unsigned char IO_D6 = 6;
+const unsigned char IO_D7 = 7;
 
 // port B pins
-const unsigned char B0 = 8;
-const unsigned char B1 = 9;
-const unsigned char B2 = 10;
-const unsigned char B3 = 11;
-const unsigned char B4 = 12;
-const unsigned char B5 = 13;
+const unsigned char IO_B0 = 8;
+const unsigned char IO_B1 = 9;
+const unsigned char IO_B2 = 10;
+const unsigned char IO_B3 = 11;
+const unsigned char IO_B4 = 12;
+const unsigned char IO_B5 = 13;
 
 
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
 
-const unsigned char B6 = 14;
-const unsigned char B7 = 15;
+const unsigned char IO_B6 = 14;
+const unsigned char IO_B7 = 15;
 
 // port C pins
-const unsigned char C0 = 16;
-const unsigned char C1 = 17;
-const unsigned char C2 = 18;
-const unsigned char C3 = 19;
-const unsigned char C4 = 20;
-const unsigned char C5 = 21;
-const unsigned char C6 = 22;
-const unsigned char C7 = 23;
+const unsigned char IO_C0 = 16;
+const unsigned char IO_C1 = 17;
+const unsigned char IO_C2 = 18;
+const unsigned char IO_C3 = 19;
+const unsigned char IO_C4 = 20;
+const unsigned char IO_C5 = 21;
+const unsigned char IO_C6 = 22;
+const unsigned char IO_C7 = 23;
 
 // port A pins
-const unsigned char A0 = 31;
-const unsigned char A1 = 30;
-const unsigned char A2 = 29;
-const unsigned char A3 = 28;
-const unsigned char A4 = 27;
-const unsigned char A5 = 26;
-const unsigned char A6 = 25;
-const unsigned char A7 = 24;
+const unsigned char IO_A0 = 31;
+const unsigned char IO_A1 = 30;
+const unsigned char IO_A2 = 29;
+const unsigned char IO_A3 = 28;
+const unsigned char IO_A4 = 27;
+const unsigned char IO_A5 = 26;
+const unsigned char IO_A6 = 25;
+const unsigned char IO_A7 = 24;
 
 #else
 
 // port C pins
-const unsigned char C0 = 14;
-const unsigned char C1 = 15;
-const unsigned char C2 = 16;
-const unsigned char C3 = 17;
-const unsigned char C4 = 18;
-const unsigned char C5 = 19;
-const unsigned char C6 = 20;	// only used if RESET pin is changed to be a digital I/O
+const unsigned char IO_C0 = 14;
+const unsigned char IO_C1 = 15;
+const unsigned char IO_C2 = 16;
+const unsigned char IO_C3 = 17;
+const unsigned char IO_C4 = 18;
+const unsigned char IO_C5 = 19;
+const unsigned char IO_C6 = 20;	// only used if RESET pin is changed to be a digital I/O
 
 #endif
 
