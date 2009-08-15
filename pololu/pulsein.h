@@ -35,16 +35,15 @@
 
 
 // possible values for the newPulse member of PulseInputStruct
-const unsigned char LOW_PULSE = 1;		// the pulse just completed was a low pulse (pin just went high)
-const unsigned char HIGH_PULSE = 2;		// the pulse just completed was a high pulse (pin just went low)
+#define LOW_PULSE			1		// the pulse just completed was a low pulse (pin just went high)
+#define HIGH_PULSE		2		// the pulse just completed was a high pulse (pin just went low)
 
 // possible values for the argument to the setMaxPulseLength method
-const unsigned char MAX_PULSE_3MS = 1;	// can measure pulses with 0.05 us resolution
-const unsigned char MAX_PULSE_26MS = 2;	// can measure pulses with 0.4 us resolution
-const unsigned char MAX_PULSE_210MS = 3;	// can measure pulses with 3.2 us resolution
-const unsigned char MAX_PULSE_839MS = 4;	// can measure pulses with 12.8 us resolution
-const unsigned char MAX_PULSE_3355MS = 5;	// can measure pulses with 51.2 us resolution
-
+#define MAX_PULSE_3MS		1	// can measure pulses with 0.05 us resolution
+#define MAX_PULSE_26MS		2	// can measure pulses with 0.4 us resolution
+#define MAX_PULSE_210MS		3	// can measure pulses with 3.2 us resolution
+#define MAX_PULSE_839MS		4	// can measure pulses with 12.8 us resolution
+#define MAX_PULSE_3355MS	5	// can measure pulses with 51.2 us resolution
 
 // Structure for storing the port register and approrpiate bitmask for an I/O pin.
 // This lets us easily change the output value of the pin represented by the struct.
@@ -61,7 +60,7 @@ struct PulseInputStruct
 };
 
 
-unsigned char init_pulse_in(const unsigned char *pulsePins, unsigned char numPins);
+unsigned char init_pulse_in(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
 void update_pulse_in();
 void set_max_pulse_length(unsigned char maxLengthEnum);
 struct PulseInputStruct get_pulse_info(unsigned char idx);

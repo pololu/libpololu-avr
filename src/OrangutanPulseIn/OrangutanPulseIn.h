@@ -51,9 +51,9 @@
 // This lets us easily change the output value of the pin represented by the struct.
 struct PulseInputStruct
 {
-	unsigned char* pinRegister;
+	volatile unsigned char* pinRegister;
 	unsigned char bitmask;
-	unsigned int lastPCTime;
+	volatile unsigned int lastPCTime;
 	volatile unsigned char inputState;
 	volatile unsigned int curPulseWidth;
 	volatile unsigned int lastHighPulse;
@@ -73,7 +73,7 @@ class OrangutanPulseIn
 	// destructor (frees allocated memory)
 	~OrangutanPulseIn();
 	
-	static unsigned char init(const unsigned char *pulsePins, unsigned char numPins);
+	static unsigned char init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
 	
 	static void update();
 	

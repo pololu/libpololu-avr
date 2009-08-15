@@ -44,7 +44,7 @@
 // This lets us easily change the output value of the pin represented by the struct.
 struct PortStruct
 {
-	unsigned char* portRegister;
+	volatile unsigned char* portRegister;
 	unsigned char bitmask;
 };
 

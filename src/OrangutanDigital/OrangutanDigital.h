@@ -116,9 +116,10 @@
 
 struct IOStruct
 {
-	unsigned char* pinRegister;
-	unsigned char* portRegister;
-	unsigned char* ddrRegister;
+	// if these aren't volatile, the compiler sometimes incorrectly optimizes away operations involving these registers:
+	volatile unsigned char* pinRegister;
+	volatile unsigned char* portRegister;
+	volatile unsigned char* ddrRegister;
 	unsigned char bitmask;
 };
 

@@ -84,9 +84,9 @@ ISR(PCINT3_vect,ISR_ALIASOF(PCINT0_vect));
 
 #ifdef LIB_POLOLU
 
-extern "C" unsigned char init_pulse_in(const unsigned char *pulsePins, unsigned char numPins)
+extern "C" unsigned char init_pulse_in(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
 {
-	return OrangutanPulseIn::init(pulsePins, numPins);
+	return OrangutanPulseIn::init(pulsePins, numPins, maxLengthEnum);
 }
 
 extern "C" void update_pulse_in()
@@ -131,11 +131,16 @@ OrangutanPulseIn::~OrangutanPulseIn()
 }
 
 
-unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned char numPins)
+unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
 {
 	TIMSK1 = 0;			// disable all timer 1 interrupts
 	TCCR1A = 0;
-	TCCR1B = 0x02;		// FCPU/8 = 2.5 MHz tick rate (can measure pulses as long as 26 ms)
+
+	if (maxLengthEnum < 1)
+		maxLengthEnum = 1;
+	if (maxLengthEnum > 5)
+		maxLengthEnum = 5;
+	TCCR1B = maxLengthEnum;	// set clock tick rate (determines resolution and max measurable pulse length)
 	
 	PCICR = 0;			// disable pin-change interrupts
 	PCMSK0 = 0;
@@ -230,12 +235,12 @@ void OrangutanPulseIn::setMaxPulseLength(unsigned char maxLengthEnum)
 {
 	unsigned char origPCICR = PCICR;
 	PCICR = 0;				// disable pin-change interrupts
-	TCCR1B = maxLengthEnum;
 	if (maxLengthEnum < 1)
 		maxLengthEnum = 1;
 	if (maxLengthEnum > 5)
 		maxLengthEnum = 5;
-	
+	TCCR1B = maxLengthEnum;
+
 	unsigned char i;
 	for (i = 0; i < numPulsePins; i++)
 	{
