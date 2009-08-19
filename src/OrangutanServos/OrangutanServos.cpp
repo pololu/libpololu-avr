@@ -129,7 +129,7 @@ ISR(TIMER1_CAPT_vect)
 	
 	if (i >= numServosB)
 	{
-			OCR1B = 0;
+		OCR1B = 0;
 	}
 	else
 	{
@@ -157,6 +157,12 @@ ISR(TIMER1_CAPT_vect)
 		OCR1B = posB;						// setup duty cycle for next servo now; will take effect just before this ISR is next called
 		servoPosB[i] = posB;
 	}
+#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
+	if (servoIdx < numServos)
+		*(portPin[servoIdx].portRegister) &= ~portPin[servoIdx].bitmask;
+#endif
+	if (servoIdx < numServosB)
+		*(portPinB[servoIdx].portRegister) &= ~portPinB[servoIdx].bitmask;
 }
 
 
