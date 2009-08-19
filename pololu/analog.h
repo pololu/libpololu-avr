@@ -30,6 +30,7 @@ static inline unsigned int read_battery_millivolts()
   return read_battery_millivolts_3pi();
 }
 unsigned int read_battery_millivolts_sv();
+unsigned int read_battery_millivolts_sv168();
 
 #endif
 

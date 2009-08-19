@@ -91,6 +91,11 @@ extern "C" unsigned int read_battery_millivolts_sv()
 	return OrangutanAnalog::readBatteryMillivolts_SV();
 }
 
+extern "C" unsigned int read_battery_millivolts_sv168()
+{
+	return OrangutanAnalog::readBatteryMillivolts_SV();
+}
+
 extern "C" int read_temperature_f()
 {
 	return OrangutanAnalog::readTemperatureF();

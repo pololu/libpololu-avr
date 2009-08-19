@@ -245,7 +245,7 @@ inline void set_digital_input(unsigned char pin, unsigned char inputState)
 	struct IOStruct registers;
 	get_io_registers(&registers, pin);
 	set_data_direction(&registers, 0);
-	set_output_value(&registers, inputState);
+	set_digital_output_value(&registers, inputState);
 }
 
 
