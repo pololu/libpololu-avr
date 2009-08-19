@@ -64,7 +64,7 @@ unsigned char numServos;		// number of servos controlled by OCR1A duty cycles
 unsigned char numServosB;		// number of servos controlled by OCR1B duty cycles
 
 // the index of the servo whose pulse is currently being generated
-unsigned char idx;
+unsigned char servoIdx;
 
 struct PortStruct *portPin;		// mux selector pins (Orangutan SVP) or servo signal pins (everything else)
 struct PortStruct *portPinB;	// servo signal pins
@@ -75,11 +75,11 @@ struct PortStruct *portPinB;	// servo signal pins
 ISR(TIMER1_CAPT_vect)
 {
 	unsigned char i;
-	idx = (idx + 1) & 7;					// increment idx, loop back to 0 when idx == 8
+	servoIdx = (servoIdx + 1) & 7;					// increment idx, loop back to 0 when idx == 8
 
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 
-	unsigned char temp = idx;	// set mux pins based on bits of idx (pin SA = idx bit 0, ..., SC = idx bit 2)
+	unsigned char temp = servoIdx;	// set mux pins based on bits of idx (pin SA = idx bit 0, ..., SC = idx bit 2)
 	for (i = 0; i < numMuxPins; i++)
 	{
 		if (temp & 1)
@@ -95,7 +95,7 @@ ISR(TIMER1_CAPT_vect)
 
 #endif
 	
-	i = (idx + 1) & 7;
+	i = (servoIdx + 1) & 7;
 	if (i >= numServos)
 	{
 			OCR1A = 0;
@@ -168,9 +168,9 @@ ISR(TIMER1_CAPT_vect)
 // servo.
 ISR(TIMER1_COMPA_vect)
 {
-	if (idx < numServos)
+	if (servoIdx < numServos)
 	{
-		*(portPin[idx].portRegister) ^= portPin[idx].bitmask;
+		*(portPin[servoIdx].portRegister) ^= portPin[servoIdx].bitmask;
 	}
 }
 #endif
@@ -182,19 +182,25 @@ ISR(TIMER1_COMPA_vect)
 // servo.
 ISR(TIMER1_COMPB_vect)
 {
-	if (idx < numServosB)
+	if (servoIdx < numServosB)
 	{
-		*(portPinB[idx].portRegister) ^= portPinB[idx].bitmask;
+		*(portPinB[servoIdx].portRegister) ^= portPinB[servoIdx].bitmask;
 	}
 }
 
 
 #ifdef LIB_POLOLU
 
-extern "C" void init_servos(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB)
+extern "C" unsigned char init_servos(const unsigned char servoPins[], unsigned char numPins)
 {
-	OrangutanServos::initServos(servoPins, numServos, servoPinsB, numPinsB);
+	return OrangutanServos::initServos(servoPins, numServos, 0, 0);
 }
+
+extern "C" unsigned char init_servos_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB)
+{
+	return OrangutanServos::initServos(servoPins, numServos, servoPinsB, numPinsB);
+}
+
 
 extern "C" unsigned int get_servo_position(unsigned char servoNum)
 {
@@ -258,7 +264,7 @@ OrangutanServos::OrangutanServos()
 }
 
 
-void freeMemory()
+void freeServoMemory()
 {
 	if (portPin)
 	{
@@ -307,7 +313,7 @@ void freeMemory()
 // the destructor frees up allocated memory
 OrangutanServos::~OrangutanServos()
 {
-	freeMemory();
+	freeServoMemory();
 }
 
 
@@ -323,6 +329,11 @@ OrangutanServos::~OrangutanServos()
 // represents a set of up to eight digital I/O pins on which the servo signals should be output.
 // If you don't want this second set of eight servos, use a numPinsB value of 0 (and you can pass in NULL for servoPinsB).
 // A nonzero return value indicates that memory for the desired arrays could not be allocated
+unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsigned char numPins)
+{
+	return initServos(servoPins, numPins, 0, 0);
+}
+
 unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsigned char numPins, const unsigned char *servoPinsB, unsigned char numPinsB)
 {
 	TCCR1B = 0;
@@ -350,7 +361,7 @@ unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsign
 		numPinsB = 8;
 	numServosB = numPinsB;
 
-	freeMemory();
+	freeServoMemory();
 	
 	portPin = (struct PortStruct*)malloc(sizeof(struct PortStruct)*numPins);
 	servoPos = (unsigned int*)malloc(sizeof(unsigned int)*numServos);
@@ -358,7 +369,7 @@ unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsign
 	servoSpeed = (unsigned int*)malloc(sizeof(unsigned int)*numServos);
 	if (portPin == 0 || servoPos == 0 || servoTargetPos == 0 || servoSpeed == 0)
 	{
-		freeMemory();
+		freeServoMemory();
 		return 1;
 	}
 	
@@ -370,7 +381,7 @@ unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsign
 		servoSpeedB = (unsigned int*)malloc(sizeof(unsigned int)*numServosB);
 		if (portPinB == 0 || servoPosB == 0 || servoTargetPosB == 0 || servoSpeedB == 0)
 		{
-			freeMemory();
+			freeServoMemory();
 			return 1;
 		}
 	}
@@ -395,7 +406,7 @@ unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsign
 		servoSpeedB[i] = 0;
 	}
 
-	idx = 0;
+	servoIdx = 0;
 
 	TCCR1B = 0b00010001;		// phase correct PWM with TOP = ICR1, clock prescaler = 1 (freq = FCPU / (2 * ICR1))
 

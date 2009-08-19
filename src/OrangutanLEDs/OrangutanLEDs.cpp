@@ -26,9 +26,9 @@
 #include "OrangutanLEDs.h"
 
 
-#define RED_LED			PORT1
+#define RED_LED		PORT1
 #define RED_LED_PORT	PORTD
-#define RED_LED_DDR		DDRD
+#define RED_LED_DDR	DDRD
 
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 #define GREEN_LED		PORT4

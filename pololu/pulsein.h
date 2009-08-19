@@ -49,7 +49,7 @@
 // This lets us easily change the output value of the pin represented by the struct.
 struct PulseInputStruct
 {
-	unsigned char* pinRegister;
+	volatile unsigned char* pinRegister;
 	unsigned char bitmask;
 	unsigned int lastPCTime;
 	volatile unsigned char inputState;

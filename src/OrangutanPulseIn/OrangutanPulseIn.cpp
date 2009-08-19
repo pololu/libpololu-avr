@@ -38,7 +38,7 @@
 #include <stdlib.h>
 
 
-struct PulseInputStruct *pi;
+struct PulseInputStruct *pis;
 unsigned char numPulsePins;
 
 
@@ -48,28 +48,28 @@ ISR(PCINT0_vect)
 	unsigned char i;
 	for (i = 0; i < numPulsePins; i++)
 	{
-		unsigned char pr = *pi[i].pinRegister & pi[i].bitmask;
-		if (pr ^ pi[i].inputState)
+		unsigned char pr = *pis[i].pinRegister & pis[i].bitmask;
+		if (pr ^ pis[i].inputState)
 		{
-			unsigned int width = time - pi[i].lastPCTime;
-			if (width < pi[i].curPulseWidth)
+			unsigned int width = time - pis[i].lastPCTime;
+			if (width < pis[i].curPulseWidth)
 			{
 				width = 0xFFFF;
 			}
-			if (pi[i].inputState)
+			if (pis[i].inputState)
 			{
-				pi[i].lastHighPulse = width;
-				pi[i].newPulse = HIGH_PULSE;
+				pis[i].lastHighPulse = width;
+				pis[i].newPulse = HIGH_PULSE;
 			}
 			else
 			{
-				pi[i].lastLowPulse = width;
-				pi[i].newPulse = LOW_PULSE;
+				pis[i].lastLowPulse = width;
+				pis[i].newPulse = LOW_PULSE;
 			}
 			
-			pi[i].inputState = pr;
-			pi[i].curPulseWidth = 0;
-			pi[i].lastPCTime = time;
+			pis[i].inputState = pr;
+			pis[i].curPulseWidth = 0;
+			pis[i].lastPCTime = time;
 		}
 	}
 }
@@ -114,12 +114,12 @@ OrangutanPulseIn::OrangutanPulseIn()
 }
 
 
-void freeMemory()
+void freePulseMemory()
 {
-	if (pi != 0)
+	if (pis != 0)
 	{
-		free(pi);
-		pi = 0;
+		free(pis);
+		pis = 0;
 	}
 }
 
@@ -127,7 +127,7 @@ void freeMemory()
 // the destructor frees up allocated memory
 OrangutanPulseIn::~OrangutanPulseIn()
 {
-	freeMemory();
+	freePulseMemory();
 }
 
 
@@ -152,9 +152,9 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 
 	numPulsePins = numPins;
 
-	freeMemory();
-	pi = (struct PulseInputStruct*)malloc(sizeof(struct PulseInputStruct)*numPins);
-	if (pi == 0)
+	freePulseMemory();
+	pis = (struct PulseInputStruct*)malloc(sizeof(struct PulseInputStruct)*numPins);
+	if (pis == 0)
 		return 1;
 		
 	unsigned char i;
@@ -164,13 +164,13 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 		OrangutanDigital::getIORegisters(&io, pulsePins[i]);
 		OrangutanDigital::setDataDirection(&io, 0);			// set pin as an input
 		OrangutanDigital::setOutputValue(&io, 0);				// internal pull-up disabled
-		pi[i].pinRegister = io.pinRegister;
-		pi[i].bitmask = io.bitmask;
-		pi[i].lastHighPulse = 0;
-		pi[i].lastLowPulse = 0;
-		pi[i].curPulseWidth = 0xFFFF;
-		pi[i].inputState = *io.pinRegister & io.bitmask;
-		pi[i].newPulse = 0;
+		pis[i].pinRegister = io.pinRegister;
+		pis[i].bitmask = io.bitmask;
+		pis[i].lastHighPulse = 0;
+		pis[i].lastLowPulse = 0;
+		pis[i].curPulseWidth = 0xFFFF;
+		pis[i].inputState = *io.pinRegister & io.bitmask;
+		pis[i].newPulse = 0;
 		
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
 
@@ -197,14 +197,14 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 	
 	PCIFR = 0XFF;		// cancel any pending pin-change interrupts
 	if (PCMSK0)
-		PCICR |= PCIE0;
+		PCICR |= 1 << PCIE0;
 	if (PCMSK1)
-		PCICR |= PCIE1;
+		PCICR |= 1 << PCIE1;
 	if (PCMSK2)
-		PCICR |= PCIE2;
+		PCICR |= 1 << PCIE2;
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
 	if (PCMSK3)
-		PCICR |= PCIE3;
+		PCICR |= 1 << PCIE3;
 #endif
 
 	sei();
@@ -220,12 +220,12 @@ void OrangutanPulseIn::update()
 	{
 		unsigned char origPCICR = PCICR;
 		PCICR = 0;				// disable pin-change interrupts
-		unsigned int width = TCNT1 - pi[i].lastPCTime;
-		if (width < pi[i].curPulseWidth)
+		unsigned int width = TCNT1 - pis[i].lastPCTime;
+		if (width < pis[i].curPulseWidth)
 		{
 			width = 0xFFFF;
 		}
-		pi[i].curPulseWidth = width;
+		pis[i].curPulseWidth = width;
 		PCICR = origPCICR;		// re-enable pin-change interrupts
 	}
 }
@@ -244,11 +244,11 @@ void OrangutanPulseIn::setMaxPulseLength(unsigned char maxLengthEnum)
 	unsigned char i;
 	for (i = 0; i < numPulsePins; i++)
 	{
-		pi[i].lastHighPulse = 0;
-		pi[i].lastLowPulse = 0;
-		pi[i].curPulseWidth = 0xFFFF;
-		pi[i].inputState = *pi[i].pinRegister & pi[i].bitmask;
-		pi[i].newPulse = 0;
+		pis[i].lastHighPulse = 0;
+		pis[i].lastLowPulse = 0;
+		pis[i].curPulseWidth = 0xFFFF;
+		pis[i].inputState = *pis[i].pinRegister & pis[i].bitmask;
+		pis[i].newPulse = 0;
 	}
 	PCIFR = 0XFF;			// cancel any pending pin-change interrupts
 	PCICR = origPCICR;		// re-enable pin-change interrupts
@@ -265,7 +265,8 @@ struct PulseInputStruct OrangutanPulseIn::getPulseInfo(unsigned char idx)
 	unsigned char origPCICR = PCICR;
 	PCICR = 0;				// disable pin-change interrupts
 	
-	ret = pi[idx];
+	ret = pis[idx];
+	pis[idx].newPulse = 0;
 	
 	PCICR = origPCICR;		// re-enable pin-change interrupts
 	
