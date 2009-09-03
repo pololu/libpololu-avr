@@ -14,18 +14,7 @@ CPP=avr-g++
 CC=avr-gcc
 
 LIBRARY_OBJECT_FILES=\
-	src/OrangutanMotors/OrangutanMotors.o \
-	src/OrangutanBuzzer/OrangutanBuzzer.o \
-	src/OrangutanPushbuttons/OrangutanPushbuttons.o \
-	src/OrangutanLCD/OrangutanLCD.o \
-	src/OrangutanLEDs/OrangutanLEDs.o \
-	src/OrangutanAnalog/OrangutanAnalog.o \
-	src/PololuQTRSensors/PololuQTRSensors.o \
-	src/Pololu3pi/Pololu3pi.o \
-	src/PololuQTRSensors/PololuQTRSensors.o \
-	src/OrangutanResources/OrangutanResources.o \
-	src/OrangutanTime/OrangutanTime.o \
-	src/OrangutanSerial/OrangutanSerial.o
+	src/*/*.o
 
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -L. -lpololu -lm

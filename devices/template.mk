@@ -10,6 +10,8 @@ LIBRARY_OBJECT_FILES=\
 	OrangutanDigital.o \
 	OrangutanLCD.o \
 	OrangutanLEDs.o \
+	OrangutanSPIMaster.o \
+	OrangutanSVP.o \
 	OrangutanMotors.o \
 	OrangutanPulseIn.o \
 	OrangutanPushbuttons.o \
