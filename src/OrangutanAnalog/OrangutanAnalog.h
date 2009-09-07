@@ -29,8 +29,23 @@
 
 #define MODE_8_BIT		1
 #define MODE_10_BIT		0
+
+// ADC Channels
+
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+
+#define TRIMPOT   32
+#define CHANNEL_A 33
+#define CHANNEL_B 34
+#define CHANNEL_C 35
+#define CHANNEL_D 36
+
+#else
+
 #define TRIMPOT			7
 #define TEMP_SENSOR		6
+
+#endif
 
 #include "../OrangutanSVP/OrangutanSVP.h"
 
@@ -53,7 +68,10 @@ class OrangutanAnalog
 
 	// take a single analog reading of the specified channel
 	static unsigned int read(unsigned char channel);
-	
+
+	// take a single analog reading of the specified channel and return result in millivolts
+	static unsigned int readMillivolts(unsigned char channel);
+
 	// take 'sample' readings of the specified channel and return the average
 	static unsigned int readAverage(unsigned char channel, 
 									  unsigned int samples);
@@ -82,10 +100,22 @@ class OrangutanAnalog
 	
 	// returns the result of the previous ADC conversion.
 	static unsigned int conversionResult();
-	
+
+	// returns the result of the previous ADC conversion in millivolts.
+	static unsigned int conversionResultMillivolts();
+
 	// converts the specified ADC result to millivolts
 	static unsigned int toMillivolts(unsigned int adcResult);
-	
+
+	// SVP: returns the voltage of the battery in millivolts, as retrieved from
+	// the auxiliary processor.  Calling this function will have side effects
+	// related to enabling the SPI module.  See the SVP User's Guide for details.
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	static inline unsigned int readBatteryMillivolts_SVP()
+	{
+		return OrangutanSVP::readBatteryMillivolts();
+	}
+#endif
 
 #if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
 

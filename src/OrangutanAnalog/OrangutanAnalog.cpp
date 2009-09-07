@@ -44,6 +44,11 @@ extern "C" unsigned int analog_read(unsigned char channel)
 	return OrangutanAnalog::read(channel);
 }
 
+extern "C" unsigned int analog_read_millivolts(unsigned char channel)
+{
+	return OrangutanAnalog::readMillivolts(channel);
+}
+
 extern "C" unsigned int analog_read_average(unsigned char channel, unsigned int samples)
 {
 	return OrangutanAnalog::readAverage(channel, samples);
@@ -69,6 +74,11 @@ extern "C" unsigned int analog_conversion_result()
 	return OrangutanAnalog::conversionResult();
 }
 
+extern "C" unsigned int analog_conversion_result_millivolts()
+{
+	return OrangutanAnalog::conversionResultMillivolts();
+}
+
 extern "C" unsigned int to_millivolts(unsigned int analog_result)
 {
 	return OrangutanAnalog::toMillivolts(analog_result);
@@ -79,7 +89,14 @@ extern "C" unsigned int read_trimpot()
 	return OrangutanAnalog::readTrimpot();
 }
 
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
+#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+extern "C" unsigned int read_battery_millivolts_svp()
+{
+	return OrangutanAnalog::readBatteryMillivolts_SVP();
+}
+#endif
+
+#if !defined(__AVR_ATmega324P__) && !defined(__AVR_ATmega1284P__)
 
 extern "C" unsigned int read_battery_millivolts_3pi()
 {
@@ -110,6 +127,29 @@ extern "C" unsigned int read_temperature_c()
 
 #endif
 
+static unsigned int fromMillivoltsToNormal(unsigned int millivolts);
+
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#define ADC_PORT PORTA
+#define ADC_DDR  DDRA
+#else
+#define ADC_PORT PORTC
+#define ADC_DDR  DDRC
+#endif
+
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+/*  non-zero means the result from the last conversion is stored in millivolts
+        in adc_result_millivolts.  The contents of ADCL and ADCH are irrelevant.
+	0 means the result from the last conversion is stored in ADCL and ADCH.
+	    The contents of adc_result_millivolts are irrelevant.
+ */
+static unsigned char adc_result_is_in_millivolts = 0;
+
+/*  adc_result_millivolts holds the last ADC result if adc_result_is_in_millivolts
+        is non-zero.  David wanted to just store it in ADCL and ADCH, but those
+		registers are not writable. */
+static unsigned int adc_result_millivolts;
+#endif
 
 // constructor
 OrangutanAnalog::OrangutanAnalog()
@@ -140,15 +180,48 @@ unsigned char OrangutanAnalog::getMode()
 // returns 0
 unsigned char OrangutanAnalog::isConverting()
 {
-	return ADCSRA & (1 << ADSC);
+    // We have to read ADCSRA this way so that it returns 1 instead of (1<<ADSC).
+	return (ADCSRA >> ADSC) & 1;
 }
 
 // returns the result of the previous ADC conversion.
-inline unsigned int OrangutanAnalog::conversionResult()
+unsigned int OrangutanAnalog::conversionResult()
 {
+	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	if (adc_result_is_in_millivolts)
+	{
+		return fromMillivoltsToNormal(adc_result_millivolts);
+	}
+	#endif
+
 	if (getMode())				// if left-adjusted (i.e. 8-bit mode)
+	{
 		return ADCH;			// 8-bit result
-	return ADC;				// 10-bit result
+	}
+	else
+	{
+		return ADC;				// 10-bit result
+	}
+}
+
+// returns the result from the previous ADC conversion in millivolts.
+unsigned int OrangutanAnalog::conversionResultMillivolts()
+{
+	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	if (adc_result_is_in_millivolts)
+	{
+		return adc_result_millivolts;
+	}
+	#endif
+
+	if (getMode())  // if left-adjusted (i.e. 8-bit mode)
+	{
+		return toMillivolts(ADCH);
+	}
+	else
+	{
+		return toMillivolts(ADC);
+	}
 }
 
 // the following method can be used to initiate an ADC conversion
@@ -161,10 +234,34 @@ inline unsigned int OrangutanAnalog::conversionResult()
 // channel as an input with the internal pull-up disabled.
 void OrangutanAnalog::startConversion(unsigned char channel, unsigned char use_internal_reference)
 {
-	if (channel > 15)
+	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	if (channel > 31)
+	{
+		adc_result_is_in_millivolts = 1;
+
+		if (channel == TRIMPOT){ adc_result_millivolts = OrangutanSVP::readTrimpotMillivolts(); }
+		else if (channel == CHANNEL_A){ adc_result_millivolts = OrangutanSVP::readChannelAMillivolts(); }
+		else if (channel == CHANNEL_B){ adc_result_millivolts = OrangutanSVP::readChannelBMillivolts(); }
+		else if (channel == CHANNEL_C){ adc_result_millivolts = OrangutanSVP::readChannelCMillivolts(); }
+		else if (channel == CHANNEL_D){ adc_result_millivolts = OrangutanSVP::readChannelDMillivolts(); }
+
 		return;
-	PORTC &= ~(1 << channel);	// turn off any pull-ups
-	DDRC &= ~(1 << channel);	// set I/O line to be an input
+	}
+
+	adc_result_is_in_millivolts = 0;
+
+	#else
+
+	// Channel numbers greater than 15 are invalid.
+	if (channel > 15)
+	{
+		return;
+	}
+
+	#endif
+
+	ADC_PORT &= ~(1 << channel); // turn off any pull-ups
+	ADC_DDR &= ~(1 << channel);  // set I/O line to be an input
 	ADCSRA = 0x87;		// bit 7 set: ADC enabled
 						// bit 6 clear: don't start conversion
 						// bit 5 clear: disable autotrigger
@@ -184,23 +281,35 @@ void OrangutanAnalog::startConversion(unsigned char channel, unsigned char use_i
 		ADMUX &= ~(1 << 7);
 	}
 
-	ADMUX &= 0xF0;				// set the conversion channel
-	ADMUX |= channel & 0x0F;
-	ADCSRA |= 1 << ADSC;		// start the conversion
+	ADMUX &= 0xF0;		 // set the conversion channel
+	ADMUX |= channel;    // assumption: channel is less than 16 (32 on the ATmega324/1284)
+	ADCSRA |= 1 << ADSC; // start the conversion
 }
 
+static void performConversion(unsigned char channel)
+{
+	unsigned char tempDDR = ADC_DDR;	// store current I/O state of ADC pin
+	unsigned char tempPORT = ADC_PORT;
+	OrangutanAnalog::startConversion(channel);
+	while (OrangutanAnalog::isConverting());	// wait for conversion to finish
+	ADC_PORT = tempPORT;			// restore I/O state of the pin
+	ADC_DDR = tempDDR;
+}
 
 // take a single analog reading of the specified channel
 unsigned int OrangutanAnalog::read(unsigned char channel)
 {
-	unsigned char tempDDRC = DDRC;	// store current I/O state of ADC pin
-	unsigned char tempPORTC = PORTC;
-	startConversion(channel);
-	while (isConverting());	// wait for conversion to finish
-	PORTC = tempPORTC;			// restore I/O state of the pin
-	DDRC = tempDDRC;
+	performConversion(channel);
 	return conversionResult();
 }
+
+// take a single analog reading of the specified channel and return the result in millivolts
+unsigned int OrangutanAnalog::readMillivolts(unsigned char channel)
+{
+	performConversion(channel);
+	return conversionResultMillivolts();
+}
+
 
 
 // take 'sample' readings of the specified channel and return the average
@@ -209,8 +318,17 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 {
 	unsigned int i = samples;
 	unsigned long sum = 0;
-	unsigned char tempDDRC = DDRC;	// store current I/O state of ADC pin
-	unsigned char tempPORTC = PORTC;
+	unsigned char tempDDR = ADC_DDR;	// store current I/O state of ADC pin
+	unsigned char tempPORT = ADC_PORT;
+
+#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	if (channel > 31)
+	{
+		// We have not implemented averaging of the adc readings from the auxiliary
+		// processor on the SVP, so we will just return a simple reading.
+		return read(channel);
+	}
+#endif
 
 	startConversion(channel);	// call this first to set the channel
 	do
@@ -220,8 +338,8 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 		sum += conversionResult();	// sum the results
 	} while (--i);
 	
-	PORTC = tempPORTC;			// restore I/O state of the pin
-	DDRC = tempDDRC;
+	ADC_PORT = tempPORT;			// restore I/O state of the pin
+	ADC_DDR = tempDDR;
 
 	if (samples < 64)			// can do the division much faster
 		return ((unsigned int)sum + (samples >> 1)) / (unsigned char)samples;

@@ -92,10 +92,10 @@ typedef union SVPVariables
 	unsigned char byte[13];
     struct
 	{
-	    unsigned int lineA;
-    	unsigned int lineB;
-		unsigned int lineC;
-    	unsigned int lineD;
+	    unsigned int channelA;
+    	unsigned int channelB;
+		unsigned int channelC;
+    	unsigned int channelD;
     	unsigned int trimpot;
     	unsigned int battery;
 		struct
@@ -243,8 +243,45 @@ static void updateVariablesIfNeeded()
 
 unsigned int OrangutanSVP::readTrimpotMillivolts()
 {
+	// TODO: use setMode to disable slave select if it is enabled?  Otherwise,
+	// if slave select is enabled, then the reading will just be 0xFFFF.
+
 	updateVariablesIfNeeded();
 	return svp_variables.trimpot;
+}
+
+unsigned int OrangutanSVP::readBatteryMillivolts()
+{
+	updateVariablesIfNeeded();
+	return svp_variables.battery;
+}
+
+unsigned int OrangutanSVP::readChannelAMillivolts()
+{
+	// TODO: if necessary, set the mode and delay?
+	updateVariablesIfNeeded();
+	return svp_variables.channelA;
+}
+
+unsigned int OrangutanSVP::readChannelBMillivolts()
+{
+	// TODO: if necessary, set the mode and delay?
+	updateVariablesIfNeeded();
+	return svp_variables.channelB;
+}
+
+unsigned int OrangutanSVP::readChannelCMillivolts()
+{
+	// TODO: if necessary, set the mode and delay?
+	updateVariablesIfNeeded();
+	return svp_variables.channelC;
+}
+
+unsigned int OrangutanSVP::readChannelDMillivolts()
+{
+	// TODO: if necessary, set the mode and delay?
+	updateVariablesIfNeeded();
+	return svp_variables.channelD;
 }
 
 #endif

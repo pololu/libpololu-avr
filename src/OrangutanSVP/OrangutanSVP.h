@@ -67,7 +67,14 @@ class OrangutanSVP
 	static unsigned char readNextByte();
 	static unsigned char serialReadStart();
 
+	// Undocumented functions that are used by other parts of the library that
+	// the user does not need to know about:
+	static unsigned int readBatteryMillivolts();
 	static unsigned int readTrimpotMillivolts();
+	static unsigned int readChannelAMillivolts();
+	static unsigned int readChannelBMillivolts();
+	static unsigned int readChannelCMillivolts();
+	static unsigned int readChannelDMillivolts();
 };
 #endif
 
