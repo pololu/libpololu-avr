@@ -1,3 +1,28 @@
+/*
+  analog.h - Library for using the analog inputs on the
+	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library also
+	provides a method for reading the temperature sensor on the LV-168.
+*/
+
+/*
+ * Written by Ben Schmidel, May 27, 2008.
+ * Copyright (c) 2008 Pololu Corporation. For more information, see
+ *
+ *   http://www.pololu.com
+ *   http://forum.pololu.com
+ *   http://www.pololu.com/docs/0J18
+ *
+ * You may freely modify and share this code, as long as you keep this
+ * notice intact (including the two links above).  Licensed under the
+ * Creative Commons BY-SA 3.0 license:
+ *
+ *   http://creativecommons.org/licenses/by-sa/3.0/
+ *
+ * Disclaimer: To the extent permitted by law, Pololu provides this work
+ * without any warranty.  It might be defective, in which case you agree
+ * to be responsible for all resulting costs and damages.
+ */
+
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
@@ -17,9 +42,9 @@ unsigned char analog_is_converting();
 unsigned int analog_conversion_result();
 unsigned int to_millivolts(unsigned int analog_result);
 
-#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
-
 unsigned int read_trimpot();
+
+#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
 
 int read_temperature_f();
 int read_temperature_c();

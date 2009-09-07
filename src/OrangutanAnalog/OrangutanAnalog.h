@@ -32,6 +32,7 @@
 #define TRIMPOT			7
 #define TEMP_SENSOR		6
 
+#include "../OrangutanSVP/OrangutanSVP.h"
 
 class OrangutanAnalog
 {
@@ -58,7 +59,10 @@ class OrangutanAnalog
 									  unsigned int samples);
 	
 	// returns the position of the trimpot (20 readings averaged together).
-	// The trimpot is on ADC channel 7 (this does not work for the Orangutan SVP)
+	// For all devices except the Orangutan SVP, the trimpot is on ADC channel 7.
+	// On the Orangutan SVP, the trimpot is on the auxiliary processor, so 
+	// calling this function can have side effects related to enabling SPI
+	// communication (see the SVP user's guide for more info).
 	static unsigned int readTrimpot();
 
 	// the following methods can be used to initiate an ADC conversion
@@ -83,7 +87,7 @@ class OrangutanAnalog
 	static unsigned int toMillivolts(unsigned int adcResult);
 	
 
-#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
+#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
 
 	// 3pi: returns the voltage of the battery in millivolts,
 	// using 10 averaged samples.

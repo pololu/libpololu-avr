@@ -600,10 +600,8 @@ void OrangutanLCD::printHex(unsigned int word)
 // display a single-byte value in hex (00 - FF) at the current cursor location
 void OrangutanLCD::printHex(unsigned char byte)
 {
-	unsigned char val = byte >> 4;
-	printHexNibble(val);		// display high byte high nibble
-	val = byte & 0x0F;
-	printHexNibble(val);		// display high byte low nibble
+	printHexNibble(byte >> 4);	 // display high byte high nibble
+	printHexNibble(byte & 0x0F); // display high byte low nibble
 }
 
 

@@ -31,28 +31,6 @@
 #define SVP_MODE_ENCODERS     4
 #define SVP_MODE_SLAVE_SELECT 1
 
-typedef union SVPVariables
-{
-	unsigned char byte[13];
-    struct
-	{
-	    unsigned int lineA;
-    	unsigned int lineB;
-		unsigned int lineC;
-    	unsigned int lineD;
-    	unsigned int pot;
-    	unsigned int battery;
-		struct
-	    {
-    	    unsigned usbPowerPresent :1;
-        	unsigned usbConfigured :1;
-        	unsigned usbSuspend :1;
-        	unsigned dtr :1;
-    	    unsigned rts :1;
-	    } status;
-	};
-} SVPVariables;
-
 typedef union SVPEncoders
 {
 	unsigned char byte[5];
@@ -75,12 +53,14 @@ typedef union SVPEncoders
 void svp_set_mode(unsigned char mode);
 unsigned char svp_read_firmware_version();
 unsigned char svp_read_next_byte();
-SVPVariables svp_read_variables();
 SVPEncoders svp_read_encoders();
 unsigned char svp_serial_read(char * buffer);
 unsigned char svp_serial_read_start();
-unsigned char svp_serial_send_if_ready(char data);
-void svp_serial_send_blocking(char data);
+unsigned char svp_serial_send_character_if_ready(char data);
+unsigned char svp_serial_send_if_ready(const char * data);
+void svp_serial_send_character_blocking(char data);
+void svp_serial_send_blocking(const char * data);
+unsigned int svp_read_trimpot_millivolts();
 #endif
 
 #endif

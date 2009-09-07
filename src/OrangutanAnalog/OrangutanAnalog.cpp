@@ -74,12 +74,12 @@ extern "C" unsigned int to_millivolts(unsigned int analog_result)
 	return OrangutanAnalog::toMillivolts(analog_result);
 }
 
-#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
-
 extern "C" unsigned int read_trimpot()
 {
 	return OrangutanAnalog::readTrimpot();
 }
+
+#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
 
 extern "C" unsigned int read_battery_millivolts_3pi()
 {
@@ -238,16 +238,44 @@ unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 	return (temp + 511) / 1023;
 }
 
-
-#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
-
-// returns the position of the trimpot (20 readings averaged together).
-// The trimpot is on ADC channel 7 (does not work on the Orangutan SVP)
-unsigned int OrangutanAnalog::readTrimpot()
+static unsigned int fromMillivoltsToNormal(unsigned int millivolts)
 {
-	return readAverage(TRIMPOT, 20);
+	unsigned long temp;
+
+	if (OrangutanAnalog::getMode())  // if 8-bit mode
+	{
+		temp = (millivolts * 255UL + 2500) / 5000;
+		if (temp > 0xFFu)
+		{
+			return 0xFFu;
+		}
+	}
+	else
+	{
+		temp = (millivolts * 1023UL + 2500) / 5000;
+		if (temp > 0xFFFFu)
+		{
+			return 0xFFFFu;
+		}
+	}
+	return temp;
 }
 
+// returns the position of the trimpot (20 readings averaged together).
+// For all devices except the Orangutan SVP, the trimpot is on ADC channel 7.
+// On the Orangutan SVP, the trimpot is on the auxiliary processor, so 
+// calling this function can have side effects related to enabling SPI
+// communication (see the SVP user's guide for more info).
+unsigned int OrangutanAnalog::readTrimpot()
+{
+	#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+	return fromMillivoltsToNormal(OrangutanSVP::readTrimpotMillivolts());
+	#else
+	return readAverage(TRIMPOT, 20);
+	#endif
+}
+
+#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
 
 // The temperature sensor reading (on the Orangutan LV) can be converted into degrees C as follows:
 //   T = (Vout - 0.4) / 0.0195 Celcius

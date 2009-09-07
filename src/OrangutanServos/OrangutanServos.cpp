@@ -157,7 +157,7 @@ ISR(TIMER1_CAPT_vect)
 		OCR1B = posB;						// setup duty cycle for next servo now; will take effect just before this ISR is next called
 		servoPosB[i] = posB;
 	}
-#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)
+#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
 	if (servoIdx < numServos)
 		*(portPin[servoIdx].portRegister) &= ~portPin[servoIdx].bitmask;
 #endif
@@ -166,7 +166,7 @@ ISR(TIMER1_CAPT_vect)
 }
 
 
-#if !defined (__AVR_ATmega324P__) || !defined (__AVR_ATmega1284P__)	// NOT USED FOR ORANGUTAN SVP, which uses hardware PWM
+#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)	// NOT USED FOR ORANGUTAN SVP, which uses hardware PWM
 // This interrupt is executed when Timer1 counter (TCNT1) = OCR1A.  Since we are running Timer1 in phase-correct mode,
 // TCNT1 counts from 0 up to TOP and then back down to 0 again.  As a result, this interrupt will occur twice (once
 // while the timer is upcounting and once while it is downcounting) for every TIMER1_CAPT interrupt.

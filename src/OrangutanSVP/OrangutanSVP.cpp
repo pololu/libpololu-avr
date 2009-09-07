@@ -23,6 +23,7 @@
  */
 
 #include "../OrangutanSPIMaster/OrangutanSPIMaster.h"
+#include "../OrangutanTime/OrangutanTime.h"
 #include "OrangutanSVP.h"
 
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
@@ -49,11 +50,6 @@ extern "C" SVPEncoders svp_read_encoders()
 	return OrangutanSVP::readEncoders();
 }
 
-extern "C" SVPVariables svp_read_variables()
-{
-	return OrangutanSVP::readVariables();
-}
-
 extern "C" unsigned char svp_serial_read_start()
 {
 	return OrangutanSVP::serialReadStart();
@@ -64,55 +60,96 @@ extern "C" unsigned char svp_serial_read(char * buffer)
 	return OrangutanSVP::serialRead(buffer);
 }
 
-extern "C" unsigned char svp_serial_send_if_ready(char data)
+extern "C" unsigned char svp_serial_send_character_if_ready(char character)
 {
-	return OrangutanSVP::serialSendIfReady(data);
+	return OrangutanSVP::serialSendIfReady(character);
 }
 
-extern "C" void svp_serial_send_blocking(char data)
+extern "C" void svp_serial_send_character_blocking(char character)
 {
-	OrangutanSVP::serialSendBlocking(data);
+	OrangutanSVP::serialSendBlocking(character);
+}
+
+extern "C" unsigned char svp_serial_send_if_ready(const char * str)
+{
+	return OrangutanSVP::serialSendIfReady(str);
+}
+
+extern "C" void svp_serial_send_blocking(const char * str)
+{
+	OrangutanSVP::serialSendBlocking(str);
+}
+
+extern "C" unsigned int svp_read_trimpot_millivolts()
+{
+	return OrangutanSVP::readTrimpotMillivolts();
 }
 
 #endif
 
+typedef union SVPVariables
+{
+	unsigned char byte[13];
+    struct
+	{
+	    unsigned int lineA;
+    	unsigned int lineB;
+		unsigned int lineC;
+    	unsigned int lineD;
+    	unsigned int trimpot;
+    	unsigned int battery;
+		struct
+	    {
+    	    unsigned usbPowerPresent :1;
+        	unsigned usbConfigured :1;
+        	unsigned usbSuspend :1;
+        	unsigned dtr :1;
+    	    unsigned rts :1;
+	    } status;
+	};
+} SVPVariables;
+
+/* GLOBAL VARIABLES ***********************************************************/
+
+/* A cache of all the variables from the SVP's auxilliary processor. **********/
+// Battery is initialized the invalid value 0xFFFF so that our library can tell
+// when the variables have never been updated and be sure to update them when
+// updateVariablesIfNeeded is first called.
+static SVPVariables svp_variables = {battery:0xFFFF};
+
+/* LOW-LEVEL FUNCTIONS FOR DOING SPI COMMUNICATION ****************************/
+// All the delays in these functions were chosen by doing an analysis of the
+// auxiliary processor's assembly code for handling SPI communication.
+
 unsigned char OrangutanSVP::readFirmwareVersion()
 {
-	OrangutanSPIMaster::transmitAndDelay(0x80, 4);
+	OrangutanSPIMaster::transmitAndDelay(0x80, 5);
 	return readNextByte();
 }
 
 unsigned char OrangutanSVP::readNextByte()
 {
-	return OrangutanSPIMaster::transmitAndDelay(0xFF, 3);
+	return OrangutanSPIMaster::transmitAndDelay(0xFF, 4);
 }
 
-void OrangutanSVP::setMode(unsigned char mode)
+static void updateVariables()
 {
-	OrangutanSPIMaster::transmitAndDelay(0xC0 | mode, 4);
-}
-
-SVPVariables OrangutanSVP::readVariables()
-{
-	SVPVariables vars;
-    OrangutanSPIMaster::transmitAndDelay(0x81, 6);
+    OrangutanSPIMaster::transmitAndDelay(0x81, 7);
 
 	for(unsigned char i=0; i < sizeof(SVPVariables); i++)
 	{
-		vars.byte[i] = readNextByte();
+		svp_variables.byte[i] = OrangutanSVP::readNextByte();
 	}
-
-	return vars;
 }
 
 SVPEncoders OrangutanSVP::readEncoders()
 {
 	SVPEncoders encoders;
-	OrangutanSPIMaster::transmitAndDelay(0x82, 5);
+	OrangutanSPIMaster::transmitAndDelay(0x82, 6);
 
 	for(unsigned char i=0; i < sizeof(SVPEncoders); i++)
 	{
-		encoders.byte[i] = readNextByte();
+		encoders.byte[i] = OrangutanSVP::readNextByte();
 	}
 
 	return encoders;
@@ -122,7 +159,7 @@ SVPEncoders OrangutanSVP::readEncoders()
 // Those bytes should then be read with calls to readNextByte().
 unsigned char OrangutanSVP::serialReadStart()
 {
-    OrangutanSPIMaster::transmitAndDelay(0x83, 6);
+    OrangutanSPIMaster::transmitAndDelay(0x83, 7);
 	return readNextByte();
 }
 
@@ -138,13 +175,76 @@ unsigned char OrangutanSVP::serialRead(char * buffer)
 
 unsigned char OrangutanSVP::serialSendIfReady(char byte)
 {
-    OrangutanSPIMaster::transmitAndDelay(byte & 0x80 ? 0x85 : 0x84, 4);
-	return OrangutanSPIMaster::transmitAndDelay(byte & 0x7F, 4);
+    OrangutanSPIMaster::transmitAndDelay(byte & 0x80 ? 0x85 : 0x84, 5);
+	return OrangutanSPIMaster::transmitAndDelay(byte & 0x7F, 5);
+}
+
+unsigned char OrangutanSVP::serialSendIfReady(const char * str)
+{
+	while (*str != 0)
+	{
+		if (0xFF != serialSendIfReady(*str))
+		{
+			return 0;
+		}
+		str++;
+	}
+	return 0xFF;
 }
 
 void OrangutanSVP::serialSendBlocking(char byte)
 {
 	while(0xFF != serialSendIfReady(byte)){}
+}
+
+void OrangutanSVP::serialSendBlocking(const char * str)
+{
+	while (*str != 0)
+	{
+		serialSendBlocking(*str);
+		str++;
+	}
+}
+
+/* setMode: Sets the current mode of the SVP's auxiliary processor.
+   The mode parameter should be an inclusive or of
+     1) MODE_RX, MODE_ANALOG, or MODE_ENCODERS
+     2) MODE_SLAVE_SELECT or 0
+ */
+void OrangutanSVP::setMode(unsigned char mode)
+{
+	// When the auxiliary processor starts up, it is in SVP_MODE_RX.
+	static unsigned char svp_mode = SVP_MODE_RX;
+
+	if (svp_mode == mode)
+	{
+		// The auxilliary processor is already in the correct mode,
+		// so don't actually set it.
+		return;
+	}
+
+	svp_mode = mode;
+	OrangutanSPIMaster::transmitAndDelay(0xC0 | svp_mode, 5);
+}
+
+/* HIGH-LEVEL FUCNTIONS FOR HANDLING CACHING **********************************/
+
+static void updateVariablesIfNeeded()
+{
+    // The value of ms() from the last time the svp_variables was updated.
+	static unsigned int svp_variables_last_update_ms;
+	
+	if (svp_variables.battery == 0xFFFF || OrangutanTime::ms() - svp_variables_last_update_ms >= 2)
+	{
+		svp_variables_last_update_ms = OrangutanTime::ms();
+		updateVariables();
+	}
+}
+
+unsigned int OrangutanSVP::readTrimpotMillivolts()
+{
+	updateVariablesIfNeeded();
+	return svp_variables.trimpot;
 }
 
 #endif
