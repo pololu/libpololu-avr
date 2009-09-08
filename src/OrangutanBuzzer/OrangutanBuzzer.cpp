@@ -70,7 +70,7 @@ static unsigned char staccato_rest_duration;	// duration of a staccato
 												//  rest, or zero if it is time
 												//  to play a note
 
-void nextNote();
+static void nextNote();
 
 // Timer1 overflow interrupt
 ISR (TIMER1_OVF_vect)
@@ -480,7 +480,7 @@ void OrangutanBuzzer::stopPlaying()
 
 // Gets the current character, converting to lower-case and skipping
 // spaces.  For any spaces, this automatically increments sequence!
-char currentCharacter()
+static char currentCharacter()
 {
 	char c = 0;
 	do
@@ -500,7 +500,7 @@ char currentCharacter()
 // Returns the numerical argument specified at sequence[0] and
 // increments sequence to point to the character immediately after the
 // argument.
-unsigned int getNumber()
+static unsigned int getNumber()
 {
 	unsigned int arg = 0;
 
@@ -517,7 +517,7 @@ unsigned int getNumber()
 	return arg;
 }
 
-void nextNote()
+static void nextNote()
 {
 	unsigned char note = 0;
 	unsigned char rest = 0;

@@ -85,6 +85,11 @@ extern "C" unsigned int svp_read_trimpot_millivolts()
 	return OrangutanSVP::readTrimpotMillivolts();
 }
 
+extern "C" SVPStatus svp_read_status()
+{
+	return OrangutanSVP::readStatus();
+}
+
 #endif
 
 typedef union SVPVariables
@@ -98,14 +103,7 @@ typedef union SVPVariables
     	unsigned int channelD;
     	unsigned int trimpot;
     	unsigned int battery;
-		struct
-	    {
-    	    unsigned usbPowerPresent :1;
-        	unsigned usbConfigured :1;
-        	unsigned usbSuspend :1;
-        	unsigned dtr :1;
-    	    unsigned rts :1;
-	    } status;
+		SVPStatus status;  // see OrangutanSVP.h or svp.h
 	};
 } SVPVariables;
 
@@ -232,7 +230,7 @@ void OrangutanSVP::setMode(unsigned char mode)
 static void updateVariablesIfNeeded()
 {
     // The value of ms() from the last time the svp_variables was updated.
-	static unsigned int svp_variables_last_update_ms;
+	static unsigned long svp_variables_last_update_ms;
 	
 	if (svp_variables.battery == 0xFFFF || OrangutanTime::ms() - svp_variables_last_update_ms >= 2)
 	{
@@ -282,6 +280,12 @@ unsigned int OrangutanSVP::readChannelDMillivolts()
 	// TODO: if necessary, set the mode and delay?
 	updateVariablesIfNeeded();
 	return svp_variables.channelD;
+}
+
+SVPStatus OrangutanSVP::readStatus()
+{
+	updateVariablesIfNeeded();
+	return svp_variables.status;
 }
 
 #endif

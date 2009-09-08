@@ -51,6 +51,19 @@ typedef union SVPEncoders
 	};
 } SVPEncoders;
 
+typedef	union SVPStatus
+{
+	unsigned char status;
+	struct
+	{
+	    unsigned usbPowerPresent :1;
+        unsigned usbConfigured :1;
+		unsigned usbSuspend :1;
+		unsigned dtrEnabled :1;
+	    unsigned rtsEnabled :1;
+	};
+} SVPStatus;
+
 class OrangutanSVP
 {
   public:
@@ -67,6 +80,12 @@ class OrangutanSVP
 	static unsigned char readNextByte();
 	static unsigned char serialReadStart();
 
+	static inline unsigned char usbPowerPresent(){ return readStatus().usbPowerPresent; }
+	static inline unsigned char usbConfigured(){ return readStatus().usbConfigured; }
+	static inline unsigned char usbSuspend(){ return readStatus().usbSuspend; }
+	static inline unsigned char dtrEnabled(){ return readStatus().dtrEnabled; }
+	static inline unsigned char rtsEnabled(){ return readStatus().rtsEnabled; }
+
 	// Undocumented functions that are used by other parts of the library that
 	// the user does not need to know about:
 	static unsigned int readBatteryMillivolts();
@@ -75,6 +94,7 @@ class OrangutanSVP
 	static unsigned int readChannelBMillivolts();
 	static unsigned int readChannelCMillivolts();
 	static unsigned int readChannelDMillivolts();
+	static SVPStatus readStatus();
 };
 #endif
 

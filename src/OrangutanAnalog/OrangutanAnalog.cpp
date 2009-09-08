@@ -310,9 +310,7 @@ unsigned int OrangutanAnalog::readMillivolts(unsigned char channel)
 	return conversionResultMillivolts();
 }
 
-
-
-// take 'sample' readings of the specified channel and return the average
+// take 'samples' readings of the specified channel and return the average
 unsigned int OrangutanAnalog::readAverage(unsigned char channel, 
 											unsigned int samples)
 {
@@ -386,11 +384,7 @@ static unsigned int fromMillivoltsToNormal(unsigned int millivolts)
 // communication (see the SVP user's guide for more info).
 unsigned int OrangutanAnalog::readTrimpot()
 {
-	#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
-	return fromMillivoltsToNormal(OrangutanSVP::readTrimpotMillivolts());
-	#else
 	return readAverage(TRIMPOT, 20);
-	#endif
 }
 
 #if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)

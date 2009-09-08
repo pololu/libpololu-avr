@@ -50,6 +50,19 @@ typedef union SVPEncoders
 	};
 } SVPEncoders;
 
+typedef	union SVPStatus
+{
+	unsigned char status;
+	struct
+	{
+	    unsigned usbPowerPresent :1;
+        unsigned usbConfigured :1;
+		unsigned usbSuspend :1;
+		unsigned dtrEnabled :1;
+	    unsigned rtsEnabled :1;
+	};
+} SVPStatus;
+
 void svp_set_mode(unsigned char mode);
 unsigned char svp_read_firmware_version();
 unsigned char svp_read_next_byte();
@@ -61,6 +74,13 @@ unsigned char svp_serial_send_if_ready(const char * data);
 void svp_serial_send_character_blocking(char data);
 void svp_serial_send_blocking(const char * data);
 unsigned int svp_read_trimpot_millivolts();
+SVPStatus svp_read_status();
+static inline unsigned char usb_power_present(){ return svp_read_status().usbPowerPresent; }
+static inline unsigned char usb_configured(){ return svp_read_status().usbConfigured; }
+static inline unsigned char usb_suspend(){ return svp_read_status().usbSuspend; }
+static inline unsigned char dtr_enabled(){ return svp_read_status().dtrEnabled; }
+static inline unsigned char rts_enabled(){ return svp_read_status().rtsEnabled; }
+
 #endif
 
 #endif
