@@ -49,8 +49,8 @@ class OrangutanMotors
 
 		if (!initialized)
 		{
-			initialized = 1;	// this MUST be set before init2() is called
-			init2();			// or else infinite recursion ensues
+			initialized = 1;
+			init2();
 		}
 	}
   	
