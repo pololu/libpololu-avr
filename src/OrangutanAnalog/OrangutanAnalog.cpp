@@ -173,14 +173,13 @@ void OrangutanAnalog::setMode(unsigned char mode)
 // For example: if (getMode() == MODE_8_BIT) ...
 unsigned char OrangutanAnalog::getMode()
 {
-	return ADMUX & (1 << ADLAR) ? 1 : 0;
+	return (ADMUX >> ADLAR) & 1;
 }
 
 // returns 1 if the ADC is in the middle of an conversion, otherwise
 // returns 0
 unsigned char OrangutanAnalog::isConverting()
 {
-    // We have to read ADCSRA this way so that it returns 1 instead of (1<<ADSC).
 	return (ADCSRA >> ADSC) & 1;
 }
 
