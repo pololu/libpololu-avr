@@ -21,61 +21,104 @@
  * to be responsible for all resulting costs and damages.
  */
 
+// TODO: add underscores on some of these to avoid namespace collisions?
+
+#ifndef OrangutanSerial_h
+#define OrangutanSerial_h
+
+#undef ORANGUTAN_X2
+#undef ORANGUTAN_SVP
+
+#include <avr/interrupt.h>
+
+#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+ // The Orangutan SVP has two UARTs and one virtual COM port via USB.
+ #define ORANGUTAN_SVP
+ #define SERIAL_PORTS 3
+ #define USART0 0
+ #define USART1 1
+ #define USB    2
+#elif defined(__AVR_ATmega644P__)
+ // The Orangutan X2 has two UARTs and one virtual COM port via USB.
+ #define ORANGUTAN_X2
+ #define SERIAL_PORTS 3
+ #define USART0 0
+ #define USART1 1
+ #define USB    2
+#else
+ #define SERIAL_PORTS 1
+ #define USART0 0
+#endif
+
+#if SERIAL_PORTS > 1
+    #define MULTIPORT_PUBLIC
+#else
+    #define MULTIPORT_PUBLIC inline
+#endif
+
+#define UART0 USART0
+#define UART1 USART1
+
 #define SERIAL_AUTOMATIC 0
 #define SERIAL_CHECK 1
 
+#ifdef __cplusplus
+
+typedef struct SerialPortData
+{
+	unsigned char mode;	// SERIAL_AUTOMATIC (interrupt-driven) or SERIAL_CHECK
+	volatile unsigned char sentBytes;
+	volatile unsigned char receivedBytes;
+	unsigned char sendSize;
+	unsigned char receiveSize;
+	unsigned char receiveRingOn; // boolean
+	char *sendBuffer;
+	char *receiveBuffer;
+} SerialPortData;
+
 class OrangutanSerial
 {
-public:
+  public:
 
 	// Constructor (doesn't do anything).
 	OrangutanSerial();
-	
-	// Sets the serial library to a given baudrate.
-	static void setBaudRate(unsigned long baud);
 
-	// Sets the serial library to use either a polling scheme
+	// check: This function should be called periodically when in
+	// SERIAL_CHECK mode.
+	static void check();
+
+	// setBaudRate: Sets the serial port to a given baudrate.
+
+	// setMode: Sets the serial library to use either a polling scheme
 	// (SERIAL_CHECK) or interrupts (SERIAL_AUTOMATIC; the default)
 	// for sending and receiving serial data.  If the mode is set to
 	// SERIAL_CHECK, the function serialCheck() must be called
 	// periodically to trigger reception and transmission of new
 	// bytes.
-	static void setMode(unsigned char mode);
 
-	// Returns the current serial mode
-	static inline unsigned char getMode() { return mode; }
+	// getMode: Returns the current serial mode
 
-	// This function should be called periodically when in
-	// SERIAL_CHECK mode.
-	static void check();
-
-	// Sets up a buffer for background receive.
+	// receive: Sets up a buffer for background receive.
 	// Data will go into this buffer until size bytes have been
 	// stored.
-	static void receive(char *buffer, unsigned char size);
 
-	// Same as receive(), but waits until the buffer is full or the
+	// receiveBlocking: Same as receive(), but waits until the buffer is full or the
 	// timeout has elapsed to return.  Returns true on timeout, false
 	// on buffer fill.
-	static char receiveBlocking(char *buffer, unsigned char size, unsigned int timeout_ms);
 
-	// Sets up a ring buffer for background receive.
+	// receiveRing: Sets up a ring buffer for background receive.
 	// Data will go into this buffer, and when size bytes have been
 	// stored, it will wrap around to the beginning, with
 	// getReceivedBytes reset to 0.
-	static void receiveRing(char *buffer, unsigned char size);
 
-	// Stops receiving serial bytes.
-	static void cancelReceive();
+	// cancelReceive: Stops receiving serial bytes.
 
-	// Gets the number of bytes that have been received since
+	// getReceivedBytes: Gets the number of bytes that have been received since
 	// receive() was called.
-	static inline unsigned char getReceivedBytes() { return receivedBytes; }
 
-	// True when the receive buffer is full.
-	static inline char receiveBufferFull() { return getReceivedBytes() == receiveSize; }
+	// receiveBufferFull: True when the receive buffer is full.
 
-	// Sets up a buffer for background transmit.
+	// send: Sets up a buffer for background transmit.
 	// Data from this buffer will be transmitted until size bytes have
 	// been sent.  If send() is called before sendBufferEmpty()
 	// returns true (when transmission of the last byte has started),
@@ -83,34 +126,111 @@ public:
 	// short.  This means that you should almost always wait until the
 	// data has been sent before calling this function again.  See
 	// sendBlocking(), below, for an easy way to do this.
-	static void send(char *buffer, unsigned char size);
 
-	// Same as send(), but waits until transmission of the last byte
+	// sendBlocking: Same as send(), but waits until transmission of the last byte
 	// has started to return.  When this function returns, it is safe
 	// to call send() or sendBlocking() again.
-	static void sendBlocking(char *buffer, unsigned char size);
 
-	// Gets the number of bytes that have been sent since send() was
+	// getSentBytes: Gets the number of bytes that have been sent since send() was
 	// called.
-	static inline unsigned char getSentBytes() { return sentBytes; }
 
-	// True when the receive buffer is empty.
-	static char sendBufferEmpty() { return sentBytes == sendSize; }
+	// sendBufferEmpty: True when the send buffer is empty.
 
-	volatile static unsigned char sentBytes;
-	volatile static unsigned char receivedBytes;
-	static unsigned char sendSize;
-	static unsigned char receiveSize;
-	static unsigned char receiveRingOn; // boolean
+#if SERIAL_PORTS == 1
+	static void setBaudRate(unsigned long baud);
+	static void setMode(unsigned char mode);
+	static void receive(char *buffer, unsigned char size);
+	static char receiveBlocking(char *buffer, unsigned char size, unsigned int timeout_ms);
+	static void receiveRing(char *buffer, unsigned char size);
+	static void cancelReceive();
+	static void send(char *buffer, unsigned char size);
+	static void sendBlocking(char *buffer, unsigned char size);
+#endif
 
-	static char *sendBuffer;
-	static char *receiveBuffer;
+#if SERIAL_PORTS > 1
+  public:
+#else
+  private:
+#endif
+	static MULTIPORT_PUBLIC void setBaudRate(unsigned char port, unsigned long baud);
+	static MULTIPORT_PUBLIC void setMode(unsigned char port, unsigned char mode);
+	static MULTIPORT_PUBLIC void receive(unsigned char port, char *buffer, unsigned char size);
+	static MULTIPORT_PUBLIC char receiveBlocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout_ms);
+	static MULTIPORT_PUBLIC void receiveRing(unsigned char port, char *buffer, unsigned char size);
+	static MULTIPORT_PUBLIC void cancelReceive(unsigned char port);
+	static MULTIPORT_PUBLIC void send(unsigned char port, char *buffer, unsigned char size);
+	static MULTIPORT_PUBLIC void sendBlocking(unsigned char port, char *buffer, unsigned char size);
+	static inline char sendBufferEmpty(unsigned char port) { return ports[port].sentBytes == ports[port].sendSize; }
+	static inline unsigned char getMode(unsigned char port) { return ports[port].mode; }
+	static inline unsigned char getReceivedBytes(unsigned char port) { return ports[port].receivedBytes; }
+	static inline char receiveBufferFull(unsigned char port) { return getReceivedBytes(port) == ports[port].receiveSize; }
+	static inline unsigned char getSentBytes(unsigned char port) { return ports[port].sentBytes; }
+  public:
 
-private:
-	static void init();
-	static unsigned char mode;
+	static inline char sendBufferEmpty() { return ports[0].sentBytes == ports[0].sendSize; }
+	static inline unsigned char getSentBytes() { return ports[0].sentBytes; }
+	static inline unsigned char getReceivedBytes() { return ports[0].receivedBytes; }
+	static inline char receiveBufferFull() { return getReceivedBytes() == ports[0].receiveSize; }
+	static inline unsigned char getMode() { return ports[0].mode; }
+
+  private:
+	static SerialPortData ports[SERIAL_PORTS];
+
+	static void initMode();
+	static inline void initModeIfNeeded();
+
+	static inline void uart_update_tx_interrupt(unsigned char port);
+	static inline void serial_tx_check(unsigned char port);
+	static inline void serial_rx_check(unsigned char port);
+
+	static void initPort(unsigned char port);
+
+	// Don't call these functions.  They should only be called from the interrupt-service routine
+	// defined in OrangutanSerial.cpp.  They only reason they are public is because they need to
+	// access private data (ports) and David could not figure out how to make the ISR be inside the class.
+  public:
+	static inline void uart_tx_isr(unsigned char port);
+	static inline void serial_rx(unsigned char port, unsigned char byte_received);
 };
 
+#else
+
+// C Function declarations.
+void serial_check();
+
+#if SERIAL_PORTS > 1
+void serial_set_baud_rate(unsigned char port, unsigned long baud);
+void serial_set_mode(unsigned char port, unsigned char mode);
+void serial_receive(unsigned char port, char *buffer, unsigned char size);
+void serial_cancel_receive(unsigned char port);
+char serial_receive_blocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout);
+void serial_receive_ring(unsigned char port, char *buffer, unsigned char size);
+unsigned char serial_get_received_bytes(unsigned char port);
+char serial_receive_buffer_full(unsigned char port);
+void serial_send(unsigned char port, char *buffer, unsigned char size);
+void serial_send_blocking(unsigned char port, char *buffer, unsigned char size);
+unsigned char serial_get_sent_bytes(unsigned char port);
+char serial_send_buffer_empty(unsigned char port);
+#else
+void serial_set_baud_rate(unsigned long baud);
+void serial_set_mode(unsigned char mode);
+void serial_receive(char *buffer, unsigned char size);
+void serial_cancel_receive();
+char serial_receive_blocking(char *buffer, unsigned char size, unsigned int timeout);
+void serial_receive_ring(char *buffer, unsigned char size);
+unsigned char serial_get_received_bytes();
+char serial_receive_buffer_full();
+void serial_send(char *buffer, unsigned char size);
+void serial_send_blocking(char *buffer, unsigned char size);
+unsigned char serial_get_sent_bytes();
+char serial_send_buffer_empty();
+#endif
+
+// __cplusplus
+#endif
+
+//OrangutanSerial_h
+#endif
 
 // Local Variables: **
 // mode: C++ **
