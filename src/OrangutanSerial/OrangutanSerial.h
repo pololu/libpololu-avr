@@ -35,29 +35,26 @@
  // The Orangutan SVP has two UARTs and one virtual COM port via USB.
  #define ORANGUTAN_SVP
  #define SERIAL_PORTS 3
- #define USART0 0
- #define USART1 1
+ #define UART0 0
+ #define UART1 1
  #define USB    2
 #elif defined(__AVR_ATmega644P__)
  // The Orangutan X2 has two UARTs and one virtual COM port via USB.
  #define ORANGUTAN_X2
  #define SERIAL_PORTS 3
- #define USART0 0
- #define USART1 1
+ #define UART0 0
+ #define UART1 1
  #define USB    2
 #else
  #define SERIAL_PORTS 1
- #define USART0 0
+ #define UART0 0
 #endif
 
 #if SERIAL_PORTS > 1
-    #define MULTIPORT_PUBLIC
+    #define SINGLE_PORT_INLINE
 #else
-    #define MULTIPORT_PUBLIC inline
+    #define SINGLE_PORT_INLINE inline
 #endif
-
-#define UART0 USART0
-#define UART1 USART1
 
 #define SERIAL_AUTOMATIC 0
 #define SERIAL_CHECK 1
@@ -152,32 +149,35 @@ class OrangutanSerial
 #else
   private:
 #endif
-	static MULTIPORT_PUBLIC void setBaudRate(unsigned char port, unsigned long baud);
-	static MULTIPORT_PUBLIC void setMode(unsigned char port, unsigned char mode);
-	static MULTIPORT_PUBLIC void receive(unsigned char port, char *buffer, unsigned char size);
-	static MULTIPORT_PUBLIC char receiveBlocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout_ms);
-	static MULTIPORT_PUBLIC void receiveRing(unsigned char port, char *buffer, unsigned char size);
-	static MULTIPORT_PUBLIC void cancelReceive(unsigned char port);
-	static MULTIPORT_PUBLIC void send(unsigned char port, char *buffer, unsigned char size);
-	static MULTIPORT_PUBLIC void sendBlocking(unsigned char port, char *buffer, unsigned char size);
+	static SINGLE_PORT_INLINE void setBaudRate(unsigned char port, unsigned long baud);
+	static SINGLE_PORT_INLINE void setMode(unsigned char port, unsigned char mode);
+	static SINGLE_PORT_INLINE void receive(unsigned char port, char *buffer, unsigned char size);
+	static SINGLE_PORT_INLINE char receiveBlocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout_ms);
+	static SINGLE_PORT_INLINE void receiveRing(unsigned char port, char *buffer, unsigned char size);
+	static SINGLE_PORT_INLINE void cancelReceive(unsigned char port);
+	static SINGLE_PORT_INLINE void send(unsigned char port, char *buffer, unsigned char size);
+	static SINGLE_PORT_INLINE void sendBlocking(unsigned char port, char *buffer, unsigned char size);
 	static inline char sendBufferEmpty(unsigned char port) { return ports[port].sentBytes == ports[port].sendSize; }
 	static inline unsigned char getMode(unsigned char port) { return ports[port].mode; }
 	static inline unsigned char getReceivedBytes(unsigned char port) { return ports[port].receivedBytes; }
 	static inline char receiveBufferFull(unsigned char port) { return getReceivedBytes(port) == ports[port].receiveSize; }
 	static inline unsigned char getSentBytes(unsigned char port) { return ports[port].sentBytes; }
-  public:
 
+#if SERIAL_PORTS == 1
+  public:
 	static inline char sendBufferEmpty() { return ports[0].sentBytes == ports[0].sendSize; }
 	static inline unsigned char getSentBytes() { return ports[0].sentBytes; }
 	static inline unsigned char getReceivedBytes() { return ports[0].receivedBytes; }
 	static inline char receiveBufferFull() { return getReceivedBytes() == ports[0].receiveSize; }
 	static inline unsigned char getMode() { return ports[0].mode; }
+#endif
 
   private:
+
 	static SerialPortData ports[SERIAL_PORTS];
 
-	static void initMode();
-	static inline void initModeIfNeeded();
+	static inline void initUART_inline(unsigned char port);
+	static inline void receive_inline(unsigned char port, char *buffer, unsigned char size, unsigned char ring);
 
 	static inline void uart_update_tx_interrupt(unsigned char port);
 	static inline void serial_tx_check(unsigned char port);
@@ -190,7 +190,7 @@ class OrangutanSerial
 	// access private data (ports) and David could not figure out how to make the ISR be inside the class.
   public:
 	static inline void uart_tx_isr(unsigned char port);
-	static inline void serial_rx(unsigned char port, unsigned char byte_received);
+	static inline void serial_rx_handle_byte(unsigned char port, unsigned char byte_received);
 };
 
 #else
@@ -201,6 +201,7 @@ void serial_check();
 #if SERIAL_PORTS > 1
 void serial_set_baud_rate(unsigned char port, unsigned long baud);
 void serial_set_mode(unsigned char port, unsigned char mode);
+unsigned char serial_get_mode(unsigned char port);
 void serial_receive(unsigned char port, char *buffer, unsigned char size);
 void serial_cancel_receive(unsigned char port);
 char serial_receive_blocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout);
@@ -214,6 +215,7 @@ char serial_send_buffer_empty(unsigned char port);
 #else
 void serial_set_baud_rate(unsigned long baud);
 void serial_set_mode(unsigned char mode);
+unsigned char serial_get_mode();
 void serial_receive(char *buffer, unsigned char size);
 void serial_cancel_receive();
 char serial_receive_blocking(char *buffer, unsigned char size, unsigned int timeout);

@@ -32,7 +32,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-
 #ifdef LIB_POLOLU
 
 extern "C" void serial_check()
@@ -42,11 +41,18 @@ extern "C" void serial_check()
 
 #if SERIAL_PORTS > 1
 
-// C functions for devices with multiple serial ports.  A port argument is necessary.
+/** MULTI-PORT C FUNCTIONS ****************************************************/
+// C functions for device with multiple serial ports.  A port argument is
+// necessary.
 
 extern "C" void serial_set_mode(unsigned char port, unsigned char mode)
 {
 	OrangutanSerial::setMode(port, mode);
+}
+
+extern "C" unsigned char serial_get_mode(unsigned char port)
+{
+	return OrangutanSerial::getMode(port);
 }
 
 extern "C" void serial_set_baud_rate(unsigned char port, unsigned long baud)
@@ -106,11 +112,19 @@ extern "C" char serial_send_buffer_empty(unsigned char port)
 
 #else
 
+/** SINGLE-PORT C FUNCTIONS ***************************************************/
 // C Functions for devices with one UART.  No port argument is necessary.
+// These functions simply call the C++ single port functions, which are defined
+// below.
 
 extern "C" void serial_set_mode(unsigned char mode)
 {
 	OrangutanSerial::setMode(mode);
+}
+
+extern "C" unsigned char serial_get_mode()
+{
+	return OrangutanSerial::getMode();
 }
 
 extern "C" void serial_set_baud_rate(unsigned long baud)
@@ -174,10 +188,12 @@ extern "C" char serial_send_buffer_empty()
 
 #if SERIAL_PORTS==1
 
+/** SINGLE-PORT C++ FUNCTIONS *************************************************/
 // C++ Functions for devices with one UART.  No port argument is necessary.
-// The functions called by these functions are inline (MULTIPORT_PUBLIC), so
-// the compiler will know ahead of time that the port argument to those
-// is going to be zero and it can make a lot of optimizations.
+// These functions call the multi-port C++ functions which are inline because
+// they are declared with SINGLE_PORT_INLINE, so the compiler will know ahead of
+// time that the port argument to those is going to be zero and it can make a lot
+// of optimizations in these functions.
 
 void OrangutanSerial::setBaudRate(unsigned long baud)
 {
@@ -224,10 +240,10 @@ void OrangutanSerial::sendBlocking(char *message, unsigned char size)
 
 SerialPortData OrangutanSerial::ports[SERIAL_PORTS] =
 {
-	{0,0,0,0,0,0,0,0},
+	{mode:SERIAL_AUTOMATIC, sentBytes:0, receivedBytes:0, sendSize:0, receiveSize:0, receiveRingOn:0, sendBuffer:0, receiveBuffer:0},
 #if SERIAL_PORTS > 1
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
+	{mode:SERIAL_AUTOMATIC, sentBytes:0, receivedBytes:0, sendSize:0, receiveSize:0, receiveRingOn:0, sendBuffer:0, receiveBuffer:0},
+	{mode:SERIAL_CHECK,     sentBytes:0, receivedBytes:0, sendSize:0, receiveSize:0, receiveRingOn:0, sendBuffer:0, receiveBuffer:0},
 #endif
 };
 
@@ -239,21 +255,13 @@ inline void serial_rx_check(unsigned char port);
 /** HELPERS *******************************************************************/
 
 // UART-generic bit numbers.
-#define RXEN RXEN0
-#define TXEN TXEN0
+#define RXEN  RXEN0
+#define TXEN  TXEN0
 #define RXCIE RXCIE0
-#define RXEN RXEN0
-#define TXEN TXEN0
-#define UDRE UDRE0
-#define RXC  RXC0
-
-#if SERIAL_PORTS > 1
- #define PORT_ARGUMENT_VALUE port
-#else
- #define PORT_ARGUMENT_VALUE 0
-#endif
-
-#define PORT_DATA ports[PORT_ARGUMENT_VALUE]
+#define RXEN  RXEN0
+#define TXEN  TXEN0
+#define UDRE  UDRE0
+#define RXC   RXC0
 
 #if SERIAL_PORTS > 1
 
@@ -299,30 +307,8 @@ inline volatile unsigned char * udr(unsigned char port)
 
 /** INITIALIZATION ************************************************************/
 
-void OrangutanSerial::initMode()
+void OrangutanSerial::initUART_inline(unsigned char port)
 {
-	ports[0].mode = SERIAL_AUTOMATIC;
-	#if defined(ORANGUTAN_SVP) || defined(ORANGUTAN_X2)
-	ports[1].mode = SERIAL_AUTOMATIC;
-	ports[2].mode = SERIAL_CHECK;
-	#endif
-}
-
-inline void OrangutanSerial::initModeIfNeeded()
-{
-	static unsigned char initialized = 0;
-	if (!initialized)
-	{
-		initialized = 1;
-		initMode();
-	}
-}
-
-// OPT: make this inline?
-void OrangutanSerial::initPort(unsigned char port)
-{
-	initModeIfNeeded();
-
 	#if SERIAL_PORTS > 1
 	if (port == USB)
 	{
@@ -333,7 +319,7 @@ void OrangutanSerial::initPort(unsigned char port)
 
 	// Enable receiver and transmitter.
 	// Enable reception interrupt if desired.
-	if(PORT_DATA.mode == SERIAL_AUTOMATIC)
+	if(ports[port].mode == SERIAL_AUTOMATIC)
 	{
 		*ucsrb(port) = (1<<RXEN) | (1<<TXEN) | (1<<RXCIE);
 	}
@@ -343,13 +329,33 @@ void OrangutanSerial::initPort(unsigned char port)
 	}
 
 	// Enable transmission interrupt if desired.
-	uart_update_tx_interrupt(PORT_ARGUMENT_VALUE);
+	uart_update_tx_interrupt(port);
 
 	// Enable interrupts in general.
 	sei();
 }
 
-MULTIPORT_PUBLIC void OrangutanSerial::setBaudRate(unsigned char port, unsigned long baud)
+void OrangutanSerial::initPort(unsigned char port)
+{
+	// We use a case statement instead of just "initUART_inline(port)"
+	// because that allows us to save about 100 bytes of program space.  That's
+	// because this method allows the compiler to compute ahead of time the
+	// exact addresses of all the variables accessed by initUART_inline, so it
+	// does not need to deal with pointers.
+
+	#if SERIAL_PORTS > 1
+	switch(port)
+	{
+		case 0:	initUART_inline(0); break; // Initialize UART0
+		case 1: initUART_inline(1); break; // Initialize UART1
+		// No initialization is reuquired for the USB-based serial port.
+	}
+	#else
+	initUART_inline(0);
+	#endif
+}
+
+SINGLE_PORT_INLINE void OrangutanSerial::setBaudRate(unsigned char port, unsigned long baud)
 {
 	initPort(port);
 
@@ -361,65 +367,68 @@ MULTIPORT_PUBLIC void OrangutanSerial::setBaudRate(unsigned char port, unsigned 
 	}
 	#endif
 
-	// TODO: take out this temporarily variable if that is okay
-
-	unsigned int brg = (F_CPU-8*baud)/(16*baud);
-
-	*ubrr(port) = brg;
+	*ubrr(port) = (F_CPU-8*baud)/(16*baud);
 }
 
-MULTIPORT_PUBLIC void OrangutanSerial::setMode(unsigned char port, unsigned char mode)
+SINGLE_PORT_INLINE void OrangutanSerial::setMode(unsigned char port, unsigned char mode)
 {
-	initModeIfNeeded();
-
 	ports[port].mode = mode;
 
-	// reset the interrupt status
+	// Disable/Enable the UART RX/TX interrupts as required.
 	initPort(port);
 }
 
 void OrangutanSerial::check()
 {
-	initModeIfNeeded();
-
 	serial_tx_check(0);
 
-#if SERIAL_PORTS > 1
+	#if SERIAL_PORTS > 1
 	serial_tx_check(1);
-#endif
+	#endif
 
-#if SERIAL_PORTS > 2
+	#if SERIAL_PORTS > 2
 	serial_tx_check(2);
-#endif
+	#endif
 
 	serial_rx_check(0);
 
-#if SERIAL_PORTS > 1
+	#if SERIAL_PORTS > 1
 	serial_rx_check(1);
-#endif
+	#endif
 
-#if SERIAL_PORTS > 2
+	#if SERIAL_PORTS > 2
 	serial_rx_check(2);
-#endif
+	#endif
 }
 
 /** RECEIVING *****************************************************************/
 
 #ifdef ORANGUTAN_SVP
-// The low-level SPI protocol for the Orangutan SVP's auxiliary processor only lets
-// you receive bytes in chunks of unknown size.  When you ask to receive a byte,
-// it tells you how many bytes are in the buffer, and then you HAVE to read all
-// of them or else they will be lost.  Therefore, we implement this 8-byte buffer
-// so the user can receive bytes at whatever pace he wants.
-namespace OrangutanSVPRXBuffer
+// The low-level SPI protocol for the Orangutan SVP's auxiliary processor only
+// lets the AVR receive bytes in chunks of unknown size.  When the AVR asks to
+// receive data, the auxiliary processor tells the AVR how many bytes are in the
+// buffer, and then the AVR must read all of them or else they will be lost.
+// The auxiliary buffer will send at most 8 bytes at a time.  Therefore, we
+// implement this 8-byte buffer so the user can receive bytes at whatever pace
+// he wants.
+namespace OrangutanSVPRXFIFO
 {
+	// The number of bytes received that are in the buffer.
 	static unsigned char byte_count;
+
+	// Holds the bytes received.  The bytes are stored backwards, starting
+	// at buffer[byte_count] for the first byte down to buffe[0] for the last.
+	// This lets us implement getNextByte without having to shift the whole
+	// buffer by one.
 	static unsigned char buffer[8];
 
+	// Returns the number of bytes in the buffer to be received.
 	static unsigned char getReceivedBytes()
 	{
 		if (byte_count == 0)
 		{
+			// The buffer is empty, so we can ask the auxiliary processor
+			// for more data.
 			byte_count = OrangutanSVP::serialReadStart();
 			for (unsigned char i=0; i < byte_count; i++)
 			{
@@ -429,6 +438,7 @@ namespace OrangutanSVPRXBuffer
 		return byte_count;
 	}
 
+	// Removes one byte from the buffer and returns it.
 	static unsigned char getNextByte()
 	{
 		byte_count--;
@@ -437,7 +447,11 @@ namespace OrangutanSVPRXBuffer
 }
 #endif
 
-// This is called in the main loop to take care of receiving bytes.
+// This is called in check() to take care of receiving bytes.
+// It is only called with a constant port argument, so we don't need
+// to worry about overhead form functions like ucsrb(port), or
+// accessing variables in ports[port].  The compiler knows ahead of time
+// the exact locations of those variables.
 inline void OrangutanSerial::serial_rx_check(unsigned char port)
 {
 	#ifdef USB
@@ -446,9 +460,9 @@ inline void OrangutanSerial::serial_rx_check(unsigned char port)
 		#ifdef ORANGUTAN_SVP
 
 		// If we are trying to receive bytes, and a byte has been received...
-		if(ports[port].receiveBuffer && PORT_DATA.receivedBytes < ports[port].receiveSize && OrangutanSVPRXBuffer::getReceivedBytes())
+		if(ports[USB].receiveBuffer && ports[USB].receivedBytes < ports[USB].receiveSize && OrangutanSVPRXFIFO::getReceivedBytes())
 		{
-			serial_rx(port, OrangutanSVPRXBuffer::getNextByte());
+			serial_rx_handle_byte(USB, OrangutanSVPRXFIFO::getNextByte());
 		}
 
 		#else
@@ -467,7 +481,7 @@ inline void OrangutanSerial::serial_rx_check(unsigned char port)
 
 	if(ports[port].receiveBuffer && ports[port].receivedBytes < ports[port].receiveSize && *ucsra(port) & (1<<RXC)) // A byte has been received
 	{
-		serial_rx(port, *udr(port));
+		serial_rx_handle_byte(port, *udr(port));
 	}
 
 	// Re-enable the RX interrupt if desired.
@@ -477,8 +491,12 @@ inline void OrangutanSerial::serial_rx_check(unsigned char port)
 	}
 }
 
-// This is the ISR for receiving bytes and is also called in serial_rx_check.
-inline void OrangutanSerial::serial_rx(unsigned char port, unsigned char byte_received)
+// This function is called whenever a byte has been received on the serial port
+// and it needs to be handled.  It is called from serial_rx_check and also from
+// the ISR (interrupt service routine).  In both cases, it is called with a 
+// constant port argument (or from an inline function with a constant port
+// argument) so we needn't worry about overhead from expressions like ports[port].
+inline void OrangutanSerial::serial_rx_handle_byte(unsigned char port, unsigned char byte_received)
 {
 	if(ports[port].receiveBuffer && ports[port].receivedBytes < ports[port].receiveSize)
 	{
@@ -491,47 +509,58 @@ inline void OrangutanSerial::serial_rx(unsigned char port, unsigned char byte_re
 	}
 }
 
-MULTIPORT_PUBLIC void OrangutanSerial::receive(unsigned char port, char *buffer, unsigned char size)
+inline void OrangutanSerial::receive_inline(unsigned char port, char * buffer, unsigned char size, unsigned char receiveRingOn)
 {
-	initModeIfNeeded();
-
-	// TODO: disable the reception interrupt here and re-enable it if necessary before returning
+	// Disable the UART reception interrupt if necessary.
+	#if SERIAL_PORTS > 1
+	if (port != USB)
+	#endif
+	{
+		*ucsrb(port) &= ~(1<<RXCIE);
+	}
 
 	ports[port].receiveBuffer = buffer;
 	ports[port].receivedBytes = 0;
 	ports[port].receiveSize = size;
-	ports[port].receiveRingOn = 0;
+	ports[port].receiveRingOn = receiveRingOn;
+
+	// Re-enable the UART reception interrupt so background receiving will work.
+	initPort(port);
 }
 
-MULTIPORT_PUBLIC char OrangutanSerial::receiveBlocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout_ms)
+SINGLE_PORT_INLINE void OrangutanSerial::receive(unsigned char port, char *buffer, unsigned char size)
 {
-	// TODO: Save code-space by calling the non-inlined version of the function? (uncomment lines below)
-//#if SERIAL_PORTS > 1
+	receive_inline(port, buffer, size, 0);
+}
+
+SINGLE_PORT_INLINE char OrangutanSerial::receiveBlocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout_ms)
+{
 	receive(port, buffer, size);
-//#else
-//	receive(buffer, size);
-//#end
 
 	unsigned long start_time = get_ms();
-	while(!receiveBufferFull(port) && (get_ms()-start_time) < timeout_ms)
-	{
-	    OrangutanSerial::check();
-	}
 
-	if(!receiveBufferFull(port))
+	while(1)
 	{
-		return 1;
+	    check();
+
+		if (receiveBufferFull(port))
+		{
+			return 0; // Success
+		}
+
+		if (get_ms()-start_time >= timeout_ms)
+		{
+			return 1; // Timeout
+		}
 	}
-	return 0;
 }
 
-MULTIPORT_PUBLIC void OrangutanSerial::receiveRing(unsigned char port, char *buffer, unsigned char size)
+SINGLE_PORT_INLINE void OrangutanSerial::receiveRing(unsigned char port, char *buffer, unsigned char size)
 {
-	receive(port, buffer, size);
-	ports[port].receiveRingOn = 1;
+	receive_inline(port, buffer, size, 1);
 }
 
-MULTIPORT_PUBLIC void OrangutanSerial::cancelReceive(unsigned char port)
+SINGLE_PORT_INLINE void OrangutanSerial::cancelReceive(unsigned char port)
 {
 	receive(port,0,0);
 }
@@ -539,21 +568,21 @@ MULTIPORT_PUBLIC void OrangutanSerial::cancelReceive(unsigned char port)
 #ifdef USART_RX_vect
 ISR(USART_RX_vect)
 {
-	OrangutanSerial::serial_rx(0, UDR0);
+	OrangutanSerial::serial_rx_handle_byte(0, UDR0);
 }
 #endif
 
 #ifdef USART0_RX_vect
 ISR(USART0_RX_vect)
 {
-	OrangutanSerial::serial_rx(0, UDR0);
+	OrangutanSerial::serial_rx_handle_byte(0, UDR0);
 }
 #endif
 
 #ifdef USART1_RX_vect
 ISR(USART1_RX_vect)
 {
-	OrangutanSerial::serial_rx(1, UDR1);
+	OrangutanSerial::serial_rx_handle_byte(1, UDR1);
 }
 #endif
 
@@ -629,10 +658,8 @@ inline void OrangutanSerial::uart_tx_isr(unsigned char port)
 	uart_update_tx_interrupt(port);
 }
 
-MULTIPORT_PUBLIC void OrangutanSerial::send(unsigned char port, char *buffer, unsigned char size)
+SINGLE_PORT_INLINE void OrangutanSerial::send(unsigned char port, char *buffer, unsigned char size)
 {
-	initModeIfNeeded();
-
 	ports[port].sendBuffer = buffer;
 	ports[port].sentBytes = 0;
 	ports[port].sendSize = size;
@@ -646,9 +673,9 @@ MULTIPORT_PUBLIC void OrangutanSerial::send(unsigned char port, char *buffer, un
 	}
 }
 
-MULTIPORT_PUBLIC void OrangutanSerial::sendBlocking(unsigned char port, char *message, unsigned char size)
+SINGLE_PORT_INLINE void OrangutanSerial::sendBlocking(unsigned char port, char *buffer, unsigned char size)
 {
-	send(port, message, size);
+	send(port, buffer, size);
 
 	// wait for sending before returning
 	while(!sendBufferEmpty(port)){ check(); }
@@ -674,8 +701,6 @@ ISR(USART1_UDRE_vect)
 	OrangutanSerial::uart_tx_isr(1);
 }
 #endif
-
-
 
 // Local Variables: **
 // mode: C++ **
