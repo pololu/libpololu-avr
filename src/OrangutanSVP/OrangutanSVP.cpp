@@ -26,18 +26,13 @@
 #include "../OrangutanTime/OrangutanTime.h"
 #include "OrangutanSVP.h"
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
 
 #ifdef LIB_POLOLU
 
 extern "C" unsigned char svp_read_firmware_version()
 {
 	return OrangutanSVP::readFirmwareVersion();
-}
-
-extern "C" unsigned char svp_read_next_byte()
-{
-	return OrangutanSVP::readNextByte();
 }
 
 extern "C" void svp_set_mode(unsigned char mode)
@@ -48,41 +43,6 @@ extern "C" void svp_set_mode(unsigned char mode)
 extern "C" SVPEncoders svp_read_encoders()
 {
 	return OrangutanSVP::readEncoders();
-}
-
-extern "C" unsigned char svp_serial_read_start()
-{
-	return OrangutanSVP::serialReadStart();
-}
-
-extern "C" unsigned char svp_serial_read(char * buffer)
-{
-	return OrangutanSVP::serialRead(buffer);
-}
-
-extern "C" unsigned char svp_serial_send_character_if_ready(char character)
-{
-	return OrangutanSVP::serialSendIfReady(character);
-}
-
-extern "C" void svp_serial_send_character_blocking(char character)
-{
-	OrangutanSVP::serialSendBlocking(character);
-}
-
-extern "C" unsigned char svp_serial_send_if_ready(const char * str)
-{
-	return OrangutanSVP::serialSendIfReady(str);
-}
-
-extern "C" void svp_serial_send_blocking(const char * str)
-{
-	OrangutanSVP::serialSendBlocking(str);
-}
-
-extern "C" unsigned int svp_read_trimpot_millivolts()
-{
-	return OrangutanSVP::readTrimpotMillivolts();
 }
 
 extern "C" SVPStatus svp_read_status()
@@ -161,47 +121,10 @@ unsigned char OrangutanSVP::serialReadStart()
 	return readNextByte();
 }
 
-unsigned char OrangutanSVP::serialRead(char * buffer)
-{
-	unsigned char byteCount = serialReadStart();
-	for (unsigned char i=0; i < byteCount; i++)
-	{
-		buffer[i] = readNextByte();
-	}
-	return byteCount;
-}
-
 unsigned char OrangutanSVP::serialSendIfReady(char byte)
 {
     OrangutanSPIMaster::transmitAndDelay(byte & 0x80 ? 0x85 : 0x84, 5);
 	return OrangutanSPIMaster::transmitAndDelay(byte & 0x7F, 5);
-}
-
-unsigned char OrangutanSVP::serialSendIfReady(const char * str)
-{
-	while (*str != 0)
-	{
-		if (0xFF != serialSendIfReady(*str))
-		{
-			return 0;
-		}
-		str++;
-	}
-	return 0xFF;
-}
-
-void OrangutanSVP::serialSendBlocking(char byte)
-{
-	while(0xFF != serialSendIfReady(byte)){}
-}
-
-void OrangutanSVP::serialSendBlocking(const char * str)
-{
-	while (*str != 0)
-	{
-		serialSendBlocking(*str);
-		str++;
-	}
 }
 
 /* setMode: Sets the current mode of the SVP's auxiliary processor.

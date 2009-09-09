@@ -71,11 +71,7 @@ class OrangutanSVP
 	
 	static unsigned char readFirmwareVersion();
 	static SVPEncoders readEncoders();
-	static unsigned char serialRead(char * buffer);
 	static unsigned char serialSendIfReady(char data);
-	static unsigned char serialSendIfReady(const char * data);
-	static void serialSendBlocking(char data);
-	static void serialSendBlocking(const char * data);
 
 	static unsigned char readNextByte();
 	static unsigned char serialReadStart();

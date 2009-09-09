@@ -65,15 +65,7 @@ typedef	union SVPStatus
 
 void svp_set_mode(unsigned char mode);
 unsigned char svp_read_firmware_version();
-unsigned char svp_read_next_byte();
 SVPEncoders svp_read_encoders();
-unsigned char svp_serial_read(char * buffer);
-unsigned char svp_serial_read_start();
-unsigned char svp_serial_send_character_if_ready(char data);
-unsigned char svp_serial_send_if_ready(const char * data);
-void svp_serial_send_character_blocking(char data);
-void svp_serial_send_blocking(const char * data);
-unsigned int svp_read_trimpot_millivolts();
 SVPStatus svp_read_status();
 static inline unsigned char usb_power_present(){ return svp_read_status().usbPowerPresent; }
 static inline unsigned char usb_configured(){ return svp_read_status().usbConfigured; }
