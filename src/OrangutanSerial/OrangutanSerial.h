@@ -37,17 +37,20 @@
  #define SERIAL_PORTS 3
  #define UART0 0
  #define UART1 1
- #define USB    2
+ #define USB   2
+ #define PORT_IS_UART (port!=2)
 #elif defined(__AVR_ATmega644P__)
  // The Orangutan X2 has two UARTs and one virtual COM port via USB.
  #define ORANGUTAN_X2
  #define SERIAL_PORTS 3
  #define UART0 0
  #define UART1 1
- #define USB    2
+ #define USB   2
+ #define PORT_IS_UART (port!=2)
 #else
  #define SERIAL_PORTS 1
  #define UART0 0
+ #define PORT_IS_UART (1)
 #endif
 
 #if SERIAL_PORTS > 1

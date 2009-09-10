@@ -309,13 +309,10 @@ inline volatile unsigned char * udr(unsigned char port)
 
 void OrangutanSerial::initUART_inline(unsigned char port)
 {
-	#if SERIAL_PORTS > 1
-	if (port == USB)
+	if (!PORT_IS_UART)
 	{
-		// No more initialization is required for the SPI/USB port.
 		return;
 	}
-	#endif
 
 	// Enable receiver and transmitter.
 	// Enable reception interrupt if desired.
@@ -359,13 +356,11 @@ SINGLE_PORT_INLINE void OrangutanSerial::setBaudRate(unsigned char port, unsigne
 {
 	initPort(port);
 
-	#if SERIAL_PORTS > 1
-	if (port == USB)
+	if (!PORT_IS_UART)
 	{
 		// You can't set the baud rate on the virtual COM port.
 		return;
 	}
-	#endif
 
 	*ubrr(port) = (F_CPU-8*baud)/(16*baud);
 }
@@ -454,8 +449,26 @@ namespace OrangutanSVPRXFIFO
 // the exact locations of those variables.
 inline void OrangutanSerial::serial_rx_check(unsigned char port)
 {
-	#ifdef USB
-	if (port==USB)
+	if (PORT_IS_UART)
+	{
+		// This serial port is a UART.
+
+		// Disable the RX interrupt so it doesn't interrupt this function.
+		*ucsrb(port) &= ~(1<<RXCIE);
+
+		if(ports[port].receiveBuffer && ports[port].receivedBytes < ports[port].receiveSize && *ucsra(port) & (1<<RXC)) // A byte has been received
+		{
+			serial_rx_handle_byte(port, *udr(port));
+		}
+
+		// Re-enable the RX interrupt if desired.
+		if(ports[port].mode == SERIAL_AUTOMATIC)
+		{
+			*ucsrb(port) |= (1<<RXCIE);
+		}
+	}
+    #ifdef USB
+	else if (port==USB)
 	{
 		#ifdef ORANGUTAN_SVP
 
@@ -473,22 +486,6 @@ inline void OrangutanSerial::serial_rx_check(unsigned char port)
 		return;
 	}
 	#endif
-
-	// This serial port is a UART.
-
-	// Disable the RX interrupt so it doesn't interrupt this function.
-	*ucsrb(port) &= ~(1<<RXCIE);
-
-	if(ports[port].receiveBuffer && ports[port].receivedBytes < ports[port].receiveSize && *ucsra(port) & (1<<RXC)) // A byte has been received
-	{
-		serial_rx_handle_byte(port, *udr(port));
-	}
-
-	// Re-enable the RX interrupt if desired.
-	if(ports[port].mode == SERIAL_AUTOMATIC)
-	{
-		*ucsrb(port) |= (1<<RXCIE);
-	}
 }
 
 // This function is called whenever a byte has been received on the serial port
@@ -512,9 +509,7 @@ inline void OrangutanSerial::serial_rx_handle_byte(unsigned char port, unsigned 
 inline void OrangutanSerial::receive_inline(unsigned char port, char * buffer, unsigned char size, unsigned char receiveRingOn)
 {
 	// Disable the RX interrupt if necessary.
-	#if SERIAL_PORTS > 1
-	if (port != USB)
-	#endif
+	if (PORT_IS_UART)
 	{
 		*ucsrb(port) &= ~(1<<RXCIE);
 	}
@@ -615,8 +610,17 @@ inline void OrangutanSerial::uart_update_tx_interrupt(unsigned char port)
 // Inner function to be called by the ISR and by serial_check.
 inline void OrangutanSerial::serial_tx_check(unsigned char port)
 {
+	if (PORT_IS_UART)
+	{
+		// This serial port is a UART, not a USB/SPI port.
+
+		// Disable the TX interrupt so it doesn't interrupt this next part.
+		uart_disable_tx_interrupt(port);
+
+		uart_tx_isr(port);
+	}
 	#ifdef USB
-	if (port==USB)
+	else if (port==USB)
 	{
 		if(ports[USB].sendBuffer && ports[USB].sentBytes < ports[USB].sendSize)
 		{
@@ -634,17 +638,8 @@ inline void OrangutanSerial::serial_tx_check(unsigned char port)
 		return;
 	}
 	#endif
-
-	// This serial port is a UART, not a USB/SPI port.
-
-	// Disable the TX interrupt so it doesn't interrupt this next part.
-	uart_disable_tx_interrupt(port);
-
-	uart_tx_isr(port);
 }
 
-// TODO: fix the lameness of checking the UDRE bit inside the ISR?  We have to check it because this
-// function is also called in the main loop.
 inline void OrangutanSerial::uart_tx_isr(unsigned char port)
 {
 	if(ports[port].sendBuffer && ports[port].sentBytes < ports[port].sendSize && *ucsra(port) & (1<<UDRE))
@@ -665,9 +660,7 @@ SINGLE_PORT_INLINE void OrangutanSerial::send(unsigned char port, char *buffer, 
 	ports[port].sendSize = size;
 
 	// enable the interrupts, and everything will be started by the ISR
-	#ifdef USB
-	if (port != USB)
-	#endif
+	if (PORT_IS_UART)
 	{
 		uart_update_tx_interrupt(port);
 	}
