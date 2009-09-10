@@ -432,7 +432,7 @@ namespace OrangutanSVPRXFIFO
 			byte_count = OrangutanSVP::serialReadStart();
 			for (unsigned char i=0; i < byte_count; i++)
 			{
-				buffer[byte_count-1-i] = OrangutanSVP::readNextByte();
+				buffer[byte_count-1-i] = OrangutanSVP::getNextByte();
 			}
 		}
 		return byte_count;

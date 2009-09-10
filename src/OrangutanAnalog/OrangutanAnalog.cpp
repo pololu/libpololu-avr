@@ -238,11 +238,11 @@ void OrangutanAnalog::startConversion(unsigned char channel, unsigned char use_i
 	{
 		adc_result_is_in_millivolts = 1;
 
-		if (channel == TRIMPOT){ adc_result_millivolts = OrangutanSVP::readTrimpotMillivolts(); }
-		else if (channel == CHANNEL_A){ adc_result_millivolts = OrangutanSVP::readChannelAMillivolts(); }
-		else if (channel == CHANNEL_B){ adc_result_millivolts = OrangutanSVP::readChannelBMillivolts(); }
-		else if (channel == CHANNEL_C){ adc_result_millivolts = OrangutanSVP::readChannelCMillivolts(); }
-		else if (channel == CHANNEL_D){ adc_result_millivolts = OrangutanSVP::readChannelDMillivolts(); }
+		if (channel == TRIMPOT){ adc_result_millivolts = OrangutanSVP::getTrimpotMillivolts(); }
+		else if (channel == CHANNEL_A){ adc_result_millivolts = OrangutanSVP::getChannelAMillivolts(); }
+		else if (channel == CHANNEL_B){ adc_result_millivolts = OrangutanSVP::getChannelBMillivolts(); }
+		else if (channel == CHANNEL_C){ adc_result_millivolts = OrangutanSVP::getChannelCMillivolts(); }
+		else if (channel == CHANNEL_D){ adc_result_millivolts = OrangutanSVP::getChannelDMillivolts(); }
 
 		return;
 	}

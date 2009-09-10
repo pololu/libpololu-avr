@@ -30,9 +30,9 @@
 
 #ifdef LIB_POLOLU
 
-extern "C" unsigned char svp_read_firmware_version()
+extern "C" unsigned char svp_get_firmware_version()
 {
-	return OrangutanSVP::readFirmwareVersion();
+	return OrangutanSVP::getFirmwareVersion();
 }
 
 extern "C" void svp_set_mode(unsigned char mode)
@@ -40,14 +40,39 @@ extern "C" void svp_set_mode(unsigned char mode)
 	OrangutanSVP::setMode(mode);
 }
 
-extern "C" SVPEncoders svp_read_encoders()
+extern "C" SVPStatus svp_get_status()
 {
-	return OrangutanSVP::readEncoders();
+	return OrangutanSVP::getStatus();
 }
 
-extern "C" SVPStatus svp_read_status()
+extern "C" int svp_get_counts_ab()
 {
-	return OrangutanSVP::readStatus();
+	return OrangutanSVP::getCountsAB();
+}
+
+extern "C" int svp_get_counts_and_reset_ab()
+{
+	return OrangutanSVP::getCountsAndResetAB();
+}
+
+extern "C" int svp_get_counts_cd()
+{
+	return OrangutanSVP::getCountsCD();
+}
+
+extern "C" int svp_get_counts_and_reset_cd()
+{
+	return OrangutanSVP::getCountsAndResetCD();
+}
+
+extern "C" unsigned char svp_check_error_ab()
+{
+	return OrangutanSVP::checkErrorAB();
+}
+
+extern "C" unsigned char svp_check_error_cd()
+{
+	return OrangutanSVP::checkErrorCD();
 }
 
 #endif
@@ -67,25 +92,49 @@ typedef union SVPVariables
 	};
 } SVPVariables;
 
+typedef union SVPEncoders
+{
+	unsigned char byte[5];
+	struct
+	{
+		unsigned int countAB;
+		unsigned int countCD;
+		union
+		{
+			struct
+			{
+				unsigned errorAB :1;
+				unsigned errorCD :1;
+			};
+			unsigned char status;
+		};
+	};
+} SVPEncoders;
+
+int lastCountAB;
+int lastCountCD;
+
 /* GLOBAL VARIABLES ***********************************************************/
 
 /* A cache of all the variables from the SVP's auxilliary processor. **********/
 // Battery is initialized the invalid value 0xFFFF so that our library can tell
 // when the variables have never been updated and be sure to update them when
 // updateVariablesIfNeeded is first called.
-static SVPVariables svp_variables = {battery:0xFFFF};
+static SVPVariables svp_variables;
+
+static SVPEncoders encoders;
 
 /* LOW-LEVEL FUNCTIONS FOR DOING SPI COMMUNICATION ****************************/
 // All the delays in these functions were chosen by doing an analysis of the
 // auxiliary processor's assembly code for handling SPI communication.
 
-unsigned char OrangutanSVP::readFirmwareVersion()
+unsigned char OrangutanSVP::getFirmwareVersion()
 {
 	OrangutanSPIMaster::transmitAndDelay(0x80, 5);
-	return readNextByte();
+	return getNextByte();
 }
 
-unsigned char OrangutanSVP::readNextByte()
+unsigned char OrangutanSVP::getNextByte()
 {
 	return OrangutanSPIMaster::transmitAndDelay(0xFF, 4);
 }
@@ -96,29 +145,37 @@ static void updateVariables()
 
 	for(unsigned char i=0; i < sizeof(SVPVariables); i++)
 	{
-		svp_variables.byte[i] = OrangutanSVP::readNextByte();
+		svp_variables.byte[i] = OrangutanSVP::getNextByte();
 	}
 }
 
-SVPEncoders OrangutanSVP::readEncoders()
+SVPEncoders updateEncoders()
 {
-	SVPEncoders encoders;
 	OrangutanSPIMaster::transmitAndDelay(0x82, 6);
+	
+	// Read the total number of counts seen on AB (encoders.countAB).
+	encoders.byte[0] = OrangutanSVP::getNextByte();
+	encoders.byte[1] = OrangutanSVP::getNextByte();
 
-	for(unsigned char i=0; i < sizeof(SVPEncoders); i++)
-	{
-		encoders.byte[i] = OrangutanSVP::readNextByte();
-	}
+	// Read the total number of counts seen on CD (encoders.countCD).
+	encoders.byte[2] = OrangutanSVP::getNextByte();
+	encoders.byte[3] = OrangutanSVP::getNextByte();
+
+	// Read the status flags.  When these flags are read, the auxiliary
+	// processor clears the status byte, so we must use |= here to
+	// preserve the status flags we have stored in status until the
+	// user has seen them.
+	encoders.status |= OrangutanSVP::getNextByte();
 
 	return encoders;
 }
 
 // Issues the Read Port Bytes command and returns the number of bytes there are to read.
-// Those bytes should then be read with calls to readNextByte().
+// Those bytes should then be read with calls to getNextByte().
 unsigned char OrangutanSVP::serialReadStart()
 {
     OrangutanSPIMaster::transmitAndDelay(0x83, 7);
-	return readNextByte();
+	return getNextByte();
 }
 
 unsigned char OrangutanSVP::serialSendIfReady(char byte)
@@ -153,62 +210,114 @@ void OrangutanSVP::setMode(unsigned char mode)
 static void updateVariablesIfNeeded()
 {
     // The value of ms() from the last time the svp_variables was updated.
-	static unsigned long svp_variables_last_update_ms;
+	static unsigned long svp_variables_last_update_ms = 0xFFFFFFFF;
 	
-	if (svp_variables.battery == 0xFFFF || OrangutanTime::ms() - svp_variables_last_update_ms >= 2)
+	if (OrangutanTime::ms() != svp_variables_last_update_ms)
 	{
-		svp_variables_last_update_ms = OrangutanTime::ms();
 		updateVariables();
+		svp_variables_last_update_ms = OrangutanTime::ms();
 	}
 }
 
-unsigned int OrangutanSVP::readTrimpotMillivolts()
+static void updateEncodersIfNeeded()
 {
-	// TODO: use setMode to disable slave select if it is enabled?  Otherwise,
-	// if slave select is enabled, then the reading will just be 0xFFFF.
+	static unsigned long encoders_last_update_ms = 0xFFFFFFFF;
+	
+	if (OrangutanTime::ms() != encoders_last_update_ms)
+	{
+		updateEncoders();
+		encoders_last_update_ms = OrangutanTime::ms();
+	}
+}
 
+unsigned int OrangutanSVP::getTrimpotMillivolts()
+{
 	updateVariablesIfNeeded();
 	return svp_variables.trimpot;
 }
 
-unsigned int OrangutanSVP::readBatteryMillivolts()
+unsigned int OrangutanSVP::getBatteryMillivolts()
 {
 	updateVariablesIfNeeded();
 	return svp_variables.battery;
 }
 
-unsigned int OrangutanSVP::readChannelAMillivolts()
+unsigned int OrangutanSVP::getChannelAMillivolts()
 {
-	// TODO: if necessary, set the mode and delay?
 	updateVariablesIfNeeded();
 	return svp_variables.channelA;
 }
 
-unsigned int OrangutanSVP::readChannelBMillivolts()
+unsigned int OrangutanSVP::getChannelBMillivolts()
 {
-	// TODO: if necessary, set the mode and delay?
 	updateVariablesIfNeeded();
 	return svp_variables.channelB;
 }
 
-unsigned int OrangutanSVP::readChannelCMillivolts()
+unsigned int OrangutanSVP::getChannelCMillivolts()
 {
-	// TODO: if necessary, set the mode and delay?
 	updateVariablesIfNeeded();
 	return svp_variables.channelC;
 }
 
-unsigned int OrangutanSVP::readChannelDMillivolts()
+unsigned int OrangutanSVP::getChannelDMillivolts()
 {
-	// TODO: if necessary, set the mode and delay?
 	updateVariablesIfNeeded();
 	return svp_variables.channelD;
 }
 
-SVPStatus OrangutanSVP::readStatus()
+SVPStatus OrangutanSVP::getStatus()
 {
 	updateVariablesIfNeeded();
 	return svp_variables.status;
+}
+
+int OrangutanSVP::getCountsAB()
+{
+	updateEncodersIfNeeded();
+	return encoders.countAB - lastCountAB;
+}
+
+int OrangutanSVP::getCountsAndResetAB()
+{
+	int temp = getCountsAB();
+	lastCountAB = encoders.countAB;
+	return temp;
+}
+
+int OrangutanSVP::getCountsCD()
+{
+	updateEncodersIfNeeded();
+	return encoders.countCD - lastCountCD;
+}
+
+int OrangutanSVP::getCountsAndResetCD()
+{
+	int temp = getCountsCD();
+	lastCountCD = encoders.countCD;
+	return temp;
+}
+
+unsigned char OrangutanSVP::checkErrorAB()
+{
+	updateEncodersIfNeeded();
+	if (encoders.errorAB)
+	{
+		encoders.errorAB = 0;
+		return 1;
+	}
+	return 0;
+}
+
+unsigned char OrangutanSVP::checkErrorCD()
+{
+	updateEncodersIfNeeded();
+	if (encoders.errorCD)
+	{
+		encoders.errorCD = 0;
+		return 1;
+	}
+	return 0;
 }
 
 #endif

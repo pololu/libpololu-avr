@@ -32,25 +32,6 @@
 #define SVP_MODE_ENCODERS     4
 #define SVP_MODE_SLAVE_SELECT 1
 
-typedef union SVPEncoders
-{
-	unsigned char byte[5];
-	struct
-	{
-		unsigned int countAB;
-		unsigned int countCD;
-		union
-		{
-			struct
-			{
-				unsigned errorAB :1;
-				unsigned errorCD :1;
-			};
-			unsigned char status;
-		};
-	};
-} SVPEncoders;
-
 typedef	union SVPStatus
 {
 	unsigned char status;
@@ -64,34 +45,69 @@ typedef	union SVPStatus
 	};
 } SVPStatus;
 
+#ifdef __cplusplus
+
+// C++ Function Declarations
+
 class OrangutanSVP
 {
   public:
 	static void setMode(unsigned char mode);
-	
-	static unsigned char readFirmwareVersion();
-	static SVPEncoders readEncoders();
-	static unsigned char serialSendIfReady(char data);
+	static unsigned char getFirmwareVersion();
 
-	static unsigned char readNextByte();
-	static unsigned char serialReadStart();
+	// Encoders
+	static int getCountsAB();
+	static int getCountsCD();
+	static int getCountsAndResetAB();
+	static int getCountsAndResetCD();
+	static unsigned char checkErrorAB();
+	static unsigned char checkErrorCD();
 
-	static inline unsigned char usbPowerPresent(){ return readStatus().usbPowerPresent; }
-	static inline unsigned char usbConfigured(){ return readStatus().usbConfigured; }
-	static inline unsigned char usbSuspend(){ return readStatus().usbSuspend; }
-	static inline unsigned char dtrEnabled(){ return readStatus().dtrEnabled; }
-	static inline unsigned char rtsEnabled(){ return readStatus().rtsEnabled; }
+	// Status
+	static inline unsigned char usbPowerPresent(){ return getStatus().usbPowerPresent; }
+	static inline unsigned char usbConfigured(){ return getStatus().usbConfigured; }
+	static inline unsigned char usbSuspend(){ return getStatus().usbSuspend; }
+	static inline unsigned char dtrEnabled(){ return getStatus().dtrEnabled; }
+	static inline unsigned char rtsEnabled(){ return getStatus().rtsEnabled; }
 
 	// Undocumented functions that are used by other parts of the library that
 	// the user does not need to know about:
-	static unsigned int readBatteryMillivolts();
-	static unsigned int readTrimpotMillivolts();
-	static unsigned int readChannelAMillivolts();
-	static unsigned int readChannelBMillivolts();
-	static unsigned int readChannelCMillivolts();
-	static unsigned int readChannelDMillivolts();
-	static SVPStatus readStatus();
+	static unsigned char serialSendIfReady(char data);
+	static unsigned char getNextByte();
+	static unsigned char serialReadStart();
+	static unsigned int getBatteryMillivolts();
+	static unsigned int getTrimpotMillivolts();
+	static unsigned int getChannelAMillivolts();
+	static unsigned int getChannelBMillivolts();
+	static unsigned int getChannelCMillivolts();
+	static unsigned int getChannelDMillivolts();
+	static SVPStatus getStatus();
 };
+
+#else
+
+// C Function Declarations
+
+void svp_set_mode(unsigned char mode);
+unsigned char svp_get_firmware_version();
+
+int svp_get_counts_ab();
+int svp_get_counts_and_reset_ab();
+int svp_get_counts_cd();
+int svp_get_counts_and_reset_cd();
+unsigned char svp_check_error_ab();
+unsigned char svp_check_error_cd();
+
+SVPStatus svp_get_status();
+static inline unsigned char usb_power_present(){ return svp_get_status().usbPowerPresent; }
+static inline unsigned char usb_configured(){ return svp_get_status().usbConfigured; }
+static inline unsigned char usb_suspend(){ return svp_get_status().usbSuspend; }
+static inline unsigned char dtr_enabled(){ return svp_get_status().dtrEnabled; }
+static inline unsigned char rts_enabled(){ return svp_get_status().rtsEnabled; }
+
+#endif
+
+// endif 324 or 1284
 #endif
 
 #endif

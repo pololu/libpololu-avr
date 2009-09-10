@@ -113,7 +113,7 @@ class OrangutanAnalog
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 	static inline unsigned int readBatteryMillivolts_SVP()
 	{
-		return OrangutanSVP::readBatteryMillivolts();
+		return OrangutanSVP::getBatteryMillivolts();
 	}
 #endif
 

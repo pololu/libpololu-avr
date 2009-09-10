@@ -10,7 +10,7 @@
 #include <pololu/resources.h>
 #include <pololu/serial.h>
 #include <pololu/spi_master.h>
-#include <pololu/svp.h>
+#include <pololu/OrangutanSVP.h>
 #include <pololu/digital.h>
 #include <pololu/servos.h>
 #include <pololu/pulsein.h>
