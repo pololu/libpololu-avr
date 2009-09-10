@@ -511,7 +511,7 @@ inline void OrangutanSerial::serial_rx_handle_byte(unsigned char port, unsigned 
 
 inline void OrangutanSerial::receive_inline(unsigned char port, char * buffer, unsigned char size, unsigned char receiveRingOn)
 {
-	// Disable the UART reception interrupt if necessary.
+	// Disable the RX interrupt if necessary.
 	#if SERIAL_PORTS > 1
 	if (port != USB)
 	#endif
@@ -524,7 +524,7 @@ inline void OrangutanSerial::receive_inline(unsigned char port, char * buffer, u
 	ports[port].receiveSize = size;
 	ports[port].receiveRingOn = receiveRingOn;
 
-	// Re-enable the UART reception interrupt so background receiving will work.
+	// Re-enable the RX interrupt so background receiving will work.
 	initPort(port);
 }
 
