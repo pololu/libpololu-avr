@@ -34,11 +34,11 @@
 
 #if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
 
-#define TRIMPOT   32
-#define CHANNEL_A 33
-#define CHANNEL_B 34
-#define CHANNEL_C 35
-#define CHANNEL_D 36
+#define TRIMPOT   128
+#define CHANNEL_A 129
+#define CHANNEL_B 130
+#define CHANNEL_C 131
+#define CHANNEL_D 132
 
 #else
 

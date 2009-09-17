@@ -26,7 +26,13 @@
 #define OrangutanSPIMaster_h
 
 #define SPI_EDGE_LEADING  0
-#define SPI_EDGE_TRAILING 1
+#define SPI_EDGE_TRAILING (1<<CPHA)
+
+#define SPI_MSB_FIRST     0
+#define SPI_LSB_FIRST     (1<<DORD)
+
+#define SPI_SCK_IDLE_LOW    0
+#define SPI_SCK_IDLE_HIGH   (1<<CPOL)
 
 #define SPI_SPEED_DIVIDER_2   0b100
 #define SPI_SPEED_DIVIDER_4   0b000
@@ -36,13 +42,27 @@
 #define SPI_SPEED_DIVIDER_64  0b010
 #define SPI_SPEED_DIVIDER_128 0b011
 
+#ifdef __cplusplus
+
+// C++ Function Declarations
+
 class OrangutanSPIMaster
 {
   public:
-    static void init(unsigned char samplingEdge, unsigned char speed);
-    static unsigned char transmit(unsigned char byteToSend);
-    static unsigned char transmitAndDelay(unsigned char byteToSend, unsigned char post_delay_us);
+    static void init(unsigned char speed_divider, unsigned char options);
+    static unsigned char transmit(unsigned char data);
+    static unsigned char transmitAndDelay(unsigned char data, unsigned char post_delay_us);
 };
+
+#else
+
+// C Function Declarations
+
+void spi_master_init(unsigned char speed_divider, unsigned char options);
+unsigned char spi_master_transmit(unsigned char data);
+unsigned char spi_master_transmit_and_delay(unsigned char data, unsigned char post_delay_us);
+
+#endif
 
 #endif
 

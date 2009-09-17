@@ -21,42 +21,39 @@
  * to be responsible for all resulting costs and damages.
  */
 
-// TODO: add underscores on some of these to avoid namespace collisions?
-
 #ifndef OrangutanSerial_h
 #define OrangutanSerial_h
 
-#undef ORANGUTAN_X2
-#undef ORANGUTAN_SVP
+#undef _ORANGUTAN_X2
+#undef _ORANGUTAN_SVP
 
 #include <avr/interrupt.h>
 
 #if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
  // The Orangutan SVP has two UARTs and one virtual COM port via USB.
- #define ORANGUTAN_SVP
- #define SERIAL_PORTS 3
- #define UART0 0
- #define UART1 1
- #define USB   2
- #define PORT_IS_UART (port!=2)
+ #define _ORANGUTAN_SVP
+ #define _SERIAL_PORTS 3
+ #define UART0    0
+ #define UART1    1
+ #define USB_COMM 2
+ #define _PORT_IS_UART (port!=2)
 #elif defined(__AVR_ATmega644P__)
  // The Orangutan X2 has two UARTs and one virtual COM port via USB.
- #define ORANGUTAN_X2
- #define SERIAL_PORTS 3
+ #define _ORANGUTAN_X2
+ #define _SERIAL_PORTS 3
  #define UART0 0
  #define UART1 1
- #define USB   2
- #define PORT_IS_UART (port!=2)
+ #define USB_COMM   2
+ #define _PORT_IS_UART (port!=2)
 #else
- #define SERIAL_PORTS 1
- #define UART0 0
- #define PORT_IS_UART (1)
+ #define _SERIAL_PORTS 1
+ #define _PORT_IS_UART (1)
 #endif
 
-#if SERIAL_PORTS > 1
-    #define SINGLE_PORT_INLINE
+#if _SERIAL_PORTS > 1
+    #define _SINGLE_PORT_INLINE
 #else
-    #define SINGLE_PORT_INLINE inline
+    #define _SINGLE_PORT_INLINE inline
 #endif
 
 #define SERIAL_AUTOMATIC 0
@@ -136,7 +133,7 @@ class OrangutanSerial
 
 	// sendBufferEmpty: True when the send buffer is empty.
 
-#if SERIAL_PORTS == 1
+#if _SERIAL_PORTS == 1
 	static void setBaudRate(unsigned long baud);
 	static void setMode(unsigned char mode);
 	static void receive(char *buffer, unsigned char size);
@@ -145,29 +142,6 @@ class OrangutanSerial
 	static void cancelReceive();
 	static void send(char *buffer, unsigned char size);
 	static void sendBlocking(char *buffer, unsigned char size);
-#endif
-
-#if SERIAL_PORTS > 1
-  public:
-#else
-  private:
-#endif
-	static SINGLE_PORT_INLINE void setBaudRate(unsigned char port, unsigned long baud);
-	static SINGLE_PORT_INLINE void setMode(unsigned char port, unsigned char mode);
-	static SINGLE_PORT_INLINE void receive(unsigned char port, char *buffer, unsigned char size);
-	static SINGLE_PORT_INLINE char receiveBlocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout_ms);
-	static SINGLE_PORT_INLINE void receiveRing(unsigned char port, char *buffer, unsigned char size);
-	static SINGLE_PORT_INLINE void cancelReceive(unsigned char port);
-	static SINGLE_PORT_INLINE void send(unsigned char port, char *buffer, unsigned char size);
-	static SINGLE_PORT_INLINE void sendBlocking(unsigned char port, char *buffer, unsigned char size);
-	static inline char sendBufferEmpty(unsigned char port) { return ports[port].sentBytes == ports[port].sendSize; }
-	static inline unsigned char getMode(unsigned char port) { return ports[port].mode; }
-	static inline unsigned char getReceivedBytes(unsigned char port) { return ports[port].receivedBytes; }
-	static inline char receiveBufferFull(unsigned char port) { return getReceivedBytes(port) == ports[port].receiveSize; }
-	static inline unsigned char getSentBytes(unsigned char port) { return ports[port].sentBytes; }
-
-#if SERIAL_PORTS == 1
-  public:
 	static inline char sendBufferEmpty() { return ports[0].sentBytes == ports[0].sendSize; }
 	static inline unsigned char getSentBytes() { return ports[0].sentBytes; }
 	static inline unsigned char getReceivedBytes() { return ports[0].receivedBytes; }
@@ -175,9 +149,28 @@ class OrangutanSerial
 	static inline unsigned char getMode() { return ports[0].mode; }
 #endif
 
+#if _SERIAL_PORTS > 1
+  public:
+#else
+  private:
+#endif
+	static _SINGLE_PORT_INLINE void setBaudRate(unsigned char port, unsigned long baud);
+	static _SINGLE_PORT_INLINE void setMode(unsigned char port, unsigned char mode);
+	static _SINGLE_PORT_INLINE void receive(unsigned char port, char *buffer, unsigned char size);
+	static _SINGLE_PORT_INLINE char receiveBlocking(unsigned char port, char *buffer, unsigned char size, unsigned int timeout_ms);
+	static _SINGLE_PORT_INLINE void receiveRing(unsigned char port, char *buffer, unsigned char size);
+	static _SINGLE_PORT_INLINE void cancelReceive(unsigned char port);
+	static _SINGLE_PORT_INLINE void send(unsigned char port, char *buffer, unsigned char size);
+	static _SINGLE_PORT_INLINE void sendBlocking(unsigned char port, char *buffer, unsigned char size);
+	static inline char sendBufferEmpty(unsigned char port) { return ports[port].sentBytes == ports[port].sendSize; }
+	static inline unsigned char getMode(unsigned char port) { return ports[port].mode; }
+	static inline unsigned char getReceivedBytes(unsigned char port) { return ports[port].receivedBytes; }
+	static inline char receiveBufferFull(unsigned char port) { return getReceivedBytes(port) == ports[port].receiveSize; }
+	static inline unsigned char getSentBytes(unsigned char port) { return ports[port].sentBytes; }
+
   private:
 
-	static SerialPortData ports[SERIAL_PORTS];
+	static SerialPortData ports[_SERIAL_PORTS];
 
 	static inline void initUART_inline(unsigned char port);
 	static inline void receive_inline(unsigned char port, char *buffer, unsigned char size, unsigned char ring);
@@ -201,7 +194,7 @@ class OrangutanSerial
 // C Function declarations.
 void serial_check();
 
-#if SERIAL_PORTS > 1
+#if _SERIAL_PORTS > 1
 void serial_set_baud_rate(unsigned char port, unsigned long baud);
 void serial_set_mode(unsigned char port, unsigned char mode);
 unsigned char serial_get_mode(unsigned char port);

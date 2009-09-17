@@ -30,7 +30,9 @@
 #define SVP_MODE_RX           0
 #define SVP_MODE_ANALOG       2
 #define SVP_MODE_ENCODERS     4
-#define SVP_MODE_SLAVE_SELECT 1
+
+#define SVP_SLAVE_SELECT_ON   1
+#define SVP_SLAVE_SELECT_OFF  0
 
 typedef	union SVPStatus
 {
@@ -52,10 +54,17 @@ typedef	union SVPStatus
 class OrangutanSVP
 {
   public:
-	static void setMode(unsigned char mode);
+    static inline void setMode(unsigned char mode, unsigned char slave_select){ setModeByte(mode | slave_select); }
 	static unsigned char getFirmwareVersion();
 
-	// Encoders
+	// Status Functions
+	static inline unsigned char usbPowerPresent(){ return getStatus().usbPowerPresent; }
+	static inline unsigned char usbConfigured(){ return getStatus().usbConfigured; }
+	static inline unsigned char usbSuspend(){ return getStatus().usbSuspend; }
+	static inline unsigned char dtrEnabled(){ return getStatus().dtrEnabled; }
+	static inline unsigned char rtsEnabled(){ return getStatus().rtsEnabled; }
+
+	// Encoder Functions
 	static int getCountsAB();
 	static int getCountsCD();
 	static int getCountsAndResetAB();
@@ -63,15 +72,9 @@ class OrangutanSVP
 	static unsigned char checkErrorAB();
 	static unsigned char checkErrorCD();
 
-	// Status
-	static inline unsigned char usbPowerPresent(){ return getStatus().usbPowerPresent; }
-	static inline unsigned char usbConfigured(){ return getStatus().usbConfigured; }
-	static inline unsigned char usbSuspend(){ return getStatus().usbSuspend; }
-	static inline unsigned char dtrEnabled(){ return getStatus().dtrEnabled; }
-	static inline unsigned char rtsEnabled(){ return getStatus().rtsEnabled; }
-
 	// Undocumented functions that are used by other parts of the library that
-	// the user does not need to know about:
+	// the typical user does not need to know about:
+	static void setModeByte(unsigned char mode);
 	static unsigned char serialSendIfReady(char data);
 	static unsigned char getNextByte();
 	static unsigned char serialReadStart();
@@ -88,15 +91,11 @@ class OrangutanSVP
 
 // C Function Declarations
 
-void svp_set_mode(unsigned char mode);
-unsigned char svp_get_firmware_version();
+void svp_set_mode_byte(unsigned char mode);
 
-int svp_get_counts_ab();
-int svp_get_counts_and_reset_ab();
-int svp_get_counts_cd();
-int svp_get_counts_and_reset_cd();
-unsigned char svp_check_error_ab();
-unsigned char svp_check_error_cd();
+static inline void svp_set_mode(unsigned char mode, unsigned char slave_select){ svp_set_mode_byte(mode | slave_select); }
+
+unsigned char svp_get_firmware_version();
 
 SVPStatus svp_get_status();
 static inline unsigned char usb_power_present(){ return svp_get_status().usbPowerPresent; }
@@ -104,6 +103,14 @@ static inline unsigned char usb_configured(){ return svp_get_status().usbConfigu
 static inline unsigned char usb_suspend(){ return svp_get_status().usbSuspend; }
 static inline unsigned char dtr_enabled(){ return svp_get_status().dtrEnabled; }
 static inline unsigned char rts_enabled(){ return svp_get_status().rtsEnabled; }
+
+// Encoder Functions
+int svp_get_counts_ab();
+int svp_get_counts_and_reset_ab();
+int svp_get_counts_cd();
+int svp_get_counts_and_reset_cd();
+unsigned char svp_check_error_ab();
+unsigned char svp_check_error_cd();
 
 #endif
 
