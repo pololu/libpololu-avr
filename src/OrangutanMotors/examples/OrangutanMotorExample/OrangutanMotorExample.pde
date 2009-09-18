@@ -4,15 +4,15 @@
 
 
 /*
- * OrangutanMotorExample for the 3pi robot, Orangutan LV-168, or Baby Orangutan B
+ * OrangutanMotorExample for the 3pi robot, Orangutan LV-168, Orangutan SV-xx8,
+ *   Orangutan SVP, and Baby Orangutan B
  *
- * This example program is indended for use on the 3pi, Orangutan LV-168, or
- * Baby Orangutan B.  It uses the OrangutanMotors library to drive
+ * This example uses the OrangutanMotors library to drive
  * motors in response to the position of user trimmer potentiometer
  * and blinks the red user LED at a rate determined by the trimmer
  * potentiometer position.  It uses the OrangutanAnalog library to measure
  * the trimpot position, and it uses the OrangutanLEDs library to provide
- * limited feedback with the red and green user LEDs.
+ * limited feedback with the red user LED.
  *
  * http://www.pololu.com/docs/0J17/5.e
  * http://www.pololu.com
