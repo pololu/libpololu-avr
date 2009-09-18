@@ -11,48 +11,27 @@
 // uses the Pololu AVR library on an Orangutan.
 #include <pololu/orangutan.h>
 
-// tmphax
-#undef BUTTON_A
-#undef BUTTON_B
-#undef BUTTON_C
-
 // This include file allows data to be stored in program space.  The
 // ATmega168 has 16k of program space compared to 1k of RAM, so large
-// pieces of static data should be stored in program space.
+// pieces of static data should be stored in program space.  The word
+// PROGMEM tells the compiler to store data in program space.
 #include <avr/pgmspace.h>
 
 const char lcd_width = 16;
 
-// Introductory messages.  The "PROGMEM" identifier causes the data to
-// go into program space.
-const char welcome_line1[] PROGMEM      = "     Pololu     ";
-const char welcome_line2[] PROGMEM      = " Orangutan SVP  ";
-
-const char demo_name_line1[] PROGMEM    = "Demo Program    ";
-
-const char instructions_line1[] PROGMEM = "Use mid button  ";
-const char instructions_line2[] PROGMEM = "to select.      ";
-
-const char instructions_line3[] PROGMEM = "Press middle    ";
-const char instructions_line4[] PROGMEM = "button: Try it! ";
-
-const char thank_you_line1[] PROGMEM    = "   Thank you!   ";
-
-const char main_menu_intro_line1[] PROGMEM = "   Main Menu";
-
-const char menu_bat_test[] PROGMEM = "Battery";
-const char menu_led_test[] PROGMEM = "LEDs";
-const char menu_motor_test[] PROGMEM = "Motors";
-const char menu_music_test[] PROGMEM = "Music";
-const char menu_pot_test[] PROGMEM = "Trimpot";
-const char menu_time_test[] PROGMEM = "Timer";
-const char menu_usb_test[] PROGMEM = "USB";
-
-const char trimpot_line1[] PROGMEM = "Adjust trimpot.";
+const char menu_analog_test[] PROGMEM   = "Analog Inputs";
+const char menu_bat_test[] PROGMEM      = "Battery Voltage";
+const char menu_led_test[] PROGMEM      = "LEDs";
+const char menu_motor_test[] PROGMEM    = "Motors";
+const char menu_music_test[] PROGMEM    = "Music";
+const char menu_pot_test[] PROGMEM      = "Trimpot";
+const char menu_time_test[] PROGMEM     = "Timer";
+const char menu_usb_test[] PROGMEM      = "USB";
 
 const char menu_line2[] PROGMEM = "\x7ftop  \xa5mid  bot\x7e";
 const char back_line2[] PROGMEM = "\6mid";
 
+void analog_test();
 void bat_test();
 void led_test();
 void motor_test();
@@ -61,16 +40,16 @@ void time_test();
 void pot_test();
 void usb_test();
 typedef void (*function)();
-const function main_menu_functions[] = { bat_test, led_test, pot_test, motor_test, music_test, time_test, usb_test };
-const char *main_menu_options[] = { menu_bat_test, menu_led_test, menu_pot_test, menu_motor_test, menu_music_test, menu_time_test, menu_usb_test };
+const function main_menu_functions[] = { analog_test, bat_test, led_test, pot_test, motor_test, music_test, time_test, usb_test };
+const char *main_menu_options[] = { menu_analog_test, menu_bat_test, menu_led_test, menu_pot_test, menu_motor_test, menu_music_test, menu_time_test, menu_usb_test };
 const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
 
 // A couple of simple tunes, stored in program space.
 const char welcome[] PROGMEM = ">g32>>c32";
 const char thank_you_music[] PROGMEM = ">>c32>g32";
-const char beep_button_a[] PROGMEM = "!c32";
-const char beep_button_b[] PROGMEM = "!e32";
-const char beep_button_c[] PROGMEM = "!g32";
+const char beep_button_top[] PROGMEM = "!c32";
+const char beep_button_middle[] PROGMEM = "!e32";
+const char beep_button_middleottom[] PROGMEM = "!g32";
 const char timer_tick[] PROGMEM = "!v8>>c32";
 
 // Data for generating the characters used in load_custom_characters
@@ -134,12 +113,22 @@ void load_custom_characters()
 	clear(); // the LCD must be cleared for the characters to take effect
 }
 
-// 10 levels of bar graph characters
-const char bar_graph_characters[10] = {' ',0,0,1,2,3,3,4,5,255};
+// 15 levels of bar graph characters.
+/**
+  Character, Bar Height, 0-7 (high 3 bits of reading)
+  ' '        0           0
+  0          1           1
+  1          2           2
+  2          3           3
+  3          5           4
+  4          6           5
+  5          7           6
+  255        8           7
+**/
 
-unsigned char wait_for_250_ms_or_middle_button()
+unsigned char wait_for_ms_or_middle_button(unsigned char ms)
 {
-	unsigned int stop_time = get_ms() + 250;
+	unsigned int stop_time = get_ms() + ms;
 	while(1)
 	{
 		if(button_is_pressed(MIDDLE_BUTTON))
@@ -147,9 +136,102 @@ unsigned char wait_for_250_ms_or_middle_button()
 			return 1;
 		}
 
-		if (get_ms() == stop_time)
+		if ((unsigned int)get_ms() >= stop_time)
 		{
 			return 0;
+		}
+	}
+}
+
+unsigned char wait_for_250_ms_or_middle_button()
+{
+	return wait_for_ms_or_middle_button(250);
+}
+
+void print_bar(unsigned char three_bits)
+{
+	const char bar_graph_characters[8] = {' ',0,1,2,3,4,5,255};
+	print_character(bar_graph_characters[three_bits]);
+}
+
+void print_reading(unsigned char channel)
+{
+	delay_ms(2);
+
+	// Do a dummy reading and throw it away, so that the real reading
+	// is not biased by the previous reading.
+	if (!button_is_pressed(BOTTOM_BUTTON))
+	{
+		analog_read(channel);
+	}
+
+	print_bar(analog_read(channel) >> 5);
+}
+
+void analog_test()
+{
+	static const char analog_labels[] PROGMEM = "\6m 76543210TABCD";
+
+	svp_set_mode(SVP_MODE_ANALOG);
+	set_analog_mode(MODE_8_BIT);
+
+	// Turn off the pull-ups by default.
+	unsigned char pullups = 0;
+	PORTA = 0;
+
+	while(1)
+	{
+		green_led(1);
+		lcd_goto_xy(0,0);
+
+		if (pullups)
+		{
+			print("\xa5T ");
+		}
+		else
+		{
+			print("\xa5t ");
+		}
+
+		print_reading(7);
+		print_reading(6);
+		print_reading(5);
+		print_reading(4);
+		print_reading(3);
+		print_reading(2);
+		print_reading(1);
+		print_reading(0);
+		print_reading(TRIMPOT);
+		print_reading(CHANNEL_A);
+		print_reading(CHANNEL_B);
+		print_reading(CHANNEL_C);
+		print_reading(CHANNEL_D);
+		green_led(0);
+
+		lcd_goto_xy(0,1);
+		print_from_program_space(analog_labels);
+
+		if (button_is_pressed(TOP_BUTTON))
+		{
+			pullups = !pullups;
+
+			play_from_program_space(beep_button_top);
+
+			if (pullups)
+			{
+				PORTA = 0xFF;
+			}
+			else
+			{
+				PORTA = 0;
+			}
+			wait_for_button_release(TOP_BUTTON);
+			clear();  //tmphax for org06a01
+		}
+
+		if(wait_for_ms_or_middle_button(40))
+		{
+			return;
 		}
 	}
 }
@@ -196,7 +278,8 @@ int m2_speed = 0;
 void motor_test()
 {
 	static char m1_back = 0, m2_back = 0;
-	char m1_char, m2_char;
+
+	return; //tmphax
 
 	if(button_is_pressed(TOP_BUTTON))
 	{
@@ -244,16 +327,15 @@ void motor_test()
 	if(m2_speed > 255)
 		m2_speed = 255;
 
-	// 255/26 = 9, so this gives values in the range of 0 to 9
-	m1_char = bar_graph_characters[m1_speed / 26];
-	m2_char = bar_graph_characters[m2_speed / 26];
-	print_character(m1_char);
+    // Shifting to the right by 5 gets the high 3 bits, which gives us a bar graph character.
+
+	print_bar(m1_speed >> 5);
 	print_character(m1_back ? 'a' : 'A');
-	print_character(m1_char);
+	print_bar(m1_speed >> 5);
 	lcd_goto_xy(5,0);
-	print_character(m2_char);
+	print_bar(m2_speed >> 5);
 	print_character(m2_back ? 'c' : 'C');
-	print_character(m2_char);
+	print_bar(m2_speed >> 5);
 
 	set_motors(m1_speed * (m1_back ? -1 : 1), m2_speed * (m2_back ? -1 : 1));
 	delay_ms(50);
@@ -295,9 +377,7 @@ void music_test()
 
 void pot_test()
 {
-	long start = get_ms();
-	char elapsed_ms;
-	int value;
+	static const char trimpot_line1[] PROGMEM = "Adjust trimpot.";
 
 	set_analog_mode(MODE_10_BIT);
 	print_from_program_space(trimpot_line1);
@@ -305,9 +385,12 @@ void pot_test()
 	print_long(read_trimpot());
 	print("   "); // to clear the display
 
+	long start = get_ms();
+	char elapsed_ms;
+
 	while((elapsed_ms = get_ms() - start) < 100)
 	{
-		value = read_trimpot();
+		int value = read_trimpot();
 		play_frequency(value, 200, 10);
 		
 		if(value < elapsed_ms*10)
@@ -353,7 +436,7 @@ void time_test()
 			top_is_pressed = 1;
 			is_ticking = 0;
 			elapsed_time = 0;
-			play_from_program_space(beep_button_a);
+			play_from_program_space(beep_button_top);
 
 			wait_for_button_release(TOP_BUTTON);clear();// tmphax to make this work on org06a01
 		}
@@ -370,7 +453,7 @@ void time_test()
 			// start/stop
 			bottom_is_pressed = 1;
 			is_ticking = !is_ticking;
-			play_from_program_space(beep_button_c);
+			play_from_program_space(beep_button_middleottom);
 		}
 	}
 	else
@@ -415,19 +498,17 @@ void print_two_lines_delay_1s(const char *line1, const char *line2)
 	delay_ms(1000);
 }
 
-const char connect_usb[] PROGMEM     = "Connect USB.    ";
-const char install_drivers[] PROGMEM = "Install drivers.";
-const char suspend[] PROGMEM         = "ZZZZZZzzzzzz....";
-const char comport[] PROGMEM         = "Type in to COM. ";
-const char blank_line[] PROGMEM      = "                ";
-
 // Receive_buffer must be 17 characters long to hold a full line of
 // test and the terminating null character (0)
 char receive_buffer[17];
 
 void usb_test()
 {
-	unsigned char buffer_position = 0;
+	static const char connect_usb[] PROGMEM     = "Connect USB.    ";
+	static const char install_drivers[] PROGMEM = "Install drivers.";
+	static const char suspend[] PROGMEM         = "ZZZZZZzzzzzz....";
+	static const char comport[] PROGMEM         = "Type in to COM. ";
+	static const char blank_line[] PROGMEM      = "                ";
 
 	serial_receive(USB_COMM, receive_buffer, 16);
 
@@ -473,7 +554,7 @@ void usb_test()
 			receive_buffer[byte_count] = 0;
 			lcd_goto_xy(0,0);
 			print(receive_buffer);
-			//lcd_show_cursor(CURSOR_BLINKING);
+			//lcd_show_cursor(CURSOR_BLINKING); // TODO: make this work
 		}
 
 		if (byte_count == 16)
@@ -502,7 +583,7 @@ void usb_test()
 				break;
 			}
 
-			if ((unsigned char)get_ms() == stop_time)
+			if ((unsigned char)get_ms() >= stop_time)
 			{
 				break;
 			}
@@ -519,15 +600,15 @@ unsigned char wait_for_button_and_beep()
 	
 	if(button & TOP_BUTTON)
 	{
-		play_from_program_space(beep_button_a);
+		play_from_program_space(beep_button_top);
 	}
 	else if(button & MIDDLE_BUTTON)
 	{
-		play_from_program_space(beep_button_b);
+		play_from_program_space(beep_button_middle);
 	}
 	else
 	{
-		play_from_program_space(beep_button_c);
+		play_from_program_space(beep_button_middleottom);
 	}
 
 	wait_for_button_release(button);
@@ -538,6 +619,19 @@ unsigned char wait_for_button_and_beep()
 // plays the initial music.
 void initialize()
 {
+	static const char welcome_line1[] PROGMEM      = "     Pololu     ";
+	static const char welcome_line2[] PROGMEM      = " Orangutan SVP  ";
+
+	static const char demo_name_line1[] PROGMEM    = "Demo Program    ";
+
+	static const char instructions_line1[] PROGMEM = "Use mid button  ";
+	static const char instructions_line2[] PROGMEM = "to select.      ";
+
+	static const char instructions_line3[] PROGMEM = "Press middle    ";
+	static const char instructions_line4[] PROGMEM = "button: Try it! ";
+
+	static const char thank_you_line1[] PROGMEM    = "   Thank you!   ";
+
 	load_custom_characters(); // load the custom characters
 	
 	play_from_program_space(welcome);
@@ -562,6 +656,8 @@ void menu_select()
 {
 	static unsigned char menu_index = 0;
 
+    static const char main_menu_intro_line1[] PROGMEM = "   Main Menu";
+
 	print_two_lines_delay_1s(main_menu_intro_line1,0);
 
 	while(1)
@@ -581,7 +677,7 @@ void menu_select()
 		if(button & TOP_BUTTON)
 		{
 			wait_for_button_release(TOP_BUTTON);// tmphax to get it to work on org06a01
-			play_from_program_space(beep_button_a);
+			play_from_program_space(beep_button_top);
 
 			if (menu_index == 0)
 			{
@@ -597,7 +693,7 @@ void menu_select()
 			//lcd_hide_cursor(); // TODO: get this to work
 			clear();
 
-			play_from_program_space(beep_button_b);
+			play_from_program_space(beep_button_middle);
 			wait_for_button_release(button);
 
 			while(!button_is_pressed(MIDDLE_BUTTON))
@@ -616,11 +712,11 @@ void menu_select()
 			green_led(0);
 			lcd_hide_cursor();
 			serial_cancel_receive(USB_COMM);
-			play_from_program_space(beep_button_b);
+			play_from_program_space(beep_button_middle);
 		}
 		else if(button & BOTTOM_BUTTON)
 		{
-			play_from_program_space(beep_button_c);
+			play_from_program_space(beep_button_middleottom);
 
 			if (menu_index == main_menu_length-1)
 			{
