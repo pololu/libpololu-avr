@@ -54,7 +54,7 @@ typedef	union SVPStatus
 class OrangutanSVP
 {
   public:
-    static inline void setMode(unsigned char mode, unsigned char slave_select){ setModeByte(mode | slave_select); }
+	static void setMode(unsigned char mode);
 	static unsigned char getFirmwareVersion();
 
 	// Status Functions
@@ -74,7 +74,6 @@ class OrangutanSVP
 
 	// Undocumented functions that are used by other parts of the library that
 	// the typical user does not need to know about:
-	static void setModeByte(unsigned char mode);
 	static unsigned char serialSendIfReady(char data);
 	static unsigned char getNextByte();
 	static unsigned char serialReadStart();
@@ -91,9 +90,7 @@ class OrangutanSVP
 
 // C Function Declarations
 
-void svp_set_mode_byte(unsigned char mode);
-
-static inline void svp_set_mode(unsigned char mode, unsigned char slave_select){ svp_set_mode_byte(mode | slave_select); }
+void svp_set_mode(unsigned char mode);
 
 unsigned char svp_get_firmware_version();
 

@@ -35,9 +35,9 @@ extern "C" unsigned char svp_get_firmware_version()
 	return OrangutanSVP::getFirmwareVersion();
 }
 
-extern "C" void svp_set_mode_byte(unsigned char mode)
+extern "C" void svp_set_mode(unsigned char mode)
 {
-	OrangutanSVP::setModeByte(mode);
+	OrangutanSVP::setMode(mode);
 }
 
 extern "C" SVPStatus svp_get_status()
@@ -184,12 +184,7 @@ unsigned char OrangutanSVP::serialSendIfReady(char byte)
 	return OrangutanSPIMaster::transmitAndDelay(byte & 0x7F, 5);
 }
 
-/* setModeByte: Sets the current mode of the SVP's auxiliary processor.
-   The mode parameter should be an inclusive or of
-     1) MODE_RX, MODE_ANALOG, or MODE_ENCODERS
-     2) MODE_SLAVE_SELECT or 0
- */
-void OrangutanSVP::setModeByte(unsigned char mode)
+void OrangutanSVP::setMode(unsigned char mode)
 {
 	// When the auxiliary processor starts up, it is in SVP_MODE_RX.
 	static unsigned char svp_mode = SVP_MODE_RX;
