@@ -31,18 +31,18 @@ int main()
     if (!analog_is_converting())     // if conversion is done...
     {
       sum += analog_conversion_result();  // get result
-      start_analog_conversion(TRIMPOT);          // and start next conversion
-      if (++samples == 20)
+      start_analog_conversion(TRIMPOT);   // start next conversion
+      if (++samples == 20)           // if 20 samples have been taken...
       {
-	avg = sum / 20;             // compute 20-sample average of ADC result
-	samples = 0;
-	sum = 0;
+        avg = sum / 20;             // compute 20-sample average of ADC result
+        samples = 0;
+        sum = 0;
       }
     }
     
-    // when avg == 0, the red LED is almost totally off
-    // when avg == 255, the red LED is almost totally on
-    // brightness should scale approximately linearly in between
+    // when avg == 0, the red LED is almost totally off.
+    // when avg == 255, the red LED is almost totally on.
+    // brightness should scale approximately linearly in between.
     red_led(0);                 // red LED off
     delay_us(256 - avg);
     red_led(1);                 // red LED on
