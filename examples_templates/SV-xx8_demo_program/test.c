@@ -380,7 +380,6 @@ void time_test()
 
 void print_two_lines_delay_1s(const char *line1, const char *line2)
 {
-	// Play welcome music and display a message
 	clear();
 	print_from_program_space(line1);
 	lcd_goto_xy(0,1);

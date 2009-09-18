@@ -1,10 +1,10 @@
 #include <pololu/orangutan.h>
 
 /*
- * OrangutanPushbuttonExample for the Orangutan LV/SV-xx8
+ * OrangutanPushbuttonExample: for the Orangutan LV-168,
+ *   Orangutan SV-xx8, Orangutan SVP, and 3pi robot
  *
- * This example program is intended for use on the Orangutan
- * LV/SV-xx8.  It uses the OrangutanPushbuttons library to detect user
+ * This example uses the OrangutanPushbuttons library to detect user
  * input from the pushbuttons, and it uses the OrangutanLCD library to
  * display feedback on the LCD.
  *

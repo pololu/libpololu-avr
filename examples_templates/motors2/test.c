@@ -1,16 +1,15 @@
 #include <pololu/orangutan.h>
 
 /*
- * motors2: for the Orangutan LV/SV-xx8
+ * motors2: for the 3pi robot, Orangutan LV-168,
+ *    Orangutan SVP, and Orangutan SV-xx8.	
  *
- * This example program is intended for use on the Orangutan
- * LV/SV-xx8.  It uses the OrangutanMotors and OrangutanLCD functions
- * to drive motors in response to the position of user trimmer
- * potentiometer and to display the potentiometer position and desired
- * motor speed on the LCD.  It uses the OrangutanAnalog functions to
- * measure the trimpot position, and it uses the OrangutanLEDs
- * functions to provide limited feedback with the red and green user
- * LEDs.
+ * This example uses the OrangutanMotors and OrangutanLCD libraries to drive
+ * motors in response to the position of user trimmer potentiometer
+ * and to display the potentiometer position and desired motor speed
+ * on the LCD.  It uses the OrangutanAnalog library to measure the
+ * trimpot position, and it uses the OrangutanLEDs library to provide
+ * limited feedback with the red and green user LEDs.
  *
  * http://www.pololu.com/docs/0J20/6.g
  * http://www.pololu.com
