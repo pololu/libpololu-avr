@@ -56,6 +56,7 @@ install: $(LIBRARY_FILES)
 	install -d $(INCLUDE_POLOLU)
 	install $(foreach device,$(devices),libpololu_$(device).a) $(LIB)
 	install pololu/*.h $(INCLUDE_POLOLU)
+	install src/*/*.h $(INCLUDE_POLOLU)
 	install pololu/orangutan $(INCLUDE_POLOLU)
 	@echo "Installation is complete."
 
@@ -66,6 +67,7 @@ install: $(LIBRARY_FILES)
 examples_3pi := 3pi-demo-program 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
 examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog2 analog3 buzzer2 lcd1 motors2 simple-test wheel_encoders1
 examples_168_328p := 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program
+examples_svp := svp1 SVP_demo_program
 
 # The 48 examples are the only ones that will work on the mega48.
 # They will also work on the orangutans, which could have either a 168
@@ -74,7 +76,7 @@ examples_168_328p := 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program
 examples_atmega48 := analog1 motors1 led1 simple_servo_control
 examples_atmega168 := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
 examples_atmega328p := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
-examples_atmega324p := $(examples_atmega48) $(examples_orangutan)
+examples_atmega324p := $(examples_atmega48) $(examples_orangutan) $(examples_svp)
 
 example_template = examples_templates/$(example)
 example_dir = examples/$(device)/$(example)
