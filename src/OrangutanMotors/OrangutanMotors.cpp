@@ -177,7 +177,6 @@ void OrangutanMotors::init2()
 	OrangutanDigital::setOutput(PWM2B, 0);
 
 #endif
-#endif
 }
 
 
