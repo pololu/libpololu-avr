@@ -37,9 +37,9 @@
 #ifndef OrangutanServos_h
 #define OrangutanServos_h
 
-unsigned char init_servos(const unsigned char servoPins[], unsigned char numPins);
+unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins);
 
-unsigned char init_servos_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB);
+unsigned char servos_init_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB);
 
 unsigned int get_servo_position(unsigned char servoNum);
 

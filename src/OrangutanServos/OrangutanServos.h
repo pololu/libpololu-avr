@@ -84,8 +84,8 @@ class OrangutanServos
 	// represents a set of up to eight digital I/O pins on which the servo signals should be output.
 	// If you don't want this second set of eight servos, use a numPinsB value of 0 (and you can pass in NULL for servoPinsB).
 	// A nonzero return value indicates that memory for the desired arrays could not be allocated
-	static unsigned char initServos(const unsigned char servoPins[], unsigned char numPins);
-	static unsigned char initServos(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB);
+	static unsigned char init(const unsigned char servoPins[], unsigned char numPins);
+	static unsigned char init(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB);
 
 
 

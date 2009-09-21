@@ -197,14 +197,14 @@ ISR(TIMER1_COMPB_vect)
 
 #ifdef LIB_POLOLU
 
-extern "C" unsigned char init_servos(const unsigned char servoPins[], unsigned char numPins)
+extern "C" unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins)
 {
-	return OrangutanServos::initServos(servoPins, numServos, 0, 0);
+	return OrangutanServos::init(servoPins, numPins, 0, 0);
 }
 
-extern "C" unsigned char init_servos_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB)
+extern "C" unsigned char servos_init_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB)
 {
-	return OrangutanServos::initServos(servoPins, numServos, servoPinsB, numPinsB);
+	return OrangutanServos::init(servoPins, numPins, servoPinsB, numPinsB);
 }
 
 
@@ -335,12 +335,12 @@ OrangutanServos::~OrangutanServos()
 // represents a set of up to eight digital I/O pins on which the servo signals should be output.
 // If you don't want this second set of eight servos, use a numPinsB value of 0 (and you can pass in NULL for servoPinsB).
 // A nonzero return value indicates that memory for the desired arrays could not be allocated
-unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsigned char numPins)
+unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned char numPins)
 {
-	return initServos(servoPins, numPins, 0, 0);
+	return init(servoPins, numPins, 0, 0);
 }
 
-unsigned char OrangutanServos::initServos(const unsigned char *servoPins, unsigned char numPins, const unsigned char *servoPinsB, unsigned char numPinsB)
+unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned char numPins, const unsigned char *servoPinsB, unsigned char numPinsB)
 {
 	TCCR1B = 0;
 	TIMSK1 = 0;					// disable all timer1 interrupts
