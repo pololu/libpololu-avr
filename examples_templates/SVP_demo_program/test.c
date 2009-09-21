@@ -21,6 +21,7 @@ const char lcd_width = 16;
 
 const char menu_analog_test[] PROGMEM   = "Analog Inputs";
 const char menu_bat_test[] PROGMEM      = "Battery Voltage";
+const char menu_digital_test[] PROGMEM  = "Digital Inputs";
 const char menu_led_test[] PROGMEM      = "LEDs";
 const char menu_motor_test[] PROGMEM    = "Motors";
 const char menu_music_test[] PROGMEM    = "Music";
@@ -33,6 +34,7 @@ const char back_line2[] PROGMEM = "\6mid";
 
 void analog_test();
 void bat_test();
+void digital_test();
 void led_test();
 void motor_test();
 void music_test();
@@ -40,8 +42,8 @@ void time_test();
 void pot_test();
 void usb_test();
 typedef void (*function)();
-const function main_menu_functions[] = { analog_test, bat_test, led_test, pot_test, motor_test, music_test, time_test, usb_test };
-const char *main_menu_options[] = { menu_analog_test, menu_bat_test, menu_led_test, menu_pot_test, menu_motor_test, menu_music_test, menu_time_test, menu_usb_test };
+const function main_menu_functions[] = { analog_test, bat_test, digital_test, led_test, motor_test, music_test, pot_test, time_test, usb_test };
+const char *main_menu_options[] = { menu_analog_test, menu_bat_test, menu_digital_test, menu_led_test, menu_motor_test, menu_music_test, menu_pot_test, menu_time_test, menu_usb_test };
 const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
 
 // A couple of simple tunes, stored in program space.
@@ -154,10 +156,8 @@ void print_bar(unsigned char three_bits)
 	print_character(bar_graph_characters[three_bits]);
 }
 
-void print_reading(unsigned char channel)
+static void print_analog_reading(unsigned char channel)
 {
-	delay_ms(2);
-
 	// Do a dummy reading and throw it away, so that the real reading
 	// is not biased by the previous reading.
 	if (!button_is_pressed(BOTTOM_BUTTON))
@@ -166,6 +166,18 @@ void print_reading(unsigned char channel)
 	}
 
 	print_bar(analog_read(channel) >> 5);
+}
+
+static void print_digital_reading(unsigned char pin)
+{
+	if (is_digital_input_high(pin))
+	{
+		print_character('1');
+	}
+	else
+	{
+		print_character('0');
+	}
 }
 
 void analog_test()
@@ -193,19 +205,19 @@ void analog_test()
 			print("\xa5t ");
 		}
 
-		print_reading(7);
-		print_reading(6);
-		print_reading(5);
-		print_reading(4);
-		print_reading(3);
-		print_reading(2);
-		print_reading(1);
-		print_reading(0);
-		print_reading(TRIMPOT);
-		print_reading(CHANNEL_A);
-		print_reading(CHANNEL_B);
-		print_reading(CHANNEL_C);
-		print_reading(CHANNEL_D);
+		print_analog_reading(7);
+		print_analog_reading(6);
+		print_analog_reading(5);
+		print_analog_reading(4);
+		print_analog_reading(3);
+		print_analog_reading(2);
+		print_analog_reading(1);
+		print_analog_reading(0);
+		print_analog_reading(TRIMPOT);
+		print_analog_reading(CHANNEL_A);
+		print_analog_reading(CHANNEL_B);
+		print_analog_reading(CHANNEL_C);
+		print_analog_reading(CHANNEL_D);
 		green_led(0);
 
 		lcd_goto_xy(0,1);
@@ -245,6 +257,37 @@ void bat_test()
 	print("mV");
 
 	wait_for_250_ms_or_middle_button();
+}
+
+void digital_test()
+{
+	set_digital_input(IO_B3, PULL_UP_ENABLED);
+	set_digital_input(IO_C0, PULL_UP_ENABLED);
+	set_digital_input(IO_C1, PULL_UP_ENABLED);
+	set_digital_input(IO_D0, PULL_UP_ENABLED);
+	set_digital_input(IO_D1, PULL_UP_ENABLED);
+	set_digital_input(IO_D2, PULL_UP_ENABLED);
+	set_digital_input(IO_D3, PULL_UP_ENABLED);
+
+	while(1)
+	{
+		lcd_goto_xy(3,0);
+
+		print_digital_reading(IO_B3);
+		print_character('.');
+		print_digital_reading(IO_C0);
+		print_digital_reading(IO_C1);
+		print_digital_reading(IO_D0);
+		print_digital_reading(IO_D1);
+		print_digital_reading(IO_D2);
+		print_digital_reading(IO_D3);
+
+		if(wait_for_ms_or_middle_button(40))
+		{
+			return;
+		}		
+	}
+
 }
 
 // Blinks the LEDs
@@ -385,15 +428,15 @@ void pot_test()
 	print_long(read_trimpot());
 	print("   "); // to clear the display
 
-	long start = get_ms();
-	char elapsed_ms;
+	unsigned long start = get_ms();
+	unsigned char elapsed_ms;
 
-	while((elapsed_ms = get_ms() - start) < 100)
+	while((elapsed_ms = get_ms() - start) < 128)
 	{
-		int value = read_trimpot();
+		unsigned int value = read_trimpot();
 		play_frequency(value, 200, 10);
 		
-		if(value < elapsed_ms*10)
+		if((elapsed_ms & 0xF) < (value>>6))
 		{
 			red_led(0);
 			green_led(1);
@@ -676,7 +719,7 @@ void menu_select()
 
 		if(button & TOP_BUTTON)
 		{
-			wait_for_button_release(TOP_BUTTON);// tmphax to get it to work on org06a01
+			//wait_for_button_release(TOP_BUTTON);// tmphax to get it to work on org06a01
 			play_from_program_space(beep_button_top);
 
 			if (menu_index == 0)
