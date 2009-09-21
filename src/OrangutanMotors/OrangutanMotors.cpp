@@ -113,49 +113,69 @@ void OrangutanMotors::init2()
 #endif
 
 
-#if !defined (__AVR_ATmega644__) && !defined (__AVR_ATmega644P__)
+#if defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__)
 
 /*  40 kHz operation (3pi, Orangutan SV and SVP, and Baby Orangutan B can handle this, Orangutan LV cannot)
 	*** Note that using these settings will break OrangutanTime and QTRsensors ***
 	// configure for inverted phase-correct PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
     //  Timer0 and Timer2 count up from 0 to 255 and then counts back down to 0  
-    TCCR2A = 0xF1;
+    TCCR0A = TCCR2A = 0xF1;
   
     // use the system clock (=20 MHz) as the timer clock,
 	// which will produce a PWM frequency of 39 kHz (because of phase-correct mode)
-    TCCR2B = 0x01;
+    TCCR0B = TCCR2B = 0x01;
 */
 
 
 	// configure for inverted fast PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
+    //  Timer0 and Timer2 counts up from 0 to 255 and then overflows directly to 0   
+    TCCR0A = TCCR2A = 0xF3;
+  
+    // use the system clock/8 (=2.5 MHz) as the timer clock,
+	// which will produce a PWM frequency of 10 kHz
+    TCCR0B = TCCR2B = 0x02;
+
+	// use the system clock (=20 MHz) as the timer clock,
+	// which will produce a PWM frequency of 78 kHz.  The Baby Orangutan B
+	// and 3Pi can support PWM frequencies this high.  The
+	// Orangutan LV-168 cannot support frequencies above 10 kHz.
+    //TCCR0B = TCCR2B = 0x01;
+
+    // initialize all PWMs to 0% duty cycle (braking)   
+    OCR0A = OCR0B = OCR2A = OCR2B = 0;
+	
+	OrangutanDigital::setOutput(PWM0A, 0);
+	OrangutanDigital::setOutput(PWM0B, 0);
+	OrangutanDigital::setOutput(PWM2A, 0);
+	OrangutanDigital::setOutput(PWM2B, 0);
+	
+#elif defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega324PA__) || defined (__AVR_ATmega1284PA__)
+
+	// configure for non-inverted fast PWM output on motor control pins:   
+    //  set OCxx on compare match, clear on timer overflow   
     //  Timer2 counts up from 0 to 255 and then overflows directly to 0   
-    TCCR2A = 0xF3;
+    TCCR2A = 0xA3;
   
     // use the system clock/8 (=2.5 MHz) as the timer clock,
 	// which will produce a PWM frequency of 10 kHz
     TCCR2B = 0x02;
 
 	// use the system clock (=20 MHz) as the timer clock,
-	// which will produce a PWM frequency of 78 kHz.  The Baby Orangutan B
-	// and 3Pi can support PWM frequencies this high.  The
+	// which will produce a PWM frequency of 78 kHz.  The Baby Orangutan B,
+	// Orangutan SVP, and 3Pi can support PWM frequencies this high.  The
 	// Orangutan LV-168 cannot support frequencies above 10 kHz.
     //TCCR2B = 0x01;
 
     // initialize all PWMs to 0% duty cycle (braking)   
     OCR2A = OCR2B = 0;
 	
+	OrangutanDigital::setOutput(DIRA, 0);
+	OrangutanDigital::setOutput(DIRB, 0);
 	OrangutanDigital::setOutput(PWM2A, 0);
 	OrangutanDigital::setOutput(PWM2B, 0);
-	
 
-#if defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__)
-	TCCR0A = TCCR2A;
-	TCCR0B = TCCR2B;
-	OCR0A = OCR0B = 0;
-	OrangutanDigital::setOutput(PWM0A, 0);
-	OrangutanDigital::setOutput(PWM0B, 0);
 #endif
 #endif
 }
