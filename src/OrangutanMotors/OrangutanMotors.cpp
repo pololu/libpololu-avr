@@ -33,8 +33,30 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include "OrangutanMotors.h"
+#include "../OrangutanDigital/OrangutanDigital.h"
 
-#ifndef LIB_POLOLU
+
+#if (defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__))
+
+#define PWM0A	IO_D6
+#define	PWM0B	IO_D5
+#define PWM2A	IO_B3
+#define PWM2B	IO_D3
+
+#else
+
+#define PWM2A	IO_D7
+#define PWM2B	IO_D6
+#define DIRA	IO_C7
+#define	DIRB	IO_C6
+
+#endif
+
+
+#if !defined (LIB_POLOLU) && (defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__))
+// This code is for people using the Arduino IDE (it lets the millis() function keep working)
+// It will conflict with OrangutanTime, so Arduino IDE users cannot use OrangutanTime and
+// OrangutanMotors.
 // declared in wiring.c of Arduino-0012 and used to drive millis()
 extern volatile unsigned long timer0_millis;
 unsigned int us_times_10 = 0;		// in units of 10^-7 s
@@ -83,46 +105,59 @@ OrangutanMotors::OrangutanMotors()
 // to the motor drivers
 void OrangutanMotors::init2()
 {
-#ifndef LIB_POLOLU
+#if !defined (LIB_POLOLU) && (defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__))
+	// this code is for people using the Arduino IDE (it lets the millis() function work using timer 2 instead of timer 0)
 	TIMSK0 &= ~(1 << TOIE0);	// timer0 overflow interrupt disabled
 	TIMSK2 |= 1 << TOIE2;		// timer2 overflow interrupt enabled
 	// we intentionally do not call sei() here
 #endif
+
+
+#if !defined (__AVR_ATmega644__) && !defined (__AVR_ATmega644P__)
 
 /*  40 kHz operation (3pi, Orangutan SV and SVP, and Baby Orangutan B can handle this, Orangutan LV cannot)
 	*** Note that using these settings will break OrangutanTime and QTRsensors ***
 	// configure for inverted phase-correct PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
     //  Timer0 and Timer2 count up from 0 to 255 and then counts back down to 0  
-    TCCR0A = TCCR2A = 0xF1;
+    TCCR2A = 0xF1;
   
     // use the system clock (=20 MHz) as the timer clock,
 	// which will produce a PWM frequency of 39 kHz (because of phase-correct mode)
-    TCCR0B = TCCR2B = 0x01;
+    TCCR2B = 0x01;
 */
+
 
 	// configure for inverted fast PWM output on motor control pins:   
     //  set OCxx on compare match, clear on timer overflow   
-    //  Timer0 and Timer2 count up from 0 to 255 and then overflows directly to 0   
-    TCCR0A = TCCR2A = 0xF3;
+    //  Timer2 counts up from 0 to 255 and then overflows directly to 0   
+    TCCR2A = 0xF3;
   
     // use the system clock/8 (=2.5 MHz) as the timer clock,
 	// which will produce a PWM frequency of 10 kHz
-    TCCR0B = TCCR2B = 0x02;
+    TCCR2B = 0x02;
 
 	// use the system clock (=20 MHz) as the timer clock,
 	// which will produce a PWM frequency of 78 kHz.  The Baby Orangutan B
 	// and 3Pi can support PWM frequencies this high.  The
 	// Orangutan LV-168 cannot support frequencies above 10 kHz.
-    //TCCR0B = TCCR2B = 0x01;
+    //TCCR2B = 0x01;
 
     // initialize all PWMs to 0% duty cycle (braking)   
-    OCR0A = OCR0B = OCR2A = OCR2B = 0;   
-  
-    // set PWM pins as digital outputs (the PWM signals will not   
-    // appear on the lines if they are digital inputs)   
-    DDRD |= (1 << PORTD3) | (1 << PORTD5) | (1 << PORTD6);   
-    DDRB |= (1 << PORTB3);
+    OCR2A = OCR2B = 0;
+	
+	OrangutanDigital::setOutput(PWM2A, 0);
+	OrangutanDigital::setOutput(PWM2B, 0);
+	
+
+#if defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__)
+	TCCR0A = TCCR2A;
+	TCCR0B = TCCR2B;
+	OCR0A = OCR0B = 0;
+	OrangutanDigital::setOutput(PWM0A, 0);
+	OrangutanDigital::setOutput(PWM0B, 0);
+#endif
+#endif
 }
 
 
@@ -131,6 +166,11 @@ void OrangutanMotors::init2()
 // |speed| = 255 produces the maximum speed while speed = 0 is full brake.
 void OrangutanMotors::setM1Speed(int speed)
 {
+#if defined (__AVR_ATmega644__) || defined (__AVR_ATmega644P__)
+
+// x2 code
+
+#else
 	init();
 	unsigned char reverse = 0;
 
@@ -141,6 +181,8 @@ void OrangutanMotors::setM1Speed(int speed)
 	}
 	if (speed > 0xFF)	// 0xFF = 255
 		speed = 0xFF;
+	
+#if defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__)
 
 	if (reverse)
 	{
@@ -152,11 +194,27 @@ void OrangutanMotors::setM1Speed(int speed)
 		OCR0B = speed;	// pwm one driver input
 		OCR0A = 0;		// hold the other driver input high
 	}
+	
+#else
+
+	OCR2A = speed;
+	if (reverse)
+		OrangutanDigital::setOutput(DIRA, HIGH);
+	else
+		OrangutanDigital::setOutput(DIRA, LOW);
+		
+#endif
+#endif
 }
 
 
 void OrangutanMotors::setM2Speed(int speed)
 {
+#if defined (__AVR_ATmega644__) || defined (__AVR_ATmega644P__)
+
+// x2 code
+
+#else
 	init();
 	unsigned char reverse = 0;
 
@@ -168,6 +226,8 @@ void OrangutanMotors::setM2Speed(int speed)
 	if (speed > 0xFF)	// 0xFF = 255
 		speed = 0xFF;
 
+#if defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__)
+
 	if (reverse)
 	{
 		OCR2B = 0;		// hold one driver input high
@@ -178,6 +238,17 @@ void OrangutanMotors::setM2Speed(int speed)
 		OCR2B = speed;	// pwm one driver input
 		OCR2A = 0;		// hold the other driver input high
 	}
+	
+#else
+
+	OCR2B = speed;
+	if (reverse)
+		OrangutanDigital::setOutput(DIRB, HIGH);
+	else
+		OrangutanDigital::setOutput(DIRB, LOW);
+		
+#endif
+#endif
 }
 
 
