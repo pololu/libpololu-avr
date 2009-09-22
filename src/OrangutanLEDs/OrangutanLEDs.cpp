@@ -23,6 +23,7 @@
  */
  
 #include <avr/io.h>
+#include <pololu/OrangutanModel.h>
 #include "OrangutanLEDs.h"
 
 
@@ -30,7 +31,7 @@
 #define RED_LED_PORT	PORTD
 #define RED_LED_DDR	DDRD
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 #define GREEN_LED		PORT4
 #define GREEN_LED_PORT	PORTC
 #define GREEN_LED_DDR	DDRC
@@ -79,11 +80,11 @@ OrangutanLEDs::OrangutanLEDs()
 void OrangutanLEDs::red(unsigned char on)
 {
 	RED_LED_DDR |= 1 << RED_LED;
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)	// red LED turns on when driven low
+	#if defined (_ORANGUTAN_SVP)	// red LED turns on when driven low
 	if (on)
-#else																// red LED turns on when driven high
+	#else							// red LED turns on when driven high
 	if (!on)
-#endif
+	#endif
 		RED_LED_PORT &= ~(1 << RED_LED);
 	else
 		RED_LED_PORT |= 1 << RED_LED;

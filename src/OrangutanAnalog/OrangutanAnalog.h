@@ -27,12 +27,15 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
+#include <pololu/OrangutanModel.h>
+#include <pololu/OrangutanSVP.h>
+
 #define MODE_8_BIT		1
 #define MODE_10_BIT		0
 
 // ADC Channels
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 #define TRIMPOT   128
 #define CHANNEL_A 129
@@ -46,8 +49,6 @@
 #define TEMP_SENSOR		6
 
 #endif
-
-#include "../OrangutanSVP/OrangutanSVP.h"
 
 class OrangutanAnalog
 {
@@ -110,15 +111,12 @@ class OrangutanAnalog
 	// SVP: returns the voltage of the battery in millivolts, as retrieved from
 	// the auxiliary processor.  Calling this function will have side effects
 	// related to enabling the SPI module.  See the SVP User's Guide for details.
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 	static inline unsigned int readBatteryMillivolts_SVP()
 	{
 		return OrangutanSVP::getBatteryMillivolts();
 	}
-#endif
-
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
-
+#else
 	// 3pi: returns the voltage of the battery in millivolts,
 	// using 10 averaged samples.
 	static unsigned int readBatteryMillivolts_3pi();

@@ -25,6 +25,7 @@
 #include "avr/io.h"
 #include "OrangutanSPIMaster.h"
 #include "../include/atmega328p_pins.h"
+#include <pololu/OrangutanModel.h>
 
 #ifdef LIB_POLOLU
 #include "../OrangutanTime/OrangutanTime.h" // provides delayMicroseconds()
@@ -34,7 +35,7 @@
 
 // Default parameter values for svp_master_init
 
-#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 #define PIN_SSBAR 4
 #define PIN_MOSI  5

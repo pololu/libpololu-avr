@@ -25,8 +25,9 @@
 #ifndef OrangutanPushbuttons_h
 #define OrangutanPushbuttons_h
 
+#include <pololu/OrangutanModel.h>
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 // Orangutan SVP definitions
 #define TOP_BUTTON		(1 << PORTC5)

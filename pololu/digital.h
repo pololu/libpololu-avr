@@ -46,6 +46,7 @@
 #ifndef OrangutanDigital_h
 #define OrangutanDigital_h
 
+#include <pololu/OrangutanModel.h>
 #include <avr/io.h>
 
 #define INPUT 				0
@@ -75,7 +76,7 @@
 #define IO_B5				13
 
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 
 #define IO_B6				14
 #define IO_B7				15
@@ -142,7 +143,7 @@ inline void get_io_registers(struct IOStruct* io, unsigned char pin)
 		io->bitmask = 1 << pin;
 	}
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 	else if (pin < 16)		// pin 8 = PB0, ..., 15 = PB7
 	{
 		io->pinRegister = (unsigned char*)&PINB;

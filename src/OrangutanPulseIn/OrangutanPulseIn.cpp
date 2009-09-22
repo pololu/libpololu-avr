@@ -31,6 +31,7 @@
  */
  
 
+#include <pololu/OrangutanModel.h>
 #include "OrangutanPulseIn.h"
 #include "../OrangutanDigital/OrangutanDigital.h"	// digital I/O routines
 #include <avr/io.h>
@@ -74,9 +75,9 @@ ISR(PCINT0_vect)
 	}
 }
 
-ISR(PCINT1_vect, ISR_ALIASOF(PCINT0_vect));
+ISR(PCINT1_vect,ISR_ALIASOF(PCINT0_vect));
 ISR(PCINT2_vect,ISR_ALIASOF(PCINT0_vect));
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
+#ifdef PCINT3_vect  // this ISR only available on the Orangutan SVP and X2
 ISR(PCINT3_vect,ISR_ALIASOF(PCINT0_vect));
 #endif
 
@@ -146,9 +147,9 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 	PCMSK0 = 0;
 	PCMSK1 = 0;
 	PCMSK2 = 0;
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
+    #ifdef PCMSK3  // for the Orangutan X2 and SVP
 	PCMSK3 = 0;
-#endif
+    #endif
 
 	numPulsePins = numPins;
 
@@ -172,7 +173,7 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 		pis[i].inputState = *io.pinRegister & io.bitmask;
 		pis[i].newPulse = 0;
 		
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 
 		if (io.pinRegister == &PINA)
 			PCMSK0 |= io.bitmask;

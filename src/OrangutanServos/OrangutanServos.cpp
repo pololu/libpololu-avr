@@ -38,7 +38,7 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 #include "OrangutanServos.h"
-
+#include <pololu/OrangutanModel.h>
 
 // global arrays for storing state data for each of the 8 possible servos
 
@@ -55,7 +55,7 @@ unsigned int *servoTargetPosB;
 unsigned int *servoSpeed;
 unsigned int *servoSpeedB;
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 unsigned char numMuxPins;	// number of mux control pins used (must be <= 3)
 #endif
 
@@ -77,7 +77,7 @@ ISR(TIMER1_CAPT_vect)
 	unsigned char i;
 	servoIdx = (servoIdx + 1) & 7;					// increment idx, loop back to 0 when idx == 8
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 	unsigned char temp = servoIdx;	// set mux pins based on bits of idx (pin SA = idx bit 0, ..., SC = idx bit 2)
 	for (i = 0; i < numMuxPins; i++)
@@ -157,7 +157,7 @@ ISR(TIMER1_CAPT_vect)
 		OCR1B = posB;						// setup duty cycle for next servo now; will take effect just before this ISR is next called
 		servoPosB[i] = posB;
 	}
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
+#if !defined(_ORANGUTAN_SVP)
 	if (servoIdx < numServos)
 		*(portPin[servoIdx].portRegister) &= ~portPin[servoIdx].bitmask;
 #endif
@@ -166,7 +166,7 @@ ISR(TIMER1_CAPT_vect)
 }
 
 
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)	// NOT USED FOR ORANGUTAN SVP, which uses hardware PWM
+#if !defined(_ORANGUTAN_SVP)	// NOT USED FOR ORANGUTAN SVP, which uses hardware PWM
 // This interrupt is executed when Timer1 counter (TCNT1) = OCR1A.  Since we are running Timer1 in phase-correct mode,
 // TCNT1 counts from 0 up to TOP and then back down to 0 again.  As a result, this interrupt will occur twice (once
 // while the timer is upcounting and once while it is downcounting) for every TIMER1_CAPT interrupt.
@@ -345,7 +345,7 @@ unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned cha
 	TCCR1B = 0;
 	TIMSK1 = 0;					// disable all timer1 interrupts
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 	if (numPins > 3)
 		numPins = 3;
 	numMuxPins = numPins;
@@ -423,7 +423,7 @@ unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned cha
 	{
 		TIMSK1 |= 1 << OCIE1B;	// enable compare match B interrupt
 	}
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
+#if !defined(_ORANGUTAN_SVP)
 	TIMSK1 |= 1 << OCIE1A;		// enable compare match A interrupt if not using Orangutan SVP
 #endif
 	sei();

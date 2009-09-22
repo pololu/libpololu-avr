@@ -22,11 +22,12 @@
  * to be responsible for all resulting costs and damages.
  */
 
+#include <pololu/OrangutanModel.h>
 #include "../OrangutanSPIMaster/OrangutanSPIMaster.h"
 #include "../OrangutanTime/OrangutanTime.h"
 #include "OrangutanSVP.h"
 
-#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 #ifdef LIB_POLOLU
 

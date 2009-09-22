@@ -31,6 +31,8 @@
 #ifndef OrangutanBuzzer_h
 #define OrangutanBuzzer_h
 
+#include <pololu/OrangutanModel.h>
+
 #define PLAY_AUTOMATIC	0
 #define PLAY_CHECK		1
 
@@ -68,7 +70,7 @@
 #define DIV_BY_10		(1 << 15)		// frequency bit that indicates Hz/10
 
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 #define BUZZER_DDR		DDRD
 #define BUZZER			(1 << PORTD4)

@@ -24,6 +24,7 @@
  */
 
 #include <avr/io.h>
+#include <pololu/OrangutanModel.h>
 #include "OrangutanAnalog.h"
 
 
@@ -89,14 +90,13 @@ extern "C" unsigned int read_trimpot()
 	return OrangutanAnalog::readTrimpot();
 }
 
-#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 extern "C" unsigned int read_battery_millivolts_svp()
 {
 	return OrangutanAnalog::readBatteryMillivolts_SVP();
 }
-#endif
 
-#if !defined(__AVR_ATmega324P__) && !defined(__AVR_ATmega1284P__)
+#else
 
 extern "C" unsigned int read_battery_millivolts_3pi()
 {
@@ -129,7 +129,7 @@ extern "C" unsigned int read_temperature_c()
 
 static unsigned int fromMillivoltsToNormal(unsigned int millivolts);
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 #define ADC_PORT PORTA
 #define ADC_DDR  DDRA
 #else
@@ -137,7 +137,7 @@ static unsigned int fromMillivoltsToNormal(unsigned int millivolts);
 #define ADC_DDR  DDRC
 #endif
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 /*  non-zero means the result from the last conversion is stored in millivolts
         in adc_result_millivolts.  The contents of ADCL and ADCH are irrelevant.
 	0 means the result from the last conversion is stored in ADCL and ADCH.
@@ -186,7 +186,7 @@ unsigned char OrangutanAnalog::isConverting()
 // returns the result of the previous ADC conversion.
 unsigned int OrangutanAnalog::conversionResult()
 {
-	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	#ifdef _ORANGUTAN_SVP
 	if (adc_result_is_in_millivolts)
 	{
 		return fromMillivoltsToNormal(adc_result_millivolts);
@@ -206,7 +206,7 @@ unsigned int OrangutanAnalog::conversionResult()
 // returns the result from the previous ADC conversion in millivolts.
 unsigned int OrangutanAnalog::conversionResultMillivolts()
 {
-	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	#ifdef _ORANGUTAN_SVP
 	if (adc_result_is_in_millivolts)
 	{
 		return adc_result_millivolts;
@@ -233,7 +233,7 @@ unsigned int OrangutanAnalog::conversionResultMillivolts()
 // channel as an input with the internal pull-up disabled.
 void OrangutanAnalog::startConversion(unsigned char channel, unsigned char use_internal_reference)
 {
-	#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+	#ifdef _ORANGUTAN_SVP
 	if (channel > 31)
 	{
 		adc_result_is_in_millivolts = 1;
@@ -318,7 +318,7 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 	unsigned char tempDDR = ADC_DDR;	// store current I/O state of ADC pin
 	unsigned char tempPORT = ADC_PORT;
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 	if (channel > 31)
 	{
 		// We have not implemented averaging of the adc readings from the auxiliary
@@ -386,7 +386,7 @@ unsigned int OrangutanAnalog::readTrimpot()
 	return readAverage(TRIMPOT, 20);
 }
 
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
+#if !defined(_ORANGUTAN_SVP)
 
 // The temperature sensor reading (on the Orangutan LV) can be converted into degrees C as follows:
 //   T = (Vout - 0.4) / 0.0195 Celcius

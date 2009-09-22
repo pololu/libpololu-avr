@@ -24,22 +24,19 @@
 #ifndef OrangutanSerial_h
 #define OrangutanSerial_h
 
-#undef _ORANGUTAN_X2
-#undef _ORANGUTAN_SVP
+#include <pololu/OrangutanModel.h>
 
 #include <avr/interrupt.h>
 
-#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__)
+#if defined(_ORANGUTAN_SVP)
  // The Orangutan SVP has two UARTs and one virtual COM port via USB.
- #define _ORANGUTAN_SVP
  #define _SERIAL_PORTS 3
  #define UART0    0
  #define UART1    1
  #define USB_COMM 2
  #define _PORT_IS_UART (port!=2)
-#elif defined(__AVR_ATmega644P__)
+#elif defined(_ORANGUTAN_X2)
  // The Orangutan X2 has two UARTs and one virtual COM port via USB.
- #define _ORANGUTAN_X2
  #define _SERIAL_PORTS 3
  #define UART0 0
  #define UART1 1
@@ -47,7 +44,7 @@
  #define _PORT_IS_UART (port!=2)
 #else
  #define _SERIAL_PORTS 1
- #define _PORT_IS_UART (1)
+ #define _PORT_IS_UART 1
 #endif
 
 #if _SERIAL_PORTS > 1

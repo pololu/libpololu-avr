@@ -26,12 +26,14 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
+#include <pololu/OrangutanModel.h>
+
 #define MODE_8_BIT		1
 #define MODE_10_BIT		0
 
 // ADC Channels
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 #define TRIMPOT   128
 #define CHANNEL_A 129
@@ -59,13 +61,11 @@ unsigned int analog_conversion_result_millivolts();
 unsigned int to_millivolts(unsigned int analog_result);
 unsigned int read_trimpot();
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 unsigned int read_battery_millivolts_svp();
 
-#endif
-
-#if !defined (__AVR_ATmega324P__) && !defined (__AVR_ATmega1284P__)
+#else
 
 int read_temperature_f();
 int read_temperature_c();

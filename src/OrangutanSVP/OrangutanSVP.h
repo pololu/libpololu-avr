@@ -25,7 +25,9 @@
 #ifndef OrangutanSVP_h
 #define OrangutanSVP_h
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#include <pololu/OrangutanModel.h>
+
+#ifdef _ORANGUTAN_SVP
 
 #define SVP_MODE_RX           0
 #define SVP_MODE_ANALOG       2

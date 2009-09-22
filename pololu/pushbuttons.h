@@ -6,13 +6,15 @@
 #ifndef OrangutanPushbuttons_h
 #define OrangutanPushbuttons_h
 
+#include <pololu/OrangutanModel.h>
+
 void buttons_init();
 unsigned char wait_for_button_press(unsigned char buttons);
 unsigned char wait_for_button_release(unsigned char buttons);
 unsigned char wait_for_button(unsigned char buttons);
 unsigned char button_is_pressed(unsigned char buttons);
 
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+#ifdef _ORANGUTAN_SVP
 
 // Orangutan SVP definitions
 #define TOP_BUTTON		(1 << PORTC5)

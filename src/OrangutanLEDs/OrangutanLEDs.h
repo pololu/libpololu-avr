@@ -25,6 +25,7 @@
 #ifndef OrangutanLEDs_h
 #define OrangutanLEDs_h
 
+#include <pololu/OrangutanModel.h>
 
 class OrangutanLEDs
 {
@@ -40,21 +41,21 @@ class OrangutanLEDs
 	static void red(unsigned char on);
 	static inline void left(unsigned char on)
 	{
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+		#ifdef _ORANGUTAN_SVP
 		green(on);
-#else
+		#else
 		red(on);
-#endif
+		#endif
 	}
 	
 	static void green(unsigned char on);
 	static inline void right(unsigned char on)
 	{
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__)
+		#ifdef _ORANGUTAN_SVP
 		red(on);
-#else
+		#else
 		green(on);
-#endif
+		#endif
 	}
 };
 
