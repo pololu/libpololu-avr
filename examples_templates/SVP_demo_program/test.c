@@ -322,26 +322,7 @@ void motor_test()
 {
 	static char m1_back = 0, m2_back = 0;
 
-	return; //tmphax
-
 	if(button_is_pressed(TOP_BUTTON))
-	{
-		if(m1_speed == 0)
-		{
-			delay_ms(200);
-
-			// If the button is pressed quickly when the motor is off,
-			// reverse direction.
-			if(!button_is_pressed(TOP_BUTTON))
-				m1_back = !m1_back;
-		}
-		
-		m1_speed += 10;
-	}
-	else
-		m1_speed -= 20;
-
-	if(button_is_pressed(BOTTOM_BUTTON))
 	{
 		if(m2_speed == 0)
 		{
@@ -349,14 +330,31 @@ void motor_test()
 
 			// If the button is pressed quickly when the motor is off,
 			// reverse direction.
-			if(!button_is_pressed(BOTTOM_BUTTON))
+			if(!button_is_pressed(TOP_BUTTON))
 				m2_back = !m2_back;
 		}
-
+		
 		m2_speed += 10;
 	}
 	else
 		m2_speed -= 20;
+
+	if(button_is_pressed(BOTTOM_BUTTON))
+	{
+		if(m1_speed == 0)
+		{
+			delay_ms(200);
+
+			// If the button is pressed quickly when the motor is off,
+			// reverse direction.
+			if(!button_is_pressed(BOTTOM_BUTTON))
+				m1_back = !m1_back;
+		}
+
+		m1_speed += 10;
+	}
+	else
+		m1_speed -= 20;
 
 	if(m1_speed < 0)
 		m1_speed = 0;
@@ -372,13 +370,14 @@ void motor_test()
 
     // Shifting to the right by 5 gets the high 3 bits, which gives us a bar graph character.
 
-	print_bar(m1_speed >> 5);
-	print_character(m1_back ? 'a' : 'A');
-	print_bar(m1_speed >> 5);
+	print_bar(m2_speed >> 5);
+	print_from_program_space(m2_back ? PSTR("top") : PSTR("TOP"));
+	print_bar(m2_speed >> 5);
 	lcd_goto_xy(5,0);
-	print_bar(m2_speed >> 5);
-	print_character(m2_back ? 'c' : 'C');
-	print_bar(m2_speed >> 5);
+	print_bar(m1_speed >> 5);
+	print_from_program_space(m1_back ? PSTR("bot") : PSTR("BOT"));
+	print_bar(m1_speed >> 5);
+
 
 	set_motors(m1_speed * (m1_back ? -1 : 1), m2_speed * (m2_back ? -1 : 1));
 	delay_ms(50);
@@ -662,37 +661,28 @@ unsigned char wait_for_button_and_beep()
 // plays the initial music.
 void initialize()
 {
-	static const char welcome_line1[] PROGMEM      = "     Pololu     ";
-	static const char welcome_line2[] PROGMEM      = " Orangutan SVP  ";
-
-	static const char demo_name_line1[] PROGMEM    = "Demo Program    ";
-
-	static const char instructions_line1[] PROGMEM = "Use mid button  ";
-	static const char instructions_line2[] PROGMEM = "to select.      ";
-
-	static const char instructions_line3[] PROGMEM = "Press middle    ";
-	static const char instructions_line4[] PROGMEM = "button: Try it! ";
-
-	static const char thank_you_line1[] PROGMEM    = "   Thank you!   ";
-
 	load_custom_characters(); // load the custom characters
 	
 	play_from_program_space(welcome);
-	print_two_lines_delay_1s(welcome_line1,welcome_line2);
-	print_two_lines_delay_1s(demo_name_line1,0);
 
-	print_two_lines_delay_1s(instructions_line1, instructions_line2);
+	print_two_lines_delay_1s(PSTR("     Pololu     "),
+	                         PSTR(" Orangutan SVP  "));
+
+	print_two_lines_delay_1s(PSTR("Demo Program    "), 0);
+
+	print_two_lines_delay_1s(PSTR("Use mid button  "),
+							 PSTR("to select.      "));
 
 	clear();
-	print_from_program_space(instructions_line3);
+	print_from_program_space(PSTR("Press middle    "));
 	lcd_goto_xy(0,1);
-	print_from_program_space(instructions_line4);
+	print_from_program_space(PSTR("button: Try it! "));
 
 	while(!(wait_for_button_and_beep() & MIDDLE_BUTTON));
 
 	play_from_program_space(thank_you_music);
 
-	print_two_lines_delay_1s(0,thank_you_line1);
+	print_two_lines_delay_1s(0, PSTR("   Thank you!   "));
 }
 
 void menu_select()
