@@ -352,6 +352,8 @@ void OrangutanLCD::busyWait()
 	LCD_RS_PORT &= ~(1 << LCD_RS);
 	LCD_RW_PORT |= 1 << LCD_RW;
 
+	uint32_t time = millis();
+
 	do
 	{
 		// Bring E high
@@ -384,9 +386,10 @@ void OrangutanLCD::busyWait()
 		// Bring E low
 		LCD_E_PORT &= ~(1 << LCD_E);
 	}
-	while (data & LCD_BF_MASK);
+	while ((data & LCD_BF_MASK) && (millis() - time < 10));
 
 	// To reach here our busy flag must be zero, meaning the LCD is free
+	// or the 10ms timeout period has elapsed
 
 	// Restore our DDR information
 	LCD_BF_DDR = temp_ddr;
