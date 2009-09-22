@@ -1,6 +1,7 @@
 SRC=../../src
+TOPLEVEL=../../
 
-CFLAGS=-g -Wall -mcall-prologues -mmcu=$(DEVICE) -DLIB_POLOLU -ffunction-sections -Os -I$(SRC)/include
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(DEVICE) -DLIB_POLOLU -ffunction-sections -Os -I$(SRC)/include -I$(TOPLEVEL)
 CPP=avr-g++
 CC=avr-gcc
 
