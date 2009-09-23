@@ -46,7 +46,10 @@
 #ifndef OrangutanDigital_h
 #define OrangutanDigital_h
 
+#ifndef Wiring_h
 #include <pololu/OrangutanModel.h>
+#endif
+
 #include <avr/io.h>
 
 #define INPUT 				0

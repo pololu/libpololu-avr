@@ -25,7 +25,9 @@
 #ifndef OrangutanPushbuttons_h
 #define OrangutanPushbuttons_h
 
+#ifndef Wiring_h
 #include <pololu/OrangutanModel.h>
+#endif
 
 #ifdef _ORANGUTAN_SVP
 

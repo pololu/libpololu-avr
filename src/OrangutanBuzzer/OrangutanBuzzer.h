@@ -31,7 +31,9 @@
 #ifndef OrangutanBuzzer_h
 #define OrangutanBuzzer_h
 
+#ifndef Wiring_h
 #include <pololu/OrangutanModel.h>
+#endif
 
 #define PLAY_AUTOMATIC	0
 #define PLAY_CHECK		1
