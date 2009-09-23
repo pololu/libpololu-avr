@@ -118,18 +118,20 @@ ARDUINO_EXCLUDES := libpololu-arduino/OrangutanTime/\* libpololu-arduino/Orangut
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
-zip: library_files examples hex_files
+zip: library_files examples hex_files arduino_zip
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
-	rm -f $(ARDUINO_ZIPFILE)
-	rm -f $(ARDUINO_QTR_ZIPFILE)
 	rm -f $(HEX_ZIPFILE)
 	ln -s . libpololu-avr
 	zip -rq $(LIB_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) $(NON_ARDUINO_EXCLUDES)
 	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex
 	rm libpololu-avr
-	#
+
+arduino_zip:
+	mkdir -p $(ZIPDIR)
+	rm -f $(ARDUINO_ZIPFILE)
+	rm -f $(ARDUINO_QTR_ZIPFILE)
 	ln -s src libpololu-arduino
 	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino -x $(ZIP_EXCLUDES) -x $(ARDUINO_EXCLUDES)
 	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino/README-Arduino.txt
