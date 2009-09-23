@@ -24,9 +24,11 @@
  */
 
 #include <avr/io.h>
-#include <pololu/OrangutanModel.h>
 #include "OrangutanAnalog.h"
 
+#ifndef Wiring_h
+#include <pololu/OrangutanModel.h>
+#endif
 
 #ifdef LIB_POLOLU
 

@@ -32,9 +32,12 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <pololu/OrangutanModel.h>
 #include "OrangutanMotors.h"
 #include "../OrangutanDigital/OrangutanDigital.h"
+
+#ifndef Wiring_h
+#include <pololu/OrangutanModel.h>
+#endif
 
 
 #ifdef _ORANGUTAN_SVP

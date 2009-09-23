@@ -31,7 +31,10 @@
  */
  
 
+#ifndef Wiring_h
 #include <pololu/OrangutanModel.h>
+#endif
+
 #include "OrangutanPulseIn.h"
 #include "../OrangutanDigital/OrangutanDigital.h"	// digital I/O routines
 #include <avr/io.h>

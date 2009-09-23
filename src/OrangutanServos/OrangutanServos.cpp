@@ -38,7 +38,10 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 #include "OrangutanServos.h"
+
+#ifndef Wiring_h
 #include <pololu/OrangutanModel.h>
+#endif
 
 // global arrays for storing state data for each of the 8 possible servos
 
