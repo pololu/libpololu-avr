@@ -521,99 +521,111 @@ void print_two_lines_delay_1s(const char *line1, const char *line2)
 	delay_ms(1000);
 }
 
-// Receive_buffer must be 17 characters long to hold a full line of
-// test and the terminating null character (0)
-char receive_buffer[17];
+
+char receive_buffer[64];
 
 void usb_test()
 {
-	serial_receive(USB_COMM, receive_buffer, 16);
+	serial_receive(USB_COMM, receive_buffer, sizeof(receive_buffer));
 
-	unsigned char byte_count = 0;
-	unsigned char first_line_finished = 0;
+	char screen_string[lcd_width+1] = "Type in to COM.";
+	unsigned char screen_string_length = 0;
 
-	unsigned char next_echo_byte = 0;
+	unsigned char update_lcd_soon = 1;
+
+	unsigned long next_update_time = 0;
 
 	while(1)
 	{
-		byte_count = serial_get_received_bytes(USB_COMM);
-
-		if(next_echo_byte != byte_count && serial_send_buffer_empty(USB_COMM))
+		while(1)
 		{
-			serial_send(USB_COMM, &receive_buffer[next_echo_byte], 1);
+			// Ask the auxiliary processor if new bytes have been received.
+			serial_check();
 
-			next_echo_byte++;
-			if (next_echo_byte == 16)
+			unsigned char received_bytes = serial_get_received_bytes(USB_COMM);
+
+			if (received_bytes == 0)
 			{
-				next_echo_byte=  0;
+				break;
 			}
+
+			// Cancel receiving now so that no more bytes get added to the receive_buffer
+		    // while we handle the bytes thare are in there now.
+			serial_cancel_receive(USB_COMM);
+
+			for (unsigned char i = 0; i < received_bytes; i++)
+			{
+				// Process the new byte that has been received.
+				serial_send_blocking(USB_COMM, &receive_buffer[i], 1);
+
+				if (screen_string_length == lcd_width)
+				{
+					screen_string_length = 0;
+				}
+				screen_string[screen_string_length] = receive_buffer[i];
+				screen_string_length++;
+				screen_string[screen_string_length] = 0;
+			}
+
+			update_lcd_soon = 1;
+
+			serial_receive(USB_COMM, receive_buffer, sizeof(receive_buffer));
 		}
 
-		if (!usb_power_present())
+		if (get_ms() > next_update_time)
 		{
-			lcd_hide_cursor();
-			lcd_goto_xy(0,0);
-			print_from_program_space(PSTR("Connect USB."));
+			update_lcd_soon = 1;
 		}
-		else if (usb_suspend())
+
+		if (update_lcd_soon)
 		{
-			lcd_hide_cursor();
-			lcd_goto_xy(0,0);
-			print_from_program_space(PSTR("ZZZZZZzzzzzz...."));
-		}
-		else if(!usb_configured())
-		{
-			lcd_hide_cursor();
-			lcd_goto_xy(0,0);
-			print_from_program_space(PSTR("Install drivers."));
-		}
-		else if(byte_count==0)
-		{
-			if (!first_line_finished)
+			if (!usb_power_present())
 			{
-				lcd_hide_cursor();
 				lcd_goto_xy(0,0);
-				print_from_program_space(PSTR("Type in to COM."));
+				print_from_program_space(PSTR("Connect USB."));
 			}
+			else if (usb_suspend())
+			{
+				lcd_goto_xy(0,0);
+				print_from_program_space(PSTR("ZZZZZZzzzzzz...."));
+			}
+			else if(!usb_configured())
+			{
+				lcd_goto_xy(0,0);
+				print_from_program_space(PSTR("Install drivers."));
+			}
+			else
+			{
+				lcd_goto_xy(0,0);
+				print(screen_string);
+				print_from_program_space(PSTR("                "));
+			}
+
+			update_lcd_soon = 0;
+			next_update_time = get_ms() + 100;
+		}
+
+		if (dtr_enabled())
+		{
+			red_led(1);
 		}
 		else
 		{
-			receive_buffer[byte_count] = 0;
-			lcd_goto_xy(0,0);
-			print(receive_buffer);
-			print_from_program_space(PSTR("                "));
+			red_led(0):
 		}
 
-		if (byte_count == 16)
+		if (rts_enabled())
 		{
-			// We finished a line of characters, so wait for another.
-			first_line_finished = 1;
-			serial_receive(USB_COMM, receive_buffer, 16);
-			byte_count = 0;
+			green_led(1);
+		}
+		else
+		{
+			green_led(0);
 		}
 
-		unsigned char stop_time = get_ms() + 100;
-		while(1)
+		if(button_is_pressed(MIDDLE_BUTTON))
 		{
-			serial_check();
-
-			red_led(dtr_enabled());
-			green_led(rts_enabled());
-
-			if(button_is_pressed(MIDDLE_BUTTON))
-			{
-				return;
-			}
-
-			if(byte_count != serial_get_received_bytes(USB_COMM))
-			{
-				break;
-			}
-
-			if ((unsigned char)get_ms() >= stop_time)
-			{
-				break;
-			}
+			return;
 		}
 	}
 
