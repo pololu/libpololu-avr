@@ -19,33 +19,6 @@
 
 const char lcd_width = 16;
 
-const char menu_analog_test[] PROGMEM   = "Analog Inputs";
-const char menu_bat_test[] PROGMEM      = "Battery Voltage";
-const char menu_digital_test[] PROGMEM  = "Digital Inputs";
-const char menu_led_test[] PROGMEM      = "LEDs";
-const char menu_motor_test[] PROGMEM    = "Motors";
-const char menu_music_test[] PROGMEM    = "Music";
-const char menu_pot_test[] PROGMEM      = "Trimpot";
-const char menu_time_test[] PROGMEM     = "Timer";
-const char menu_usb_test[] PROGMEM      = "USB";
-
-const char menu_line2[] PROGMEM = "\x7ftop  \xa5mid  bot\x7e";
-const char back_line2[] PROGMEM = "\6mid";
-
-void analog_test();
-void bat_test();
-void digital_test();
-void led_test();
-void motor_test();
-void music_test();
-void time_test();
-void pot_test();
-void usb_test();
-typedef void (*function)();
-const function main_menu_functions[] = { analog_test, bat_test, digital_test, led_test, motor_test, music_test, pot_test, time_test, usb_test };
-const char *main_menu_options[] = { menu_analog_test, menu_bat_test, menu_digital_test, menu_led_test, menu_motor_test, menu_music_test, menu_pot_test, menu_time_test, menu_usb_test };
-const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
-
 // A couple of simple tunes, stored in program space.
 const char welcome[] PROGMEM = ">g32>>c32";
 const char thank_you_music[] PROGMEM = ">>c32>g32";
@@ -54,56 +27,56 @@ const char beep_button_middle[] PROGMEM = "!e32";
 const char beep_button_middleottom[] PROGMEM = "!g32";
 const char timer_tick[] PROGMEM = "!v8>>c32";
 
-// Data for generating the characters used in load_custom_characters
-// and display_readings.  By reading levels[] starting at various
-// offsets, we can generate all of the 7 extra characters needed for a
-// bargraph.  This is also stored in program space.
-const char levels[] PROGMEM = {
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b00000,
-	0b11111,
-	0b11111,
-	0b11111,
-	0b11111,
-	0b11111,
-	0b11111,
-	0b11111
-};
-
-// This character is a musical note.
-const prog_char note[] PROGMEM = {
-	0b00100,
-	0b00110,
-	0b00101,
-	0b00101,
-	0b00100,
-	0b11100,
-	0b11100,
-	0b00000,
-};
-
-// This character is a back arrow.
-const prog_char back_arrow[] PROGMEM = {
-	0b00000,
-	0b00010,
-	0b00001,
-	0b00101,
-	0b01001,
-	0b11110,
-	0b01000,
-	0b00100,
-};
-
 // This function loads custom characters into the LCD.  Up to 8
 // characters can be loaded; we use them for 6 levels of a bar graph
 // plus a back arrow and a musical note character.
 void load_custom_characters()
 {
+	// Data for generating the characters used in load_custom_characters
+	// and display_readings.  By reading levels[] starting at various
+	// offsets, we can generate all of the 7 extra characters needed for a
+	// bargraph.  This is also stored in program space.
+	static const char levels[] PROGMEM = {
+		0b00000,
+		0b00000,
+		0b00000,
+		0b00000,
+		0b00000,
+		0b00000,
+		0b00000,
+		0b11111,
+		0b11111,
+		0b11111,
+		0b11111,
+		0b11111,
+		0b11111,
+		0b11111
+	};
+
+	// This character is a musical note.
+	static const prog_char note[] PROGMEM = {
+		0b00100,
+		0b00110,
+		0b00101,
+		0b00101,
+		0b00100,
+		0b11100,
+		0b11100,
+		0b00000,
+	};
+
+	// This character is a back arrow.
+	static const prog_char back_arrow[] PROGMEM = {
+		0b00000,
+		0b00010,
+		0b00001,
+		0b00101,
+		0b01001,
+		0b11110,
+		0b01000,
+		0b00100,
+	};
+
 	lcd_load_custom_character(levels+0,0); // no offset, e.g. one bar
 	lcd_load_custom_character(levels+1,1); // two bars
 	lcd_load_custom_character(levels+2,2); // etc...
@@ -130,7 +103,7 @@ void load_custom_characters()
 
 unsigned char wait_for_ms_or_middle_button(unsigned char ms)
 {
-	unsigned int stop_time = get_ms() + ms;
+	unsigned long stop_time = get_ms() + ms;
 	while(1)
 	{
 		if(button_is_pressed(MIDDLE_BUTTON))
@@ -138,7 +111,7 @@ unsigned char wait_for_ms_or_middle_button(unsigned char ms)
 			return 1;
 		}
 
-		if ((unsigned int)get_ms() >= stop_time)
+		if (get_ms() >= stop_time)
 		{
 			return 0;
 		}
@@ -269,14 +242,23 @@ void digital_test()
 	set_digital_input(IO_D2, PULL_UP_ENABLED);
 	set_digital_input(IO_D3, PULL_UP_ENABLED);
 
+	lcd_goto_xy(0,0);
+	print_from_program_space(PSTR("B3=x  C0=x  C1=x"));
+	lcd_goto_xy(0,1);
+	print_from_program_space(PSTR("\6mid  PD0:3=xxxx"));
+
 	while(1)
 	{
 		lcd_goto_xy(3,0);
-
 		print_digital_reading(IO_B3);
-		print_character('.');
+
+		lcd_goto_xy(9,0);
 		print_digital_reading(IO_C0);
+
+		lcd_goto_xy(15,0);
 		print_digital_reading(IO_C1);
+
+		lcd_goto_xy(12,1);
 		print_digital_reading(IO_D0);
 		print_digital_reading(IO_D1);
 		print_digital_reading(IO_D2);
@@ -377,7 +359,6 @@ void motor_test()
 	print_bar(m1_speed >> 5);
 	print_from_program_space(m1_back ? PSTR("bot") : PSTR("BOT"));
 	print_bar(m1_speed >> 5);
-
 
 	set_motors(m1_speed * (m1_back ? -1 : 1), m2_speed * (m2_back ? -1 : 1));
 	delay_ms(50);
@@ -546,38 +527,45 @@ char receive_buffer[17];
 
 void usb_test()
 {
-	static const char connect_usb[] PROGMEM     = "Connect USB.    ";
-	static const char install_drivers[] PROGMEM = "Install drivers.";
-	static const char suspend[] PROGMEM         = "ZZZZZZzzzzzz....";
-	static const char comport[] PROGMEM         = "Type in to COM. ";
-	static const char blank_line[] PROGMEM      = "                ";
-
 	serial_receive(USB_COMM, receive_buffer, 16);
 
 	unsigned char byte_count = 0;
 	unsigned char first_line_finished = 0;
 
+	unsigned char next_echo_byte = 0;
+
 	while(1)
 	{
 		byte_count = serial_get_received_bytes(USB_COMM);
+
+		if(next_echo_byte != byte_count && serial_send_buffer_empty(USB_COMM))
+		{
+			serial_send(USB_COMM, &receive_buffer[next_echo_byte], 1);
+
+			next_echo_byte++;
+			if (next_echo_byte == 16)
+			{
+				next_echo_byte=  0;
+			}
+		}
 
 		if (!usb_power_present())
 		{
 			lcd_hide_cursor();
 			lcd_goto_xy(0,0);
-			print_from_program_space(connect_usb);
+			print_from_program_space(PSTR("Connect USB."));
 		}
 		else if (usb_suspend())
 		{
 			lcd_hide_cursor();
 			lcd_goto_xy(0,0);
-			print_from_program_space(suspend);
+			print_from_program_space(PSTR("ZZZZZZzzzzzz...."));
 		}
 		else if(!usb_configured())
 		{
 			lcd_hide_cursor();
 			lcd_goto_xy(0,0);
-			print_from_program_space(install_drivers);
+			print_from_program_space(PSTR("Install drivers."));
 		}
 		else if(byte_count==0)
 		{
@@ -585,18 +573,15 @@ void usb_test()
 			{
 				lcd_hide_cursor();
 				lcd_goto_xy(0,0);
-				print_from_program_space(comport);
+				print_from_program_space(PSTR("Type in to COM."));
 			}
 		}
 		else
 		{
-			lcd_goto_xy(0,0);
-			print_from_program_space(blank_line);
-
 			receive_buffer[byte_count] = 0;
 			lcd_goto_xy(0,0);
 			print(receive_buffer);
-			//lcd_show_cursor(CURSOR_BLINKING); // TODO: make this work
+			print_from_program_space(PSTR("                "));
 		}
 
 		if (byte_count == 16)
@@ -687,21 +672,33 @@ void initialize()
 
 void menu_select()
 {
+	static const char menu_analog_test[] PROGMEM   = "Analog Inputs";
+	static const char menu_bat_test[] PROGMEM      = "Battery Voltage";
+	static const char menu_digital_test[] PROGMEM  = "Digital Inputs";
+	static const char menu_led_test[] PROGMEM      = "LEDs";
+	static const char menu_motor_test[] PROGMEM    = "Motors";
+	static const char menu_music_test[] PROGMEM    = "Music";
+	static const char menu_pot_test[] PROGMEM      = "Trimpot";
+	static const char menu_time_test[] PROGMEM     = "Timer";
+	static const char menu_usb_test[] PROGMEM      = "USB";
+
+	typedef void (*function)();
+	static const function main_menu_functions[] = { analog_test, bat_test, digital_test, led_test, motor_test, music_test, pot_test, time_test, usb_test };
+	static const char *main_menu_options[] = { menu_analog_test, menu_bat_test, menu_digital_test, menu_led_test, menu_motor_test, menu_music_test, menu_pot_test, menu_time_test, menu_usb_test };
+	static const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
+
 	static unsigned char menu_index = 0;
 
-    static const char main_menu_intro_line1[] PROGMEM = "   Main Menu";
-
-	print_two_lines_delay_1s(main_menu_intro_line1,0);
+	print_two_lines_delay_1s(PSTR("   Main Menu"),0);
 
 	while(1)
 	{
 		clear();
 		lcd_goto_xy(0,1);
-		print_from_program_space(menu_line2);
+
+		print_from_program_space(PSTR("\x7ftop  \xa5mid  bot\x7e"));
 		lcd_goto_xy(0,0);
 		print_from_program_space(main_menu_options[menu_index]);
-
-		// lcd_show_cursor(CURSOR_BLINKING); //TODO: get this to work
 
 		// wait for all buttons to be released, then a press
 		while(button_is_pressed(ALL_BUTTONS));
@@ -723,7 +720,6 @@ void menu_select()
 		}
 		else if(button & MIDDLE_BUTTON)
 		{
-			//lcd_hide_cursor(); // TODO: get this to work
 			clear();
 
 			play_from_program_space(beep_button_middle);
@@ -732,7 +728,7 @@ void menu_select()
 			while(!button_is_pressed(MIDDLE_BUTTON))
 			{
 				lcd_goto_xy(0,1);
-				print_from_program_space(back_line2);
+				print_from_program_space(PSTR("\6mid"));
 				lcd_goto_xy(0,0);
 				main_menu_functions[menu_index]();
 			}
