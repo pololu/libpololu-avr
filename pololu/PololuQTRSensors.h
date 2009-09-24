@@ -1,1 +1,1 @@
-../src/PololuQTRSensors/PololuQTRSensors.h
+#include "PololuQTRSensors/PololuQTRSensors.h"
