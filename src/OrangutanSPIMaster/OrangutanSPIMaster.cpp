@@ -24,7 +24,6 @@
 
 #include "avr/io.h"
 #include "OrangutanSPIMaster.h"
-#include "../include/atmega328p_pins.h"
 #include <pololu/OrangutanModel.h>
 
 #ifdef LIB_POLOLU

@@ -97,8 +97,10 @@
 #endif //!F_CPU
 #include "private/OrangutanLCDPrivate.h"	// contains all of the macros and pin defines
 #include "OrangutanLCD.h"
-#include <pololu/OrangutanModel.h>
 
+#ifndef Wiring_h
+#include <pololu/OrangutanModel.h>
+#endif
 
 // *************************************************************************
 // *       Functions specifically tailored for the Orangutan               *
