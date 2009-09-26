@@ -6,7 +6,7 @@
 #ifndef OrangutanPushbuttons_h
 #define OrangutanPushbuttons_h
 
-#include <pololu/OrangutanModel.h>
+#include "OrangutanResources/include/OrangutanModel.h"
 
 void buttons_init();
 unsigned char wait_for_button_press(unsigned char buttons);

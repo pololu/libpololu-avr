@@ -46,7 +46,7 @@
 #ifndef OrangutanDigital_h
 #define OrangutanDigital_h
 
-#include <pololu/OrangutanModel.h>
+#include "OrangutanResources/include/OrangutanModel.h"
 #include <avr/io.h>
 
 #define INPUT 				0
@@ -128,7 +128,7 @@ struct IOStruct
 // gets a structure with pointers to the three digital I/O registers associated
 // with the specified pin (DDR, PORT, and PIN) along with a bitmask with a
 // 1 in the position of the specified pin and 0s everywhere else.
-inline void get_io_registers(struct IOStruct* io, unsigned char pin)
+static inline void get_io_registers(struct IOStruct* io, unsigned char pin)
 {
 	io->pinRegister = 0;
 	io->portRegister = 0;
@@ -188,7 +188,7 @@ inline void get_io_registers(struct IOStruct* io, unsigned char pin)
 
 // low-level method for setting the data direction (i.e. input or output) of an pin or set of pins
 // described by an IOStruct pointer.
-inline void set_data_direction(struct IOStruct* ioPin, unsigned char val)
+static inline void set_data_direction(struct IOStruct* ioPin, unsigned char val)
 {
 	if (val)
 		*(ioPin->ddrRegister) |= ioPin->bitmask;
@@ -202,7 +202,7 @@ inline void set_data_direction(struct IOStruct* ioPin, unsigned char val)
 // setting it as high-impedance (val = 0) or enabling the internal pull-up (val = 1).  If the pin is an
 // output, this lets you choose between driving low (val = 0) and driving high (val = 1).
 // NOTE: if val is 0xFF (255), this method will toggle the PORT register pin(s).
-inline  void set_digital_output_value(struct IOStruct* ioPin, unsigned char val)
+static inline void set_digital_output_value(struct IOStruct* ioPin, unsigned char val)
 {
 	if (val == 0xFF)
 		*(ioPin->portRegister) ^= ioPin->bitmask;
@@ -218,7 +218,7 @@ inline  void set_digital_output_value(struct IOStruct* ioPin, unsigned char val)
 // setting it as high-impedance (val = 0) or enabling the internal pull-up (val = 1).  If the pin is an
 // output, this lets you choose between driving low (val = 0) and driving high (val = 1).
 // NOTE: if val is 0xFF, this method will toggle the PORT register pin(s).
-inline  unsigned char get_digital_input_value(struct IOStruct* ioPin)
+static inline unsigned char get_digital_input_value(struct IOStruct* ioPin)
 {
 	return *(ioPin->pinRegister) & ioPin->bitmask;
 }
@@ -228,7 +228,7 @@ inline  unsigned char get_digital_input_value(struct IOStruct* ioPin)
 // An outputState value of 0 will cause the pin to drive low; a value of 1 will cause the pin to 
 // drive high.  A value of 0xFF (255) will toggle the output state of the pin (i.e. high -> low and
 // low -> high).
-inline void set_digital_output(unsigned char pin, unsigned char outputState)
+static inline void set_digital_output(unsigned char pin, unsigned char outputState)
 {
 	struct IOStruct registers;
 	get_io_registers(&registers, pin);
@@ -241,7 +241,7 @@ inline void set_digital_output(unsigned char pin, unsigned char outputState)
 // An inputState value of 0 will cause the pin to be a high-impedance input; a value of 1 will enable the 
 // pin's internal pull-up resistor, which weakly pulls it to Vcc.  A value of 0xFF (255) will toggle the
 // input state.
-inline void set_digital_input(unsigned char pin, unsigned char inputState)
+static inline void set_digital_input(unsigned char pin, unsigned char inputState)
 {
 	struct IOStruct registers;
 	get_io_registers(&registers, pin);
@@ -253,7 +253,7 @@ inline void set_digital_input(unsigned char pin, unsigned char inputState)
 // high-level method for reading the input value of the specified pin.  If the voltage on the pin is low,
 // this method will return 0.  Otherwise, it will return a non-zero result that depends on the value of
 // the pin.
-inline unsigned char is_digital_input_high(unsigned char pin)
+static inline unsigned char is_digital_input_high(unsigned char pin)
 {
 	struct IOStruct registers;
 	get_io_registers(&registers, pin);

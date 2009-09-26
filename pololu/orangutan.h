@@ -8,9 +8,10 @@
 #include <pololu/qtr.h>
 #include <pololu/encoders.h>
 #include <pololu/resources.h>
-#include <pololu/serial.h>
 #include <pololu/digital.h>
 #include <pololu/servos.h>
 #include <pololu/pulsein.h>
-#include <pololu/OrangutanSPIMaster.h>
-#include <pololu/OrangutanSVP.h>
+#include <pololu/OrangutanSerial/OrangutanSerial.h>
+#include <pololu/OrangutanSPIMaster/OrangutanSPIMaster.h>
+#include <pololu/OrangutanSVP/OrangutanSVP.h>
+

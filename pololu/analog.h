@@ -26,7 +26,7 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
-#include <pololu/OrangutanModel.h>
+#include "OrangutanResources/include/OrangutanModel.h"
 
 #define MODE_8_BIT		1
 #define MODE_10_BIT		0
