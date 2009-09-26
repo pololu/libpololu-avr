@@ -25,9 +25,7 @@
 #ifndef OrangutanLEDs_h
 #define OrangutanLEDs_h
 
-#ifndef Wiring_h
-#include <pololu/OrangutanModel.h>
-#endif
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 class OrangutanLEDs
 {

@@ -24,10 +24,7 @@
  
 #include <avr/io.h>
 #include "OrangutanLEDs.h"
-
-#ifndef Wiring_h
-#include <pololu/OrangutanModel.h>
-#endif
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 #define RED_LED		PORT1
 #define RED_LED_PORT	PORTD

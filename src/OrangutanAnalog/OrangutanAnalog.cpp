@@ -26,9 +26,7 @@
 #include <avr/io.h>
 #include "OrangutanAnalog.h"
 
-#ifndef Wiring_h
-#include <pololu/OrangutanModel.h>
-#endif
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 #ifdef LIB_POLOLU
 
@@ -129,7 +127,9 @@ extern "C" unsigned int read_temperature_c()
 
 #endif
 
+#ifdef _ORANGUTAN_SVP
 static unsigned int fromMillivoltsToNormal(unsigned int millivolts);
+#endif
 
 #ifdef _ORANGUTAN_SVP
 #define ADC_PORT PORTA
@@ -355,6 +355,7 @@ unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 	return (temp + 511) / 1023;
 }
 
+#ifdef _ORANGUTAN_SVP
 static unsigned int fromMillivoltsToNormal(unsigned int millivolts)
 {
 	unsigned long temp;
@@ -377,6 +378,7 @@ static unsigned int fromMillivoltsToNormal(unsigned int millivolts)
 	}
 	return temp;
 }
+#endif
 
 // returns the position of the trimpot (20 readings averaged together).
 // For all devices except the Orangutan SVP, the trimpot is on ADC channel 7.

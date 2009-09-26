@@ -27,9 +27,10 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
-#ifndef Wiring_h
-#include <pololu/OrangutanModel.h>
-#include <pololu/OrangutanSVP.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
+
+#ifdef _ORANGUTAN_SVP
+#include "../OrangutanSVP/OrangutanSVP.h"
 #endif
 
 #define MODE_8_BIT		1

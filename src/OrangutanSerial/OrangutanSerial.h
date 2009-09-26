@@ -24,7 +24,7 @@
 #ifndef OrangutanSerial_h
 #define OrangutanSerial_h
 
-#include <pololu/OrangutanModel.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 #include <avr/interrupt.h>
 

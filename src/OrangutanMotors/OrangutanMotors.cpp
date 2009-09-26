@@ -34,11 +34,7 @@
 #include <avr/io.h>
 #include "OrangutanMotors.h"
 #include "../OrangutanDigital/OrangutanDigital.h"
-
-#ifndef Wiring_h
-#include <pololu/OrangutanModel.h>
-#endif
-
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 #ifdef _ORANGUTAN_SVP
 

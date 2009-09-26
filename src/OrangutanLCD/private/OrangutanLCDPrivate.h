@@ -6,7 +6,7 @@
 #ifndef OrangutanLCDPrivate_h
 #define OrangutanLCDPrivate_h
 
-#include <pololu/OrangutanModel.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 // LCD Pinouts:
 

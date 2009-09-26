@@ -28,7 +28,7 @@
 #include "OrangutanSerial.h"
 #include "../OrangutanTime/OrangutanTime.h"
 #include "../OrangutanSVP/OrangutanSVP.h"
-#include <pololu/OrangutanModel.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>

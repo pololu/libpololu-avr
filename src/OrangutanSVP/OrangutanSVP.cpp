@@ -22,7 +22,7 @@
  * to be responsible for all resulting costs and damages.
  */
 
-#include <pololu/OrangutanModel.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
 #include "../OrangutanSPIMaster/OrangutanSPIMaster.h"
 #include "../OrangutanTime/OrangutanTime.h"
 #include "OrangutanSVP.h"

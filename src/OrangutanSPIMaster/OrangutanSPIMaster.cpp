@@ -24,7 +24,7 @@
 
 #include "avr/io.h"
 #include "OrangutanSPIMaster.h"
-#include <pololu/OrangutanModel.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 #ifdef LIB_POLOLU
 #include "../OrangutanTime/OrangutanTime.h" // provides delayMicroseconds()

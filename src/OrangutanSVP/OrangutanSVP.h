@@ -25,7 +25,7 @@
 #ifndef OrangutanSVP_h
 #define OrangutanSVP_h
 
-#include <pololu/OrangutanModel.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 #ifdef _ORANGUTAN_SVP
 
