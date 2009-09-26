@@ -65,6 +65,7 @@ PREFIX ?= $(shell type avr-gcc | sed 's/\/bin\/avr-gcc//' | sed 's/avr-gcc is //
 INCLUDE := $(PREFIX)/include
 INCLUDE_POLOLU := $(INCLUDE)/pololu
 LIB := $(PREFIX)/lib
+INSTALL_FILES := install -m=r--
 
 .PHONY: show_prefix
 show_prefix:
@@ -75,11 +76,11 @@ install: $(LIBRARY_FILES)
 	install -d $(LIB)
 	install -d $(INCLUDE_POLOLU)
 	install $(foreach device,$(devices),libpololu_$(device).a) $(LIB)
-	install pololu/*.h $(INCLUDE_POLOLU)
-	for OrangutanObject in $(LIBRARY_OBJECTS); do install -d $(INCLUDE_POLOLU)/$$OrangutanObject ; install src/$$OrangutanObject/*.h $(INCLUDE_POLOLU)/$$OrangutanObject ; done
+	$(INSTALL_FILES) pololu/*.h $(INCLUDE_POLOLU)
+	for OrangutanObject in $(LIBRARY_OBJECTS); do install -d $(INCLUDE_POLOLU)/$$OrangutanObject ; $(INSTALL_FILES) src/$$OrangutanObject/*.h $(INCLUDE_POLOLU)/$$OrangutanObject ; done
 	install -d $(INCLUDE_POLOLU)/OrangutanResources/include
-	install src/OrangutanResources/include/*.h $(INCLUDE_POLOLU)/OrangutanResources/include
-	install pololu/orangutan $(INCLUDE_POLOLU)
+	$(INSTALL_FILES) src/OrangutanResources/include/*.h $(INCLUDE_POLOLU)/OrangutanResources/include
+	$(INSTALL_FILES) pololu/orangutan $(INCLUDE_POLOLU)
 	@echo "Installation is complete."
 
 # We make all of the examples from templates in the examples_templates
