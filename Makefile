@@ -2,6 +2,26 @@
 # remove the atmega328p from the list of target devices below:
 devices := atmega48 atmega168 atmega328p atmega324p
 
+LIBRARY_OBJECTS=\
+	OrangutanAnalog \
+	OrangutanBuzzer \
+	OrangutanDigital \
+	OrangutanLCD \
+	OrangutanLEDs \
+	OrangutanSVP \
+	OrangutanSPIMaster \
+	OrangutanMotors \
+	OrangutanPulseIn \
+	OrangutanPushbuttons \
+	OrangutanResources \
+	OrangutanSerial \
+	OrangutanServos \
+	OrangutanTime \
+	Pololu3pi \
+	PololuQTRSensors \
+	PololuWheelEncoders
+
+
 SHELL = sh
 
 # We need to do our recursive make with cd, since WinAVR does not support make -C.
@@ -54,9 +74,11 @@ show_prefix:
 install: $(LIBRARY_FILES)
 	install -d $(LIB)
 	install -d $(INCLUDE_POLOLU)
-	install $(foreach device,$(devices),libpololu_$(device).a) $(LIB)
-	install pololu/*.h $(INCLUDE_POLOLU)
-	install src/*/*.h $(INCLUDE_POLOLU)
+	install -t $(LIB) $(foreach device,$(devices),libpololu_$(device).a)
+	install -t $(INCLUDE_POLOLU) pololu/*.h
+	for OrangutanObject in $(LIBRARY_OBJECTS); do install -d $(INCLUDE_POLOLU)/$$OrangutanObject ; install -t $(INCLUDE_POLOLU)/$$OrangutanObject src/$$OrangutanObject/*.h ; done
+	install -d $(INCLUDE_POLOLU)/OrangutanResources/include
+	install -t $(INCLUDE_POLOLU)/OrangutanResources/include src/OrangutanResources/include/*.h
 	install pololu/orangutan $(INCLUDE_POLOLU)
 	@echo "Installation is complete."
 
@@ -114,7 +136,7 @@ ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
 ZIP_EXCLUDES := \*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
 
-ARDUINO_EXCLUDES := libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSerial/\*
+ARDUINO_EXCLUDES := libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/include/\*
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
