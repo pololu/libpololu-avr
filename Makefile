@@ -74,11 +74,11 @@ show_prefix:
 install: $(LIBRARY_FILES)
 	install -d $(LIB)
 	install -d $(INCLUDE_POLOLU)
-	install -t $(LIB) $(foreach device,$(devices),libpololu_$(device).a)
-	install -t $(INCLUDE_POLOLU) pololu/*.h
-	for OrangutanObject in $(LIBRARY_OBJECTS); do install -d $(INCLUDE_POLOLU)/$$OrangutanObject ; install -t $(INCLUDE_POLOLU)/$$OrangutanObject src/$$OrangutanObject/*.h ; done
+	install $(foreach device,$(devices),libpololu_$(device).a) $(LIB)
+	install pololu/*.h $(INCLUDE_POLOLU)
+	for OrangutanObject in $(LIBRARY_OBJECTS); do install -d $(INCLUDE_POLOLU)/$$OrangutanObject ; install src/$$OrangutanObject/*.h $(INCLUDE_POLOLU)/$$OrangutanObject ; done
 	install -d $(INCLUDE_POLOLU)/OrangutanResources/include
-	install -t $(INCLUDE_POLOLU)/OrangutanResources/include src/OrangutanResources/include/*.h
+	install src/OrangutanResources/include/*.h $(INCLUDE_POLOLU)/OrangutanResources/include
 	install pololu/orangutan $(INCLUDE_POLOLU)
 	@echo "Installation is complete."
 
