@@ -107,10 +107,10 @@ void OrangutanMotors::init2()
 {
 #ifdef _ORANGUTAN_SVP
 	
-	// configure for non-inverted fast PWM output on motor control pins:   
-    //  set OCxx on compare match, clear on timer overflow   
-    //  Timer2 counts up from 0 to 255 and then overflows directly to 0   
-    TCCR2A = 0xA3;
+	// Configure for non-inverted fast PWM output on motor PWM pins:   
+    //  Normal port operation, OC2x disconnected (changes later when a non-zero speed is set)
+    //  Timer2 counts up from 0 to 255 and then overflows directly to 0.
+    TCCR2A = 0x03;
   
     // use the system clock/8 (=2.5 MHz) as the timer clock,
 	// which will produce a PWM frequency of 10 kHz
@@ -122,11 +122,14 @@ void OrangutanMotors::init2()
 	// Orangutan LV-168 cannot support frequencies above 10 kHz.
     //TCCR2B = 0x01;
 
-    // initialize all PWMs to 0% duty cycle (braking)   
+    // Initialize both PWMs to lowest duty cycle possible (almost braking).
     OCR2A = OCR2B = 0;
 	
 	OrangutanDigital::setOutput(DIRA, 0);
 	OrangutanDigital::setOutput(DIRB, 0);
+
+	// Set the PWM pins to be low outputs.  They have to be low, otherwise
+	// speed-zero (when OC2x is disconnected) would not work.
 	OrangutanDigital::setOutput(PWM2A, 0);
 	OrangutanDigital::setOutput(PWM2B, 0);
 
@@ -199,14 +202,31 @@ void OrangutanMotors::setM1Speed(int speed)
 	}
 	if (speed > 0xFF)	// 0xFF = 255
 		speed = 0xFF;
-	
+
 #ifdef _ORANGUTAN_SVP
 
 	OCR2A = speed;
-	if (reverse)
-		OrangutanDigital::setOutput(DIRA, HIGH);
+
+	if (speed == 0)
+	{
+		// Achieve a 0% duty cycle on the PWM pin by driving it low,
+		// disconnecting it from Timer2
+		TCCR2A &= ~(1<<COM2A1);
+	}
 	else
-		OrangutanDigital::setOutput(DIRA, LOW);
+	{
+		// Achieve a variable duty cycle on the PWM pin using Timer2.
+		TCCR2A |= 1<<COM2A1;
+
+		if (reverse)
+		{
+			OrangutanDigital::setOutput(DIRA, HIGH);
+		}
+		else
+		{
+			OrangutanDigital::setOutput(DIRA, LOW);
+		}
+	}
 
 #else
 	if (reverse)
@@ -245,11 +265,28 @@ void OrangutanMotors::setM2Speed(int speed)
 #ifdef _ORANGUTAN_SVP
 
 	OCR2B = speed;
-	if (reverse)
-		OrangutanDigital::setOutput(DIRB, HIGH);
+
+	if (speed == 0)
+	{
+		// Achieve a 0% duty cycle on the PWM pin by driving it low,
+		// disconnecting it from Timer2
+		TCCR2A &= ~(1<<COM2B1);
+	}
 	else
-		OrangutanDigital::setOutput(DIRB, LOW);
-		
+	{
+		// Achieve a variable duty cycle on the PWM pin using Timer2.
+		TCCR2A |= 1<<COM2B1;
+
+		if (reverse)
+		{
+			OrangutanDigital::setOutput(DIRB, HIGH);
+		}
+		else
+		{
+			OrangutanDigital::setOutput(DIRB, LOW);
+		}
+	}
+
 #else
 
 	if (reverse)
