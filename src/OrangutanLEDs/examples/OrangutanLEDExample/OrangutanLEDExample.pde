@@ -2,7 +2,7 @@
 
 /*
  * OrangutanLEDExample: for the 3pi robot, Orangutan LV 168, Orangutan SV-xx8,
- *   Orangutan SVP, or Baby Orangutan B.
+ *   or Baby Orangutan B.
  * 
  * This program uses the OrangutanLEDs functions to control the red and green  
  * LEDs on the 3pi robot or Orangutan.  It will also work to control the red 

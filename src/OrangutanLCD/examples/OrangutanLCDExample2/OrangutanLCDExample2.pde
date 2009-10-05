@@ -3,11 +3,11 @@
 #include <stdlib.h>        // used for its "random" and "srandom" functions
 
 /*
- * OrangutanLCDExample2 for the Orangutan LV-168 or 3pi robot
+ * OrangutanLCDExample2: for the Orangutan SV-xx8, Orangutan LV-168 or 3pi robot
  *
- * This example program is intended for use on the Orangutan LV-168 or 3pi robot.
- * It uses the OrangutanLCD library to display custom characters on the LCD.
- * Simply push a any user pushbutton to display a new, randomly chosen mood character.
+ * This example uses the OrangutanLCD library to display custom characters on
+ * the LCD.  Simply push a any user pushbutton to display a new, randomly
+ * chosen mood character.
  *
  * http://www.pololu.com/docs/0J17/5.c
  * http://www.pololu.com

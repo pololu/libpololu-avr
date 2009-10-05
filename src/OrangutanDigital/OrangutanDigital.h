@@ -224,10 +224,7 @@ class OrangutanDigital
 
 
 	// low-level method for reading the value of the PIN register for an pin or set of pins
-	// described by an IOStruct pointer.  If the pin is an input, this lets you choose between
-	// setting it as high-impedance (val = 0) or enabling the internal pull-up (val = 1).  If the pin is an
-	// output, this lets you choose between driving low (val = 0) and driving high (val = 1).
-	// NOTE: if val is 0xFF, this method will toggle the PORT register pin(s).
+	// described by an IOStruct pointer.
 	inline static unsigned char getInputValue(struct IOStruct* ioPin)
 	{
 		return *(ioPin->pinRegister) & ioPin->bitmask;

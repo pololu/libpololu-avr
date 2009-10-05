@@ -3,14 +3,13 @@
 #include <OrangutanBuzzer.h>
 
 /*
- * OrangutanBuzzerExample for the Orangutan LV-168 or 3pi robot
+ * OrangutanBuzzerExample: for the Orangutan SV-xx8, Orangutan LV-168,
+ *    and 3pi robot
  *
- * This example program is indended for use on the Orangutan LV-168 or 3pi.
- * It uses the OrangutanBuzzer library to play a series of notes on
- * the Orangutan LV-168's buzzer.  It also uses the OrangutanLCD library
- * to display the notes its playing, and it uses the OrangutanPushbuttons
- * library to allow the user to stop/reset the melody with the top
- * pushbutton.
+ * This example uses the OrangutanBuzzer library to play a series of notes on
+ * the buzzer.  It also uses the OrangutanLCD library to display the notes it is
+ * playing, and it uses the OrangutanPushbuttons library to allow the user to
+ * stop/reset the melody with the top pushbutton.
  *
  * http://www.pololu.com/docs/0J17/5.b
  * http://www.pololu.com

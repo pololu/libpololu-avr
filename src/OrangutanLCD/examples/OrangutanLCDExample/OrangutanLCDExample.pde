@@ -1,10 +1,10 @@
 #include <OrangutanLCD.h>
 
 /*
- * OrangutanLCDExample for the Orangutan LV-168 or 3pi robot
+ * OrangutanLCDExample for the Orangutan LV-168, Orangutan SV-xx8,
+ *     or 3pi robot
  *
- * This example program is intended for use on the Orangutan LV-168
- * or 3pi robot.  It uses the OrangutanLCD library to write "Hello"
+ * This example uses the OrangutanLCD library to write "Hello"
  * on the LCD and then move it around the display area.
  *
  * http://www.pololu.com/docs/0J17/5.c

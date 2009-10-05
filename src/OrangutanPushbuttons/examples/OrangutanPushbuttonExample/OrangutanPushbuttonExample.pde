@@ -3,7 +3,7 @@
 
 /*
  * OrangutanPushbuttonExample: for the 3pi robot, Orangutan LV-168,
- *    Orangutan SVP, and Orangutan SV-xx8
+ *    and Orangutan SV-xx8
  *
  * This example uses the OrangutanPushbuttons library to detect user input
  * from the pushbuttons, and it uses the OrangutanLCD library to display

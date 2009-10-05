@@ -5,7 +5,7 @@
 
 /*
  * OrangutanMotorExample2 for the 3pi robot, Orangutan LV-168,
- *    Orangutan SVP, and Orangutan SV-xx8.
+ *    and Orangutan SV-xx8.
  *
  * This example uses the OrangutanMotors and OrangutanLCD libraries to drive
  * motors in response to the position of user trimmer potentiometer

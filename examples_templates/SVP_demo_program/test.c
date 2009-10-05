@@ -24,7 +24,7 @@ const char welcome[] PROGMEM = ">g32>>c32";
 const char thank_you_music[] PROGMEM = ">>c32>g32";
 const char beep_button_top[] PROGMEM = "!c32";
 const char beep_button_middle[] PROGMEM = "!e32";
-const char beep_button_middleottom[] PROGMEM = "!g32";
+const char beep_button_bottom[] PROGMEM = "!g32";
 const char timer_tick[] PROGMEM = "!v8>>c32";
 
 // This function loads custom characters into the LCD.  Up to 8
@@ -211,7 +211,6 @@ void analog_test()
 				PORTA = 0;
 			}
 			wait_for_button_release(TOP_BUTTON);
-			clear();  //tmphax for org06a01
 		}
 
 		if(wait_for_ms_or_middle_button(40))
@@ -476,7 +475,7 @@ void time_test()
 			// start/stop
 			bottom_is_pressed = 1;
 			is_ticking = !is_ticking;
-			play_from_program_space(beep_button_middleottom);
+			play_from_program_space(beep_button_bottom);
 		}
 	}
 	else
@@ -611,7 +610,7 @@ void usb_test()
 		}
 		else
 		{
-			red_led(0):
+			red_led(0);
 		}
 
 		if (rts_enabled())
@@ -647,7 +646,7 @@ unsigned char wait_for_button_and_beep()
 	}
 	else
 	{
-		play_from_program_space(beep_button_middleottom);
+		play_from_program_space(beep_button_bottom);
 	}
 
 	wait_for_button_release(button);
@@ -757,7 +756,7 @@ void menu_select()
 		}
 		else if(button & BOTTOM_BUTTON)
 		{
-			play_from_program_space(beep_button_middleottom);
+			play_from_program_space(beep_button_bottom);
 
 			if (menu_index == main_menu_length-1)
 			{
@@ -1105,6 +1104,10 @@ void test()
 // must have a main() function defined somewhere.
 int main()
 {
+	clear();
+	print_two_lines_delay_1s(PSTR("     Pololu     "),
+	                         PSTR(" Orangutan SVP  "));
+
 	// if any button is pressed, go into the old version of the test code
 	if(button_is_pressed(ALL_BUTTONS))
 		test(); // activate the simpler test code

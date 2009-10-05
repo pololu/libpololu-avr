@@ -34,7 +34,6 @@
 #define SVP_MODE_ENCODERS     4
 
 #define SVP_SLAVE_SELECT_ON   1
-#define SVP_SLAVE_SELECT_OFF  0
 
 typedef	union SVPStatus
 {

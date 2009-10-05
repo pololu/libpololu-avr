@@ -2,25 +2,23 @@
 #include <OrangutanAnalog.h>
 
 /*
- * OrangutanAnalogExample2 for the Orangutan LV-168 (or 3pi robot)
+ * OrangutanAnalogExample2: for the Orangutan LV-168
  *
  * This sketch uses the OrangutanAnalog library to read the voltage output
  * of the trimpot (in millivolts) and to read the Orangutan LV-168's
  * temperature sensor in degrees Farenheit.  These values are printed to 
  * the LCD 10 times per second.  This example is intended for use with the
- * Orangutan LV-168 only, though all but the temperature-measuring portion
+ * Orangutan LV-168, though all but the temperature-measuring portion
  * will work on the 3pi robot (on the 3pi, analog input 6 connects to 2/3rds
- * of the battery voltage rather than a temperature sensor).
+ * of the battery voltage rather than a temperature sensor) and the
+ * Orangutan SV-xx8 (on the SV-xx8, analog input 6 connects to 1/3rd of
+ * the battery voltage).
  *
  * You should see the trimpot voltage change as you turn it, and you can
  * get the temperature reading to slowly increase by holding a finger on the
  * underside of the Orangutan LV-168's PCB near the center of the board.
  * Be careful not to zap the board with electrostatic discharge if you
  * try this!
- *
- * http://www.pololu.com/docs/0J17/5.a
- * http://www.pololu.com
- * http://forum.pololu.com
  */
 
 OrangutanLCD lcd;
