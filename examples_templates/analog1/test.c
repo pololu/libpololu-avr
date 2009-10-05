@@ -9,7 +9,7 @@
  * proportional to the trimpot position.  This example will work on
  * both the Orangutan LV/SV-xx8 and Baby Orangutan B.
  *
- * http://www.pololu.com/docs/0J20/6.c
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

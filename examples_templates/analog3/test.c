@@ -6,7 +6,7 @@
  * IMPORTANT NOTE: your board must have the identifiers "org01b03" and
  * "0J1499", or this test will not work!!!
  *
- * http://www.pololu.com/docs/0J20/6.c
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

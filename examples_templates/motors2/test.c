@@ -11,7 +11,7 @@
  * trimpot position, and it uses the OrangutanLEDs library to provide
  * limited feedback with the red and green user LEDs.
  *
- * http://www.pololu.com/docs/0J20/6.g
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

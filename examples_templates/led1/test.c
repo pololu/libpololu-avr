@@ -8,7 +8,7 @@
  * LEDs on the 3pi robot or Orangutan.  It will also work to control the red
  * LED on the Baby Orangutan B (which lacks a second, green LED). 
  *
- * http://www.pololu.com/docs/0J20/6.f
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

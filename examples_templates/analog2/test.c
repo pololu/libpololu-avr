@@ -15,7 +15,7 @@
  * Be careful not to zap the board with electrostatic discharge if you
  * try this!
  *
- * http://www.pololu.com/docs/0J20/6.c
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

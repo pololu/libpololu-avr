@@ -8,7 +8,7 @@
  * input from the pushbuttons, and it uses the OrangutanLCD library to
  * display feedback on the LCD.
  *
- * http://www.pololu.com/docs/0J20/6.h
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

@@ -7,7 +7,7 @@
  * auxiliary processor, take analog readings on line D/RX, and display
  * information about the Orangutan's current USB device state on the LCD.
  *
- * http://www.pololu.com/docs/0J20/6.l
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

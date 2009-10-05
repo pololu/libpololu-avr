@@ -5,7 +5,7 @@
  *
  * Uses the OrangutanLCD library to display things on the LCD.
  *
- * http://www.pololu.com/docs/0J20/6.e
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */
