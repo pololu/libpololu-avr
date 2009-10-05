@@ -377,8 +377,9 @@ const char music_title[] PROGMEM = "               \7 Hungarian Rhapsody No. 2 -
 void music_test()
 {
 	static unsigned char title_pos = 0;
+	unsigned char i;
 
-	for(unsigned char i = 0; i < lcd_width; i++)
+	for(i = 0; i < lcd_width; i++)
 	{
 		print_character(pgm_read_byte(music_title + title_pos + i));
 	}
@@ -552,7 +553,8 @@ void usb_test()
 		    // while we handle the bytes thare are in there now.
 			serial_cancel_receive(USB_COMM);
 
-			for (unsigned char i = 0; i < received_bytes; i++)
+			unsigned char i;
+			for (i = 0; i < received_bytes; i++)
 			{
 				// Process the new byte that has been received.
 				serial_send_blocking(USB_COMM, &receive_buffer[i], 1);

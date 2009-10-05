@@ -18,7 +18,7 @@ int main()
   set_digital_output(IO_B4, LOW);
 
   // Set the mode to SVP_MODE_ANALOG so we can get analog readings on line D/RX.
-  svp_set_mode(SVP_MODE_ANALOG, SVP_SLAVE_SELECT_OFF);
+  svp_set_mode(SVP_MODE_ANALOG);
 
   while(1)
   {
