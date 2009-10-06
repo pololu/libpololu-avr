@@ -103,7 +103,7 @@ ISR(TIMER1_CAPT_vect)
 	else
 	{
 		unsigned int pos = servoPos[i];		// hint to the compiler that it should store this RAM value in registers
-		if (servoSpeed[i])
+		if (servoSpeed[i] && pos && servoTargetPos[i])
 		{
 			if (servoTargetPos[i] > pos)
 			{
@@ -351,8 +351,9 @@ unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned cha
 	numMuxPins = numPins;
 	numServos = 1 << numPins;
 	
-	PORTD &= ~(1 << PORTD5);	// MUX output pin -> low output or high-impedance input
-	DDRD |= 1 << PORTD5;		// pin -> output
+	// Drive the DEMUX input pin low.
+	PORTD &= ~(1 << PORTD5);
+	DDRD |= 1 << PORTD5;
 
 	TCCR1A = 0b10000010;		// clear OC1A on comp match when upcounting, set OC1A on comp match when downcounting
 #else
