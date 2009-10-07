@@ -1,5 +1,5 @@
 DEVICE ?= atmega324p
-AVRDUDE_DEVICE ?= m324
+AVRDUDE_DEVICE ?= m324p -F
 
 CFLAGS=-g -Wall -mcall-prologues -mmcu=$(DEVICE) -Os
 CC=avr-gcc

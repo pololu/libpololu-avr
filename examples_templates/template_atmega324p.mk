@@ -1,2 +1,3 @@
 DEVICE = atmega324p
-AVRDUDE_DEVICE = m324p
+AVRDUDE_DEVICE = m324p -F
+PORT = /dev/ttyACM0
