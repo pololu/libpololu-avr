@@ -9,7 +9,6 @@ LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax
 PORT ?= /dev/ttyACM0
 AVRDUDE=avrdude
 TARGET=test
-OBJECT_FILES=test.o
 
 all: $(TARGET).hex
 
@@ -19,10 +18,8 @@ clean:
 %.hex: %.obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
 
-test.o: test.c
-
-%.obj: $(OBJECT_FILES)
-	$(CC) $(CFLAGS) $(OBJECT_FILES) $(LDFLAGS) -o $@
+%.obj: %.o
+	$(CC) $(CFLAGS) $< $(LDFLAGS) -o $@
 
 program: $(TARGET).hex
 	$(AVRDUDE) -p $(AVRDUDE_DEVICE) -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
