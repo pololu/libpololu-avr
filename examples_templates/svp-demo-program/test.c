@@ -773,332 +773,86 @@ void menu_select()
 }
 
 /**********************************************************************/
-/* Simpler test code accessed by holding down a button on startup     */
+/* Factory test code accessed by holding down a button on startup     */
 
-// store this fugue in program space using the PROGMEM macro.     
-// Later we will play it directly from program space using the melodyTest()
-// function, bypassing the need to load it all into RAM first.
-const char fugue[] PROGMEM =    
-	"! O5 L16 agafaea dac+adaea fa<aa<bac#a dac#adaea f"    
-	"O6 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad"    
-	"L8 MS <b-d<b-d MLe-<ge-<g MSc<ac<a ML d<fd<f O5 MS b-gb-g"    
-	"ML >c#e>c#e MS afaf ML gc#gc# MS fdfd ML e<b-e<b-"    
-	"O6 L16ragafaea dac#adaea fa<aa<bac#a dac#adaea faeadaca"    
-	"<b-acadg<b-g egdgcg<b-g <ag<b-gcf<af dfcf<b-f<af"    
-	"<gf<af<b-e<ge c#e<b-e<ae<ge <fe<ge<ad<fd"    
-	"O5 e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d"    
-	"e>d>c#>db>d>c#b >c#agaegfe f O6 dc#dfdc#<b c#4";
-
-
-
-
-// *** triggered by top button ***
-// This function plays a melody from flash in the background while the two
-// user LEDs alternately fade in and out.
-unsigned char melodyTest()
+void all_inputs()
 {
-	unsigned char button;
-	int i = 0;
+	// Make all pins inputs.
+	DDRA = DDRB = DDRC = DDRD = 0;
 
-	// the following function does not block execution
-	play_from_program_space(fugue);	// play music from flash in the background
-
-	red_led(0);		// turn red and green LEDs off
-	green_led(0);
-
-	clear();			// clear the LCD, go to the start of the first LCD line
-	print("melody:");	// print to the LCD
-	lcd_goto_xy(0, 1);	// go to the start of the second LCD line
-	print("fugue");		// print to the LCD
-
-	time_reset();		// reset the internal millisecond timer count to zero
-
-	while (1)			// loop here until we detect a button press and return
-	{
-		if (get_ms() >= 5)	// if 5 or more milliseconds have elapsed
-		{
-			time_reset();	// reset timer count to zero
-			// check if middle or bottom buttons have been pressed
-			button = button_is_pressed(MIDDLE_BUTTON | BOTTOM_BUTTON);
-			if (button != 0)	// if so, stop melody and return the button ID
-			{
-				stop_playing();	// stop playing music
-				return button;
-			}
-			i += 5;		// increase our state variable based on the time
-			if (i >= 1000)	// once a second has elapsed, reset the state var
-				i = 0;
-		}
-
-		// the following code alternately flashes the red and green LEDs,
-		// fading them in and out over time as the music plays in the
-		// background.  This is accomplished by using high-frequency PWM
-		// signals on the LED lines.  Essentially, each LED is flickering
-		// on and off very quickly, which gives it the apperance of variable
-		// brightness depending on the percentage of the cycle the LED is on.
-		// Each LED flicker cycle takes a total approximately 251 us.
-
-		if (i < 250)		// phase 1: ramp up the red LED brightness
-		{					//  as i increases over time
-			red_led(1);			// turn the red LED on
-			delay_us(i + 1);	// microsecond delay
-			red_led(0);			// turn the red LED off
-			delay_us(250 - i);	// microsecond delay
-		}
-		else if (i < 500)	// phase 2: ramp down the red LED brightness
-		{
-			red_led(1);			// turn the red LED on
-			delay_us(500 - i);	// microsecond delay
-			red_led(0);			// turn the red LED off
-			delay_us(i - 249);	// microsecond delay
-		}
-		else if (i < 750)	// phase 3: ramp up the green LED brightness
-		{
-			green_led(1);		// turn the green LED on
-			delay_us(i - 499);	// microsecond delay
-			green_led(0);		// turn the green LED off
-			delay_us(750 - i);	// microsecond delay
-		}
-		else				// phase 4: ramp down the green LED brightness
-		{
-			green_led(1);		// turn the green LED on
-			delay_us(1000 - i);	// microsecond delay
-			green_led(0);		// turn the green LED off
-			delay_us(i - 749);	// microsecond delay
-		}
-		
-	}
+	// Disable all pull-up resistors.
+	PORTA = PORTB = PORTC = PORTD = 0;
 }
 
-
-// *** triggered by middle button ***
-// This function tests the eight user I/O pins and the trimmer potentiometer.
-// At any given time, one pin is being driven low while the rest are weakly
-// pulled high (to 5 V).  At the same time, the LCD is displaying the input
-// values on the eight user I/O pins.  If you short a pin to *GROUND* (note:
-// do not short the pin to power, only short it to one of the ground pads
-// along the top edge of the board), you will see the corresponding bit on
-// the LCD go to zero.  The PD1 bit will always read zero as it is being
-// pulled down through the red user LED.
-unsigned char IOTest()
+// A fatal error has occurred, so blink the red LED forever.
+void error_red_led()
 {
-	// the bits of the "outputs" byte will correspond to the pin states of
-	// the user I/O lines as follows:
-
-	// outputs:   b7  b6  b5  b4  b3  b2  b1  b0
-	// user I/O: PC5 PC4 PC3 PC2 PC1 PC0 PD1 PD0
-
-	// Only one bit of "outputs" will ever be set (1) at a time; the rest will
-	// be cleared (0).  The user I/O pin that corresponds to the set bit will
-	// be an output that is driven low while all of the other user I/O pins
-	// will be inputs with internal pull-ups enabled (i.e. they will be weakly
-	// pulled to 5V and will read as high).
-	unsigned char outputs = 0x80;	// binary: 10000000
-	unsigned char direction = 0;
-	unsigned char button;
-
-	red_led(0);		// turn red and green LEDs off
-	green_led(0);
-
-	clear();		// clear the LCD
-	print("User I/O");
-
-	set_analog_mode(MODE_8_BIT);	// configure ADC for 8-bit readings
-
-	while (1)			// loop here until we detect a button press and return
+	all_inputs();
+	while(1)
 	{
-		time_reset();				// reset millisecond timer count to zero
-
-		DDRC = 0;					// make PC0 - PC5 inputs
-		PORTC = 0;					// PC0 - PC5 -> high impedance inputs
-		DDRD &= ~0x03;				// clear PD0 & PD1 bits (make them inputs)
-		PORTD &= ~0x03;				// PD0 & PD1 -> high impedance inputs
-		PORTC |= ~outputs >> 2;		// set the outputs states of PC0 - PC5
-		DDRC |= outputs >> 2;		// make low pin an output (inputs for rest)
-		PORTD |= ~outputs & 0x03;	// set the output states of PD0 and PD1
-		DDRD |= outputs & 0x03;		// make low pin an output (inputs for rest)
-
-		// The following loop will execute for an amount of time determined
-		// by the position of the user trimmer potentiometer (trimpot).
-		// When the trimpot is at one extreme, the loop will take 256*2 = 512
-		// milliseconds.  When the trimpot is at the other extreme, the
-		// loop will only execute once, which takes slightly more than 20 ms.
-		// In this way, the trimpot controls the speed at which the output
-		// byte changes.
-		do
-		{
-			// The bits of the "inputs" byte reflect the input values of pins
-			// PD0, PD1, and PC0 - PC5.  Bit 0 corresponds to PD0, bit 1 to
-			// PD1, and bits 2 - 7 to PC0 - PC5, respectively.
-			unsigned char inputs = PIND & 0x03;	// store PD0 and PD1 input vals
-			inputs |= PINC << 2;	// store PC0 - PC5 input values
-			lcd_goto_xy(0, 1);		// go to the start of the second LCD line
-			print_binary(inputs);	// print the "input" byte in binary
-			delay_ms(20);			// delay here for 20 milliseconds
-			// check if top or bottom buttons have been pressed
-			button = button_is_pressed(TOP_BUTTON | BOTTOM_BUTTON);
-			if (button != 0)	// if so, reset I/O states, return button ID
-			{
-				DDRC = 0;		// make PC0 - PC5 inputs
-				PORTC = 0;		// disable pull-ups on PC0 - PC5
-				DDRD &= ~0x03;	// make PD0 and PD1 inputs
-				PORTD &= ~0x03;	// disable pull-ups on PD0 and PD1
-				return button;
-			}
-		}
-		while (get_ms() < read_trimpot() * 2);
-
-		if (direction)
-			outputs <<= 1;		// bit-shift our output byte left by one bit
-		else
-			outputs >>= 1;		// bit-shift our output byte right by one bit
-
-		if (outputs == 1)		// if we have reached the right edge
-			direction = 1;		// switch direction to "left"
-		if (outputs == 0x80)	// if we have reached the left edge
-			direction = 0;		// switch direction to "right"
-	}
-}
-
-
-// This function comprises the main part of the motor speed update loop.
-// If a button press is detected, both the red and green user LEDs are
-// turned off, as are the motor outputs.  This function also includes
-// a brief delay that ensures the entire loop takes the desired amount
-// of time.
-unsigned char motorUpdate(unsigned char motor, int speed)
-{
-	unsigned char button;
-
-	if (motor == 0)		// set the desired motor to the desired speed
-		set_m1_speed(speed);
-	else
-		set_m2_speed(speed);
-
-	delay_ms(2);		// delay here for 2 milliseconds
-
-	// check if top or bottom buttons have been pressed
-	button = button_is_pressed(TOP_BUTTON | MIDDLE_BUTTON);
-	if (button != 0)	// if so, turn off motors and LEDs, return button ID
-	{
-		red_led(0);
+		red_led(1);
 		green_led(0);
-		set_motors(0, 0);
+		delay_ms(250);
+		red_led(0);
+		green_led(1);
+		delay_ms(250);
 	}
-	return button;
 }
 
-
-// *** triggered by middle button ***
-// This function tests the motors by first ramping motor1 speed from zero
-// to full speed "forward", to full speed "reverse", and finally back to zero.
-// It then does the same for motor2 before repeating all over again.
-// While motor1 is running, the red user LED is on, otherwise it is off.
-// While the currently active motor is moving "forward", the green user LED
-// is on, otherwise it is off.  The LCD gives you feedback as to which motor
-// is currently moving in which direction (F = "forward", R = "reverse", and
-// - = inactive).
-unsigned char motorTest()
+// jig_test: make sure that the board is on the test fixture.
+// (This test code should be run on the test fixture with no LCD
+//  attached.)
+// At this point, we want to drive as few lines as possible because
+// we don't know what kind of hardware the board is connected to and
+// we don't want to damage anything.  Any of the lines that we DO drive
+// should be lines that the user is unlikely to hook up to anything.
+void jig_test()
 {
-	unsigned char button;
-	int speed;
-	unsigned char motor = 0;
+	all_inputs();
 
-	clear();			// clear the LCD, go to the start of the first LCD line
-	print("motor2");	// print to the first line of the LCD
-	lcd_goto_xy(0, 1);	// go to the start of the second LCD line
-	print("motor1");	// print to the second line of the LCD
+	// Make sure PD3 is connected to PC5.
+	set_digital_input(IO_D3, PULL_UP_ENABLED);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_D3)){	error_red_led(); }
+	set_digital_output(IO_C5, LOW);
+	delay_ms(1);
+	if (is_digital_input_high(IO_D3)){ error_red_led(); }
+}
 
-	while (1)
+// demux_test: Flash the 8 LEDs connected to the demultiplexer
+// in sequence.  PD5 -> SPWM,  PD0 -> SA, PD1 -> SB, PD2 -> SC
+void demux_test()
+{
+	unsigned char led = 0;
+
+	all_inputs();
+
+	set_digital_output(IO_D5, HIGH);
+
+	while(1)
 	{
-		red_led(!motor);	// turn red LED on when m1 is active, off for m2
-		lcd_goto_xy(7, !motor);	// go to end of LCD line for active motor
-		print("F");				// print "F" for "forward"
-		lcd_goto_xy(7, motor);	// go to end of LCD line for inactive motor
-		print("-");				// print "-" for "inactive"
-		green_led(1);		// turn green LED on when motor is moving "forward"
-		for (speed = 0; speed < 255; speed++)
-		{
-			button = motorUpdate(motor, speed);	// ramp up motor speed
-			if (button != 0)					//  from 0 to 255
-				return button;
-		}
+		// Select the next LED.
+		if (led == 0) { led = 7; }
+		else { led--; }
 
-		for (speed = 255; speed > -255; speed--)
-		{
-			if (speed == -1)	// motor starts moving in "reverse"
-			{
-				green_led(0);	// green LED off when motor going "reverse"
-				lcd_goto_xy(7, !motor);	// go to end of active motor's LCD line
-				print("R");		// print "R" for "reverse"
-			}
-
-			button = motorUpdate(motor, speed);	// ramp down motor speed
-			if (button != 0)					//  from 255 to -255
-				return button;
-		}
-
-		for (speed = -255; speed <= 0; speed++)
-		{
-			button = motorUpdate(motor, speed);	// ramp up motor speed
-			if (button != 0)					//  from -255 to 0
-				return button;
-		}
-
-		motor = !motor;		// alternate between m1 and m2
+		set_digital_output(IO_D0, led & 1);
+		set_digital_output(IO_C1, led & 2);
+		set_digital_output(IO_D2, led & 4);
+		
+		delay_ms(180);
 	}
 }
 
 void test()
 {
-	unsigned char button;
+	set_analog_mode(MODE_8_BIT);
 
-	clear();
-	delay(200);
-	print("Orangutn");	// print to the top line of the LCD
-	delay_ms(400);		// delay 200 ms
-	lcd_goto_xy(0, 1);	// go to the start of the second LCD line
-	print(" SVP");	    // print to the bottom line of the LCD
+	jig_test();
 
-	delay_ms(1000);		// delay 700 ms
-
-	clear();			// clear the LCD, move cursor to start of top line
-
-	print("  VBAT");
-
-	do
-	{
-		// Perform 10-bit analog-to-digital conversions on ADC channel 6.
-		// Average ten readings and return the result, which will be one
-		// third of the battery voltage when the "ADC6 = VBAT/3" solder
-		// bridge is in place on the bottom of the Orangutan PCB
-		int vbat = analog_read_average(6, 10);	// 10-sample avg of ADC6
-		vbat = to_millivolts(vbat) * 3;	// convert reading to bat. voltage (mV)
-		lcd_goto_xy(0, 1);	// go to the start of the second LCD line
-		print_long(vbat);	// display battery voltage in millivolts
-		print(" mV ");		// display the units
-		delay_ms(50);		// delay for 50 ms
-		button = button_is_pressed(ALL_BUTTONS);	// check for button press
-	}
-	while (button == 0);	// loop if no buttons are being pressed
-
-
-	// *** MAIN LOOP ***
-
-	while (1)	// loop forever
-	{
-		if (button & TOP_BUTTON)			// if the top button is pressed
-			button = melodyTest();	// this func. loops until next button press
-
-		else if (button & MIDDLE_BUTTON)	// if the middle button is pressed
-			button = IOTest();		// this func. loops until next button press
-
-		else if (button & BOTTOM_BUTTON)	// if the bottom button is pressed
-			button = motorTest();	// this func. loops until next button press
-	}
+	demux_test();
 }
 
-/* End of simpler test code.                                          */
+/* End of factory test code.                                          */
 /**********************************************************************/
 
 
@@ -1106,15 +860,16 @@ void test()
 // must have a main() function defined somewhere.
 int main()
 {
+	test(); // tmphax
+
+	// If any button is pressed, go into the factory test code.
+	if(button_is_pressed(BOTTOM_BUTTON))
+		test();
+
 	clear();
 	print_two_lines_delay_1s(PSTR("     Pololu     "),
 	                         PSTR(" Orangutan SVP  "));
 
-	// if any button is pressed, go into the old version of the test code
-	if(button_is_pressed(ALL_BUTTONS))
-		test(); // activate the simpler test code
-
-	// set up the robot
 	initialize();
 
 	// This is the "main loop" - it will run forever.
