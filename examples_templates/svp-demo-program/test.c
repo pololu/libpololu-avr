@@ -798,6 +798,8 @@ void menu_select()
 #define ERROR_A6_HIGH              0b10100101
 #define ERROR_A6_LOW               0b10100110
 #define ERROR_SHUTDOWN             0b10100111
+#define ERROR_AREF_HIGH            0b10101000
+#define ERROR_AREF_LOW             0b10101001
 
 void all_inputs()
 {
@@ -907,7 +909,17 @@ void flash_leds(unsigned char leds)
 void show_leds(unsigned char leds, unsigned short time)
 {
 	time_reset();
-	while(get_ms() < time){ flash_leds(leds); }
+	while(get_ms() < time)
+	{
+		if (leds)
+		{
+			flash_leds(leds);
+		}
+		else
+		{
+			turn_off_leds(leds);
+		}
+	}
 }
 
 void error(unsigned char leds)
@@ -934,6 +946,37 @@ void jig_test()
 	set_digital_output(IO_C5, LOW);
 	delay_ms(1);
 	if (is_digital_input_high(IO_D3)){ error_red_led(); }
+}
+
+void aref_test()
+{
+	ADCSRA = 0b10000111; // Turn on ADC and use largest prescaler.
+	ADMUX = 0b11111110;  // Use 2.56 V reference, left-aligned, channel = 1.1 V reference
+	delay_ms(5);
+	ADCSRA |= 1 << ADSC; // start the conversion
+	while(ADCSRA & (1<<ADSC)){};
+
+	unsigned char result = ADCH;
+
+	// Expect ADCH = 1.1*255/2.56 = 110 
+	if (result > 110u)
+	{
+		while(1)
+		{
+			show_leds(ERROR_AREF_HIGH,500);
+			show_leds(result, 1200);
+		}
+	}
+
+	if (result < 90u)
+	{
+		while(1)
+		{
+			show_leds(ERROR_AREF_LOW,500);
+			show_leds(result, 1200);
+		}
+	}
+
 }
 
 // demux_test: Flash the 8 LEDs connected to the demultiplexer
@@ -1261,13 +1304,11 @@ void test()
 	jig_test();
 
 	demux_test();
-
+	aref_test();
 	factory_motor_test();
-
 	input_test();
 
 	vadj_test();
-
 	shutdown_test();
 }
 

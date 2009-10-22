@@ -282,7 +282,7 @@ void OrangutanAnalog::startConversion(unsigned char channel, unsigned char use_i
 		ADMUX &= ~(1 << 7);
 	}
 
-	ADMUX &= 0xF0;		 // set the conversion channel
+	ADMUX &= 0xE0;		 // set the conversion channel
 	ADMUX |= channel;    // assumption: channel is less than 16 (32 on the ATmega324/1284)
 	ADCSRA |= 1 << ADSC; // start the conversion
 }
