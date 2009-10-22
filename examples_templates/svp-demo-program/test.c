@@ -799,6 +799,38 @@ void error_red_led()
 	}
 }
 
+void turn_on_led(unsigned char number)
+{
+	set_digital_output(IO_D5, HIGH);
+	set_digital_output(IO_D0, (number & 1) ? HIGH : LOW);
+	set_digital_output(IO_C1, (number & 2) ? HIGH : LOW);
+	set_digital_output(IO_D2, (number & 4) ? HIGH : LOW);
+}
+
+void turn_off_leds()
+{
+	set_digital_output(IO_D5, LOW);
+}
+
+void flash_leds(unsigned char leds)
+{
+	unsigned char i;
+	for(i=0; i < 8; i++)
+	{
+		if (leds >> i & 1)
+		{
+			turn_on_led(i);
+			delay_ms(2);
+		}
+	}
+}
+
+void show_leds(unsigned char leds, unsigned short time)
+{
+	time_reset();
+	while(get_ms() < time){ flash_leds(leds); }
+}
+
 // jig_test: make sure that the board is on the test fixture.
 // (This test code should be run on the test fixture with no LCD
 //  attached.)
@@ -820,36 +852,127 @@ void jig_test()
 }
 
 // demux_test: Flash the 8 LEDs connected to the demultiplexer
-// in sequence.  PD5 -> SPWM,  PD0 -> SA, PD1 -> SB, PD2 -> SC
+// in sequence.  PD5 -> SPWM,  PD0 -> SA, PC1 -> SB, PD2 -> SC.
+// PB2 -> Button -> PB0
 void demux_test()
 {
 	unsigned char led = 0;
 
 	all_inputs();
 
-	set_digital_output(IO_D5, HIGH);
-
 	while(1)
 	{
+		set_digital_output(IO_B2, LOW);
+		set_digital_input(IO_B0, PULL_UP_ENABLED);
+
 		// Select the next LED.
 		if (led == 0) { led = 7; }
 		else { led--; }
 
-		set_digital_output(IO_D0, led & 1);
-		set_digital_output(IO_C1, led & 2);
-		set_digital_output(IO_D2, led & 4);
-		
-		delay_ms(180);
+		turn_on_led(led);
+
+		time_reset();
+		while(get_ms() < 180)
+		{
+			// Check to see if B0 is connected to B2.
+			if (!is_digital_input_high(IO_B0))
+			{
+				set_digital_output(IO_B2, HIGH);
+				delay_ms(1);
+				if (is_digital_input_high(IO_B0))
+				{
+					set_digital_output(IO_B2, LOW);
+					delay_ms(1);
+					if (!is_digital_input_high(IO_B0))
+					{
+						while(!is_digital_input_high(IO_B0));
+						return; // Success
+					}
+				}
+			}
+		}
+	}
+}
+
+// VADJ -- 4.6k -- PA0 -- 2.2k -- GND
+//
+//                  Max     Min
+// VADJ             9.0 V   2.5 V
+// PA0              3.0 V   .83 V
+// reading          153     42     (ADC offset error not accounted for)
+// (reading-50)/10  10.3    0
+void vadj_test()           
+{
+	set_analog_mode(MODE_8_BIT);
+
+	unsigned char levels_reached = 0;
+
+	all_inputs();
+
+	analog_read_average(0, 10);
+	
+	while(1)
+	{
+		// Compute what level the VADJ is on a scale of 0-7.
+		unsigned char level = analog_read(0);
+		if (level < 50){ level = 0; }
+		else { level = (level - 50)/10; }
+		if (level > 7){ level = 7; }
+
+		levels_reached |= 1<<level;  // Record this level.
+		if(levels_reached == 0xFF)
+		{
+			return; // Succes!
+		}
+
+		//if (level==1)
+		//{
+		//	turn_on_led(1);
+		//}
+		//delay_ms(2);
+		//if (level==3)
+		//{
+		//	turn_on_led(3);
+		//}
+		//delay_ms(2);
+		//continue;
+
+		//flash_leds(analog_read(0)); continue; // tmphax
+
+		// Show the levels on the 8 LEDs.
+		// LED off: level not reached.
+		// LED on dim: level reached.
+		// LED on bright: current level.
+		for(unsigned char i=0; i < 8; i++)
+		{
+			if ((levels_reached >> i) & 1){ turn_on_led(i); }
+			delay_ms((i == level) ? 8 : 2);
+		}
+
 	}
 }
 
 void test()
 {
-	set_analog_mode(MODE_8_BIT);
-
 	jig_test();
 
 	demux_test();
+
+	vadj_test();
+
+	// Success!  Flash all the LEDs together
+	all_inputs();
+	while(1)
+	{
+		red_led(1);
+		green_led(1);
+		show_leds(0xFF, 170);
+
+		turn_off_leds();
+		red_led(0);
+		green_led(0);
+		delay_ms(170);
+	}
 }
 
 /* End of factory test code.                                          */
