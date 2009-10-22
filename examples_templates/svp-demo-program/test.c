@@ -772,8 +772,31 @@ void menu_select()
 	}
 }
 
-/**********************************************************************/
-/* Factory test code accessed by holding down a button on startup     */
+/******************************************************************************/
+/* Factory test code accessed by holding down a button on startup             */
+
+// Error codes
+#define ERROR_CURRENT_SENSE_1_LOW  0b10000010
+#define ERROR_CURRENT_SENSE_1_HIGH 0b10000100
+#define ERROR_CURRENT_SENSE_2_LOW  0b10000110
+#define ERROR_CURRENT_SENSE_2_HIGH 0b10001000
+#define ERROR_D0_LOW               0b10001010
+#define ERROR_D2_LOW               0b10001100
+#define ERROR_C5_LOW               0b10001110
+#define ERROR_C5_HIGH              0b10010000
+#define ERROR_D2_HIGH              0b10010010
+#define ERROR_D4_HIGH              0b10010100
+#define ERROR_B1_LOW               0b10010110
+#define ERROR_B1_HIGH              0b10011000
+#define ERROR_D5_LOW               0b10011010
+#define ERROR_C1_LOW               0b10011100
+#define ERROR_B4_LOW               0b10011110
+#define ERROR_C3_LOW               0b10100000
+#define ERROR_C3_HIGH              0b10100010
+#define ERROR_A4_HIGH              0b10100011
+#define ERROR_A4_LOW               0b10100100
+#define ERROR_A6_HIGH              0b10100101
+#define ERROR_A6_LOW               0b10100110
 
 void all_inputs()
 {
@@ -782,6 +805,61 @@ void all_inputs()
 
 	// Disable all pull-up resistors.
 	PORTA = PORTB = PORTC = PORTD = 0;
+}
+
+// Drive all the lines low which are safe to drive.
+void drive_all_low()
+{
+	// Make all pins inputs right now so that all pins will be in a known state
+	// at the end of this function, and so that we don't cause momentary shorts
+	// when changing output states.
+	all_inputs();
+
+	// Motor control lines
+	set_digital_output(IO_D7, LOW);
+	set_digital_output(IO_D6, LOW);
+	set_digital_output(IO_C7, LOW);
+	set_digital_output(IO_C6, LOW);
+
+	// Demux control lines
+	set_digital_output(IO_D5, LOW); // SPWM / pic RX
+	set_digital_output(IO_D0, LOW);
+	set_digital_output(IO_C1, LOW);
+	set_digital_output(IO_D2, LOW);
+
+	set_digital_output(IO_D4, LOW); // Buzzer
+
+	// Button to end demux test
+	set_digital_output(IO_B0, LOW);
+	set_digital_output(IO_B2, LOW);
+
+	set_digital_output(IO_A0, LOW); // VADJ current divider
+
+	set_digital_output(IO_C4, LOW); // green LED
+
+	set_digital_output(IO_D1, LOW); // red LED
+
+	set_digital_output(IO_B4, LOW); // backlight (with external pull-up, good)
+
+	// A4 connected to B1
+	set_digital_output(IO_B1, LOW);
+	set_digital_output(IO_A4, LOW);
+
+	// Misc
+	set_digital_output(IO_A3, LOW);
+	set_digital_output(IO_A5, LOW);
+	set_digital_output(IO_A7, LOW);
+
+	set_digital_output(IO_B3, LOW);
+
+	set_digital_output(IO_C0, LOW);
+	set_digital_output(IO_C2, LOW);
+	set_digital_output(IO_C5, LOW);
+
+	// Pins it is NOT safe to drive:
+	// A1, A2: connected to current sense lines.
+	// A6: connected to PD4bar
+	// C3: conencted to K
 }
 
 // A fatal error has occurred, so blink the red LED forever.
@@ -831,6 +909,12 @@ void show_leds(unsigned char leds, unsigned short time)
 	while(get_ms() < time){ flash_leds(leds); }
 }
 
+void error(unsigned char leds)
+{
+	all_inputs();
+	while(1){ flash_leds(leds); }
+}
+
 // jig_test: make sure that the board is on the test fixture.
 // (This test code should be run on the test fixture with no LCD
 //  attached.)
@@ -840,11 +924,11 @@ void show_leds(unsigned char leds, unsigned short time)
 // should be lines that the user is unlikely to hook up to anything.
 void jig_test()
 {
-	all_inputs();
+	all_inputs(); // DON'T drive all low until we  know we're on the jig
 
 	// Make sure PD3 is connected to PC5.
 	set_digital_input(IO_D3, PULL_UP_ENABLED);
-	delay_ms(1);
+	delay_ms(2);
 	if (!is_digital_input_high(IO_D3)){	error_red_led(); }
 	set_digital_output(IO_C5, LOW);
 	delay_ms(1);
@@ -856,61 +940,69 @@ void jig_test()
 // PB2 -> Button -> PB0
 void demux_test()
 {
-	unsigned char led = 0;
+	unsigned char led = 7;
 
-	all_inputs();
+	drive_all_low();
 
 	while(1)
 	{
-		set_digital_output(IO_B2, LOW);
-		set_digital_input(IO_B0, PULL_UP_ENABLED);
+		turn_on_led(led);
 
 		// Select the next LED.
 		if (led == 0) { led = 7; }
 		else { led--; }
 
-		turn_on_led(led);
-
 		time_reset();
 		while(get_ms() < 180)
 		{
 			// Check to see if B0 is connected to B2.
-			if (!is_digital_input_high(IO_B0))
-			{
-				set_digital_output(IO_B2, HIGH);
-				delay_ms(1);
-				if (is_digital_input_high(IO_B0))
-				{
-					set_digital_output(IO_B2, LOW);
-					delay_ms(1);
-					if (!is_digital_input_high(IO_B0))
-					{
-						while(!is_digital_input_high(IO_B0));
-						return; // Success
-					}
-				}
-			}
+			set_digital_input(IO_B0, PULL_UP_ENABLED);
+
+			set_digital_output(IO_B2, LOW);
+			delay_ms(1);
+			if (is_digital_input_high(IO_B0)){ continue; }
+
+			set_digital_output(IO_B2, HIGH);
+			delay_ms(1);
+			if (!is_digital_input_high(IO_B0)){ turn_on_led(2); continue; }
+
+			set_digital_input(IO_B2, PULL_UP_ENABLED);
+
+			set_digital_output(IO_B0, HIGH);
+			delay_ms(1);
+			if (!is_digital_input_high(IO_B2)){ turn_on_led(3); continue; }
+
+			set_digital_output(IO_B0, LOW);
+			delay_ms(1);
+			if (is_digital_input_high(IO_B2)){ turn_on_led(4); continue; }
+
+			while(!is_digital_input_high(IO_B2)); // Wait for button release.
+			return; // Success
 		}
 	}
 }
 
-// VADJ -- 4.6k -- PA0 -- 2.2k -- GND
+// Connections: VADJ -- 4.6k -- PA0 -- 2.2k -- GND
 //
 //                  Max     Min
 // VADJ             9.0 V   2.5 V
 // PA0              3.0 V   .83 V
 // reading          153     42     (ADC offset error not accounted for)
 // (reading-50)/10  10.3    0
+//
+// For this test to the succeed, the user must turn the VADJ pot from
+// one extreme to the other.  The 8 LEDs on the MUX give the user feedback
+// about the current VADJ level and which levels he needs to reach.
 void vadj_test()           
 {
 	set_analog_mode(MODE_8_BIT);
 
 	unsigned char levels_reached = 0;
 
-	all_inputs();
+	drive_all_low();
+	set_digital_input(IO_A0, HIGH_IMPEDANCE);
+	delay_ms(2);	
 
-	analog_read_average(0, 10);
-	
 	while(1)
 	{
 		// Compute what level the VADJ is on a scale of 0-7.
@@ -925,20 +1017,6 @@ void vadj_test()
 			return; // Succes!
 		}
 
-		//if (level==1)
-		//{
-		//	turn_on_led(1);
-		//}
-		//delay_ms(2);
-		//if (level==3)
-		//{
-		//	turn_on_led(3);
-		//}
-		//delay_ms(2);
-		//continue;
-
-		//flash_leds(analog_read(0)); continue; // tmphax
-
 		// Show the levels on the 8 LEDs.
 		// LED off: level not reached.
 		// LED on dim: level reached.
@@ -946,10 +1024,215 @@ void vadj_test()
 		for(unsigned char i=0; i < 8; i++)
 		{
 			if ((levels_reached >> i) & 1){ turn_on_led(i); }
+			else { turn_off_leds(); }
 			delay_ms((i == level) ? 8 : 2);
 		}
 
 	}
+}
+
+void gradual_set_motors(signed int target1, signed int target2)
+{
+	static signed int speed1 = 0;
+	static signed int speed2 = 0;
+
+	while(speed1 != target1 || speed2 != target2)
+	{
+		if (target1 > speed1){ speed1 += 1; }
+		else if (target1 < speed1){ speed1 -= 1; }
+
+		if (target2 > speed2){ speed2 += 1; }
+		else if (target2 < speed2){ speed2 -= 1; }
+
+		set_motors(speed1, speed2);
+
+		delay_ms(2);
+	}
+
+}
+
+void assert_current_sense(unsigned char cs1, unsigned char cs2)
+{
+	switch(cs1)
+	{
+		case LOW:  if (analog_read(1) > 9){ error(ERROR_CURRENT_SENSE_1_HIGH); } break;
+		case HIGH: if (analog_read(1) < 15){ error(ERROR_CURRENT_SENSE_1_LOW); } break;
+	}
+
+	switch(cs2)
+	{
+		case LOW:  if (analog_read(2) > 9){ error(ERROR_CURRENT_SENSE_2_HIGH); } break;
+		case HIGH: if (analog_read(2) < 15){ error(ERROR_CURRENT_SENSE_2_LOW); } break;
+	}
+
+}
+
+// Both motor outputs should be hooked up to motors that can draw at least
+// 500 mA of current when driven at 9 V.  
+// CS1 -> A1
+// CS2 -> A2
+void factory_motor_test()
+{
+	return; // TMPHAX: return because we don't have any motors yet
+
+	drive_all_low();
+	set_analog_mode(MODE_8_BIT);
+
+	assert_current_sense(LOW, LOW);
+
+	// Test all 9 combinations of motor speed.
+	gradual_set_motors( 255,    0); assert_current_sense(HIGH, LOW );
+	gradual_set_motors( 255,  255); assert_current_sense(HIGH, HIGH);
+	gradual_set_motors(  0,   255); assert_current_sense(LOW,  HIGH);
+	gradual_set_motors(-255,  255); assert_current_sense(HIGH, LOW );
+	gradual_set_motors(-255,    0); assert_current_sense(HIGH, LOW );
+	gradual_set_motors(-255, -255); assert_current_sense(HIGH, HIGH);
+	gradual_set_motors(  0,  -255); assert_current_sense(LOW,  HIGH);
+	gradual_set_motors(255,  -255); assert_current_sense(HIGH, HIGH);
+	gradual_set_motors(  0,     0); assert_current_sense(LOW,  LOW );
+
+	delay_ms(100);
+}
+
+void input_test()
+{
+	// Pin 1: MOSI: tested when we communicate with aux. processor
+	// Pin 2: MISO: tested when we communicate with aux. processor
+	// Pin 3: SCK: tested when we communicate with aux. processor
+	// Pin 4: RESET: tested when the AVR is programmed
+	// Pin 5: VCC
+	// Pin 6: GND
+	// Pin 7: XTAL1: tested whenever the AVR is running
+	// Pin 8: XTAL2: tested whenever the AVR is running
+
+	// Pin 9: PD0: connected to SA and A and tested during demux test
+	drive_all_low();
+	set_digital_input(IO_D0, PULL_UP_ENABLED);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_D0)){ error(ERROR_D0_LOW); }
+
+	// TODO: Pin 10: PD1
+		
+	// Pin 11: PD2: connected to SC and C and tested during demux test
+	drive_all_low();
+	set_digital_input(IO_D2, PULL_UP_ENABLED);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_D2)){ error(ERROR_D2_LOW); }
+
+	// Pin 12: PD3 connected to PC5 and already tested a little bit in jig_test
+	// Pin 24: PC5
+	drive_all_low();
+	set_digital_input(IO_C5, PULL_UP_ENABLED);
+	set_digital_input(IO_D3, PULL_UP_ENABLED);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_D3)){ error(ERROR_D2_LOW); }
+	if (!is_digital_input_high(IO_C5)){ error(ERROR_C5_LOW); }
+	set_digital_output(IO_C5, LOW);
+	delay_ms(1);
+	if (is_digital_input_high(IO_D3)){ error(ERROR_D2_HIGH); }
+	set_digital_input(IO_C5, PULL_UP_ENABLED);
+	set_digital_output(IO_D3, LOW);
+	delay_ms(1);
+	if (is_digital_input_high(IO_C5)){ error(ERROR_C5_HIGH); }
+
+	// Pin 13: PD4 connected to buzzer MOSFET input
+	// Pin 31: PA6 connected to PD4bar
+	drive_all_low();
+	set_digital_input(IO_D4, HIGH_IMPEDANCE);  // D4 gets externally pulled down
+	set_digital_input(IO_A6, PULL_UP_ENABLED);
+	delay_ms(5);
+	if (is_digital_input_high(IO_D4)){ error(ERROR_D4_HIGH); }
+	if (!is_digital_input_high(IO_A6)){ error(ERROR_A6_LOW); }
+	set_digital_output(IO_D4, HIGH);
+	delay_ms(1);
+	if (is_digital_input_high(IO_A6)){ error(ERROR_A6_HIGH); }
+
+	// Pin 14: PD5 connected to SPWM/RX
+	drive_all_low();
+	set_digital_input(IO_D5, PULL_UP_ENABLED);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_D5)){ error(ERROR_D5_LOW); }
+
+	// Pin 15: PD6/PWM2: tested as output in motor test
+	// Pin 16: PD7/PWM2: tested as output in motor test
+
+	// Pin 17: VCC
+	// Pin 18: GND
+
+	// TODO: Pin 19: PC0
+
+	// Pin 20: PC1 connected to SB and tested in demuxTest
+	drive_all_low();
+	set_digital_input(IO_C1, PULL_UP_ENABLED);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_C1)){ error(ERROR_C1_LOW); }
+
+	// TODO: Pin 21: PC2: connected to the pushbutton 1k pulldown
+	
+	// Pin 22: PC3: connected to K
+	// Pin 44: PB4: connected to backlight MOSFET input
+	drive_all_low();
+	set_digital_input(IO_B4, HIGH_IMPEDANCE);  // B4 externally pulled up
+	set_digital_input(IO_C3, PULL_UP_ENABLED);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_B4)){ error(ERROR_B4_LOW); }
+	if (is_digital_input_high(IO_C3)){ error(ERROR_C3_HIGH); }
+	set_digital_output(IO_B4, LOW);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_C3)){ error(ERROR_C3_LOW); }
+
+	// TODO: Pin 23: PC4
+
+	// Pin 24: see above
+	// Pin 25: PC6/DIR2: tested as output in motor_test
+	// Pin 26: PC6/DIR2: tested as output in motor_test
+	// Pin 27: AVCC: tested whenever we take an ADC reading?
+	// Pin 28: GND
+
+	// TODO: Pin 29: AREF
+
+	// TODO: Pin 30: PA7
+
+	// Pin 31: see above
+
+	// TODO: Pin 32: PA5
+
+	// Pin 33: PA4 connected to pin PB1, which has an external 4.7k pull-down resistor
+	// Pin 41: PB1
+	drive_all_low();
+	set_digital_input(IO_A4, HIGH_IMPEDANCE);
+	set_digital_input(IO_B1, PULL_UP_ENABLED);
+	if (is_digital_input_high(IO_A4)){ error(ERROR_A4_HIGH); }
+	if (is_digital_input_high(IO_B1)){ error(ERROR_B1_HIGH); }
+	set_digital_output(IO_B1, HIGH);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_A4)){ error(ERROR_A4_LOW); }
+	set_digital_input(IO_B1, HIGH_IMPEDANCE);
+	set_digital_output(IO_A4, HIGH);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_B1)){ error(ERROR_B1_LOW); }
+
+	// TODO: Pin 34: PA3
+
+	// Pin 35: PA2: connected to CS2, tested as input in motor_test
+	// Pin 36: PA1: connected to CS1, tested as input in motor_test
+	// Pin 37: PA0: connected to VADJ/3, tested as input in vadj_test
+	// Pin 38: VCC
+	// Pin 39: GND
+	// Pin 40: PB0: tested in demuxTest
+
+	// TODO: Pin 41: PB1
+
+	// Pin 42: PB2: tested in demuxTest
+
+	// TODO: Pin 43: PB3
+
+	// Pin 44: see above
+
+	// TODO: test aux. processor input A
+	// TODO: test aux. processor input B
+	// TODO: test aux. processor input C
+	// TODO: test aux. processor input D
 }
 
 void test()
@@ -957,6 +1240,10 @@ void test()
 	jig_test();
 
 	demux_test();
+
+	factory_motor_test();
+
+	input_test();
 
 	vadj_test();
 
@@ -975,8 +1262,8 @@ void test()
 	}
 }
 
-/* End of factory test code.                                          */
-/**********************************************************************/
+/* End of factory test code.                                                  */
+/******************************************************************************/
 
 
 // This is the main function, where the code starts.  All C programs
