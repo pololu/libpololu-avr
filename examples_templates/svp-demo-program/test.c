@@ -797,6 +797,7 @@ void menu_select()
 #define ERROR_A4_LOW               0b10100100
 #define ERROR_A6_HIGH              0b10100101
 #define ERROR_A6_LOW               0b10100110
+#define ERROR_SHUTDOWN             0b10100111
 
 void all_inputs()
 {
@@ -852,14 +853,14 @@ void drive_all_low()
 
 	set_digital_output(IO_B3, LOW);
 
-	set_digital_output(IO_C0, LOW);
 	set_digital_output(IO_C2, LOW);
 	set_digital_output(IO_C5, LOW);
 
 	// Pins it is NOT safe to drive:
 	// A1, A2: connected to current sense lines.
 	// A6: connected to PD4bar
-	// C3: conencted to K
+	// C3: connected to K
+	// C0: connected to shutdown (off) pin so can't drive it low until the end
 }
 
 // A fatal error has occurred, so blink the red LED forever.
@@ -943,6 +944,7 @@ void demux_test()
 	unsigned char led = 7;
 
 	drive_all_low();
+	set_digital_output(IO_C0, LOW); // connected to shutdown pin, so can't drive it low!
 
 	while(1)
 	{
@@ -1186,7 +1188,7 @@ void input_test()
 	// Pin 24: see above
 	// Pin 25: PC6/DIR2: tested as output in motor_test
 	// Pin 26: PC6/DIR2: tested as output in motor_test
-	// Pin 27: AVCC: tested whenever we take an ADC reading?
+	// Pin 27: AVCC: tested whenever we take an ADC reading
 	// Pin 28: GND
 
 	// TODO: Pin 29: AREF
@@ -1235,6 +1237,25 @@ void input_test()
 	// TODO: test aux. processor input D
 }
 
+void shutdown_test()
+{
+	all_inputs();
+
+	// Flash LEDs 3 times
+	show_leds(0xFF, 170);
+	turn_off_leds();
+	delay_ms(170);
+	show_leds(0xFF, 170);
+	turn_off_leds();
+	delay_ms(170);
+	show_leds(0xFF, 170);
+	
+	// Turn off the power supply
+	set_digital_input(IO_C0, PULL_UP_ENABLED);
+
+	while(1){ flash_leds(ERROR_SHUTDOWN); }
+}
+
 void test()
 {
 	jig_test();
@@ -1247,19 +1268,7 @@ void test()
 
 	vadj_test();
 
-	// Success!  Flash all the LEDs together
-	all_inputs();
-	while(1)
-	{
-		red_led(1);
-		green_led(1);
-		show_leds(0xFF, 170);
-
-		turn_off_leds();
-		red_led(0);
-		green_led(0);
-		delay_ms(170);
-	}
+	shutdown_test();
 }
 
 /* End of factory test code.                                                  */
