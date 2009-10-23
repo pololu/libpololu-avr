@@ -793,13 +793,26 @@ void menu_select()
 #define ERROR_B4_LOW               0b10011110
 #define ERROR_C3_LOW               0b10100000
 #define ERROR_C3_HIGH              0b10100010
-#define ERROR_A4_HIGH              0b10100011
-#define ERROR_A4_LOW               0b10100100
-#define ERROR_A6_HIGH              0b10100101
-#define ERROR_A6_LOW               0b10100110
-#define ERROR_SHUTDOWN             0b10100111
-#define ERROR_AREF_HIGH            0b10101000
-#define ERROR_AREF_LOW             0b10101001
+#define ERROR_A4_HIGH              0b10100100
+#define ERROR_A4_LOW               0b10100110
+#define ERROR_A6_HIGH              0b10101000
+#define ERROR_A6_LOW               0b10101010
+#define ERROR_SHUTDOWN             0b10101100
+#define ERROR_AREF                 0b10101110
+#define ERROR_D1_LOW               0b10110000
+#define ERROR_B3_LOW               0b10110010
+#define ERROR_B3_HIGH              0b10110100
+#define ERROR_D1_HIGH              0b10110110
+#define ERROR_C2_HIGH              0b10111000
+#define ERROR_C4_HIGH              0b10111010
+#define ERROR_C2_LOW               0b10111100
+#define ERROR_C4_LOW               0b10111110
+#define ERROR_A7_LOW               0b11000000
+#define ERROR_A5_LOW               0b11000010
+#define ERROR_A3_LOW               0b11000100
+#define ERROR_A7_HIGH              0b11000110
+#define ERROR_A5_HIGH              0b11001000
+#define ERROR_A3_HIGH              0b11001010
 
 void all_inputs()
 {
@@ -832,31 +845,28 @@ void drive_all_low()
 
 	set_digital_output(IO_D4, LOW); // Buzzer
 
-	// Button to end demux test
-	set_digital_output(IO_B0, LOW);
-	set_digital_output(IO_B2, LOW);
+	set_digital_output(IO_B0, LOW); // connected to demux-test button
+	set_digital_output(IO_B2, LOW); // connected to demux-test button
 
 	set_digital_output(IO_A0, LOW); // VADJ current divider
 
-	set_digital_output(IO_C4, LOW); // green LED
+	set_digital_output(IO_C4, LOW); // green LED, and connected to PC2
+	set_digital_output(IO_C2, LOW); // connected to PC4
 
-	set_digital_output(IO_D1, LOW); // red LED
+	set_digital_output(IO_D1, LOW); // red LED, connected to B3
+	set_digital_output(IO_B3, LOW); // connected to D1
 
 	set_digital_output(IO_B4, LOW); // backlight (with external pull-up, good)
 
-	// A4 connected to B1
-	set_digital_output(IO_B1, LOW);
-	set_digital_output(IO_A4, LOW);
+	set_digital_output(IO_D3, LOW); // connected to C5
+	set_digital_output(IO_C5, LOW); // connected to D3
 
-	// Misc
-	set_digital_output(IO_A3, LOW);
-	set_digital_output(IO_A5, LOW);
-	set_digital_output(IO_A7, LOW);
+	set_digital_output(IO_B1, LOW); // connected to A4
+	set_digital_output(IO_A4, LOW); // connected to B1
 
-	set_digital_output(IO_B3, LOW);
-
-	set_digital_output(IO_C2, LOW);
-	set_digital_output(IO_C5, LOW);
+	set_digital_output(IO_A3, LOW); // A3, A5, A7 connected together
+	set_digital_output(IO_A5, LOW); // A3, A5, A7 connected together
+	set_digital_output(IO_A7, LOW); // A3, A5, A7 connected together
 
 	// Pins it is NOT safe to drive:
 	// A1, A2: connected to current sense lines.
@@ -950,6 +960,8 @@ void jig_test()
 
 void aref_test()
 {
+	drive_all_low();
+
 	ADCSRA = 0b10000111; // Turn on ADC and use largest prescaler.
 	ADMUX = 0b11111110;  // Use 2.56 V reference, left-aligned, channel = 1.1 V reference
 	delay_ms(5);
@@ -959,24 +971,14 @@ void aref_test()
 	unsigned char result = ADCH;
 
 	// Expect ADCH = 1.1*255/2.56 = 110 
-	if (result > 110u)
+	if (result < 90u || result > 130u)
 	{
 		while(1)
 		{
-			show_leds(ERROR_AREF_HIGH,500);
+			show_leds(ERROR_AREF,500);
 			show_leds(result, 1200);
 		}
 	}
-
-	if (result < 90u)
-	{
-		while(1)
-		{
-			show_leds(ERROR_AREF_LOW,500);
-			show_leds(result, 1200);
-		}
-	}
-
 }
 
 // demux_test: Flash the 8 LEDs connected to the demultiplexer
@@ -1156,8 +1158,22 @@ void input_test()
 	delay_ms(1);
 	if (!is_digital_input_high(IO_D0)){ error(ERROR_D0_LOW); }
 
-	// TODO: Pin 10: PD1
-		
+	// Pin 10: PD1, connected to PB3 and pulled high through red LED
+	// Pin 43: PB3
+	drive_all_low();
+	set_digital_input(IO_D1, HIGH_IMPEDANCE);
+	set_digital_input(IO_B3, HIGH_IMPEDANCE);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_D1)){ error(ERROR_D1_LOW); }
+	if (!is_digital_input_high(IO_B3)){ error(ERROR_B3_LOW); }
+	set_digital_output(IO_D1, LOW);
+	delay_ms(1);
+	if (is_digital_input_high(IO_B3)){ error(ERROR_B3_HIGH); }
+	delay_ms(1);
+	set_digital_input(IO_D1, HIGH_IMPEDANCE);
+	set_digital_output(IO_B3, LOW);
+	if (is_digital_input_high(IO_D1)){ error(ERROR_D1_HIGH); }
+
 	// Pin 11: PD2: connected to SC and C and tested during demux test
 	drive_all_low();
 	set_digital_input(IO_D2, PULL_UP_ENABLED);
@@ -1189,7 +1205,7 @@ void input_test()
 	if (is_digital_input_high(IO_D4)){ error(ERROR_D4_HIGH); }
 	if (!is_digital_input_high(IO_A6)){ error(ERROR_A6_LOW); }
 	set_digital_output(IO_D4, HIGH);
-	delay_ms(1);
+	delay_ms(5);
 	if (is_digital_input_high(IO_A6)){ error(ERROR_A6_HIGH); }
 
 	// Pin 14: PD5 connected to SPWM/RX
@@ -1212,8 +1228,22 @@ void input_test()
 	delay_ms(1);
 	if (!is_digital_input_high(IO_C1)){ error(ERROR_C1_LOW); }
 
-	// TODO: Pin 21: PC2: connected to the pushbutton 1k pulldown
+	// Pin 21: PC2: connected to PC4 / pulled down through LED
+	// Pin 23: PC4
+	drive_all_low();
+	set_digital_input(IO_C4, HIGH_IMPEDANCE);
+	set_digital_input(IO_C2, HIGH_IMPEDANCE);
+	delay_ms(1);
+	if (is_digital_input_high(IO_C2)){ error(ERROR_C2_HIGH); }
+	if (is_digital_input_high(IO_C4)){ error(ERROR_C4_HIGH); }
+	set_digital_output(IO_C4, HIGH);
+	delay_ms(1);
+	if (!is_digital_input_high(IO_C2)){ error(ERROR_C2_LOW); }
+	set_digital_input(IO_C4, HIGH_IMPEDANCE);
+	set_digital_output(IO_C2, HIGH);
+	if (!is_digital_input_high(IO_C4)){ error(ERROR_C4_LOW); }
 	
+		
 	// Pin 22: PC3: connected to K
 	// Pin 44: PB4: connected to backlight MOSFET input
 	drive_all_low();
@@ -1226,21 +1256,50 @@ void input_test()
 	delay_ms(1);
 	if (!is_digital_input_high(IO_C3)){ error(ERROR_C3_LOW); }
 
-	// TODO: Pin 23: PC4
-
+	// Pin 23: see above
 	// Pin 24: see above
 	// Pin 25: PC6/DIR2: tested as output in motor_test
 	// Pin 26: PC6/DIR2: tested as output in motor_test
 	// Pin 27: AVCC: tested whenever we take an ADC reading
 	// Pin 28: GND
 
-	// TODO: Pin 29: AREF
+	// Pin 29: AREF, tested in aref_test()
 
-	// TODO: Pin 30: PA7
+	// Pin 30: PA7 connected to PA5 and PA3
+	// Pin 32: PA5
+	// Pin 34: PA3
+	drive_all_low();
+	set_digital_input(IO_A7, PULL_UP_ENABLED);
+	set_digital_input(IO_A5, HIGH_IMPEDANCE);
+	set_digital_input(IO_A3, HIGH_IMPEDANCE);
+	if (!is_digital_input_high(IO_A7)){ error(ERROR_A7_LOW); }
+	if (!is_digital_input_high(IO_A5)){ error(ERROR_A5_LOW); }
+	if (!is_digital_input_high(IO_A3)){ error(ERROR_A3_LOW); }
+	set_digital_output(IO_A7, LOW);
+	set_digital_input(IO_A5, HIGH_IMPEDANCE);
+	set_digital_input(IO_A3, HIGH_IMPEDANCE);
+	delay_ms(1);
+	if (is_digital_input_high(IO_A7)){ error(ERROR_A7_HIGH); }
+	if (is_digital_input_high(IO_A5)){ error(ERROR_A5_HIGH); }
+	if (is_digital_input_high(IO_A3)){ error(ERROR_A3_HIGH); }
+	set_digital_input(IO_A7, HIGH_IMPEDANCE);
+	set_digital_output(IO_A5, LOW);
+	set_digital_input(IO_A3, HIGH_IMPEDANCE);
+	delay_ms(1);
+	if (is_digital_input_high(IO_A7)){ error(ERROR_A7_HIGH); }
+	if (is_digital_input_high(IO_A5)){ error(ERROR_A5_HIGH); }
+	if (is_digital_input_high(IO_A3)){ error(ERROR_A3_HIGH); }
+	set_digital_input(IO_A7, HIGH_IMPEDANCE);
+	set_digital_input(IO_A5, HIGH_IMPEDANCE);
+	set_digital_output(IO_A3, LOW);
+	delay_ms(1);
+	if (is_digital_input_high(IO_A7)){ error(ERROR_A7_HIGH); }
+	if (is_digital_input_high(IO_A5)){ error(ERROR_A5_HIGH); }
+	if (is_digital_input_high(IO_A3)){ error(ERROR_A3_HIGH); }
 
 	// Pin 31: see above
 
-	// TODO: Pin 32: PA5
+	// Pin 32: see above
 
 	// Pin 33: PA4 connected to pin PB1, which has an external 4.7k pull-down resistor
 	// Pin 41: PB1
@@ -1257,7 +1316,7 @@ void input_test()
 	delay_ms(1);
 	if (!is_digital_input_high(IO_B1)){ error(ERROR_B1_LOW); }
 
-	// TODO: Pin 34: PA3
+	// Pin 34: see above
 
 	// Pin 35: PA2: connected to CS2, tested as input in motor_test
 	// Pin 36: PA1: connected to CS1, tested as input in motor_test
@@ -1266,11 +1325,11 @@ void input_test()
 	// Pin 39: GND
 	// Pin 40: PB0: tested in demuxTest
 
-	// TODO: Pin 41: PB1
+	// Pin 41: see above
 
 	// Pin 42: PB2: tested in demuxTest
 
-	// TODO: Pin 43: PB3
+	// Pin 43 see above
 
 	// Pin 44: see above
 
