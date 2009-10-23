@@ -813,8 +813,16 @@ void menu_select()
 #define ERROR_A7_HIGH              0b11000110
 #define ERROR_A5_HIGH              0b11001000
 #define ERROR_A3_HIGH              0b11001010
+#define ERROR_A_HIGH               0b11001100
+#define ERROR_A_LOW                0b11001110
+#define ERROR_B_HIGH               0b11010000
+#define ERROR_B_LOW                0b11010010
+#define ERROR_C_HIGH               0b11010100
+#define ERROR_C_LOW                0b11010110
+#define ERROR_D_HIGH               0b11011000
+#define ERROR_D_LOW                0b11011010
 
-void all_inputs()
+static void all_inputs()
 {
 	// Make all pins inputs.
 	DDRA = DDRB = DDRC = DDRD = 0;
@@ -824,7 +832,7 @@ void all_inputs()
 }
 
 // Drive all the lines low which are safe to drive.
-void drive_all_low()
+static void drive_all_low()
 {
 	// Make all pins inputs right now so that all pins will be in a known state
 	// at the end of this function, and so that we don't cause momentary shorts
@@ -868,6 +876,10 @@ void drive_all_low()
 	set_digital_output(IO_A5, LOW); // A3, A5, A7 connected together
 	set_digital_output(IO_A7, LOW); // A3, A5, A7 connected together
 
+	// Make SPI communication work again:
+	set_digital_output(IO_B7, LOW); // SCK
+	set_digital_output(IO_B5, LOW); // MOSI
+
 	// Pins it is NOT safe to drive:
 	// A1, A2: connected to current sense lines.
 	// A6: connected to PD4bar
@@ -876,7 +888,7 @@ void drive_all_low()
 }
 
 // A fatal error has occurred, so blink the red LED forever.
-void error_red_led()
+static void error_red_led()
 {
 	all_inputs();
 	while(1)
@@ -890,7 +902,7 @@ void error_red_led()
 	}
 }
 
-void turn_on_led(unsigned char number)
+static void turn_on_led(unsigned char number)
 {
 	set_digital_output(IO_D5, HIGH);
 	set_digital_output(IO_D0, (number & 1) ? HIGH : LOW);
@@ -898,12 +910,12 @@ void turn_on_led(unsigned char number)
 	set_digital_output(IO_D2, (number & 4) ? HIGH : LOW);
 }
 
-void turn_off_leds()
+static void turn_off_leds()
 {
 	set_digital_output(IO_D5, LOW);
 }
 
-void flash_leds(unsigned char leds)
+static void flash_leds(unsigned char leds)
 {
 	unsigned char i;
 	for(i=0; i < 8; i++)
@@ -916,7 +928,7 @@ void flash_leds(unsigned char leds)
 	}
 }
 
-void show_leds(unsigned char leds, unsigned short time)
+static void show_leds(unsigned char leds, unsigned short time)
 {
 	time_reset();
 	while(get_ms() < time)
@@ -932,7 +944,7 @@ void show_leds(unsigned char leds, unsigned short time)
 	}
 }
 
-void error(unsigned char leds)
+static void error(unsigned char leds)
 {
 	all_inputs();
 	while(1){ flash_leds(leds); }
@@ -945,7 +957,7 @@ void error(unsigned char leds)
 // we don't know what kind of hardware the board is connected to and
 // we don't want to damage anything.  Any of the lines that we DO drive
 // should be lines that the user is unlikely to hook up to anything.
-void jig_test()
+static void jig_test()
 {
 	all_inputs(); // DON'T drive all low until we  know we're on the jig
 
@@ -958,7 +970,7 @@ void jig_test()
 	if (is_digital_input_high(IO_D3)){ error_red_led(); }
 }
 
-void aref_test()
+static void aref_test()
 {
 	drive_all_low();
 
@@ -984,7 +996,7 @@ void aref_test()
 // demux_test: Flash the 8 LEDs connected to the demultiplexer
 // in sequence.  PD5 -> SPWM,  PD0 -> SA, PC1 -> SB, PD2 -> SC.
 // PB2 -> Button -> PB0
-void demux_test()
+static void demux_test()
 {
 	unsigned char led = 7;
 
@@ -1040,7 +1052,7 @@ void demux_test()
 // For this test to the succeed, the user must turn the VADJ pot from
 // one extreme to the other.  The 8 LEDs on the MUX give the user feedback
 // about the current VADJ level and which levels he needs to reach.
-void vadj_test()           
+static void vadj_test()           
 {
 	set_analog_mode(MODE_8_BIT);
 
@@ -1078,7 +1090,7 @@ void vadj_test()
 	}
 }
 
-void gradual_set_motors(signed int target1, signed int target2)
+static void gradual_set_motors(signed int target1, signed int target2)
 {
 	static signed int speed1 = 0;
 	static signed int speed2 = 0;
@@ -1098,7 +1110,7 @@ void gradual_set_motors(signed int target1, signed int target2)
 
 }
 
-void assert_current_sense(unsigned char cs1, unsigned char cs2)
+static void assert_current_sense(unsigned char cs1, unsigned char cs2)
 {
 	switch(cs1)
 	{
@@ -1118,7 +1130,7 @@ void assert_current_sense(unsigned char cs1, unsigned char cs2)
 // 500 mA of current when driven at 9 V.  
 // CS1 -> A1
 // CS2 -> A2
-void factory_motor_test()
+static void factory_motor_test()
 {
 	return; // TMPHAX: return because we don't have any motors yet
 
@@ -1141,7 +1153,7 @@ void factory_motor_test()
 	delay_ms(100);
 }
 
-void input_test()
+static void input_test()
 {
 	// Pin 1: MOSI: tested when we communicate with aux. processor
 	// Pin 2: MISO: tested when we communicate with aux. processor
@@ -1332,14 +1344,54 @@ void input_test()
 	// Pin 43 see above
 
 	// Pin 44: see above
-
-	// TODO: test aux. processor input A
-	// TODO: test aux. processor input B
-	// TODO: test aux. processor input C
-	// TODO: test aux. processor input D
 }
 
-void shutdown_test()
+static void aux_input_test()
+{
+	set_analog_mode(MODE_8_BIT);
+	svp_set_mode(SVP_MODE_ANALOG);
+
+	drive_all_low();
+	delay_ms(10);
+	if (analog_read(CHANNEL_A) > 50){ error(ERROR_A_HIGH); }
+	if (analog_read(CHANNEL_B) > 50){ error(ERROR_B_HIGH); }
+	if (analog_read(CHANNEL_C) > 50){ error(ERROR_C_HIGH); }
+	if (analog_read(CHANNEL_D) > 50){ error(ERROR_D_HIGH); }
+
+	drive_all_low();
+	set_digital_output(IO_D0, HIGH);
+	delay_ms(10);
+	if (analog_read(CHANNEL_A) < 150){ error(ERROR_A_LOW); }
+	if (analog_read(CHANNEL_B) > 50){ error(ERROR_B_HIGH); }
+	if (analog_read(CHANNEL_C) > 50){ error(ERROR_C_HIGH); }
+	if (analog_read(CHANNEL_D) > 50){ error(ERROR_D_HIGH); }
+
+	drive_all_low();
+	set_digital_output(IO_C1, HIGH);
+	delay_ms(10);
+	if (analog_read(CHANNEL_A) > 50){ error(ERROR_A_HIGH); }
+	if (analog_read(CHANNEL_B) < 150){ error(ERROR_B_LOW); }
+	if (analog_read(CHANNEL_C) > 50){ error(ERROR_C_HIGH); }
+	if (analog_read(CHANNEL_D) > 50){ error(ERROR_D_HIGH); }
+
+	drive_all_low();
+	set_digital_output(IO_D2, HIGH);
+	delay_ms(10);
+	if (analog_read(CHANNEL_A) > 50){ error(ERROR_A_HIGH); }
+	if (analog_read(CHANNEL_B) > 50){ error(ERROR_B_HIGH); }
+	if (analog_read(CHANNEL_C) < 150){ error(ERROR_C_LOW); }
+	if (analog_read(CHANNEL_D) > 50){ error(ERROR_D_HIGH); }
+
+	drive_all_low();
+	set_digital_output(IO_D5, HIGH);
+	delay_ms(10);
+	if (analog_read(CHANNEL_A) > 50){ error(ERROR_A_HIGH); }
+	if (analog_read(CHANNEL_B) > 50){ error(ERROR_B_HIGH); }
+	if (analog_read(CHANNEL_C) > 50){ error(ERROR_C_HIGH); }
+	if (analog_read(CHANNEL_D) < 150){ error(ERROR_D_LOW); }
+}
+
+static void shutdown_test()
 {
 	all_inputs();
 
@@ -1358,16 +1410,17 @@ void shutdown_test()
 	while(1){ flash_leds(ERROR_SHUTDOWN); }
 }
 
-void test()
+static void test()
 {
 	jig_test();
-
 	demux_test();
+
 	aref_test();
 	factory_motor_test();
 	input_test();
-
+	aux_input_test();
 	vadj_test();
+
 	shutdown_test();
 }
 
