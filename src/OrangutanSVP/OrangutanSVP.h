@@ -45,6 +45,7 @@ typedef	union SVPStatus
 		unsigned usbSuspend :1;
 		unsigned dtrEnabled :1;
 	    unsigned rtsEnabled :1;
+		unsigned toggle :1;
 	};
 } SVPStatus;
 

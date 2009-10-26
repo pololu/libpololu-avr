@@ -83,13 +83,13 @@ typedef union SVPVariables
 	unsigned char byte[13];
     struct
 	{
+		SVPStatus status;  // see OrangutanSVP.h
 	    unsigned int channelA;
     	unsigned int channelB;
 		unsigned int channelC;
     	unsigned int channelD;
     	unsigned int trimpot;
     	unsigned int battery;
-		SVPStatus status;  // see OrangutanSVP.h or svp.h
 	};
 } SVPVariables;
 
