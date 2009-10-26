@@ -85,12 +85,12 @@ ISR(PCINT3_vect,ISR_ALIASOF(PCINT0_vect));
 
 #ifdef LIB_POLOLU
 
-extern "C" unsigned char init_pulse_in(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
+extern "C" unsigned char pulse_in_init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
 {
 	return OrangutanPulseIn::init(pulsePins, numPins, maxLengthEnum);
 }
 
-extern "C" void update_pulse_in()
+extern "C" void pulse_in_update()
 {
 	OrangutanPulseIn::update();
 }
@@ -203,7 +203,7 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 		PCICR |= 1 << PCIE1;
 	if (PCMSK2)
 		PCICR |= 1 << PCIE2;
-#if defined (__AVR_ATmega324P__) || defined (__AVR_ATmega1284P__) || defined (__AVR_ATmega644P__)
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 	if (PCMSK3)
 		PCICR |= 1 << PCIE3;
 #endif

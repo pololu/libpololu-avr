@@ -60,8 +60,8 @@ struct PulseInputStruct
 };
 
 
-unsigned char init_pulse_in(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
-void update_pulse_in();
+unsigned char pulse_in_init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
+void pulse_in_update();
 void set_max_pulse_length(unsigned char maxLengthEnum);
 struct PulseInputStruct get_pulse_info(unsigned char idx);
 
