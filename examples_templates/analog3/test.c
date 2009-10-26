@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * analog2: for the latest revision of the Orangutan SV-328.
+ * analog3: for the latest revision of the Orangutan SV-328.
  *
  * IMPORTANT NOTE: your board must have the identifiers "org01b03" and
  * "0J1499", or this test will not work!!!

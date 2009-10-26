@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * svp_eight_servo: for the Orangutan SVP.
+ * svp-eight-servo: for the Orangutan SVP.
  *
  * This example uses the OrangutanServos functions to control eight servos.
  * To use this example, you must connect the correct AVR I/O pins to their

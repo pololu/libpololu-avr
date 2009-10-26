@@ -1,5 +1,5 @@
 /*
- * SVP_demo_program - demo code for the Pololu Orangutan SVP
+ * svp-demo-program - demo code that ships with the Pololu Orangutan SVP
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com

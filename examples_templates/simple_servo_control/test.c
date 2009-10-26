@@ -1,5 +1,5 @@
 /*
- * simple_servo_program - demo code for controlling servos with the
+ * simple_servo_control - demo code for controlling servos with the
  * Pololu Baby Orangutan B and Orangutan SV-128/328 Robot Controllers.
  * 
  * Uses 8 ports: PD0, PD1, and PC0-5.

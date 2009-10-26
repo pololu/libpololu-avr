@@ -1,5 +1,5 @@
 /*
- * SV-xx8_demo_program - demo code for the Pololu SV-128/328 Robot
+ * SV-xx8_demo_program - demo code for the Pololu SV-168/328 Robot
  * Controllers.
  * 
  *
