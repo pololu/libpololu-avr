@@ -653,34 +653,6 @@ unsigned char wait_for_button_and_beep()
 	return button;
 }
 
-// Initializes, displays a welcome message, calibrates, and
-// plays the initial music.
-void initialize()
-{
-	load_custom_characters(); // load the custom characters
-	
-	play_from_program_space(welcome);
-
-	print_two_lines_delay_1s(PSTR("     Pololu     "),
-	                         PSTR(" Orangutan SVP  "));
-
-	print_two_lines_delay_1s(PSTR("Demo Program    "), 0);
-
-	print_two_lines_delay_1s(PSTR("Use mid button  "),
-							 PSTR("to select.      "));
-
-	clear();
-	print_from_program_space(PSTR("Press middle    "));
-	lcd_goto_xy(0,1);
-	print_from_program_space(PSTR("button: Try it! "));
-
-	while(!(wait_for_button_and_beep() & MIDDLE_BUTTON));
-
-	play_from_program_space(thank_you_music);
-
-	print_two_lines_delay_1s(0, PSTR("   Thank you!   "));
-}
-
 void menu_select()
 {
 	static const char menu_analog_test[] PROGMEM   = "Analog Inputs";
@@ -770,15 +742,69 @@ void menu_select()
 	}
 }
 
+void start_blinking_red_led()
+{
+    // Configure Timer 0 to overflow 76 times per second and enable the interrupt.
+	TCCR0A = 0;
+	TCCR0B = 0x05; // Prescaler 1:1024: (20MHz/1024/256) = 76 Hz
+	TIMSK0 = 1<<TOIE0; // Enable the overflow interrupt.
+	sei();
+}
+
+// This interrupt service routine is called each time Timer 0 overflows.
+// It takes care of blinking the LED app
+ISR(TIMER0_OVF_vect)
+{
+	static unsigned char counter = 0;
+	counter++;
+	if (counter == 1){ red_led(1); }
+	if (counter == 35){ red_led(0); }
+	if (counter == 70){ counter = 0; }
+}
+
+void stop_blinking_red_led()
+{
+	TIMSK0 = 0; // Disable the Timer 0 interrupts.
+	red_led(0); // Turn off the red led.
+}
+
 // This is the main function, where the code starts.  All C programs
 // must have a main() function defined somewhere.
 int main()
 {
-	clear();
+	start_blinking_red_led();
+
+	// Make sure that this program does not get run on the factory test fixture.
+	wait_for_button_release(BOTTOM_BUTTON);
+
+	green_led(1);
+
+	load_custom_characters();
+	
+	play_from_program_space(welcome);
+
 	print_two_lines_delay_1s(PSTR("     Pololu     "),
 	                         PSTR(" Orangutan SVP  "));
 
-	initialize();
+	print_two_lines_delay_1s(PSTR("Demo Program    "), 0);
+
+	print_two_lines_delay_1s(PSTR("Use mid button  "),
+							 PSTR("to select.      "));
+
+	clear();
+	print_from_program_space(PSTR("Press middle    "));
+	lcd_goto_xy(0,1);
+	print_from_program_space(PSTR("button: Try it! "));
+
+	while(!(wait_for_button_and_beep() & MIDDLE_BUTTON));
+
+	stop_blinking_red_led();
+
+	green_led(0);
+
+	play_from_program_space(thank_you_music);
+
+	print_two_lines_delay_1s(0, PSTR("   Thank you!   "));
 
 	// This is the "main loop" - it will run forever.
 	while(1)
