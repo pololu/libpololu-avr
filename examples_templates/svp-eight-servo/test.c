@@ -8,7 +8,7 @@
  * corresponding servo demultiplexer output-selection pins.
  *   - Connect PB3 to SA.
  *   - Connect PB4 to SB.
- *   - Connect PB5 to SC.
+ *   - Connect PC0 to SC.
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
