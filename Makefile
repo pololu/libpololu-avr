@@ -89,7 +89,7 @@ install: $(LIBRARY_FILES)
 
 examples_3pi := 3pi-demo-program 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
 examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 analog3 buzzer2 lcd1 motors2 simple-test wheel_encoders1 digital1
-examples_168_328p := analog2 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program
+examples_168_328p := analog2 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program serial1
 examples_svp := svp1 svp-demo-program svp-eight-servo svp-sixteen-servo svp-one-servo
 
 # The 48 examples are the only ones that will work on the mega48.
