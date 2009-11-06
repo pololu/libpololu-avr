@@ -4,9 +4,8 @@
  * serial1: for the Orangutan controllers and 3pi robot.
  *
  * This example listens for bytes on PD0/RXD.  Whenever it receives a byte, it
- * toggles bit 6 of the byte (changing its capitialization if it is an ASCII
- * letter) and transmits it on PD1/TXD.  Whenever the user presses the
- * middle button, it transmits a greeting on PD1/TXD.
+ * performs a custom action.  Whenever the user presses the middle button, it
+ * transmits a greeting on PD1/TXD.
  *
  * The Baby Orangutan does not have a green LED, LCD, or pushbuttons so
  * that part of the code will not work.
@@ -38,7 +37,7 @@ char send_buffer[32];
 // wait_for_sending_to_finish:  Waits for the bytes in the send buffer to
 // finish transmitting on PD1/TXD.  We must call this before modifying
 // send_buffer or trying to send more bytes, because otherwise we could
-// corrupt and existing transmission.
+// corrupt an existing transmission.
 void wait_for_sending_to_finish()
 {
 	while(!serial_send_buffer_empty());
@@ -103,19 +102,33 @@ void check_for_new_bytes_received()
 
 int main()
 {
+	// Set the baud rate to 9600 bits per second.  Each byte takes ten bit
+	// times, so you can get at most 960 bytes per second at this speed.
 	serial_set_baud_rate(9600);
 
+	// Start receiving bytes in the ring buffer.
 	serial_receive_ring(receive_buffer, sizeof(receive_buffer));
 
     while(1)
     {
+		// Deal with any new bytes received.
 		check_for_new_bytes_received();
 
+		// If the user presses the middle button, send "Hi there!"
+		// and wait until the user releases the button.
 		if (button_is_pressed(MIDDLE_BUTTON))
 		{
 			wait_for_sending_to_finish();
 			memcpy_P(send_buffer, PSTR("Hi there!\r\n"), 11);
 			serial_send(send_buffer, 11);
+
+			// Wait for the user to release the button.  While the processor is
+			// waiting, the OrangutanSerial library will take care of receiving
+			// bytes using the serial reception interrupt.  But if enough bytes
+			// arrive during this period to fill up the receive_buffer, then the
+			// older bytes will be lost and we won't know exactly how many bytes
+			// have been received.
+			wait_for_button_release(MIDDLE_BUTTON);
 		}
     }
 }
