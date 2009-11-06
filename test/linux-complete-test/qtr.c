@@ -84,7 +84,7 @@ void test_qtr()
 
     qtr_read(values,QTR_EMITTERS_ON);
 
-    printf("IR+ %4ud",values[0]);
+    printf("IR+ %4u",values[0]);
 
     display_values(values,2000);
 
@@ -99,7 +99,7 @@ void test_qtr()
     qtr_read_calibrated(values,QTR_EMITTERS_ON);
 
     clear();
-    printf("C + %4ud",values[0]);
+    printf("C + %4u",values[0]);
 
     display_values(values,1000);
     delay_ms(50);
@@ -114,7 +114,7 @@ void test_qtr()
 
     qtr_read(values,QTR_EMITTERS_OFF);
 
-    printf("IR- %4ud",values[0]);
+    printf("IR- %4u",values[0]);
 
     display_values(values,2000);
 
@@ -131,7 +131,7 @@ void test_qtr()
     qtr_read_calibrated(values, QTR_EMITTERS_OFF);
 
     clear();
-    printf("C - %4ud",values[0]);
+    printf("C - %4u",values[0]);
 
     display_values(values,1000);
     delay_ms(50);
@@ -145,7 +145,7 @@ void test_qtr()
 
     qtr_read(values,QTR_EMITTERS_ON_AND_OFF);
 
-    printf("IR+-%4ud",values[0]);
+    printf("IR+-%4u",values[0]);
 
     display_values(values,2000);
     delay_ms(50);
@@ -159,7 +159,7 @@ void test_qtr()
     qtr_read_calibrated(values, QTR_EMITTERS_ON_AND_OFF);
 
     clear();
-    printf("C +-%4ud",values[0]);
+    printf("C +-%4u",values[0]);
 
     display_values(values,1000);
     delay_ms(50);
