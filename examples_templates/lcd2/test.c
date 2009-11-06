@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 /*
- * lcd2: for the Orangutan LV/SV-xx8
+ * lcd2: for the Orangutan controllers and 3pi robot
  *
  * This example program is intended for use on the Orangutan LV/SV-xx8.
  * It uses the OrangutanLCD functions to display custom characters on 
@@ -76,7 +76,7 @@ const char mocking[] PROGMEM = {
 char prevMood = 5;
 
 
-int main()                    // run once, when the sketch starts
+int main()
 {
   lcd_load_custom_character(happy, 0);
   lcd_load_custom_character(sad, 1);

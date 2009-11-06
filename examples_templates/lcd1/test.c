@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * OrangutanLCDExample for the Orangutan LV/SV-xx8
+ * lcd1: for the Orangutan controllers and 3pi robot
  *
  * Uses the OrangutanLCD library to display things on the LCD.
  *
@@ -10,7 +10,7 @@
  * http://forum.pololu.com
  */
 
-int main()                     // run over and over again
+int main()
 {
   while(1)
   {
