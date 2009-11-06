@@ -146,10 +146,14 @@ zip: library_files examples hex_files arduino_zip
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
 	rm -f $(HEX_ZIPFILE)
+	yes | rm -Rf $(foreach object, $(LIBRARY_OBJECTS), ./pololu/$(object))
+	cp -R $(foreach object, $(LIBRARY_OBJECTS), ./src/$(object)) ./pololu
+	yes | rm -Rf ./pololu/*/*.cpp ./pololu/*/examples ./pololu/*/private ./pololu/*/keywords.txt
 	ln -s . libpololu-avr
 	zip -rq $(LIB_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) $(NON_ARDUINO_EXCLUDES)
 	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex
 	rm libpololu-avr
+	yes | rm -Rf $(foreach object, $(LIBRARY_OBJECTS), ./pololu/$(object))
 
 arduino_zip:
 	mkdir -p $(ZIPDIR)

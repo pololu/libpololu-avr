@@ -27,6 +27,8 @@ of robot controllers:
 * Pololu Baby Orangutan B-328
 * Pololu Orangutan LV-168
 * Pololu Orangutan SV-168
+* Pololu Orangutan SV-328
+* Pololu Orangutan SVP-324
 
 Additionally, this library supports:
 
