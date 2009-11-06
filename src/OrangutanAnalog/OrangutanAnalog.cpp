@@ -118,7 +118,7 @@ extern "C" int read_temperature_f()
 	return OrangutanAnalog::readTemperatureF();
 }
 
-extern "C" unsigned int read_temperature_c()
+extern "C" int read_temperature_c()
 {
 	return OrangutanAnalog::readTemperatureC();
 }
