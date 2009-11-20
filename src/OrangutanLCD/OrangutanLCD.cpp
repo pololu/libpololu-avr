@@ -568,7 +568,10 @@ void OrangutanLCD::print(unsigned long value)
 {
 	unsigned char str[10];
 	unsigned char i = 10;
-	unsigned long digit;
+
+    // Changed digit from a long to char 2009-11-20.  This fixed a bug with
+    // print_long on the Orangutan SVP, but I don't know why.  -David
+	unsigned char digit;
 
 	do
 	{
