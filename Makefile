@@ -90,12 +90,11 @@ ifeq ($(findstring MINGW, $(UNAME)), MINGW)
 endif
 
 ifeq ($(origin LIB), undefined)
-  # The line below is complicated because it needs to work in windows, where
-  # directories are separated with ";" and contain a drive letter "c:", and
-  # also Linux where directories are just separated with a ":".
   ifdef WINDOWS
+    # Directories are separated with ;
     LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/.*;//')
   else
+    # Directories are separated with :
     LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/.*://')
   endif
 
