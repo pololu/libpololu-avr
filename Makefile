@@ -83,14 +83,15 @@ ifeq ($(origin LIB), undefined)
   # The line below is complicated because it needs to work in windows, where
   # directories are separated with ";" and contain a drive letter "c:", and
   # also Linux where directories are just separated with a ":".
-  LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/[^;]\{1\}.\:/\;/g' | sed 's/.*;//')     FOO = bar
+  LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/\[^;\]\{1\}.\:/\;/g' | sed 's/.*;//')     
 endif
 
 INCLUDE_POLOLU ?= $(LIB)/../include/pololu
 
-# Normalize the paths so they don't have ".." in them.
-LIB := $(shell cd $(LIB); pwd)
-INCLUDE_POLOLU := $(shell cd $(INCLUDE_POLOLU); pwd)
+# Normalize the paths so they don't have ".." in them
+# (commented out because it doesn't work in Windows)
+# LIB := $(shell cd $(LIB); pwd)
+# INCLUDE_POLOLU := $(shell cd $(INCLUDE_POLOLU); pwd)
 
 INSTALL_FILES := install -m=r--
 
