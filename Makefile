@@ -79,10 +79,13 @@ clean:
 #   LIB := /usr/lib/avr/lib
 #   INCLUDE_POLOLU := /usr/lib/avr/include
 
-# The line below is complicated because it needs to work in windows, where
-# directories are separated with ";" and contain a drive letter "c:", and
-# also Linux where directories are just separated with a ":".
-LIB ?= $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/[^;]\{1\}.\:/\;/g' | sed 's/.*;//')
+ifeq ($(origin LIB), undefined)
+  # The line below is complicated because it needs to work in windows, where
+  # directories are separated with ";" and contain a drive letter "c:", and
+  # also Linux where directories are just separated with a ":".
+  LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/[^;]\{1\}.\:/\;/g' | sed 's/.*;//')     FOO = bar
+endif
+
 INCLUDE_POLOLU ?= $(LIB)/../include/pololu
 
 # Normalize the paths so they don't have ".." in them.
