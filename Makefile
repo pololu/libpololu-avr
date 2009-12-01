@@ -97,11 +97,16 @@ ifeq ($(origin LIB), undefined)
     # Directories are separated with :
     LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/.*://')
   endif
-
-  LIB := $(abspath $(LIB))
 endif
 
-INCLUDE_POLOLU ?= $(abspath $(LIB)/../include/pololu)
+INCLUDE_POLOLU ?= $(LIB)/../include/pololu
+
+# Normalize the directory names so they don't have ".." in them.
+# Doesn't work in Windows.
+ifndef WINDOWS
+  LIB := $(abspath $(LIB))
+  INCLUDE_POLOLU := $(abspath $(INCLUDE_POLOLU))
+endif
 
 INSTALL_FILES := install -m=r--
 
