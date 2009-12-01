@@ -79,19 +79,30 @@ clean:
 #   LIB := /usr/lib/avr/lib
 #   INCLUDE_POLOLU := /usr/lib/avr/include
 
+
+# Figure out what operating system we are running in.
+UNAME := $(shell uname)
+ifeq ($(findstring NT, $(UNAME)), NT)
+  WINDOWS=true
+endif
+ifeq ($(findstring MINGW, $(UNAME)), MINGW)
+  WINDOWS=true
+endif
+
 ifeq ($(origin LIB), undefined)
   # The line below is complicated because it needs to work in windows, where
   # directories are separated with ";" and contain a drive letter "c:", and
   # also Linux where directories are just separated with a ":".
-  LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/\[^;\]\{1\}.\:/\;/g' | sed 's/.*;//')     
+  ifdef WINDOWS
+    LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/.*;//')
+  else
+    LIB := $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/.*://')
+  endif
+
+  LIB := $(abspath $(LIB))
 endif
 
-INCLUDE_POLOLU ?= $(LIB)/../include/pololu
-
-# Normalize the paths so they don't have ".." in them
-# (commented out because it doesn't work in Windows)
-# LIB := $(shell cd $(LIB); pwd)
-# INCLUDE_POLOLU := $(shell cd $(INCLUDE_POLOLU); pwd)
+INCLUDE_POLOLU ?= $(abspath $(LIB)/../include/pololu)
 
 INSTALL_FILES := install -m=r--
 
