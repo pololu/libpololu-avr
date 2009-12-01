@@ -70,17 +70,24 @@ clean:
 # This seems to be a good choice on most systems because it points to
 # a path that does not include the avr-gcc version number.
 #
+# You can check what directories this makefile will use by running
+#    make show_prefix
+#
 # You can override this behavior by inserting a line below that manually
 # sets INCLUDE_POLOLU and LIB to a directory of your choice.
 # For example, you could uncomment these lines:
 #   LIB := /usr/lib/avr/lib
 #   INCLUDE_POLOLU := /usr/lib/avr/include
-LIB ?= `avr-gcc -print-search-dirs | grep -e "^libraries" | sed s/.*://`
+
+# The line below is complicated because it needs to work in windows, where
+# directories are separated with ";" and contain a drive letter "c:", and
+# also Linux where directories are just separated with a ":".
+LIB ?= $(shell avr-gcc -print-search-dirs | grep -e "^libraries" | sed 's/[^;]\{1\}.\:/\;/g' | sed 's/.*;//')
 INCLUDE_POLOLU ?= $(LIB)/../include/pololu
 
 # Normalize the paths so they don't have ".." in them.
-LIB := $(shell cd $(LIB);pwd)
-INCLUDE_POLOLU := $(shell cd $(INCLUDE_POLOLU);pwd)
+LIB := $(shell cd $(LIB); pwd)
+INCLUDE_POLOLU := $(shell cd $(INCLUDE_POLOLU); pwd)
 
 INSTALL_FILES := install -m=r--
 
