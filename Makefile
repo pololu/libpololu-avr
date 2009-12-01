@@ -58,18 +58,36 @@ clean:
 	fi
 	rm -f $(LIBRARY_FILES)
 
-# Set the PREFIX to point to the location of avr-gcc.
-# This can be overridden by setting the environment variable before compiling, e.g.:
-# PREFIX=/usr/local/bin make
-PREFIX ?= $(shell type avr-gcc | sed 's/\/bin\/avr-gcc//' | sed 's/avr-gcc is //' | sed 's/hashed //' | sed 's/[\\(\\)]//g')/avr
-INCLUDE := $(PREFIX)/include
-INCLUDE_POLOLU := $(INCLUDE)/pololu
-LIB := $(PREFIX)/lib
+# "make install" basically just copies the .a and files to the lib directory,
+# and the header files to the include directory.  The tricky thing is
+# determining which directories those are in this makefile.
+#
+# By default, this makefile will install .a files in $(LIB)
+# and header files in $(LIB)/../include/pololu, where LIB is determined
+# by running `avr-gcc -print-search-dirs`, looking on the libraries
+# line, taking the last directory listed.
+#
+# This seems to be a good choice on most systems because it points to
+# a path that does not include the avr-gcc version number.
+#
+# You can override this behavior by inserting a line below that manually
+# sets INCLUDE_POLOLU and LIB to a directory of your choice.
+# For example, you could uncomment these lines:
+#   LIB := /usr/lib/avr/lib
+#   INCLUDE_POLOLU := /usr/lib/avr/include
+LIB ?= `avr-gcc -print-search-dirs | grep -e "^libraries" | sed s/.*://`
+INCLUDE_POLOLU ?= $(LIB)/../include/pololu
+
+# Normalize the paths so they don't have ".." in them.
+LIB := $(shell cd $(LIB);pwd)
+INCLUDE_POLOLU := $(shell cd $(INCLUDE_POLOLU);pwd)
+
 INSTALL_FILES := install -m=r--
 
 .PHONY: show_prefix
 show_prefix:
-	@echo The Pololu AVR Library will be installed in $(PREFIX).
+	@echo The Pololu AVR Library object files \(.a\) will be installed in $(LIB)
+	@echo The header files \(.h\) will be installed in $(INCLUDE_POLOLU)
 
 .PHONY: install
 install: $(LIBRARY_FILES)
