@@ -22,6 +22,13 @@
  * to be responsible for all resulting costs and damages.
  */
 
+/* Changelog:
+ * 2010-01-07: In transmitAndDelay, added a check to make sure that post_delay_us is
+ *     non-zero before calling delayMicroseconds because delayMicroseconds does not
+ *     work with an argument of zero.
+ */
+
+
 #include "avr/io.h"
 #include "OrangutanSPIMaster.h"
 #include "../OrangutanResources/include/OrangutanModel.h"
@@ -206,7 +213,12 @@ unsigned char OrangutanSPIMaster::transmitAndDelay(unsigned char data, unsigned 
 	}
 
 	// Do the post delay.
-	delayMicroseconds(post_delay_us);
+	if (post_delay_us)
+	{
+		// This IF statement was added 2010-1-7 because delayMicroseconds does
+		// not work with an argument of 0.
+    	delayMicroseconds(post_delay_us);
+	}
 
 	// Return the byte that the slave device sent during that transmission.
 	return SPDR;
