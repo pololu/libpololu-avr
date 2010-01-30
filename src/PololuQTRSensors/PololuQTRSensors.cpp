@@ -143,8 +143,8 @@ void PololuQTRSensors::init(unsigned char numSensors,
 	calibratedMinimumOff=0;
 	calibratedMaximumOff=0;
 
-	if (numSensors > 16)
-		_numSensors = 16;
+	if (numSensors > QTR_MAX_SENSORS)
+		_numSensors = QTR_MAX_SENSORS;
 	else
 		_numSensors = numSensors;
 		
@@ -186,7 +186,7 @@ void PololuQTRSensors::init(unsigned char numSensors,
 // surface or a void).
 void PololuQTRSensors::read(unsigned int *sensor_values, unsigned char readMode)
 {
-	unsigned int off_values[8];
+	unsigned int off_values[QTR_MAX_SENSORS];
 	unsigned char i;
 	
 	if(readMode == QTR_EMITTERS_ON || readMode == QTR_EMITTERS_ON_AND_OFF)

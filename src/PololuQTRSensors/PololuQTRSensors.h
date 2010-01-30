@@ -38,6 +38,8 @@
 #define QTR_EMITTERS_ON 1
 #define QTR_EMITTERS_ON_AND_OFF 2
 
+#define QTR_MAX_SENSORS 16
+
 // This class cannot be instantiated directly (it has no constructor).
 // Instead, you should instantiate one of its two derived classes (either the
 // QTR-A or QTR-RC version, depending on the type of your sensor).
@@ -232,9 +234,9 @@ class PololuQTRSensorsRC : public PololuQTRSensors
 
   private:
 
-	unsigned char _bitmask[8];
+	unsigned char _bitmask[QTR_MAX_SENSORS];
 	// pointer to PIN registers
-	volatile unsigned char* _register[8];	// needs to be volatile
+	volatile unsigned char* _register[QTR_MAX_SENSORS];	// needs to be volatile
 		
 	unsigned char _portBMask;
 	unsigned char _portCMask;
@@ -310,7 +312,7 @@ class PololuQTRSensorsAnalog : public PololuQTRSensors
 
   private:
 
-	unsigned char _analogPins[8];
+	unsigned char _analogPins[QTR_MAX_SENSORS];
 	unsigned char _numSamplesPerSensor;
 	unsigned char _portCMask;
 };
