@@ -783,8 +783,13 @@ int main()
 	
 	play_from_program_space(welcome);
 
-	print_two_lines_delay_1s(PSTR("     Pololu     "),
-	                         PSTR(" Orangutan SVP  "));
+	#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega324PA__)
+	print_two_lines_delay_1s(PSTR("Pololu Orangutan"),
+	                         PSTR("    SVP-324     "));
+    #else
+	print_two_lines_delay_1s(PSTR("Pololu Orangutan"),
+	                         PSTR("    SVP-1284    "));
+    #endif
 
 	print_two_lines_delay_1s(PSTR("Demo Program    "), 0);
 

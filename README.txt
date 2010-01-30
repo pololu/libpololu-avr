@@ -1,6 +1,6 @@
 Pololu AVR Library
 
-Copyright (c) 2008-2009 Pololu Corporation. For more information, see
+Copyright (c) 2008-2010 Pololu Corporation. For more information, see
 
 http://www.pololu.com/docs/0J20
 http://www.pololu.com
@@ -29,6 +29,7 @@ of robot controllers:
 * Pololu Orangutan SV-168
 * Pololu Orangutan SV-328
 * Pololu Orangutan SVP-324
+* Pololu Orangutan SVP-1284
 
 Additionally, this library supports:
 
@@ -95,7 +96,7 @@ process.
 Determine the location of your avr-gcc files.  In Windows, they will
 usually be in a folder such as:
 
-  C:\WinAVR-20070525\avr
+  C:\WinAVR-20090313\avr
 
 In Linux, the avr-gcc files are probably located in
 

@@ -1,6 +1,6 @@
 # NOTE: to compile with avr-gcc less than verson 4.2.3, you must
 # remove the atmega328p from the list of target devices below:
-devices := atmega48 atmega168 atmega328p atmega324p
+devices := atmega48 atmega168 atmega328p atmega324p atmega1284p
 
 LIBRARY_OBJECTS=\
 	OrangutanAnalog \
@@ -144,6 +144,7 @@ examples_atmega48 := digital1 analog1 motors1 led1 simple_servo_control
 examples_atmega168 := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
 examples_atmega328p := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
 examples_atmega324p := $(examples_atmega48) $(examples_orangutan) $(examples_svp)
+examples_atmega1284p := $(examples_atmega324p)
 
 example_template = examples_templates/$(example)
 example_dir = examples/$(device)/$(example)
