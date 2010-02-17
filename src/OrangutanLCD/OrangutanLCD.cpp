@@ -115,10 +115,24 @@ OrangutanLCD::OrangutanLCD()
 #include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
 #include <stdio.h>
 
-/* define putchar and getchar functions for the LCD */
-char row1[8]={' ',' ',' ',' ',' ',' ',' ',' '}; /* remember what we write for scrolling */
+// LCD_WIDTH is the number of characters in each line of the LCD.
+#ifdef _ORANGUTAN_SVP
+  #define LCD_WIDTH 16
+#else
+  #define LCD_WIDTH 8
+#endif
+
+// Remember what was written to the bottom row (for scrolling)
+#if LCD_WIDTH==16
+char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+#elif LCD_WIDTH==8
+char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' '};
+#endif
+
 unsigned char row=0; /* the current cursor position */
 unsigned char col=0;
+
+// This function is called by printf.
 extern "C" int lcd_putchar(char c, FILE *f) {
 	unsigned char nextline=0; /* should we go to next line after output? */
 	unsigned char repos=0; /* should we relocate */
@@ -129,7 +143,7 @@ extern "C" int lcd_putchar(char c, FILE *f) {
 		nextline = 1;
 	} else if(c == 8) { // ^H
 		col--;
-		if(col==(unsigned char)-1) { row--; col=7; }
+		if(col==(unsigned char)-1) { row--; col=LCD_WIDTH-1; }
 		if(row==(unsigned char)-1) { row=0; col=0; }
 		repos = 1;
 	} else {
@@ -137,19 +151,22 @@ extern "C" int lcd_putchar(char c, FILE *f) {
 		if(row==1) row1[col]=c; /* remember the character */
 		col++;
 
-		if(col==8) nextline = 1;
+		if(col==LCD_WIDTH) nextline = 1;
 	}
 
 	if(nextline) {
 		if(row==1) {
 			/******* scroll! *******/
+            // Note: because of the way we implement scrolling,
+            // it is never possible for the user to use the lower
+            // right corner of his LCD.
 			OrangutanLCD::gotoXY(0,0); /* draw top row */
-			for(i=0;i<8;i++) {
+			for(i=0;i<LCD_WIDTH;i++) {
 				OrangutanLCD::print(row1[i]);
 				row1[i]=' ';
 			}
 			OrangutanLCD::gotoXY(0,1); /* erase bottom row */
-			for(i=0;i<8;i++) {
+			for(i=0;i<LCD_WIDTH;i++) {
 				OrangutanLCD::print(' ');
 			}
 		}
