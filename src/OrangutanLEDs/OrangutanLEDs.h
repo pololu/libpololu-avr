@@ -1,6 +1,6 @@
 /*
   OrangutanLEDs.h - Library for using the LED(s) on the
-      Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.
+      Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.
 */
 
 /*
@@ -24,8 +24,25 @@
  
 #ifndef OrangutanLEDs_h
 #define OrangutanLEDs_h
-
+#include "../OrangutanDigital/OrangutanDigital.h"
 #include "../OrangutanResources/include/OrangutanModel.h"
+
+#ifdef _ORANGUTAN_X2
+#define RED_LED		IO_C7
+#define GREEN_LED		IO_C5
+#define RED_LED2		IO_C3
+#define GREEN_LED2	IO_C2
+#define YELLOW_LED	IO_C0
+
+#elif defined(_ORANGUTAN_SVP)
+#define RED_LED		IO_D1
+#define GREEN_LED		IO_C4
+
+#else
+#define RED_LED		IO_D1
+#define GREEN_LED		IO_D7
+#endif
+
 
 class OrangutanLEDs
 {
@@ -38,7 +55,34 @@ class OrangutanLEDs
 	// turns the LED on.  Note that the Baby Orangutan B only has
 	// one LED (the red one), so green() will just drive I/O line PD7
 	// high or low, depending on the argument.
-	static void red(unsigned char on);
+	static inline void red(unsigned char on)
+	{
+		#if defined (_ORANGUTAN_SVP)	// red LED turns on when driven low
+		if (on == TOGGLE)
+			OrangutanDigital::setOutput(RED_LED, TOGGLE);
+		else if (on == LOW)
+			OrangutanDigital::setOutput(RED_LED, HIGH);
+		else
+			OrangutanDigital::setOutput(RED_LED, LOW);
+		#else					// else red LED turns on when driven high
+		OrangutanDigital::setOutput(RED_LED, on);
+		#endif
+	}
+	
+	static inline void green(unsigned char on)
+	{
+		#if defined (_ORANGUTAN_SVP)	// green LED turns on when driven low
+		if (on == TOGGLE)
+			OrangutanDigital::setOutput(GREEN_LED, TOGGLE);
+		else if (on == LOW)
+			OrangutanDigital::setOutput(GREEN_LED, HIGH);
+		else
+			OrangutanDigital::setOutput(GREEN_LED, LOW);
+		#else					// else green LED turns on when driven high
+		OrangutanDigital::setOutput(GREEN_LED, on);
+		#endif
+	}
+
 	static inline void left(unsigned char on)
 	{
 		#ifdef _ORANGUTAN_SVP
@@ -47,8 +91,7 @@ class OrangutanLEDs
 		red(on);
 		#endif
 	}
-	
-	static void green(unsigned char on);
+
 	static inline void right(unsigned char on)
 	{
 		#ifdef _ORANGUTAN_SVP
@@ -57,6 +100,25 @@ class OrangutanLEDs
 		green(on);
 		#endif
 	}
+
+#ifdef _ORANGUTAN_X2
+	// functions for controlling the additional LED red, green, and yellow
+	// LEDs on the Orangutan X2
+	static inline void red2(unsigned char on)
+	{
+		OrangutanDigital::setOutput(RED_LED2, on);
+	}
+
+	static inline void green2(unsigned char on)
+	{
+		OrangutanDigital::setOutput(GREEN_LED2, on);
+	}
+
+	static inline void yellow(unsigned char on)
+	{
+		OrangutanDigital::setOutput(YELLOW_LED, on);
+	}
+#endif //_ORANGUTAN_X2
 };
 
 #endif

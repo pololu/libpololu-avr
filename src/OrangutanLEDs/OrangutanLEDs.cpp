@@ -1,6 +1,6 @@
 /*
   OrangutanLEDs.cpp - Library for using the LED(s) on the
-      Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.
+      Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.
 */
 
 /*
@@ -24,79 +24,12 @@
  
 #include <avr/io.h>
 #include "OrangutanLEDs.h"
-#include "../OrangutanResources/include/OrangutanModel.h"
-
-#define RED_LED		PORT1
-#define RED_LED_PORT	PORTD
-#define RED_LED_DDR	DDRD
-
-#ifdef _ORANGUTAN_SVP
-#define GREEN_LED		PORT4
-#define GREEN_LED_PORT	PORTC
-#define GREEN_LED_DDR	DDRC
-#else
-#define GREEN_LED		PORT7
-#define GREEN_LED_PORT	PORTD
-#define GREEN_LED_DDR	DDRD
-#endif
-
-#ifdef LIB_POLOLU
-
-extern "C" void left_led(unsigned char on)
-{
-	OrangutanLEDs::left(on);
-}
-
-extern "C" void right_led(unsigned char on)
-{
-	OrangutanLEDs::right(on);
-}
-
-extern "C" void red_led(unsigned char on)
-{
-	OrangutanLEDs::red(on);
-}
-
-extern "C" void green_led(unsigned char on)
-{
-	OrangutanLEDs::green(on);
-}
-
-#endif
 
 
 // constructor
 OrangutanLEDs::OrangutanLEDs()
 {
 
-}
-
-
-// turns the target LED off if 'on' is zero, else this method
-// turns the LED on.  Note that the Baby Orangutan B only has
-// one LED (the red one), so green() will just drive I/O line PD7
-// high or low, depending on the argument.
-void OrangutanLEDs::red(unsigned char on)
-{
-	RED_LED_DDR |= 1 << RED_LED;
-	#if defined (_ORANGUTAN_SVP)	// red LED turns on when driven low
-	if (on)
-	#else							// red LED turns on when driven high
-	if (!on)
-	#endif
-		RED_LED_PORT &= ~(1 << RED_LED);
-	else
-		RED_LED_PORT |= 1 << RED_LED;
-}
-
-
-void OrangutanLEDs::green(unsigned char on)
-{
-	GREEN_LED_DDR |= 1 << GREEN_LED;
-	if (on)
-		GREEN_LED_PORT |= 1 << GREEN_LED;
-	else
-		GREEN_LED_PORT &= ~(1 << GREEN_LED);
 }
 
 // Local Variables: **
