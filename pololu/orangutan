@@ -13,4 +13,5 @@
 #include <pololu/OrangutanServos/OrangutanServos.h>
 #include <pololu/OrangutanPulseIn/OrangutanPulseIn.h>
 #include <pololu/OrangutanSVP/OrangutanSVP.h>
+#include <pololu/OrangutanSVP/OrangutanX2.h>
 #include <pololu/OrangutanSPIMaster/OrangutanSPIMaster.h>

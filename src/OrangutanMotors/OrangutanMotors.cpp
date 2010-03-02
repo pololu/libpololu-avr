@@ -35,6 +35,9 @@
 #include "OrangutanMotors.h"
 #include "../OrangutanDigital/OrangutanDigital.h"
 #include "../OrangutanResources/include/OrangutanModel.h"
+#ifdef _ORANGUTAN_X2
+#include "../OrangutanX2/OrangutanX2.h"
+#endif
 
 #ifdef _ORANGUTAN_SVP
 
@@ -133,7 +136,7 @@ void OrangutanMotors::init2()
 	OrangutanDigital::setOutput(PWM2A, 0);
 	OrangutanDigital::setOutput(PWM2B, 0);
 
-#else
+#elif !defined(_ORANGUTAN_X2)
 
 	#if !defined(LIB_POLOLU)
 	// this code is for people using the Arduino IDE (it lets the millis() function work using timer 2 instead of timer 0)
@@ -188,7 +191,7 @@ void OrangutanMotors::setM1Speed(int speed)
 {
 #ifdef _ORANGUTAN_X2
 
-	// TODO: x2 motor code
+	OrangutanX2::setMotor(MOTOR1, IMMEDIATE_DRIVE, speed);
 
 #else
 
@@ -239,15 +242,15 @@ void OrangutanMotors::setM1Speed(int speed)
 		OCR0B = speed;	// pwm one driver input
 		OCR0A = 0;		// hold the other driver input high
 	}
-#endif
-#endif
+#endif // _ORANGUTAN_SVP
+#endif // _ORANGUTAN_X2
 }
 
 void OrangutanMotors::setM2Speed(int speed)
 {
 #ifdef _ORANGUTAN_X2
 
-	// TODO: x2 motor code
+	OrangutanX2::setMotor(MOTOR2, IMMEDIATE_DRIVE, speed);
 
 #else
 
@@ -300,8 +303,8 @@ void OrangutanMotors::setM2Speed(int speed)
 		OCR2A = 0;		// hold the other driver input high
 	}
 	
-#endif
-#endif
+#endif // _ORANGUTAN_SVP
+#endif // _ORANGUTAN_X2
 }
 
 

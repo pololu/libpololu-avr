@@ -14,4 +14,5 @@
 #include <pololu/serial.h>
 #include <pololu/OrangutanSPIMaster/OrangutanSPIMaster.h>
 #include <pololu/OrangutanSVP/OrangutanSVP.h>
+#include <pololu/OrangutanX2/OrangutanX2.h>
 

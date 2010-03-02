@@ -11,15 +11,16 @@ LIBRARY_OBJECT_FILES=\
 	OrangutanDigital.o \
 	OrangutanLCD.o \
 	OrangutanLEDs.o \
-	OrangutanSPIMaster.o \
-	OrangutanSVP.o \
 	OrangutanMotors.o \
 	OrangutanPulseIn.o \
 	OrangutanPushbuttons.o \
 	OrangutanResources.o \
 	OrangutanSerial.o \
 	OrangutanServos.o \
+	OrangutanSPIMaster.o \
 	OrangutanTime.o \
+	OrangutanSVP.o \
+	OrangutanX2.o \
 	Pololu3pi.o \
 	PololuQTRSensors.o \
 	PololuWheelEncoders.o

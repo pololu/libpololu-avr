@@ -8,15 +8,16 @@ LIBRARY_OBJECTS=\
 	OrangutanDigital \
 	OrangutanLCD \
 	OrangutanLEDs \
-	OrangutanSVP \
-	OrangutanSPIMaster \
 	OrangutanMotors \
 	OrangutanPulseIn \
 	OrangutanPushbuttons \
 	OrangutanResources \
 	OrangutanSerial \
 	OrangutanServos \
+	OrangutanSPIMaster \
 	OrangutanTime \
+	OrangutanSVP \
+	OrangutanX2 \
 	Pololu3pi \
 	PololuQTRSensors \
 	PololuWheelEncoders
@@ -184,7 +185,7 @@ ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
 ZIP_EXCLUDES := \*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
 
-ARDUINO_EXCLUDES := libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/include/\*
+ARDUINO_EXCLUDES := libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/OrangutanX2/\* libpololu-arduino/include/\*
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
