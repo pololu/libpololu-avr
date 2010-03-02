@@ -1,17 +1,14 @@
 /*
-  OrangutanLCDPrivate.h - Library for using the LCD on the Orangutan LV, SV, SVP, or 3pi robot.
+  OrangutanLCDPrivate.h - Library for using the LCD on the Orangutan LV, SV, SVP, X2, or 3pi robot.
   This library incorporates some code originally written by Tom Benedict as part of Orangutan-Lib.
   Released into the public domain.
 */
 #ifndef OrangutanLCDPrivate_h
 #define OrangutanLCDPrivate_h
 
-#include "../OrangutanResources/include/OrangutanModel.h"
+#include "../../OrangutanResources/include/OrangutanModel.h"
 
 // LCD Pinouts:
-
-// On the Orangutan LV-168 and 3pi robot, the LCD control lines are split between
-// ports B and D:
 
 #ifdef _ORANGUTAN_SVP
 
@@ -52,8 +49,28 @@
 #define LCD_PORTC_DATA(data)	((data & 0x0F) << LCD_DB4)
 
 
+#elif defined(_ORANGUTAN_X2)
+
+#define LCD_RS_DDR			DDRB
+#define LCD_RS_PORT			PORTB
+#define LCD_E_DDR			DDRB
+#define LCD_E_PORT			PORTB
+#define LCD_RW_DDR			DDRB
+#define LCD_RW_PORT			PORTB
+
+#define LCD_RS				PORTB0
+#define LCD_RW				PORTB1
+#define LCD_E				PORTB3
+
+#define LCD_BF_DDR			DDRC
+#define LCD_BF_PIN			PINC
+#define LCD_BF_MASK			(1 << PORTC7)
+
+
 #else
 
+// On the Orangutan LV-168 and 3pi robot, the LCD control lines are split between
+// ports B and D:
 
 #define LCD_DB4				PORTB1		// PB1
 #define LCD_DB5				PORTB4		// PB4

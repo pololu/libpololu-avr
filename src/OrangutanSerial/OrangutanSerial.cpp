@@ -492,7 +492,7 @@ inline void OrangutanSerial::serial_rx_check(unsigned char port)
 		}
 
 		#else
-		#error "Need to fill this in."
+		//#error "Need to fill this in."
 		#endif
 
 		// Return because the rest of this function only works for UART-based serial ports.
@@ -656,7 +656,7 @@ inline void OrangutanSerial::serial_tx_check(unsigned char port)
 				continue;
 			}
 			#elif defined(_ORANGUTAN_X2)
-			#error "Need to fill this in."
+			//#error "Need to fill this in."
 			#else
 			#error "Need to fill this in."
 			#endif

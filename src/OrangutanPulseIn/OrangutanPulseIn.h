@@ -1,6 +1,6 @@
 /*
   OrangutanPulseIn.h - Library for reading digital pulses with the
-	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library
+	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  This library
 	can be used to read RC inputs.  To use this library, you must
 	repeatedly call the update() function in your main loop more often
 	than your configured maximum pulse length.  If this is done,

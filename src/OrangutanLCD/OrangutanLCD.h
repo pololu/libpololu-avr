@@ -1,5 +1,5 @@
 /*
-  OrangutanLCD.h - Library for using the LCD on the Orangutan LV, SV, SVP, or 3pi robot.
+  OrangutanLCD.h - Library for using the LCD on the Orangutan LV, SV, SVP, X2, or 3pi robot.
   This library incorporates some code originally written by Tom Benedict as part of Orangutan-Lib.
   Released into the public domain.
 */
@@ -27,7 +27,7 @@
 
 
 #define LCD_LEFT		0
-#define	LCD_RIGHT		1
+#define LCD_RIGHT		1
 #define CURSOR_SOLID	0
 #define CURSOR_BLINKING	1
 
@@ -39,17 +39,27 @@ class OrangutanLCD
     // constructor
 	OrangutanLCD();
 	
-	// Send either data or a command on a 4-bit interface
-	static void send(unsigned char data, unsigned char rs);
+	// Send either data or a command
+	// If we are using a 4-bit interface, only the low nibble is
+	// sent when numSends == 1; otherwise, first the high nibble is sent
+	// and then the low nibble is sent.
+	// If we are using an 8-bit interface, numSends has no effect: the data is
+	// sent via a single 8-bit transfer.
+	static void send(unsigned char data, unsigned char rs, unsigned char numSends);
 	
 	static inline void send_cmd(unsigned char cmd)
 	{
-		send(cmd, 0);
+		send(cmd, 0, 2);
+	}
+
+	static inline void send_4bit_cmd(unsigned char cmd)
+	{
+		send(cmd, 0, 1);
 	}
 
 	static inline void send_data(unsigned char data)
 	{
-		send(data, 1);
+		send(data, 1, 2);
 	}
 
 	// clears the LCD screen and returns the cursor to position (0, 0)
@@ -169,10 +179,11 @@ class OrangutanLCD
 	// of them.
 	static void busyWait();
 
-	// Send four bits out the 4-bit interface.  This assumes the busy flag
+	// Send data via the 4- or 8-bit interface.  This assumes the busy flag
 	// is clear, that our DDRs are all set, etc.  Basically all it does is
-	// line up the bits and shove them out the appropriate I/O lines.
-	static void sendNibble(unsigned char nibble);
+	// line up the bits and send them out the appropriate I/O lines while
+	// strobing the E control line.
+	static void sendData(unsigned char data);
 	
 	// prints a hex nibble (half of a hex byte) at
 	// your current cursor location.

@@ -1,6 +1,6 @@
 /*
   OrangutanPulseIn.cpp - Library for reading digital pulses with the
-	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library
+	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  This library
 	can be used to read RC inputs.  To use this library, you must
 	repeatedly call the update() function in your main loop more often
 	than your configured maximum pulse length.  If this is done,
@@ -203,7 +203,7 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 		PCICR |= 1 << PCIE1;
 	if (PCMSK2)
 		PCICR |= 1 << PCIE2;
-#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
+#ifdef PCMSK3  // for the Orangutan X2 and SVP
 	if (PCMSK3)
 		PCICR |= 1 << PCIE3;
 #endif

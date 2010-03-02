@@ -1,5 +1,5 @@
 /*
-  OrangutanLCD.cpp - Library for using the LCD on the Orangutan LV, SV, SVP, or 3pi robot.
+  OrangutanLCD.cpp - Library for using the LCD on the Orangutan LV, SV, SVP, X2, or 3pi robot.
   This library incorporates some code originally written by Tom Benedict as part of Orangutan-Lib.
   Released into the public domain.
 */
@@ -85,8 +85,9 @@
 // above, even though we're discarding the contents of the second
 // 4-bit read.
 // 
-// The Orangutan LV, SV, SVP and 3pi the LCD in 4-bit mode with E,
-// R/W, and RS control lines.
+// The Orangutan LV, SV, SVP and 3pi use the LCD in 4-bit mode with E,
+// R/W, and RS control lines.  The Orangutan X2 uses the LCD in 8-bit
+// mode with E, R/W, and RS control lines.
 
 
 #include <avr/io.h>
@@ -116,16 +117,15 @@ OrangutanLCD::OrangutanLCD()
 #include <stdio.h>
 
 // LCD_WIDTH is the number of characters in each line of the LCD.
+// row1 array lets us remember what was written to the bottom row (for scrolling)
 #ifdef _ORANGUTAN_SVP
   #define LCD_WIDTH 16
+char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+#elif defined(_ORANGUTAN_X2)
+  #define LCD_WIDTH 20
+char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
 #else
   #define LCD_WIDTH 8
-#endif
-
-// Remember what was written to the bottom row (for scrolling)
-#if LCD_WIDTH==16
-char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-#elif LCD_WIDTH==8
 char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' '};
 #endif
 
@@ -293,9 +293,11 @@ void OrangutanLCD::loadCustomCharacter(const char *picture_p, unsigned char numb
   }
 }
 
-// Initialize the LCD for a 4-bit interface
+// Initialize the LCD for an 8-bit interface if using the Orangutan X2
+// else for a 4-bit interface.
 // this method is automatically called the first time any LCD member
-// function is called
+// function is called.  See page 45 of the Hitachi HD44780U datasheet
+// for LCD initialization procedure details.
 void OrangutanLCD::init2()
 {
 	// Set up the DDR for the LCD control lines
@@ -306,54 +308,40 @@ void OrangutanLCD::init2()
 	// Wait >15ms
 	delay(20);
 
-	// Send 0x3 (last four bits ignored)
-	send_cmd(0x30);
+#ifdef _ORANGUTAN_X2
 
-	// Wait >4.1ms
-	delay(6);
+	send_cmd(0x30);	// function set
+	delay(6);	// wait >4.1ms
+	send_cmd(0x30);	// function set
+	delay(1);	// wait >100us
+	send_cmd(0x30);	// function set
+	delay(1);	// wait >100us
+	send_cmd(0x38);	// 8-bit, 2 line, 5x8 dots char (busy flag is now valid)
 
-	// Send 0x3 (last four bits ignored)
-	send_cmd(0x30);
+#else	// Orangutan SVP, LV, SV, and 3pi robot
 
-	// Wait >120us
-	delay(2);
+	send_4bit_cmd(0x3);	// function set
+	delay(6);	// wait >4.1ms
+	send_4bit_cmd(0x3);	// function set
+	delay(1);	// wait >100us
+	send_4bit_cmd(0x3);	// function set
+	delay(1);	// wait >100us
+	send_4bit_cmd(0x2);	// 4-bit interface
+	delay(1);
+	send_cmd(0x28);	// 4-bit, 2 line, 5x8 dots char (busy flag is now valid)
 
-	// Send 0x3 (last four bits ignored)
-	send_cmd(0x30);
+#endif
 
-	// Wait >120us
-	delay(2);
-
-	// Send 0x2 (last four bits ignored)  Sets 4-bit mode
-	send_cmd(0x20);
-
-	// Wait >120us
-	delay(2);
-
-	// Send 0x28 = 4-bit, 2-line, 5x8 dots per char
-	send_cmd(0x28);
-
-	// Busy Flag is now valid, so hard-coded delays are no longer
-	// required.
-
-	// Send 0x08 = Display off, cursor off, blinking off
-	send_cmd(0x08);
-
-	// Send 0x01 = Clear display
-	send_cmd(0x01);
-
-	// Send 0x06 = Set entry mode: cursor shifts right, don't scroll
-	send_cmd(0x06);
-
-	// Send 0x0C = Display on, cursor off, blinking off
-	send_cmd(0x0C);
+	send_cmd(0x08);	// display off, cursor off, blinking off
+	send_cmd(0x01);	// clear display
+	send_cmd(0x06);	// set entry mode: cursor shifts right, no scrolling
+	send_cmd(0x0C);	// display on, cursor off, blinking off
 }
 
-// Wait for the busy flag to clear on a 4-bit interface
-// This is necessarily more complicated than the 8-bit interface
-// because E must be strobed twice to get the full eight bits
-// back from the LCD, even though we're only interested in one
-// of them.
+// Wait for the busy flag to clear.  The 4-bit interface is 
+// more complicated than the 8-bit interface because E must
+// be strobed twice to get the full eight bits back from
+// the LCD, even though we're only interested in one of them.
 void OrangutanLCD::busyWait()
 {
 	uint8_t temp_ddr, data;
@@ -391,7 +379,10 @@ void OrangutanLCD::busyWait()
 		// Wait a small bit
 		delayMicroseconds(1);
 
-		// Strobe out the 4 bits we don't care about:
+#ifndef _ORANGUTAN_X2
+
+		// When using the 4-bit interface, we still need to
+		// strobe out the 4 bits we don't care about:
 
 		// Bring E high
 		LCD_E_PORT |= 1 << LCD_E;
@@ -401,6 +392,7 @@ void OrangutanLCD::busyWait()
 
 		// Bring E low
 		LCD_E_PORT &= ~(1 << LCD_E);
+#endif
 	}
 	while ((data & LCD_BF_MASK) && (millis() - time < 10));
 
@@ -412,16 +404,19 @@ void OrangutanLCD::busyWait()
 }
 
 
-// Send four bits out the 4-bit interface.  This assumes the busy flag
+// Send data via the 4- or 8-bit interface.  This assumes the busy flag
 // is clear, that our DDRs are all set, etc.  Basically all it does is
-// line up the bits and shove them out the appropriate I/O lines.
-void OrangutanLCD::sendNibble(unsigned char nibble)
+// line up the bits and send them out the appropriate I/O lines while
+// strobing the E control line.
+void OrangutanLCD::sendData(unsigned char data)
 {
 #ifdef _ORANGUTAN_SVP
-	PORTC = (PORTC & ~LCD_PORTC_MASK) | LCD_PORTC_DATA(nibble);
+	PORTC = (PORTC & ~LCD_PORTC_MASK) | LCD_PORTC_DATA(data);
+#elif defined(_ORANGUTAN_X2)
+	PORTC = data;
 #else
-	PORTB = (PORTB & ~LCD_PORTB_MASK) | LCD_PORTB_DATA(nibble);
-	PORTD = (PORTD & ~LCD_PORTD_MASK) | LCD_PORTD_DATA(nibble);
+	PORTB = (PORTB & ~LCD_PORTB_MASK) | LCD_PORTB_DATA(data);
+	PORTD = (PORTD & ~LCD_PORTD_MASK) | LCD_PORTD_DATA(data);
 #endif
 
 	// At this point the four data lines are set, so the Enable pin 
@@ -446,8 +441,8 @@ void OrangutanLCD::sendNibble(unsigned char nibble)
 }
 
 
-// Send either data or a command on a 4-bit interface
-void OrangutanLCD::send(unsigned char data, unsigned char rs)
+// Send either data or a command
+void OrangutanLCD::send(unsigned char data, unsigned char rs, unsigned char numSends)
 {	
 	init();  // initialize the LCD if we haven't already
 
@@ -455,7 +450,7 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 	busyWait();
 
 	// Save our DDR and port information
-#ifdef _ORANGUTAN_SVP
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 	unsigned char temp_ddrc, temp_portc;
 	temp_ddrc = DDRC;
 	temp_portc = PORTC;
@@ -475,21 +470,26 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs)
 	LCD_RS_PORT |= (rs << LCD_RS);
 
 	// Set the data pins as outputs
-#ifdef _ORANGUTAN_SVP
-	DDRC |= LCD_PORTC_MASK;
+#ifdef _ORANGUTAN_X2
+	DDRC = 0xFF;	// set entire port as outputs
+	sendData(data);	// send data via 8-bit interface
 #else
+
+  #ifdef _ORANGUTAN_SVP
+	DDRC |= LCD_PORTC_MASK;
+  #else
 	DDRB |= LCD_PORTB_MASK;
 	DDRD |= LCD_PORTD_MASK;
-#endif
+  #endif  // ifdef _ORANGUTAN_SVP
 
-	// Send the high 4 bits
-	sendNibble(data >> 4);
+	sendData(data >> 4);	// send high nibble via 4-bit interface
+	if (numSends != 1)
+		sendData(data & 0x0F);	// send low nibble via 4-bit interface
 
-	// Send the low 4 bits
-	sendNibble(data & 0x0F);
+#endif  // ifdef _ORANGUTAN_X2
 
 	// Restore our DDR and port information
-#ifdef _ORANGUTAN_SVP
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 	DDRC = temp_ddrc;
 	PORTC = temp_portc;
 #else
@@ -647,7 +647,7 @@ void OrangutanLCD::printBinary(unsigned char byte)
 
 // moves the cursor to the specified (x, y) position
 // x is a zero-based column indicator (0 <= x <= 7)
-// y is a zero-based row indicator (0 <= y <= 1)
+// y is a zero-based row indicator (0 <= y <= LCD rows-1)
 void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 {
 	// Memory locations for the start of each line
@@ -656,7 +656,7 @@ void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 	// ahead and make the seventh bit of our memory location bytes to 1,
 	// which makes the numbers 0x80 and 0xC0:
 
-	unsigned char line_mem[] = {0x80, 0xC0};
+	unsigned char line_mem[] = {0x80, 0xC0, 0x94, 0xD4};
 
 	// Grab the location in the LCD's memory of the start of line y,
 	// and add X to it to get the right character location.

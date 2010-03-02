@@ -1,6 +1,6 @@
 /*
   OrangutanPushbuttons.h - Library for using the three user pushbuttons on the
-      Orangutan LV, SV, SVP, or 3pi robot.
+      Orangutan LV, SV, SVP, X2, or 3pi robot.
 */
 
 /*
@@ -29,7 +29,7 @@
 
 #ifdef _ORANGUTAN_SVP
 
-// Orangutan SVP definitions
+// Orangutan SVP definitions (pushing button makes input low)
 #define TOP_BUTTON		(1 << PORTC5)
 #define MIDDLE_BUTTON	(1 << PORTC3)
 #define BOTTOM_BUTTON	(1 << PORTC2)
@@ -38,10 +38,27 @@
 #define BUTTON_PORT		PORTC
 #define BUTTON_PIN		PINC
 
+#define BUTTONS_DOWN		(~BUTTON_PIN)
+#define BUTTONS_UP		BUTTON_PIN
+
+#elif defined(_ORANGUTAN_X2)
+
+// Orangutan X2 definitions (pushing button makes input high)
+#define TOP_BUTTON		(1 << PORTC6)
+#define MIDDLE_BUTTON	(1 << PORTC4)
+#define BOTTOM_BUTTON	(1 << PORTC1)
+
+#define BUTTON_DDR		DDRC
+#define BUTTON_PORT		PORTC
+#define BUTTON_PIN		PINC
+
+#define BUTTONS_DOWN		BUTTON_PIN
+#define BUTTONS_UP		(~BUTTON_PIN)
+
 #else
 
 
-// Orangutan LV, SV, and 3pi definitions
+// Orangutan LV, SV, and 3pi definitions (pushing button makes input low)
 #define TOP_BUTTON		(1 << PORTB5)
 #define MIDDLE_BUTTON	(1 << PORTB4)
 #define BOTTOM_BUTTON	(1 << PORTB1)
@@ -49,6 +66,9 @@
 #define BUTTON_PORT		PORTB
 #define BUTTON_DDR		DDRB
 #define BUTTON_PIN		PINB
+
+#define BUTTONS_DOWN		(~BUTTON_PIN)
+#define BUTTONS_UP		BUTTON_PIN
 
 #endif
 

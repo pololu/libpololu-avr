@@ -11,7 +11,7 @@
 #include <pololu/digital.h>
 #include <pololu/servos.h>
 #include <pololu/pulsein.h>
-#include <pololu/OrangutanSerial/OrangutanSerial.h>
+#include <pololu/serial.h>
 #include <pololu/OrangutanSPIMaster/OrangutanSPIMaster.h>
 #include <pololu/OrangutanSVP/OrangutanSVP.h>
 

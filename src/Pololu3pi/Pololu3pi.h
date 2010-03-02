@@ -34,6 +34,13 @@
 #include <pololu/OrangutanLEDs.h>
 #include <pololu/OrangutanPushbuttons.h>
 #include <pololu/OrangutanTime.h>
+#include <pololu/OrangutanSerial.h>
+#include <pololu/OrangutanServos.h>
+#include <pololu/PololuWheelEncoders.h>
+#include <pololu/OrangutanResources.h>
+#include <pololu/OrangutanDigital.h>
+#include <pololu/OrangutanPulseIn.h>
+#include <pololu/OrangutanSPIMaster/OrangutanSPIMaster.h>
 
 #endif
 #endif

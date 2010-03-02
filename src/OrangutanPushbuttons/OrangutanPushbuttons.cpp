@@ -1,6 +1,6 @@
 /*
   OrangutanPushbuttons.cpp - Library for using the three user pushbuttons on the
-      Orangutan LV, SV, SVP, or 3pi robot.
+      Orangutan LV, SV, SVP, X2, or 3pi robot.
 */
 
 /*
@@ -28,6 +28,7 @@
 
 #include <avr/io.h>
 #include "OrangutanPushbuttons.h"
+#include "../OrangutanResources/include/OrangutanModel.h"
 
 
 // constructor
@@ -69,7 +70,9 @@ extern "C" unsigned char button_is_pressed(unsigned char buttons)
 void OrangutanPushbuttons::init2()
 {
 	BUTTON_DDR &= ~ALL_BUTTONS;		// set the pushbutton pins to be inputs
+#ifndef _ORANGUTAN_X2
 	BUTTON_PORT |= ALL_BUTTONS;		// enable pullups on the pushbutton pins
+#endif
 	delayMicroseconds(1);			// give pullups time to stabilize
 }
 
@@ -84,12 +87,12 @@ unsigned char OrangutanPushbuttons::waitForPress(unsigned char buttons)
 	init();		// initialize pushbutton I/O pins if necessary
 	do
 	{
-		while (!(~BUTTON_PIN & buttons))	// wait for a button to be pressed
+		while (!(BUTTONS_DOWN & buttons))	// wait for a button to be pressed
 			;
-			delay(10);						// debounce the button press
+		delay(10);						// debounce the button press
 	}
-	while (!(~BUTTON_PIN & buttons));		// if button isn't still pressed, loop
-	return ~BUTTON_PIN & buttons;			// return the pressed button(s)
+	while (!(BUTTONS_DOWN & buttons));		// if button isn't still pressed, loop
+	return BUTTONS_DOWN & buttons;			// return the pressed button(s)
 }
 
 
@@ -104,12 +107,12 @@ unsigned char OrangutanPushbuttons::waitForRelease(unsigned char buttons)
 	init();		// initialize pushbutton I/O pins if necessary
 	do
 	{
-		while (!(BUTTON_PIN & buttons))	// wait for a button to be released
+		while (!(BUTTONS_UP & buttons))	// wait for a button to be released
 			;
 			delay(10);						// debounce the button release
 	}
-	while (!(BUTTON_PIN & buttons));		// if button isn't still released, loop
-	return BUTTON_PIN & buttons;			// return the released button(s)
+	while (!(BUTTONS_UP & buttons));		// if button isn't still released, loop
+	return BUTTONS_UP & buttons;			// return the released button(s)
 }
 
 // wait for any of the specified buttons to be pressed and then released,
@@ -132,7 +135,7 @@ unsigned char OrangutanPushbuttons::waitForButton(unsigned char buttons)
 unsigned char OrangutanPushbuttons::isPressed(unsigned char buttons)
 {
 	init();		// initialize pushbutton I/O pins if necessary
-	return ~BUTTON_PIN & buttons;
+	return BUTTONS_DOWN & buttons;
 }
 
 // Local Variables: **

@@ -32,6 +32,12 @@
 #include <pololu/leds.h>
 #include <pololu/pushbuttons.h>
 #include <pololu/serial.h>
+#include <pololu/encoders.h>
+#include <pololu/resources.h>
+#include <pololu/digital.h>
+#include <pololu/servos.h>
+#include <pololu/pulsein.h>
+#include <pololu/OrangutanSPIMaster/OrangutanSPIMaster.h>
 
 #define IR_EMITTERS_OFF 0
 #define IR_EMITTERS_ON 1

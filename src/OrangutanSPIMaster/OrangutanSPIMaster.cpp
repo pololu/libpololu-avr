@@ -53,6 +53,19 @@
 #define SPI_DEFAULT_SPEED_DIVIDER SPI_SPEED_DIVIDER_4  // 20MHz / 4 = 5 MHz
 #define SPI_DEFAULT_OPTIONS       SPI_EDGE_TRAILING
 
+#elif defined(_ORANGUTAN_X2)
+
+#define PIN_SSBAR 4
+#define PIN_MOSI  5
+#define PIN_MISO  6
+#define PIN_SCK   7
+
+// For the Orangutan X2, these are the optimal settings for
+// communication with the auxiliary processor:
+#define SPI_DEFAULT_SPEED_DIVIDER SPI_SPEED_DIVIDER_8  // 20MHz / 8 = 2.5 MHz
+#define SPI_DEFAULT_OPTIONS       SPI_EDGE_LEADING
+
+
 #else
 
 #define PIN_SSBAR 2

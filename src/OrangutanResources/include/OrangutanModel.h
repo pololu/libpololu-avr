@@ -38,6 +38,6 @@
 
 #if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega1284PA__)
  #define _ORANGUTAN_SVP
-#elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega_644P__)
+#elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__)
  #define _ORANGUTAN_X2
 #endif

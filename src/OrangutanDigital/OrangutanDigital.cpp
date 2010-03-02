@@ -1,7 +1,7 @@
 /*
   OrangutanDigital.cpp - Library for using the digital I/O lines on the
-	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  The code is
-	all inline, which lets it compile to very small, fast, efficient
+	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  The code
+	is all inline, which lets it compile to very small, fast, efficient
 	assembly code if you use constants as your inputs.  For example,
 	the line:
 	

@@ -1,6 +1,6 @@
 /*
   OrangutanServo.h - Library for generating servo control pulses with digital
-	outputs on the Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  Note
+	outputs on the Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  Note
 	that only the Orangutan SV and SVP can supply enough current to power servos
 	off of their regulated voltage.  All other devices can supply the control
 	signals only (you must power the servos from a separate source).  This

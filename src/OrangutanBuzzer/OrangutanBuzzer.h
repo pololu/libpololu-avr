@@ -70,7 +70,7 @@
 #define DIV_BY_10		(1 << 15)		// frequency bit that indicates Hz/10
 
 
-#ifdef _ORANGUTAN_SVP
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 
 #define BUZZER_DDR		DDRD
 #define BUZZER			(1 << PORTD4)

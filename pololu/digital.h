@@ -1,6 +1,6 @@
 /*
   digital.h - Library for using the digital I/O lines on the
-	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  The code is
+	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  The code is
 	all inline, which lets it compile to very small, fast, efficient
 	assembly code if you use constants as your inputs.  For example,
 	the line:
@@ -143,7 +143,7 @@ static inline void get_io_registers(struct IOStruct* io, unsigned char pin)
 		io->bitmask = 1 << pin;
 	}
 
-#ifdef _ORANGUTAN_SVP
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 	else if (pin < 16)		// pin 8 = PB0, ..., 15 = PB7
 	{
 		io->pinRegister = (unsigned char*)&PINB;
