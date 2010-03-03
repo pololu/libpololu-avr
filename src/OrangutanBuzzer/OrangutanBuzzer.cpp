@@ -37,7 +37,10 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 #include "OrangutanBuzzer.h"
-
+#include "../OrangutanResources/include/OrangutanModel.h"
+#ifdef _ORANGUTAN_X2
+#include "../OrangutanX2/OrangutanX2.h"
+#endif
 
 #define TIMER1_OFF					0x00	// timer1 disconnected
 #define TIMER1_CLK_1				0x01	// 20 MHz
@@ -80,7 +83,6 @@ ISR (TIMER1_OVF_vect)
 		TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 		OCR1A = (F_CPU/2) / 1000;			// set TOP for freq = 1 kHz
 		OCR1B = 0;						// 0% duty cycle
-		//BUZZER_DDR &= ~BUZZER;	// silence buz, pin->input
 		buzzerFinished = 1;
 		DISABLE_TIMER1_INTERRUPT();
 		if (sequence && (play_mode_setting == PLAY_AUTOMATIC))
@@ -145,14 +147,19 @@ extern "C" unsigned char play_check()
 void OrangutanBuzzer::init2()
 {
 	DISABLE_TIMER1_INTERRUPT();	// disable all timer1 interrupts
-	
-	//BUZZER_DDR &= ~BUZZER;	// buzzer pin set as input
-	
+		
+#ifdef _ORANGUTAN_X2
+	TCCR1A = 0x03;	// bits 6 and 7 clear: normal port op., OC1A disconnected
+					// bit 4 and 5 clear: normal port op., OC1B disconnected
+					// bits 2 and 3: not used
+					// bits 0 & 1 set: combine with bits 3 & 4 of TCCR1B...
+#else
 	TCCR1A = 0x23;	// bits 6 and 7 clear: normal port op., OC1A disconnected
 					// bit 4 clear, 5 set: clear OC1B on comp match when upcounting, 
 					//                     set OC1B on comp match when downcounting
 					// bits 2 and 3: not used
 					// bits 0 & 1 set: combine with bits 3 & 4 of TCCR1B...
+#endif
 
 	TCCR1B = 0x11;	// bit 7 clear: input capture noise canceler disabled
 					// bit 6 clear: input capture triggers on falling edge
@@ -176,7 +183,9 @@ void OrangutanBuzzer::init2()
 	OCR1A = (F_CPU/2) / 1000;	// set TOP for freq = 1 kHz
 	OCR1B = 0;					// set 0% duty cycle
 	
+#ifndef _ORANGUTAN_X2
 	BUZZER_DDR |= BUZZER;		// buzzer pin set as an output
+#endif
 }
 
 
@@ -191,14 +200,24 @@ void OrangutanBuzzer::init2()
 void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur, 
 				   					unsigned char volume)
 {
+	init();		// initializes the buzzer if necessary
+	buzzerFinished = 0;
+	
+#ifdef _ORANGUTAN_X2
+
+	DISABLE_TIMER1_INTERRUPT();
+
+	OrangutanX2::setVolume(volume);
+	OrangutanX2::playFrequency(freq, dur);
+	buzzerTimeout = dur;		// timeout is duration (timer1 set to 1kHz)
+	
+#else
+
 	unsigned int newOCR1A;
 	unsigned int newTCCR1B;
 	unsigned int timeout;
 	unsigned char multiplier = 1;
 	
-	init();		// initializes the buzzer if necessary
-
-	buzzerFinished = 0;
 
 	if (freq & DIV_BY_10)		// if frequency's DIV_BY_10 bit is set
 	{							//  then the true frequency is freq/10
@@ -245,13 +264,6 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 		timeout = dur;	// duration for silent notes is exact
 	else
 		timeout = (unsigned int)((long)dur * freq / 1000);
-
-	/*	now that we're using a phase-correct PWM, we get a glitch-free 0V at volume 0
-	if (volume == 0)
-		BUZZER_DDR &= ~BUZZER;			// buzzer pin->input (silence buz.)
-	else
-		BUZZER_DDR |= BUZZER;			// buzzer pin->output
-	*/
 	
 	if (volume > 15)
 		volume = 15;
@@ -262,9 +274,12 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 	OCR1A = newOCR1A;					// set timer 1 pwm frequency
 	OCR1B = OCR1A >> (16 - volume);	// set duty cycle (volume)
 	buzzerTimeout = timeout;			// set buzzer duration
+	
+#endif // _ORANGUTAN_X2
+
 	TIFR1 |= 0xFF;						// clear any pending t1 overflow int.
 	ENABLE_TIMER1_INTERRUPT();			// this is the only place the t1
-										//  overflow is enabled
+										//  overflow is enabled unless using X2
 	sei();
 }
 
@@ -306,6 +321,21 @@ void OrangutanBuzzer::playNote(unsigned char note, unsigned int dur,
 	// the units for frequency are .1 Hz, not Hz, and freq must be divided
 	// by 10 to get the true frequency in Hz.  This allows for an extra digit
 	// of resolution for low frequencies without the need for using floats.
+	
+#ifdef _ORANGUTAN_X2
+
+	init();								// initializes the buzzer if necessary
+	buzzerFinished = 0;
+	DISABLE_TIMER1_INTERRUPT();
+	OrangutanX2::setVolume(volume);
+	OrangutanX2::playNote(note, dur);
+	buzzerTimeout = dur;				// timeout = dur since timer 1 ticks at 1 kHz
+	TIFR1 |= 0xFF;						// clear any pending t1 overflow int.
+	ENABLE_TIMER1_INTERRUPT();			// also enable timer 1 interrupts here when
+										//  using Orangutan X2
+	sei();
+	
+#else
 
 	unsigned int freq = 0;
 	unsigned char offset_note = note - 16;
@@ -380,6 +410,7 @@ void OrangutanBuzzer::playNote(unsigned char note, unsigned int dur,
 	if (volume > 15)
 		volume = 15;
 	playFrequency(freq, dur, volume);	// set buzzer this freq/duration
+#endif // _ORANGUTAN_X2
 }
 
 
@@ -473,9 +504,11 @@ void OrangutanBuzzer::stopPlaying()
 	TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 	OCR1A = (F_CPU/2) / 1000;					// set TOP for freq = 1 kHz
 	OCR1B = 0;									// 0% duty cycle
-	//BUZZER_DDR &= ~BUZZER;						// silence buz, pin->input
 	buzzerFinished = 1;
 	sequence = 0;
+#ifdef _ORANGUTAN_X2
+	OrangutanX2::buzzerOff();
+#endif
 }
 
 // Gets the current character, converting to lower-case and skipping

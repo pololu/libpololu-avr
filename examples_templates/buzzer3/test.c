@@ -1,12 +1,12 @@
 #include <pololu/orangutan.h>
 
 /*
- * buzzer3: for the Orangutan LV/SV-xx8
+ * buzzer3: for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
- * This example program is indended for use on the Orangutan LV/SV-xx8.
+ * This example program is indended for use on the Orangutan LV, SV,
+ * SVP, X2, and 3pi robot and will NOT work under the Arduino environment.
  * It uses the OrangutanBuzzer functions to play a series of notes on
- * the Orangutan's buzzer.  It uses the OrangutanPushbuttons
- * functions to allow the user select which melody plays.
+ * the Orangutan's buzzer.
  *
  * This example demonstrates the use of the play_mode()
  * and play_check() methods, which allow you to select
@@ -70,8 +70,8 @@ const char rhapsody[] PROGMEM = "O6 T40 L16 d#<b<f#<d#<f#<bd#f#"
 
 int main()
 {
-  TCCR2A = 0;         // configure timer2 to run at 78 kHz
-  TCCR2B = 0x06;      // and overflow when TCNT2 = 256 (~3 ms)
+  TCCR0A = 0;         // configure timer0 to run at 78 kHz
+  TCCR0B = 0x04;      // and overflow when TCNT0 = 256 (~3 ms)
   play_from_program_space(rhapsody);
 
   while(1)
@@ -110,11 +110,11 @@ int main()
     unsigned char maxTime = 0;
     for (i = 0; i < 8000; i++)
     {
-      TCNT2 = 0;
-      while (TCNT2 < 20)    // time for ~250 us
+      TCNT0 = 0;
+      while (TCNT0 < 20)    // time for ~250 us
         ;
-      if (TCNT2 > maxTime)
-        maxTime = TCNT2;    // if the elapsed time is greater than the previous max, save it
+      if (TCNT0 > maxTime)
+        maxTime = TCNT0;    // if the elapsed time is greater than the previous max, save it
 #ifndef ALWAYS_AUTOMATIC
       play_check();   // check if it's time to play the next note and play it if so
 #endif
