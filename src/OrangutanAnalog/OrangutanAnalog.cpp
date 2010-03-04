@@ -242,21 +242,33 @@ void OrangutanAnalog::startConversion(unsigned char channel, unsigned char use_i
 						// bit 3 clear: disable ADC interrupt
 						// bits 0-2 set: ADC clock prescaler is 128
 						//  128 prescaler required for 10-bit resolution when FCPU = 20 MHz
+						
+	// NOTE: it is important to make changes to a temporary variable and then set the ADMUX
+	// register in a single atomic operation rather than incrementally changing bits of ADMUX.
+	// Specifically, setting the ADC channel by first clearing the channel bits of ADMUX and
+	// then setting the ones corresponding to the desired channel briefly connects the ADC
+	// to channel 0, which can affect the ADC charge capacitor.  For example, if you have a
+	// high output impedance voltage on channel 1 and a low output impedance voltage on channel
+	// 0, the voltage on channel 0 be briefly applied to the ADC capacitor before every conversion,
+	// which could prevent the capacitor from settling to the voltage on channel 1, even over
+	// many reads.
+	unsigned char tempADMUX = ADMUX;
 
-	ADMUX |= 1 << 6;
+	tempADMUX |= 1 << 6;
 	if(use_internal_reference)	// Note: internal reference should NOT be used on devices
 	{							//  where AREF is connected to an external voltage!
 		// use the internal voltage reference
-		ADMUX |= 1 << 7;		// 1.1 V on ATmega48/168/328; 2.56 V on ATmega324/644/1284
+		tempADMUX |= 1 << 7;		// 1.1 V on ATmega48/168/328; 2.56 V on ATmega324/644/1284
 	}
 	else
 	{
 		// use AVCC as a reference
-		ADMUX &= ~(1 << 7);
+		tempADMUX &= ~(1 << 7);
 	}
 
-	ADMUX &= ~0x1F;		 // clear channel selection bits of ADMUX
-	ADMUX |= channel;    // we only get this far if channel is less than 32
+	tempADMUX &= ~0x1F;		 // clear channel selection bits of ADMUX
+	tempADMUX |= channel;    // we only get this far if channel is less than 32
+	ADMUX = tempADMUX;
 	ADCSRA |= 1 << ADSC; // start the conversion
 }
 
@@ -324,7 +336,13 @@ unsigned int OrangutanAnalog::readVCCMillivolts()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	unsigned int reading = readAverage(30, 10);  // channel 30 is internal 1.1V BG
+	
+	// bandgap cannot deliver much current, so it takes some time for the ADC
+	// to settle to the BG voltage.  The following read connects the ADC to
+	// the BG voltage and gives the voltage time to settle.
+	readAverage(30, 20);
+	
+	unsigned int reading = readAverage(30, 20);  // channel 30 is internal 1.1V BG
 	unsigned int value = (1023UL * 1100UL + (reading>>1)) / reading;
 	setMode(mode);
 	return value;
