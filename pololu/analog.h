@@ -1,6 +1,6 @@
 /*
   analog.h - Library for using the analog inputs on the
-	Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  This library also
+	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  This library also
 	provides a method for reading the temperature sensor on the LV-168.
 */
 
@@ -26,6 +26,7 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
+#include <avr/io.h>
 #include "OrangutanResources/include/OrangutanModel.h"
 
 #define MODE_8_BIT		1
@@ -48,22 +49,47 @@
 
 #endif
 
-void set_analog_mode(unsigned char mode);
-unsigned char get_analog_mode();
+static inline void set_analog_mode(unsigned char mode)
+{
+	if (mode == MODE_10_BIT)
+		ADMUX &= ~(1 << ADLAR);	// right-adjust result (ADC has result)
+	else
+		ADMUX |= 1 << ADLAR;		// left-adjust result (ADCH has result)	
+}
+static inline unsigned char get_analog_mode()
+{
+	return (ADMUX >> ADLAR) & 1;
+}
 unsigned int analog_read(unsigned char channel);
 unsigned int analog_read_millivolts(unsigned char channel);
 unsigned int analog_read_average(unsigned char channel, unsigned int samples);
 void start_analog_conversion(unsigned char channel);
-void start_analog_conversion_using_internal_reference(unsigned char channel);
-unsigned char analog_is_converting();
+static inline unsigned char analog_is_converting()
+{
+	return (ADCSRA >> ADSC) & 1;
+}
 unsigned int analog_conversion_result();
 unsigned int analog_conversion_result_millivolts();
+void set_millivolt_calibration(unsigned int calibration);
+unsigned int read_vcc_millivolts();
 unsigned int to_millivolts(unsigned int analog_result);
 unsigned int read_trimpot();
 
 #ifdef _ORANGUTAN_SVP
 
 unsigned int read_battery_millivolts_svp();
+static inline unsigned int read_battery_millivolts()
+{
+  return read_battery_millivolts_svp();
+}
+
+#elif defined(_ORANGUTAN_X2)
+
+unsigned int read_battery_millivolts_x2();
+static inline unsigned int read_battery_millivolts()
+{
+  return read_battery_millivolts_x2();
+}
 
 #else
 

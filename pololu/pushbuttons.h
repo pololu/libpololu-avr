@@ -1,6 +1,6 @@
 /*
   OrangutanPushbuttons.h - Library for using the thee user pushbuttons on the
-      Orangutan LV, SV, SVP, and 3pi.
+      Orangutan LV, SV, SVP, X2, and 3pi.
   Written by Ben Schmidel, May 23, 2008.
 */
 #ifndef OrangutanPushbuttons_h

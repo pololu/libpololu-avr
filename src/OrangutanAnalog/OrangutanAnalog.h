@@ -62,13 +62,22 @@ class OrangutanAnalog
 
 	// set the ADC to run in either 8-bit mode (MODE_8_BIT) or 
 	// 10-bit mode (MODE_10_BIT)
-	static void setMode(unsigned char mode);
+	static inline void setMode(unsigned char mode)
+	{
+		if (mode == MODE_10_BIT)
+			ADMUX &= ~(1 << ADLAR);	// right-adjust result (ADC has result)
+		else
+			ADMUX |= 1 << ADLAR;		// left-adjust result (ADCH has result)	
+	}
 	
 	// returns 0 if in 10-bit mode, otherwise returns non-zero.  The return
 	// value of this method can be directly compared against the macros
 	// MODE_8_BIT and MODE_10_BIT:
 	// For example: if (getMode() == MODE_8_BIT) ...
-	static unsigned char getMode();
+	static inline unsigned char getMode()
+	{
+		return (ADMUX >> ADLAR) & 1;
+	}
 
 	// take a single analog reading of the specified channel
 	static unsigned int read(unsigned char channel);
@@ -87,26 +96,48 @@ class OrangutanAnalog
 	// communication (see the SVP user's guide for more info).
 	static unsigned int readTrimpot();
 
-	// the following methods can be used to initiate an ADC conversion
+	// the following method can be used to initiate an ADC conversion
 	// that runs in the background, allowing the CPU to perform other tasks
 	// while the conversion is in progress.  The procedure is to start a
 	// conversion on a channel with startConversion(channel), and then
 	// poll isConverting in your main loop.  Once isConverting() returns
 	// a zero, the result can be obtained through a call to conversionResult().
-	// If use_internal_reference is set to true, the function will use
-	// the internal 1.1V voltage reference on the AVR; otherwise it
-	// uses the AVCC pin as a reference.
+	// If use_internal_reference is set to true, the function will use the
+	// internal 1.1V voltage reference on the ATmega48/168/328 or the internal
+	// 2.56V voltage reference on the ATmega324/644/1284; otherwise, it uses
+	// the AVCC pin as a reference.
+	// *** NOTE ***: Some Orangutans and 3pis have their AREF pin connected directly to VCC.
+	//  On these Orangutans, you must not use the internal voltage reference as
+	//  doing so will short the internal reference voltage to VCC and could damage
+	//  the AVR.  It is safe to use the internal reference voltage on the
+	//  Orangutan SVP.
 	static void startConversion(unsigned char channel, unsigned char use_internal_reference = 0);
 
 	// returns 1 if the ADC is in the middle of an conversion, otherwise
 	// returns 0
-	static unsigned char isConverting();
+	static inline unsigned char isConverting()
+	{
+		return (ADCSRA >> ADSC) & 1;
+	}
 	
 	// returns the result of the previous ADC conversion.
 	static unsigned int conversionResult();
 
 	// returns the result of the previous ADC conversion in millivolts.
 	static unsigned int conversionResultMillivolts();
+	
+	// sets the value used to calibrate the conversion from ADC reading
+	// to millivolts.  The argument calibration should equal VCC in millivolts,
+	// which can be automatically measured using the function readVCCMillivolts():
+	// e.g. setMillivoltCalibration(readVCCMillivolts());
+	static void setMillivoltCalibration(unsigned int calibration);
+
+	// averages ten ADC readings of the fixed internal 1.1V bandgap voltage
+	// and computes VCC from the results.  This function returns VCC in millivolts.
+	// Channel 14 is internal 1.1V BG on ATmega48/168/328, but bit 5 of ADMUX is
+	// not used, so channel 30 is equivalent to channel 14.  Channel 30 is the internal
+	// 1.1V BG on ATmega324/644/1284.
+	static unsigned int readVCCMillivolts();
 
 	// converts the specified ADC result to millivolts
 	static unsigned int toMillivolts(unsigned int adcResult);
@@ -119,16 +150,34 @@ class OrangutanAnalog
 	{
 		return OrangutanSVP::getBatteryMillivolts();
 	}
+	
+	static inline unsigned int readBatteryMillivolts()
+	{
+		return readBatteryMillivolts_SVP();
+	}
+	
+#elif defined(_ORANGUTAN_X2)
+
+	// X2: returns the voltage of the battery in millivolts using
+	// 10 averaged samples.
+	static unsigned int readBatteryMillivolts_X2();
+	
+	static inline unsigned int readBatteryMillivolts()
+	{
+		return readBatteryMillivolts_X2();
+	}
+	
 #else
-	// 3pi: returns the voltage of the battery in millivolts,
-	// using 10 averaged samples.
+
+	// 3pi: returns the voltage of the battery in millivolts using
+	// 10 averaged samples.
 	static unsigned int readBatteryMillivolts_3pi();
 
-	// SV-168/SV-328: returns the voltage of the battery in millivolts,
+	// SV-168/SV-328: returns the voltage of the battery in millivolts
 	// using 10 averaged samples.
 	static unsigned int readBatteryMillivolts_SV();
-
-	// This version of the function is included because the 3pi was
+	
+		// This version of the function is included because the 3pi was
 	// originally the only supported board with battery voltage
 	// sensing.  Instead of using this one, reading the battery
 	// voltage should be done with the board-specific functions above.
@@ -142,10 +191,11 @@ class OrangutanAnalog
 	// is on ADC channel 6.
 	static int readTemperatureF();
 	static int readTemperatureC();
-#endif
+	
+#endif // _ORANGUTAN_SVP
 };
 
-#endif
+#endif // OrangutanAnalog_h
 
 // Local Variables: **
 // mode: C++ **

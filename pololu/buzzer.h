@@ -1,6 +1,6 @@
 /*
   OrangutanBuzzer.h - Library for controlling the buzzer on the
-      Orangutan LV, SV, SVP, or 3pi robot.
+      Orangutan LV, SV, SVP, X2, or 3pi robot.
   Written by Ben Schmidel, May 23, 2008.
 
   This library uses a timer1 PWM to generate the note frequencies and

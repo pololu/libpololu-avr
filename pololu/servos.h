@@ -1,6 +1,6 @@
 /*
   servos.h - Library for generating servo control pulses with digital
-	outputs on the Orangutan LV, SV, SVP, Baby Orangutan B, or 3pi robot.  Note
+	outputs on the Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  Note
 	that only the Orangutan SV and SVP can supply enough current to power servos
 	off of their regulated voltage.  All other devices can supply the control
 	signals only (you must power the servos from a separate source).  This
@@ -52,13 +52,33 @@ void set_servo_speed(unsigned char servoNum, unsigned int speed);
 unsigned int get_servo_speed(unsigned char servoNum);
 
 unsigned int get_servo_positionB(unsigned char servoNum);
+static inline unsigned int get_servo_position_b(unsigned char servoNum)
+{
+	return get_servo_position_b(servoNum);
+}
 
 void set_servo_targetB(unsigned char servoNum, unsigned int pos_us);
+static inline void set_servo_target_b(unsigned char servoNum, unsigned int pos_us)
+{
+	set_servo_targetB(servoNum, pos_us);
+}
 
 unsigned int get_servo_targetB(unsigned char servoNum);
+static inline unsigned int get_servo_tartget_b(unsigned char servoNum)
+{
+	return get_servo_targetB(servoNum);
+}
 
 void set_servo_speedB(unsigned char servoNum, unsigned int speed);
+static inline void set_servo_speed_b(unsigned char servoNum, unsigned int speed)
+{
+	set_servo_speedB(servoNum, speed);
+}
 
 unsigned int get_servo_speedB(unsigned char servoNum);
+static inline unsigned int get_servo_speed_b(unsigned char servoNum)
+{
+	return get_servo_speedB(servoNum);
+}
 
 #endif
