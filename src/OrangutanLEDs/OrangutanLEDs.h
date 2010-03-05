@@ -71,16 +71,7 @@ class OrangutanLEDs
 	
 	static inline void green(unsigned char on)
 	{
-		#if defined (_ORANGUTAN_SVP)	// green LED turns on when driven low
-		if (on == TOGGLE)
-			OrangutanDigital::setOutput(GREEN_LED, TOGGLE);
-		else if (on == LOW)
-			OrangutanDigital::setOutput(GREEN_LED, HIGH);
-		else
-			OrangutanDigital::setOutput(GREEN_LED, LOW);
-		#else					// else green LED turns on when driven high
 		OrangutanDigital::setOutput(GREEN_LED, on);
-		#endif
 	}
 
 	static inline void left(unsigned char on)

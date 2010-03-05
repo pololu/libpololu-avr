@@ -1,4 +1,4 @@
-/*
+﻿/*
  * LV-168_demo_program - demo code for the Pololu LV-168 Robot Controller
  * 
  *
@@ -415,7 +415,7 @@ void print_two_lines_delay_1s(const char *line1, const char *line2)
 // button or buttons that were pressed
 char wait_for_button_and_beep()
 {
-	char button = wait_for_button_press(ALL_BUTTONS);
+	char button = wait_for_button_press(ANY_BUTTON);
 	
 	if(button & BUTTON_A)
 		play_from_program_space(beep_button_a);
@@ -467,8 +467,8 @@ void menu_select()
 		// the cursor will be blinking at the end of the option name
 	
 		// wait for all buttons to be released, then a press
-		while(button_is_pressed(ALL_BUTTONS));
-		char button = wait_for_button_press(ALL_BUTTONS);
+		while(button_is_pressed(ANY_BUTTON));
+		char button = wait_for_button_press(ANY_BUTTON);
 
 		if(button & BUTTON_A)
 		{
@@ -827,7 +827,7 @@ void test()
 		print_character(223);	// display the degree symbol character (°)
 		print("F  ");		// display the units
 		delay_ms(50);		// delay for 50 ms
-		button = button_is_pressed(ALL_BUTTONS);	// check for button press
+		button = button_is_pressed(ANY_BUTTON);	// check for button press
 	}
 	while (button == 0);	// loop if no buttons are being pressed
 
@@ -855,7 +855,7 @@ void test()
 int main()
 {
 	// if any button is pressed, go into the old version of the test code
-	if(button_is_pressed(ALL_BUTTONS))
+	if(button_is_pressed(ANY_BUTTON))
 		test(); // activate the simpler test code
 
 	// set up the robot

@@ -306,16 +306,16 @@ void OrangutanLCD::init2()
 	LCD_E_DDR |= 1 << LCD_E;
 
 	// Wait >15ms
-	delay(20);
+	delay(30);
 
 #ifdef _ORANGUTAN_X2
 
 	send_cmd(0x30);	// function set
 	delay(6);	// wait >4.1ms
 	send_cmd(0x30);	// function set
-	delay(1);	// wait >100us
+	delay(2);	// wait >100us
 	send_cmd(0x30);	// function set
-	delay(1);	// wait >100us
+	delay(2);	// wait >100us
 	send_cmd(0x38);	// 8-bit, 2 line, 5x8 dots char (busy flag is now valid)
 
 #else	// Orangutan SVP, LV, SV, and 3pi robot
@@ -323,11 +323,11 @@ void OrangutanLCD::init2()
 	send_4bit_cmd(0x3);	// function set
 	delay(6);	// wait >4.1ms
 	send_4bit_cmd(0x3);	// function set
-	delay(1);	// wait >100us
+	delay(2);	// wait >100us
 	send_4bit_cmd(0x3);	// function set
-	delay(1);	// wait >100us
+	delay(2);	// wait >100us
 	send_4bit_cmd(0x2);	// 4-bit interface
-	delay(1);
+	delay(2);
 	send_cmd(0x28);	// 4-bit, 2 line, 5x8 dots char (busy flag is now valid)
 
 #endif
@@ -360,6 +360,8 @@ void OrangutanLCD::busyWait()
 
 	do
 	{
+		delayMicroseconds(1);
+		
 		// Bring E high
 		LCD_E_PORT |= 1 << LCD_E;
 
@@ -376,10 +378,10 @@ void OrangutanLCD::busyWait()
 		// Bring E low
 		LCD_E_PORT &= ~(1 << LCD_E);
 
+#ifndef _ORANGUTAN_X2
+
 		// Wait a small bit
 		delayMicroseconds(1);
-
-#ifndef _ORANGUTAN_X2
 
 		// When using the 4-bit interface, we still need to
 		// strobe out the 4 bits we don't care about:
@@ -462,12 +464,12 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs, unsigned char numS
 	temp_portd = PORTD;
 #endif
 
-	// Clear RW and RS
-	LCD_RS_PORT &= ~(1 << LCD_RS);
+	// Clear RW and set or clear RS based on the rs argument
 	LCD_RW_PORT &= ~(1 << LCD_RW);
-
-	// Set RS according to what this routine was told to do
-	LCD_RS_PORT |= (rs << LCD_RS);
+	if (rs)
+		LCD_RS_PORT |= 1 << LCD_RS;
+	else
+		LCD_RS_PORT &= ~(1 << LCD_RS);
 
 	// Set the data pins as outputs
 #ifdef _ORANGUTAN_X2
@@ -482,9 +484,9 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs, unsigned char numS
 	DDRD |= LCD_PORTD_MASK;
   #endif  // ifdef _ORANGUTAN_SVP
 
-	sendData(data >> 4);	// send high nibble via 4-bit interface
 	if (numSends != 1)
-		sendData(data & 0x0F);	// send low nibble via 4-bit interface
+		sendData(data >> 4);	// send high nibble via 4-bit interface
+	sendData(data & 0x0F);	// send low nibble via 4-bit interface
 
 #endif  // ifdef _ORANGUTAN_X2
 

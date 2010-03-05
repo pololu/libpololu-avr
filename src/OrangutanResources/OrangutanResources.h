@@ -24,6 +24,19 @@
 #ifndef OrangutanResources_h
 #define OrangutanResources_h
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "../OrangutanResources/include/OrangutanModel.h"
+
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
+#define JTAG_RESET		(1 << JTRF)
+#endif
+#define WATCHDOG_RESET	(1 << WDRF)
+#define BROWNOUT_RESET	(1 << BORF)
+#define EXTERNAL_RESET	(1 << EXTRF)
+#define POWERON_RESET	(1 << PORF)
+
+#ifdef __cplusplus
 
 class OrangutanResources
 {
@@ -37,7 +50,45 @@ class OrangutanResources
 	// of the stack and the top of the static variable space or the
 	// top of the space used by malloc().
 	static int getFreeRAM();
+	
+	// returns the register that contains latched flags indicating
+	// previous reset sources.  Individual flags can be accessed by
+	// ANDing the result with the x_RESET constants defined in this
+	// file.  For example:
+	// if (OrangutanResources::getResetFlags() & WATCHDOG_RESET) ..
+	static inline unsigned char getResetFlags()
+	{
+		return MCUSR;
+	}
+	
+	// clear latched reset flags
+	static inline void clearResetFlags()
+	{
+		MCUSR = 0;
+	}
 };
+
+#else
+
+int get_free_ram();
+
+// returns the register that contains latched flags indicating
+// previous reset sources.  Individual flags can be accessed by
+// ANDing the result with the x_RESET constants defined in this
+// file.  For example:
+// if (get_reset_flags() & WATCHDOG_RESET) ..
+static inline unsigned char get_reset_flags()
+{
+	return MCUSR;
+}
+
+// clear latched reset flags
+static inline void clear_reset_flags()
+{
+	MCUSR = 0;
+}
+
+#endif // __cplusplus
 
 #endif
 

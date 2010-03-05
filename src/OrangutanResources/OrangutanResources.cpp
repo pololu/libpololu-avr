@@ -57,6 +57,7 @@ int OrangutanResources::getFreeRAM()
 	return free_memory;
 }
 
+
 // Local Variables: **
 // mode: C++ **
 // c-basic-offset: 4 **

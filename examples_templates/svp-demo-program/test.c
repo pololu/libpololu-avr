@@ -634,7 +634,7 @@ void usb_test()
 // button or buttons that were pressed
 unsigned char wait_for_button_and_beep()
 {
-	unsigned char button = wait_for_button_press(ALL_BUTTONS);
+	unsigned char button = wait_for_button_press(ANY_BUTTON);
 	
 	if(button & TOP_BUTTON)
 	{
@@ -684,8 +684,8 @@ void menu_select()
 		print_from_program_space(main_menu_options[menu_index]);
 
 		// wait for all buttons to be released, then a press
-		while(button_is_pressed(ALL_BUTTONS));
-		unsigned char button = wait_for_button_press(ALL_BUTTONS);
+		while(button_is_pressed(ANY_BUTTON));
+		unsigned char button = wait_for_button_press(ANY_BUTTON);
 
 		if(button & TOP_BUTTON)
 		{

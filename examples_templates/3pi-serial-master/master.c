@@ -192,7 +192,7 @@ int main()
 		serial_send_blocking(tune,sizeof(tune)-1);
 
 		// wait
-		wait_for_button(ALL_BUTTONS);
+		wait_for_button(ANY_BUTTON);
 
 		// reset calibration
 		slave_reset_calibration();

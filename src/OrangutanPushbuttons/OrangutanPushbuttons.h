@@ -78,6 +78,7 @@
 #define BUTTON_A		BOTTOM_BUTTON
 
 #define ALL_BUTTONS		(TOP_BUTTON | MIDDLE_BUTTON | BOTTOM_BUTTON)
+#define ANY_BUTTON		ALL_BUTTONS
 
 
 class OrangutanPushbuttons

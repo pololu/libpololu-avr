@@ -87,9 +87,9 @@ int main()
   print("mood: ?");
 
   // initialize the random number generator based on how long we hold the button the first time
-  wait_for_button_press(ALL_BUTTONS);
+  wait_for_button_press(ANY_BUTTON);
   long seed = 0;
-  while(button_is_pressed(ALL_BUTTONS))
+  while(button_is_pressed(ANY_BUTTON))
     seed++;
   srandom(seed);
 
@@ -106,6 +106,6 @@ int main()
     prevMood = mood;
   
     print_character(mood);   // print a random mood character
-    wait_for_button(ALL_BUTTONS);   // wait for any button to be pressed
+    wait_for_button(ANY_BUTTON);   // wait for any button to be pressed
   }
 }

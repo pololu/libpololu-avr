@@ -65,16 +65,7 @@ static inline void red_led(unsigned char on)
 	
 static inline void green_led(unsigned char on)
 {
-	#if defined (_ORANGUTAN_SVP)	// green LED turns on when driven low
-	if (on == TOGGLE)
-		set_digital_output(GREEN_LED, TOGGLE);
-	else if (on == LOW)
-		set_digital_output(GREEN_LED, HIGH);
-	else
-		set_digital_output(GREEN_LED, LOW);
-	#else					// else green LED turns on when driven high
 	set_digital_output(GREEN_LED, on);
-	#endif
 }
 
 static inline void left_led(unsigned char on)

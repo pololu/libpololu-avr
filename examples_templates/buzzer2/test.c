@@ -35,7 +35,7 @@ const char fugue[] PROGMEM =
 void loop()                     // run over and over again
 {
   // wait here for one of the three buttons to be pushed
-  unsigned char button = wait_for_button(ALL_BUTTONS);
+  unsigned char button = wait_for_button(ANY_BUTTON);
   clear();
   
   if (button == TOP_BUTTON)
