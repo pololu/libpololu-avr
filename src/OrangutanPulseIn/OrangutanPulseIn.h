@@ -37,7 +37,7 @@
 
 // possible values for the newPulse member of PulseInputStruct
 #define LOW_PULSE			1		// the pulse just completed was a low pulse (pin just went high)
-#define HIGH_PULSE		2		// the pulse just completed was a high pulse (pin just went low)
+#define HIGH_PULSE			2		// the pulse just completed was a high pulse (pin just went low)
 
 // possible values for the argument to the setMaxPulseLength method
 #define MAX_PULSE_3MS		1	// can measure pulses with 0.05 us resolution
@@ -45,6 +45,13 @@
 #define MAX_PULSE_210MS		3	// can measure pulses with 3.2 us resolution
 #define MAX_PULSE_839MS		4	// can measure pulses with 12.8 us resolution
 #define MAX_PULSE_3355MS	5	// can measure pulses with 51.2 us resolution
+
+// easier-to-remember defines:
+#define MAX_PULSE_200MS		3	// can measure pulses with 3.2 us resolution
+#define MAX_PULSE_800MS		4	// can measure pulses with 12.8 us resolution
+#define MAX_PULSE_3000MS	5	// can measure pulses with 51.2 us resolution
+
+#define MAX_PULSE			0xFFFF	// value of pulses that are longer than we can time
 
 
 // Structure for storing the port register and approrpiate bitmask for an I/O pin.
@@ -62,6 +69,7 @@ struct PulseInputStruct
 };
 
 
+#ifdef __cplusplus
 
 class OrangutanPulseIn
 {
@@ -81,9 +89,20 @@ class OrangutanPulseIn
 	
 	static struct PulseInputStruct getPulseInfo(unsigned char idx);
 
+	static unsigned long toMicroseconds(unsigned int pulse);
 };
 
-#endif
+#else
+
+unsigned char pulse_in_init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
+void pulse_in_update();
+void set_max_pulse_length(unsigned char maxLengthEnum);
+struct PulseInputStruct get_pulse_info(unsigned char idx);
+unsigned long pulse_to_microseconds(unsigned int pulse);
+
+#endif // _cplusplus
+
+#endif // OrangutanPulseIn_h
 
 // Local Variables: **
 // mode: C++ **

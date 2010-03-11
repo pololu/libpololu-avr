@@ -5,10 +5,10 @@
 	repeatedly call the update() function in your main loop more often
 	than your configured maximum pulse length.  If this is done,
 	pulses longer than the maximum pulse length will be reported as having
-	a duration of 0xFFFF (65535).  If update() is not called often enough,
-	pulses longer than the maximum pulse length can be reported as having
-	any pulse length from 0 and 65535, depending on how the timer has
-	overflowed.
+	a duration of MAX_PULSE (0xFFFF, or 65535).  If update() is not called
+	often enough, pulses longer than the maximum pulse length can be reported
+	as having any pulse length from 0 and 65535, depending on how the timer
+	has overflowed.
 */
 
 /*
@@ -49,13 +49,13 @@ ISR(PCINT0_vect)
 	unsigned char i;
 	for (i = 0; i < numPulsePins; i++)
 	{
-		unsigned char pr = *pis[i].pinRegister & pis[i].bitmask;
-		if (pr ^ pis[i].inputState)
+		unsigned char pr = (*pis[i].pinRegister & pis[i].bitmask) != 0;
+		if (pr != pis[i].inputState)
 		{
 			unsigned int width = time - pis[i].lastPCTime;
 			if (width < pis[i].curPulseWidth)
 			{
-				width = 0xFFFF;
+				width = MAX_PULSE;
 			}
 			if (pis[i].inputState)
 			{
@@ -103,6 +103,11 @@ extern "C" void set_max_pulse_length(unsigned char maxLengthEnum)
 extern "C" struct PulseInputStruct get_pulse_info(unsigned char idx)
 {
 	return OrangutanPulseIn::getPulseInfo(idx);
+}
+
+extern "C" unsigned long pulse_to_microseconds(unsigned int pulse)
+{
+	return OrangutanPulseIn::toMicroseconds(pulse);
 }
 
 #endif
@@ -164,12 +169,11 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 	{
 		OrangutanDigital::getIORegisters(&io, pulsePins[i]);
 		OrangutanDigital::setDataDirection(&io, 0);			// set pin as an input
-		OrangutanDigital::setOutputValue(&io, 0);				// internal pull-up disabled
 		pis[i].pinRegister = io.pinRegister;
 		pis[i].bitmask = io.bitmask;
 		pis[i].lastHighPulse = 0;
 		pis[i].lastLowPulse = 0;
-		pis[i].curPulseWidth = 0xFFFF;
+		pis[i].curPulseWidth = MAX_PULSE;
 		pis[i].inputState = *io.pinRegister & io.bitmask;
 		pis[i].newPulse = 0;
 		
@@ -224,7 +228,7 @@ void OrangutanPulseIn::update()
 		unsigned int width = TCNT1 - pis[i].lastPCTime;
 		if (width < pis[i].curPulseWidth)
 		{
-			width = 0xFFFF;
+			width = MAX_PULSE;
 		}
 		pis[i].curPulseWidth = width;
 		PCICR = origPCICR;		// re-enable pin-change interrupts
@@ -247,7 +251,7 @@ void OrangutanPulseIn::setMaxPulseLength(unsigned char maxLengthEnum)
 	{
 		pis[i].lastHighPulse = 0;
 		pis[i].lastLowPulse = 0;
-		pis[i].curPulseWidth = 0xFFFF;
+		pis[i].curPulseWidth = MAX_PULSE;
 		pis[i].inputState = *pis[i].pinRegister & pis[i].bitmask;
 		pis[i].newPulse = 0;
 	}
@@ -272,6 +276,34 @@ struct PulseInputStruct OrangutanPulseIn::getPulseInfo(unsigned char idx)
 	PCICR = origPCICR;		// re-enable pin-change interrupts
 	
 	return ret;
+}
+
+
+unsigned long OrangutanPulseIn::toMicroseconds(unsigned int pulse)
+{
+	if (pulse == 0xFFFF)
+		return 0xFFFFFFFF;
+		
+	switch (TCCR1B)
+	{
+		case MAX_PULSE_3MS:
+			return (pulse + 10) / 20;
+			
+		case MAX_PULSE_26MS:
+			return (pulse * 4UL + 5) / 10;
+			
+		case MAX_PULSE_200MS:
+			return (pulse * 32UL + 5) / 10;
+		
+		case MAX_PULSE_800MS:
+			return (pulse * 128UL + 5) / 10;
+			
+		case MAX_PULSE_3000MS:
+			return (pulse * 512UL + 5) / 10;
+		
+		default:
+			return 0;
+	}
 }
 
 

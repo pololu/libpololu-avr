@@ -27,6 +27,7 @@
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
+#include <avr/io.h>
 #include "../OrangutanResources/include/OrangutanModel.h"
 
 #ifdef _ORANGUTAN_SVP
