@@ -443,7 +443,10 @@ unsigned int OrangutanServos::getServoPosition(unsigned char servoNum)
 {
 	if (servoNum >= numServos)
 		return 0;
-	return (servoPos[servoNum] + 5) / 10;
+	TIMSK1 &= ~(1 << ICIE1);	// make sure we don't get interrupted while reading position	
+	unsigned int pos = (servoPos[servoNum] + 5) / 10;
+	TIMSK1 |= 1 << ICIE1;
+	return pos;
 }
 
 
@@ -508,7 +511,10 @@ unsigned int OrangutanServos::getServoPositionB(unsigned char servoNum)
 {
 	if (servoNum >= numServosB)
 		return 0;
-	return (servoPosB[servoNum] + 5) / 10;
+	TIMSK1 &= ~(1 << ICIE1);	// make sure we don't get interrupted while reading position	
+	unsigned int pos = (servoPosB[servoNum] + 5) / 10;
+	TIMSK1 |= 1 << ICIE1;
+	return pos;
 }
 
 
