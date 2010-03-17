@@ -264,8 +264,8 @@ class OrangutanX2
 	static unsigned char getTXBufferSpace();
 	static unsigned char getNumRXBytes();
 	static unsigned char getSerialError();
-	static void sendSerialByte(unsigned char data, unsigned int timeout_ms);
-	static unsigned char readSerialByte(unsigned int timeout_ms);
+	static unsigned char sendSerialByteIfReady(unsigned char data);
+	static unsigned char readSerialByte();
 };
 
 #else
@@ -304,8 +304,8 @@ void x2_set_read_ready_size(unsigned char rrsize, unsigned char save);
 unsigned char x2_get_tx_buffer_space();
 unsigned char x2_get_num_rx_bytes();
 unsigned char x2_get_serial_error();
-void x2_send_serial_byte(unsigned char data, unsigned int timeout_ms);
-unsigned char x2_read_serial_byte(unsigned int timeout_ms);
+unsigned char x2_send_serial_byte_if_ready(unsigned char data);
+unsigned char x2_read_serial_byte();
 
 #endif // _cplusplus
 

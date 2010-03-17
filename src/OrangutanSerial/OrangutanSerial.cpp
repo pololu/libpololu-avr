@@ -28,6 +28,7 @@
 #include "OrangutanSerial.h"
 #include "../OrangutanTime/OrangutanTime.h"
 #include "../OrangutanSVP/OrangutanSVP.h"
+#include "../OrangutanX2/OrangutanX2.h"
 #include "../OrangutanResources/include/OrangutanModel.h"
 
 #include <avr/io.h>
@@ -357,13 +358,19 @@ _SINGLE_PORT_INLINE void OrangutanSerial::setBaudRate(unsigned char port, unsign
 {
 	initPort(port);
 
+	unsigned int baud_ubrr = (F_CPU - 8*baud) / (16*baud);
+
 	if (!_PORT_IS_UART)
 	{
-		// You can't set the baud rate on the virtual COM port.
+		// You can't set the baud rate on the virtual COM port on the Orangutan SVP,
+		// but you can on the Orangutan X2 since it uses a CP2102 USB-to-UART bridge:
+		#ifdef _ORANGUTAN_X2
+		OrangutanX2::setSerial(UART_NO_PARITY, UART_ONE_STOP_BIT, UART_NORMAL_SPEED, baud_ubrr, 0);
+		#endif
 		return;
 	}
 
-	*ubrr(port) = (F_CPU-8*baud)/(16*baud);
+	*ubrr(port) = baud_ubrr;
 }
 
 _SINGLE_PORT_INLINE void OrangutanSerial::setMode(unsigned char port, unsigned char mode)
@@ -471,15 +478,13 @@ inline void OrangutanSerial::serial_rx_check(unsigned char port)
     #ifdef USB_COMM
 	else if (port==USB_COMM)
 	{
-		#ifdef _ORANGUTAN_SVP
-
 		// While we are trying to receive bytes, and a byte has been received...
-		while(ports[USB_COMM].receiveBuffer && ports[USB_COMM].receivedBytes < ports[USB_COMM].receiveSize && OrangutanSVPRXFIFO::getReceivedBytes())
+		while(ports[USB_COMM].receiveBuffer && ports[USB_COMM].receivedBytes < ports[USB_COMM].receiveSize && BYTES_RECEIVED)
 		{
 			// We don't call serial_rx_handle_byte here, because that function resets receivedBytes
 			// during ring reception mode, which could cause an infinite loop here.
 
-			ports[USB_COMM].receiveBuffer[ports[USB_COMM].receivedBytes] = OrangutanSVPRXFIFO::getNextByte();
+			ports[USB_COMM].receiveBuffer[ports[USB_COMM].receivedBytes] = NEXT_BYTE;
 			ports[USB_COMM].receivedBytes++; // the byte has been received
 
 			if(ports[USB_COMM].receivedBytes == ports[USB_COMM].receiveSize && ports[USB_COMM].receiveRingOn)
@@ -490,13 +495,6 @@ inline void OrangutanSerial::serial_rx_check(unsigned char port)
 				return;
 			}
 		}
-
-		#else
-		//#error "Need to fill this in."
-		#endif
-
-		// Return because the rest of this function only works for UART-based serial ports.
-		return;
 	}
 	#endif
 }
@@ -645,9 +643,8 @@ inline void OrangutanSerial::serial_tx_check(unsigned char port)
 				// Return because we have nothing (more) to send.
 				return;
 			}
-
-			#if defined(_ORANGUTAN_SVP)
-			if (OrangutanSVP::serialSendIfReady(ports[USB_COMM].sendBuffer[ports[USB_COMM].sentBytes]))
+			
+			if (SEND_BYTE_IF_READY(ports[USB_COMM].sendBuffer[ports[USB_COMM].sentBytes]))
 			{
 				// We successfully started sending a byte
 				ports[USB_COMM].sentBytes++;
@@ -655,12 +652,7 @@ inline void OrangutanSerial::serial_tx_check(unsigned char port)
 				// Try to send another byte.
 				continue;
 			}
-			#elif defined(_ORANGUTAN_X2)
-			//#error "Need to fill this in."
-			#else
-			#error "Need to fill this in."
-			#endif
-
+			
 			// Return because we can not send any more bytes.
 			return;
 		}

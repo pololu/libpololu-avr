@@ -30,18 +30,24 @@
 
 #if defined(_ORANGUTAN_SVP)
  // The Orangutan SVP has two UARTs and one virtual COM port via USB.
- #define _SERIAL_PORTS 3
- #define UART0    0
- #define UART1    1
- #define USB_COMM 2
- #define _PORT_IS_UART (port!=2)
+ #define _SERIAL_PORTS 				3
+ #define UART0    					0
+ #define UART1    					1
+ #define USB_COMM 					2
+ #define _PORT_IS_UART 				(port!=2)
+ #define BYTES_RECEIVED				OrangutanSVPRXFIFO::getReceivedBytes()
+ #define NEXT_BYTE					OrangutanSVPRXFIFO::getNextByte()
+ #define SEND_BYTE_IF_READY(byte)	OrangutanSVP::serialSendIfReady(byte)
 #elif defined(_ORANGUTAN_X2)
  // The Orangutan X2 has two UARTs and one virtual COM port via USB.
- #define _SERIAL_PORTS 3
- #define UART0 0
- #define UART1 1
- #define USB_COMM   2
- #define _PORT_IS_UART (port!=2)
+ #define _SERIAL_PORTS 				3
+ #define UART0 						0
+ #define UART1 						1
+ #define USB_COMM   				2
+ #define _PORT_IS_UART 				(port!=2)
+ #define BYTES_RECEIVED				OrangutanX2::getNumRXBytes()
+ #define NEXT_BYTE					OrangutanX2::readSerialByte()
+ #define SEND_BYTE_IF_READY(byte)	OrangutanX2::sendSerialByteIfReady(byte)
 #else
  #define _SERIAL_PORTS 1
  #define _PORT_IS_UART 1

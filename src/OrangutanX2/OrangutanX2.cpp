@@ -170,14 +170,14 @@ extern "C" unsigned char x2_get_serial_error()
 	return OrangutanX2::getSerialError();
 }
 
-extern "C" void x2_send_serial_byte(unsigned char data, unsigned int timeout_ms)
+extern "C" unsigned char x2_send_serial_byte_if_ready(unsigned char data)
 {
-	OrangutanX2::sendSerialByte(data, timeout_ms);
+	return OrangutanX2::sendSerialByteIfReady(data);
 }
 
-extern "C" unsigned char x2_read_serial_byte(unsigned int timeout_ms)
+extern "C" unsigned char x2_read_serial_byte()
 {
-	return OrangutanX2::readSerialByte(timeout_ms);
+	return OrangutanX2::readSerialByte();
 }
 
 #endif
@@ -753,32 +753,21 @@ unsigned char OrangutanX2::getSerialError()
 
 // Send a byte to the mega168 to be queued for transmission over the UART.
 // While queued the byte will reside in the mega168's UART send buffer.
-// This method will wait timeout_ms milliseconds for there to be room
-// in the transmit buffer before giving up.
-void OrangutanX2::sendSerialByte(unsigned char data, unsigned int timeout_ms)
+// If there is no room in the transmit buffer for the byte to be sent, this method
+// returns 0, otherwise it returns 1.
+unsigned char OrangutanX2::sendSerialByteIfReady(unsigned char data)
 {
-	unsigned long time = OrangutanTime::ms();
-	while (getTXBufferSpace() == 0)	// wait for there to be room in transmit buffer
-	{
-		if (OrangutanTime::ms() - time >= timeout_ms)	// timeout after waiting timeout_ms ms
-			return;
-	}
+	if (getTXBufferSpace() == 0)
+		return 0;
 	OrangutanSPIMaster::transmit(data & 0x80 ? CMD_SEND_SERIAL | 1 : CMD_SEND_SERIAL);
 	OrangutanSPIMaster::transmit(data & 0x7F);
+	return 1;
 }
 
 
 // Retrieve the next byte from the mega168's UART read buffer.
-// This method will wait timeout_ms milliseconds for the receive buffer to receive a byte
-// before giving up and returning 0.
-unsigned char OrangutanX2::readSerialByte(unsigned int timeout_ms)
+unsigned char OrangutanX2::readSerialByte()
 {
-	unsigned long time = OrangutanTime::ms();
-	while (getNumRXBytes() == 0)	// wait for RX buffer to have data
-	{
-		if (OrangutanTime::ms() - time >= timeout_ms)	// timeout after waiting timeout_ms ms
-			return 0;
-	}
 	OrangutanSPIMaster::transmitAndDelay(CMD_READ_SERIAL, 3);
 	return OrangutanSPIMaster::transmit(0);		// junk data byte
 }
