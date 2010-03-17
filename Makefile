@@ -133,10 +133,10 @@ install: $(LIBRARY_FILES)
 # concatenated together with &&.
 
 examples_3pi := 3pi-demo-program 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
-examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 buzzer2 lcd1 motors2 simple-test wheel_encoders1 digital1 wdt
+examples_orangutan := buzzer1 buzzer3 lcd2 pushbuttons1 buzzer2 lcd1 motors2 simple-test wheel_encoders1 wdt
 examples_168_328p := analog2 3pi-serial-master SV-xx8_demo_program LV-xx8_demo_program serial1
-examples_svp := svp1 svp-demo-program svp-eight-servo svp-sixteen-servo svp-one-servo
-examples_x2 := digital1
+examples_svp := svp1 svp-demo-program svp-eight-servo svp-sixteen-servo svp-one-servo serial2
+examples_x2 := digital1 serial2
 
 # The 48 examples are the only ones that will work on the mega48.
 # They will also work on the orangutans, which could have either a 168
@@ -146,7 +146,7 @@ examples_atmega48 := digital1 analog1 motors1 led1 simple_servo_control
 examples_atmega168 := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
 examples_atmega328p := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
 examples_atmega324p := $(examples_atmega48) $(examples_orangutan) $(examples_svp)
-examples_atmega644p := $(examples_x2)
+examples_atmega644p := $(examples_atmega48) $(examples_orangutan) $(examples_x2)
 examples_atmega1284p := $(examples_atmega324p)
 
 example_template = examples_templates/$(example)

@@ -10,9 +10,9 @@
  * The Baby Orangutan does not have a green LED, LCD, or pushbuttons so
  * that part of the code will not work.
  *
- * To make this example compile for the Orangutan SVP, you
- * must add a first argument of UART0 to all the serial_*
- * function calls.
+ * To make this example compile for the Orangutan SVP or X2, you
+ * must add a first argument of UART0 to all the serial_* function calls
+ * to receive on PD0/RXD0 and transmit on PD1/TXD0.
  * 
  * http://www.pololu.com/docs/0J20 
  * http://www.pololu.com  
