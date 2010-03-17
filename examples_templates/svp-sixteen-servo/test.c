@@ -41,14 +41,14 @@ int main()
 	set_servo_speed(5, 150);   // Servo a5 = Demux output 5
 	set_servo_speed(6, 150);   // Servo a6 = Demux output 6
 	set_servo_speed(7, 150);   // Servo a7 = Demux output 7
-	set_servo_speedB(0, 150);  // Servo b0 = pin A0
-	set_servo_speedB(1, 150);  // Servo b1 = pin A1
-	set_servo_speedB(2, 150);  // Servo b2 = pin A2
-	set_servo_speedB(3, 150);  // Servo b3 = pin A3
-	set_servo_speedB(4, 150);  // Servo b4 = pin A4
-	set_servo_speedB(5, 150);  // Servo b5 = pin A5
-	set_servo_speedB(6, 150);  // Servo b6 = pin A6
-	set_servo_speedB(7, 150);  // Servo b7 = pin A7
+	set_servo_speed_b(0, 150);  // Servo b0 = pin A0
+	set_servo_speed_b(1, 150);  // Servo b1 = pin A1
+	set_servo_speed_b(2, 150);  // Servo b2 = pin A2
+	set_servo_speed_b(3, 150);  // Servo b3 = pin A3
+	set_servo_speed_b(4, 150);  // Servo b4 = pin A4
+	set_servo_speed_b(5, 150);  // Servo b5 = pin A5
+	set_servo_speed_b(6, 150);  // Servo b6 = pin A6
+	set_servo_speed_b(7, 150);  // Servo b7 = pin A7
 
 	// Make all the servos go to a neutral position.
 	set_servo_target(0, 1300);
@@ -59,14 +59,14 @@ int main()
 	set_servo_target(5, 1300);
 	set_servo_target(6, 1300);
 	set_servo_target(7, 1300);
-	set_servo_targetB(0, 1300);
-	set_servo_targetB(1, 1300);
-	set_servo_targetB(2, 1300);
-	set_servo_targetB(3, 1300);
-	set_servo_targetB(4, 1300);
-	set_servo_targetB(5, 1300);
-	set_servo_targetB(6, 1300);
-	set_servo_targetB(7, 1300);
+	set_servo_target_b(0, 1300);
+	set_servo_target_b(1, 1300);
+	set_servo_target_b(2, 1300);
+	set_servo_target_b(3, 1300);
+	set_servo_target_b(4, 1300);
+	set_servo_target_b(5, 1300);
+	set_servo_target_b(6, 1300);
+	set_servo_target_b(7, 1300);
 
 	while(1)  // Loop forever.
 	{
@@ -82,14 +82,14 @@ int main()
 			set_servo_target(5, 1800); delay_ms(350);
 			set_servo_target(6, 1800); delay_ms(350);
 			set_servo_target(7, 1800); delay_ms(350);
-			set_servo_targetB(0, 1800); delay_ms(350);
-			set_servo_targetB(1, 1800); delay_ms(350);
-			set_servo_targetB(2, 1800); delay_ms(350);
-			set_servo_targetB(3, 1800); delay_ms(350);
-			set_servo_targetB(4, 1800); delay_ms(350);
-			set_servo_targetB(5, 1800); delay_ms(350);
-			set_servo_targetB(6, 1800); delay_ms(350);
-			set_servo_targetB(7, 1800); delay_ms(1000);
+			set_servo_target_b(0, 1800); delay_ms(350);
+			set_servo_target_b(1, 1800); delay_ms(350);
+			set_servo_target_b(2, 1800); delay_ms(350);
+			set_servo_target_b(3, 1800); delay_ms(350);
+			set_servo_target_b(4, 1800); delay_ms(350);
+			set_servo_target_b(5, 1800); delay_ms(350);
+			set_servo_target_b(6, 1800); delay_ms(350);
+			set_servo_target_b(7, 1800); delay_ms(1000);
 			
 			set_servo_target(0, 1300); delay_ms(350);
 			set_servo_target(1, 1300); delay_ms(350);
@@ -99,14 +99,14 @@ int main()
 			set_servo_target(5, 1300); delay_ms(350);
 			set_servo_target(6, 1300); delay_ms(350);
 			set_servo_target(7, 1300); delay_ms(350);
-			set_servo_targetB(0, 1300); delay_ms(350);
-			set_servo_targetB(1, 1300); delay_ms(350);
-			set_servo_targetB(2, 1300); delay_ms(350);
-			set_servo_targetB(3, 1300); delay_ms(350);
-			set_servo_targetB(4, 1300); delay_ms(350);
-			set_servo_targetB(5, 1300); delay_ms(350);
-			set_servo_targetB(6, 1300); delay_ms(350);
-			set_servo_targetB(7, 1300); delay_ms(350);
+			set_servo_target_b(0, 1300); delay_ms(350);
+			set_servo_target_b(1, 1300); delay_ms(350);
+			set_servo_target_b(2, 1300); delay_ms(350);
+			set_servo_target_b(3, 1300); delay_ms(350);
+			set_servo_target_b(4, 1300); delay_ms(350);
+			set_servo_target_b(5, 1300); delay_ms(350);
+			set_servo_target_b(6, 1300); delay_ms(350);
+			set_servo_target_b(7, 1300); delay_ms(350);
 		}
 	}
 }

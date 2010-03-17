@@ -142,7 +142,7 @@ examples_x2 := digital1 serial2
 # They will also work on the orangutans, which could have either a 168
 # or a 328 processor.
 
-examples_atmega48 := digital1 analog1 motors1 led1 simple_servo_control
+examples_atmega48 := digital1 analog1 motors1 led1 servo_control_using_delays servos1
 examples_atmega168 := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
 examples_atmega328p := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
 examples_atmega324p := $(examples_atmega48) $(examples_orangutan) $(examples_svp)
