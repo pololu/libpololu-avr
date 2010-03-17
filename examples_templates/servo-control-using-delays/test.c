@@ -1,5 +1,5 @@
 /*
- * servo_control_using_delays - demo code for controlling servos with the
+ * servo-control-using-delays - demo code for controlling servos with the
  * Pololu Baby Orangutan B and Orangutan SV-128/328 Robot Controllers.
  * This example uses some I/O lines that are not available on the
  * Orangutan X2 and Orangutan SVP, so it will not work properly on those

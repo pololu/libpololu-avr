@@ -1,6 +1,5 @@
-/*
- * SV-xx8_demo_program - demo code for the Pololu SV-168/328 Robot
- * Controllers.
+﻿/*
+ * LV-demo-program - demo code for the Pololu Orangutan LV-168 robot controller
  * 
  *
  * http://www.pololu.com/docs/0J20
@@ -18,14 +17,16 @@
 // pieces of static data should be stored in program space.
 #include <avr/pgmspace.h>
 
+#include <avr/io.h>			// provides ATmega168-specific definitions/macros
+
 // Introductory messages.  The "PROGMEM" identifier causes the data to
 // go into program space.
 const char welcome_line1[] PROGMEM = " Pololu";
 
 #if defined __AVR_ATmega328P__
-const char welcome_line2[] PROGMEM = " SV-328";
+const char welcome_line2[] PROGMEM = " LV-328";
 #elif defined __AVR_ATmega168__
-const char welcome_line2[] PROGMEM = " SV-168";
+const char welcome_line2[] PROGMEM = " LV-168";
 #else
 #error "Unrecognized device type"
 #endif
@@ -44,7 +45,7 @@ const char thank_you_line2[] PROGMEM = "  you!";
 const char main_menu_intro_line1[] PROGMEM = "  Main";
 const char main_menu_intro_line2[] PROGMEM = "  Menu";
 
-const char menu_bat_test[] PROGMEM = "Battery";
+const char menu_temp_test[] PROGMEM = "Temp";
 const char menu_led_test[] PROGMEM = "LEDs";
 const char menu_lcd_test[] PROGMEM = "LCD";
 const char menu_motor_test[] PROGMEM = "Motors";
@@ -55,7 +56,7 @@ const char menu_time_test[] PROGMEM = "Timer";
 const char menu_line2[] PROGMEM = "\x7f" "A \xa5" "B C\x7e";
 const char back_line2[] PROGMEM = "\6B";
 
-void bat_test();
+void temp_test();
 void led_test();
 void lcd_test();
 void motor_test();
@@ -63,8 +64,8 @@ void music_test();
 void time_test();
 void pot_test();
 typedef void (*function)();
-const function main_menu_functions[] = { bat_test, led_test, pot_test, motor_test, music_test, time_test };
-const char *main_menu_options[] = { menu_bat_test, menu_led_test, menu_pot_test, menu_motor_test, menu_music_test, menu_time_test };
+const function main_menu_functions[] = { temp_test, led_test, pot_test, motor_test, music_test, time_test };
+const char *main_menu_options[] = { menu_temp_test, menu_led_test, menu_pot_test, menu_motor_test, menu_music_test, menu_time_test };
 const char main_menu_length = sizeof(main_menu_options)/sizeof(main_menu_options[0]);
 
 // A couple of simple tunes, stored in program space.
@@ -139,13 +140,35 @@ void load_custom_characters()
 // 10 levels of bar graph characters
 const char bar_graph_characters[10] = {' ',0,0,1,2,3,3,4,5,255};
 
-// Displays the battery voltage.
-void bat_test()
+// Displays the temperature, in C or F.
+void temp_test()
 {
-	int bat = read_battery_millivolts_sv168();
+	static int display_c = 0; // 0 for F, 1 for C
+	int temperature;
 
-	print_long(bat);
-	print("mV");
+	if(display_c)
+		temperature = read_temperature_c();
+	else
+		temperature = read_temperature_f();
+
+	// display temperature; it is in tenths of a degree
+	print_long(temperature/10);
+	print(".");
+	print_long(temperature%10);
+
+	// character 0xDF is the degree symbol
+	print_character('\xdf');
+
+	if(display_c)
+		print_character('C');
+	else
+		print_character('F');
+
+	// allow the user to switch between modes
+	if(button_is_pressed(BUTTON_A))
+		display_c = 1;
+	if(button_is_pressed(BUTTON_C))
+		display_c = 0;
 
 	delay_ms(100);
 }
@@ -380,6 +403,7 @@ void time_test()
 
 void print_two_lines_delay_1s(const char *line1, const char *line2)
 {
+	// Play welcome music and display a message
 	clear();
 	print_from_program_space(line1);
 	lcd_goto_xy(0,1);
@@ -404,8 +428,7 @@ char wait_for_button_and_beep()
 	return button;
 }
 
-// Initializes, displays a welcome message, calibrates, and
-// plays the initial music.
+// Displays a welcome message and plays the initial music.
 void initialize()
 {
 	load_custom_characters(); // load the custom characters
@@ -507,8 +530,6 @@ const char fugue[] PROGMEM =
 	"<gf<af<b-e<ge c#e<b-e<ae<ge <fe<ge<ad<fd"    
 	"O5 e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d"    
 	"e>d>c#>db>d>c#b >c#agaegfe f O6 dc#dfdc#<b c#4";
-
-
 
 
 // *** triggered by top button ***
@@ -779,9 +800,9 @@ void test()
 	lcd_goto_xy(0, 1);	// go to the start of the second LCD line
 
 #if defined __AVR_ATmega328P__
-	print(" SV-328");	// print to the bottom line of the LCD
+	print(" LV-328");	// print to the bottom line of the LCD
 #elif defined __AVR_ATmega168__
-	print(" SV-168");	// print to the bottom line of the LCD
+	print(" LV-168");	// print to the bottom line of the LCD
 #else
 #error "Unrecognized device type"
 #endif
@@ -790,7 +811,7 @@ void test()
 
 	clear();			// clear the LCD, move cursor to start of top line
 
-	print("  VBAT");
+	print("  Temp.");
 
 	do
 	{
@@ -798,11 +819,13 @@ void test()
 		// Average ten readings and return the result, which will be one
 		// third of the battery voltage when the "ADC6 = VBAT/3" solder
 		// bridge is in place on the bottom of the Orangutan PCB
-		int vbat = analog_read_average(6, 10);	// 10-sample avg of ADC6
-		vbat = to_millivolts(vbat) * 3;	// convert reading to bat. voltage (mV)
-		lcd_goto_xy(0, 1);	// go to the start of the second LCD line
-		print_long(vbat);	// display battery voltage in millivolts
-		print(" mV ");		// display the units
+		int Tf = read_temperature_f();	// read temp sensor on ADC6 in 0.1°F
+		lcd_goto_xy(1, 1);	// second character of the second LCD line
+		print_long(Tf/10);	// display temperature in °F
+		print(".");			// print the decimal point
+		print_long(Tf - 10*(Tf/10));	// display the tenths digit
+		print_character(223);	// display the degree symbol character (°)
+		print("F  ");		// display the units
 		delay_ms(50);		// delay for 50 ms
 		button = button_is_pressed(ANY_BUTTON);	// check for button press
 	}
@@ -826,7 +849,6 @@ void test()
 
 /* End of simpler test code.                                          */
 /**********************************************************************/
-
 
 // This is the main function, where the code starts.  All C programs
 // must have a main() function defined somewhere.

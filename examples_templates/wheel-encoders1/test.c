@@ -1,5 +1,11 @@
 /*
- * PololuWheelEncoders example for the Orangutan LV/SV-xx8.
+ * wheel-encoders: example for the Orangutan LV and SV.  It will work 
+ * as is on the Baby Orangutan, though the LCD functions will have no
+ * effect.  It could be modified to work on the Orangutan X2 or SVP
+ * by changing the inputs to pins that are available on those devices.
+ * Note that the Orangutan SVP has two dedicated ports for quadrature
+ * encoders, so using the PololuWheelEncoders library is not necessary
+ * on the Orangutan SVP (the encoders are handled by an auxiliary MCU).
  *
  * This example measures the outputs of two encoders, one connected to
  * ports PC2 and PC3, and another connected to ports PC4 and PC5.
