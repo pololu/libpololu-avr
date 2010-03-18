@@ -279,7 +279,8 @@ class OrangutanLCD
 
 	// Initializes the LCD library for printf support.  After this,
 	// printf will start sending characters to the LCD.
-	static void initPrintf();
+	static void initPrintf();	// uses default width and height for device
+	static void initPrintf(unsigned char lcdWidth, unsigned char lcdHeight);
 	
 
   private:

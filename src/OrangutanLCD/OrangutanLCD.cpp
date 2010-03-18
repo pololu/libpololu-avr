@@ -91,6 +91,7 @@
 
 
 #include <avr/io.h>
+#include <stdlib.h>
 #include <avr/pgmspace.h>
 
 #ifndef F_CPU
@@ -116,7 +117,7 @@ OrangutanLCD::OrangutanLCD()
 #include <stdio.h>
 
 // LCD_WIDTH is the number of characters in each line of the LCD.
-// row1 array lets us remember what was written to the bottom row (for scrolling)
+// printf_chars array lets us remember what was written to the bottom rows (for scrolling)
 #ifdef _ORANGUTAN_SVP
   #define LCD_WIDTH 	16
   #define LCD_HEIGHT	2
@@ -128,11 +129,12 @@ OrangutanLCD::OrangutanLCD()
   #define LCD_HEIGHT	2
 #endif
 
-#define SAVED_CHARS	(LCD_WIDTH*(LCD_HEIGHT-1))
-
 char *printf_chars = 0;
-unsigned char row=0; /* the current cursor position */
-unsigned char col=0;
+unsigned char row = 0; /* the current cursor position */
+unsigned char col = 0;
+unsigned char numLCDRows = LCD_HEIGHT;
+unsigned char numLCDCols = LCD_WIDTH;
+#define SAVED_CHARS		(numLCDCols*(numLCDRows-1))
 
 // This function is called by printf.
 extern "C" int lcd_putchar(char c, FILE *f)
@@ -143,11 +145,7 @@ extern "C" int lcd_putchar(char c, FILE *f)
 
 	if (printf_chars == 0)
 	{
-		printf_chars = (char*)malloc(sizeof(char)*SAVED_CHARS);
-		if (printf_chars == 0)
-			return c;
-		for (i = 0; i < SAVED_CHARS; i++)
-			printf_chars[i] = ' ';
+		return c;
 	}
 
 	/* control characters */
@@ -157,55 +155,55 @@ extern "C" int lcd_putchar(char c, FILE *f)
 	}
 	else if (c == 8) { // ^H
 		col--;
-		if (col == (unsigned char)-1) { row--; col = LCD_WIDTH-1; }
+		if (col == (unsigned char)-1) { row--; col = numLCDCols-1; }
 		if (row == (unsigned char)-1) { row = 0; col = 0; }
 		repos = 1;
 	}
 	else
 	{
 		OrangutanLCD::print(c); /* write the character */
-		if (row != 0) printf_chars[(row-1)*LCD_WIDTH + col]=c; /* remember the character */
+		if (row != 0) printf_chars[(row-1)*numLCDCols + col]=c; /* remember the character */
 		col++;
 
-		if (col == LCD_WIDTH) nextline = 1;
+		if (col == numLCDCols) nextline = 1;
 	}
 
 	if (nextline)
 	{
-		if (row == LCD_HEIGHT - 1)
+		if (row == numLCDRows - 1)
 		{
 			/******* scroll! *******/
             // Note: because of the way we implement scrolling,
             // it is never possible for the user to use the lower
             // right corner of his LCD.
 			char j;
-			for (j = 0; j < LCD_HEIGHT-2; j++)  	// draw top LCD_HEIGHT-2 rows
+			for (j = 0; j < numLCDRows-2; j++)  	// draw top LCD_HEIGHT-2 rows
 			{
 				OrangutanLCD::gotoXY(0, j);
-				for (i = 0; i < LCD_WIDTH; i++)
+				for (i = 0; i < numLCDCols; i++)
 				{
-					OrangutanLCD::print(printf_chars[j*LCD_WIDTH + i]);
-					printf_chars[j*LCD_WIDTH + i] = printf_chars[(j+1)*LCD_WIDTH + i];
+					OrangutanLCD::print(printf_chars[j*numLCDCols + i]);
+					printf_chars[j*numLCDCols + i] = printf_chars[(j+1)*numLCDCols + i];
 				}
 			}
-			if (LCD_HEIGHT >= 2)
+			if (numLCDRows >= 2)
 			{
-				OrangutanLCD::gotoXY(0, LCD_HEIGHT-2);	// draw row above bottom row
-				for (i = 0; i < LCD_WIDTH; i++)
+				OrangutanLCD::gotoXY(0, numLCDRows-2);	// draw row above bottom row
+				for (i = 0; i < numLCDCols; i++)
 				{
-					OrangutanLCD::print(printf_chars[(LCD_HEIGHT-2)*LCD_WIDTH + i]);
-					printf_chars[(LCD_HEIGHT-2)*LCD_WIDTH + i] = ' ';	// clear saved bottom row
+					OrangutanLCD::print(printf_chars[(numLCDRows-2)*numLCDCols + i]);
+					printf_chars[(numLCDRows-2)*numLCDCols + i] = ' ';	// clear saved bottom row
 				}
 			}
-			OrangutanLCD::gotoXY(0, LCD_HEIGHT-1);		// erase bottom row
-			for (i = 0; i < LCD_WIDTH; i++)
+			OrangutanLCD::gotoXY(0, numLCDRows-1);		// erase bottom row
+			for (i = 0; i < numLCDCols; i++)
 			{
 				OrangutanLCD::print(' ');
 			}
 		}
-
+		else
+			row++;
 		col = 0;
-		row = LCD_HEIGHT - 1;
 		repos = 1;
 	}
 
@@ -221,7 +219,7 @@ extern "C" int void_getchar(FILE *f) {
 	return 0;
 }
 
-extern "C" void lcd_goto_xy(int col, int row)
+extern "C" void lcd_goto_xy(unsigned char col, unsigned char row)
 {
 	OrangutanLCD::gotoXY(col,row);
 }
@@ -229,6 +227,11 @@ extern "C" void lcd_goto_xy(int col, int row)
 extern "C" void lcd_init_printf()
 {
 	OrangutanLCD::initPrintf();
+}
+
+extern "C" void lcd_init_printf_with_dimensions(unsigned char width, unsigned char height)
+{
+	OrangutanLCD::initPrintf(width, height);
 }
 
 extern "C" void clear()
@@ -764,7 +767,23 @@ void OrangutanLCD::scroll(unsigned char direction, unsigned char num,
 // printf will start sending characters to the LCD.
 void OrangutanLCD::initPrintf()
 {
+	if (printf_chars != 0)
+		free(printf_chars);
+		
+	printf_chars = (char*)malloc(sizeof(char)*SAVED_CHARS);
+	if (printf_chars == 0)
+		return;
+	unsigned char i;
+	for (i = 0; i < SAVED_CHARS; i++)
+		printf_chars[i] = ' ';
 	fdevopen(lcd_putchar, void_getchar);
+}
+
+void OrangutanLCD::initPrintf(unsigned char lcdWidth, unsigned char lcdHeight)
+{
+	numLCDCols = lcdWidth;
+	numLCDRows = lcdHeight;
+	initPrintf();
 }
 #endif
 

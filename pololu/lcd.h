@@ -13,6 +13,7 @@
 #define CURSOR_BLINKING	1
 
 void lcd_init_printf();
+void lcd_init_printf_with_dimensions(unsigned char width, unsigned char height);
 void clear();
 void print(const char *str);
 void print_from_program_space(const char *str);
@@ -22,7 +23,7 @@ void print_unsigned_long(long value);
 void print_binary(unsigned char value);
 void print_hex(unsigned int value);
 void print_hex_byte(unsigned char value);
-void lcd_goto_xy(int col, int row);
+void lcd_goto_xy(unsigned char col, unsigned char row);
 void lcd_show_cursor(unsigned char cursorType);
 void lcd_hide_cursor();
 void lcd_move_cursor(unsigned char direction, unsigned char num);
