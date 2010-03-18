@@ -96,7 +96,6 @@
 #ifndef F_CPU
 #define F_CPU 20000000UL	// Orangutans run at 20 MHz
 #endif //!F_CPU
-#include "private/OrangutanLCDPrivate.h"	// contains all of the macros and pin defines
 #include "OrangutanLCD.h"
 #include "../OrangutanResources/include/OrangutanModel.h"
 
@@ -119,65 +118,100 @@ OrangutanLCD::OrangutanLCD()
 // LCD_WIDTH is the number of characters in each line of the LCD.
 // row1 array lets us remember what was written to the bottom row (for scrolling)
 #ifdef _ORANGUTAN_SVP
-  #define LCD_WIDTH 16
-char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+  #define LCD_WIDTH 	16
+  #define LCD_HEIGHT	2
 #elif defined(_ORANGUTAN_X2)
-  #define LCD_WIDTH 20
-char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+  #define LCD_WIDTH 	20
+  #define LCD_HEIGHT	4
 #else
-  #define LCD_WIDTH 8
-char row1[LCD_WIDTH]={' ',' ',' ',' ',' ',' ',' ',' '};
+  #define LCD_WIDTH 	8
+  #define LCD_HEIGHT	2
 #endif
 
+#define SAVED_CHARS	(LCD_WIDTH*(LCD_HEIGHT-1))
+
+char *printf_chars = 0;
 unsigned char row=0; /* the current cursor position */
 unsigned char col=0;
 
 // This function is called by printf.
-extern "C" int lcd_putchar(char c, FILE *f) {
+extern "C" int lcd_putchar(char c, FILE *f)
+{
 	unsigned char nextline=0; /* should we go to next line after output? */
 	unsigned char repos=0; /* should we relocate */
 	unsigned char i;
 
-	/* control characters */
-	if(c == '\n') {
-		nextline = 1;
-	} else if(c == 8) { // ^H
-		col--;
-		if(col==(unsigned char)-1) { row--; col=LCD_WIDTH-1; }
-		if(row==(unsigned char)-1) { row=0; col=0; }
-		repos = 1;
-	} else {
-		OrangutanLCD::print(c); /* write the character */
-		if(row==1) row1[col]=c; /* remember the character */
-		col++;
-
-		if(col==LCD_WIDTH) nextline = 1;
+	if (printf_chars == 0)
+	{
+		printf_chars = (char*)malloc(sizeof(char)*SAVED_CHARS);
+		if (printf_chars == 0)
+			return c;
+		for (i = 0; i < SAVED_CHARS; i++)
+			printf_chars[i] = ' ';
 	}
 
-	if(nextline) {
-		if(row==1) {
+	/* control characters */
+	if (c == '\n')
+	{
+		nextline = 1;
+	}
+	else if (c == 8) { // ^H
+		col--;
+		if (col == (unsigned char)-1) { row--; col = LCD_WIDTH-1; }
+		if (row == (unsigned char)-1) { row = 0; col = 0; }
+		repos = 1;
+	}
+	else
+	{
+		OrangutanLCD::print(c); /* write the character */
+		if (row != 0) printf_chars[(row-1)*LCD_WIDTH + col]=c; /* remember the character */
+		col++;
+
+		if (col == LCD_WIDTH) nextline = 1;
+	}
+
+	if (nextline)
+	{
+		if (row == LCD_HEIGHT - 1)
+		{
 			/******* scroll! *******/
             // Note: because of the way we implement scrolling,
             // it is never possible for the user to use the lower
             // right corner of his LCD.
-			OrangutanLCD::gotoXY(0,0); /* draw top row */
-			for(i=0;i<LCD_WIDTH;i++) {
-				OrangutanLCD::print(row1[i]);
-				row1[i]=' ';
+			char j;
+			for (j = 0; j < LCD_HEIGHT-2; j++)  	// draw top LCD_HEIGHT-2 rows
+			{
+				OrangutanLCD::gotoXY(0, j);
+				for (i = 0; i < LCD_WIDTH; i++)
+				{
+					OrangutanLCD::print(printf_chars[j*LCD_WIDTH + i]);
+					printf_chars[j*LCD_WIDTH + i] = printf_chars[(j+1)*LCD_WIDTH + i];
+				}
 			}
-			OrangutanLCD::gotoXY(0,1); /* erase bottom row */
-			for(i=0;i<LCD_WIDTH;i++) {
+			if (LCD_HEIGHT >= 2)
+			{
+				OrangutanLCD::gotoXY(0, LCD_HEIGHT-2);	// draw row above bottom row
+				for (i = 0; i < LCD_WIDTH; i++)
+				{
+					OrangutanLCD::print(printf_chars[(LCD_HEIGHT-2)*LCD_WIDTH + i]);
+					printf_chars[(LCD_HEIGHT-2)*LCD_WIDTH + i] = ' ';	// clear saved bottom row
+				}
+			}
+			OrangutanLCD::gotoXY(0, LCD_HEIGHT-1);		// erase bottom row
+			for (i = 0; i < LCD_WIDTH; i++)
+			{
 				OrangutanLCD::print(' ');
 			}
 		}
 
-		col=0;
-		row=1;
-		repos=1;
+		col = 0;
+		row = LCD_HEIGHT - 1;
+		repos = 1;
 	}
 
-	if(repos) {
-		OrangutanLCD::gotoXY(col,row);
+	if (repos)
+	{
+		OrangutanLCD::gotoXY(col, row);
 	}
 
 	return c;
@@ -515,11 +549,14 @@ void OrangutanLCD::clear()
 	send_cmd(LCD_CLEAR);
 
 #ifdef LIB_POLOLU
+	if (printf_chars == 0)		// if we haven't used printf(), return now
+		return;
+
 	unsigned char i;
 
 	// clear out the LCD
-	for(i=0;i<8;i++)
-		row1[i] = ' ';
+	for(i = 0; i < SAVED_CHARS; i++)
+		printf_chars[i] = ' ';
 
 	col = 0;
 	row = 0;
