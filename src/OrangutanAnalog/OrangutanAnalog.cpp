@@ -412,7 +412,7 @@ int OrangutanAnalog::readTemperatureF()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	unsigned int value = (toMillivolts(readAverage(TEMP_SENSOR, 20)) * 923UL - 49 + 500) / 1000;
+	int value = (((int)(toMillivolts(readAverage(TEMP_SENSOR, 20))) * 12) - 634) / 13;
 	setMode(mode);
 	return value;
 }
@@ -423,7 +423,7 @@ int OrangutanAnalog::readTemperatureC()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	unsigned int value = (toMillivolts(readAverage(TEMP_SENSOR, 20)) * 100UL + 97) / 195 + 205;
+	int value = (((int)(toMillivolts(readAverage(TEMP_SENSOR, 20)) * 20)) - 7982) / 39;
 	setMode(mode);
 	return value;
 }

@@ -14,6 +14,12 @@
  * pushbutton inputs to trigger events, so you will need connect an external
  * pushbutton (or wire) to the correct pin if if you are using a Baby
  * Orangutan.
+ * 
+ * The program will hold the two servos connected to pins PD0 and PD1 at
+ * default positions unless a user pushbutton is pressed.  While the button
+ * is held down, the servos will slowly move to new positions.  When the
+ * button is released, the servos will quickly go back to their default
+ * positions.
  *
  * Note: the "B" version of the servo functions are used in this example
  * so that it behaves the same for the Orangutan SVP as for all other
