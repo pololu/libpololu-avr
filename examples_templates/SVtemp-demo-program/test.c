@@ -1,5 +1,5 @@
 /*
- * SV-demo-program - demo code for the Pololu Orangutan SV-168/328 robot
+ * sv-demo-program - demo code for the Pololu Orangutan SV-168/328 robot
  * controllers.
  * 
  *

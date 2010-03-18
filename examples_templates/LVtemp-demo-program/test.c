@@ -1,5 +1,5 @@
 ﻿/*
- * LV-demo-program - demo code for the Pololu Orangutan LV-168 robot controller
+ * lv-demo-program - demo code for the Pololu Orangutan LV-168 robot controller
  * 
  *
  * http://www.pololu.com/docs/0J20
