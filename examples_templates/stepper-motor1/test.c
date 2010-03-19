@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * stepper-motor1: for the Orangutan LV, SV, SVP, X2, or Baby Orangutan.
+ * stepper-motor1: for the Orangutan LV, SV, SVP, X2, Baby-O.
  *
  * This sample program lets you control a stepper motor using the motor driver
  * outputs of any Orangutan robot controller.  The two outputs of motor channel one

@@ -1,9 +1,12 @@
 #include <pololu/orangutan.h>
 
 /*
- * lcd1: for the Orangutan controllers and 3pi robot
+ * lcd1: for for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
  * Uses the OrangutanLCD library to display things on the LCD.
+ * It will run on the Baby Orangutan, but it won't display
+ * anything unless you connect an external LCD in a way that
+ * matches the LCD pin connections on the Orangutan LV or SV.
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com

@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 /*
- * lcd2: for the Orangutan controllers and 3pi robot
+ * lcd2: for for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
- * This example program is intended for use on the Orangutan LV/SV-xx8.
+ * This example program is for any Orangutan with an LCD (or the 3pi).
  * It uses the OrangutanLCD functions to display custom characters on 
  * the LCD.  Simply push a any user pushbutton to display a new,
  * randomly chosen, custom mood character.

@@ -2,7 +2,7 @@
 #include <avr/wdt.h>	// provides functions for using the watchdog timer
 
 /*
- * wdt: for the 3pi robot, Orangutan LV 168, Orangutan SV-xx8, or Orangutan SVP
+ * wdt: for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This program demonstrates the use of the watchdog timer.  It routinely resets
  * the watchdog timer (which is set to a period of 4 seconds) unless a button

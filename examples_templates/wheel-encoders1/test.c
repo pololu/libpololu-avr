@@ -10,7 +10,7 @@
  * This example measures the outputs of two encoders, one connected to
  * ports PC2 and PC3, and another connected to ports PC4 and PC5.
  *
- * http://www.pololu.com/docs/0J20?section=6.k
+ * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
  * http://forum.pololu.com
  */

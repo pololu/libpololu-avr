@@ -74,14 +74,18 @@
 
 #define BUZZER_DDR		DDRD
 #define BUZZER			(1 << PORTD4)
+#define BUZZER_IO		IO_D4
 
 #else
 
 #define BUZZER_DDR		DDRB
 #define BUZZER			(1 << PORTB2)
+#define BUZZER_IO		IO_B2
 
 #endif
 
+
+#ifdef __cplusplus
 
 class OrangutanBuzzer
 {
@@ -222,19 +226,25 @@ class OrangutanBuzzer
 	
 	// initializes timer1 for buzzer control
 	static void init2();
-	
-	// this is called by playFrequency()
-	static inline void init()
-	{
-		static unsigned char initialized = 0;
-
-		if (!initialized)
-		{
-			initialized = 1;
-			init2();
-		}
-	}
+	static void init();
 };
+
+#else
+
+void buzzer_init();
+void play_frequency(unsigned int freq, unsigned int duration, 
+		       unsigned char volume);
+void play_note(unsigned char note, unsigned int duration,
+		  unsigned char volume);
+void play(const char *sequence);
+void play_from_program_space(const char *sequence);
+unsigned char is_playing();
+void stop_playing();
+
+unsigned char play_check();
+void play_mode(char on);
+
+#endif // __cplusplus
 
 #endif
 

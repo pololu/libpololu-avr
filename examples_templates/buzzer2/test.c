@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * buzzer2: for the Orangutan LV/SV-xx8
+ * buzzer2: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * Uses the OrangutanBuzzer functions to play a series of notes on the
  * Orangutan's buzzer.  It uses the OrangutanPushbuttons library to
@@ -11,6 +11,9 @@
  * which plays the specified melody entirely in the background, requiring
  * no further action from the user once the method is called.  The CPU
  * is then free to execute other code while the melody plays.
+ *
+ * This code will work on the Baby Orangutan if you connect a buzzer
+ * to pin PB2.
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com

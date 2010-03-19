@@ -24,6 +24,11 @@
 #include "OrangutanResources.h"
 
 
+unsigned char buzzerInitialized = 0;
+volatile unsigned char buzzerFinished = 1;	// flag: 0 while playing
+const char *buzzerSequence = 0;
+
+
 #ifdef LIB_POLOLU
 
 extern "C" int get_free_ram()

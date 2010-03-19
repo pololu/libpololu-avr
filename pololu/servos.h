@@ -37,9 +37,17 @@
 #ifndef OrangutanServos_h
 #define OrangutanServos_h
 
+// use of servos_init() is discouraged; use servos_start() instead
 unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins);
 
-unsigned char servos_init_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB);
+// use of servos_init_extended() is discouraged; use servos_start_extended() instead
+unsigned char servos_init_extended(const unsigned char servoPins[], unsigned char numPins, 
+	const unsigned char servoPinsB[], unsigned char numPinsB);
+
+unsigned char servos_start(const unsigned char servoPins[], unsigned char numPins);
+
+unsigned char servos_start_extended(const unsigned char servoPins[], unsigned char numPins, 
+	const unsigned char servoPinsB[], unsigned char numPinsB);
 
 unsigned int get_servo_position(unsigned char servoNum);
 
@@ -80,5 +88,7 @@ static inline unsigned int get_servo_speed_b(unsigned char servoNum)
 {
 	return get_servo_speedB(servoNum);
 }
+
+void servos_stop();
 
 #endif

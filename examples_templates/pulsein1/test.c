@@ -1,8 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * pulsein1: for the 3pi robot, Orangutan LV 168, Orangutan SV-xx8, Orangutan SVP,
- *   or Orangutan X2
+ * pulsein1: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This program uses the OrangutanPulseIn functions to control measure hobby servo
  * pulses connected to pin D0.  It also generates hobby servo pulses on pin D1,

@@ -197,16 +197,28 @@ ISR(TIMER1_COMPB_vect)
 
 #ifdef LIB_POLOLU
 
+
+// use of init() is discouraged; use start() instead
 extern "C" unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins)
 {
 	return OrangutanServos::init(servoPins, numPins, 0, 0);
 }
 
+// use of init() is discouraged; use start() instead
 extern "C" unsigned char servos_init_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB)
 {
 	return OrangutanServos::init(servoPins, numPins, servoPinsB, numPinsB);
 }
 
+extern "C" unsigned char servos_start(const unsigned char servoPins[], unsigned char numPins)
+{
+	return OrangutanServos::start(servoPins, numPins, 0, 0);
+}
+
+extern "C" unsigned char servos_start_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB)
+{
+	return OrangutanServos::start(servoPins, numPins, servoPinsB, numPinsB);
+}
 
 extern "C" unsigned int get_servo_position(unsigned char servoNum)
 {
@@ -257,6 +269,11 @@ extern "C" void set_servo_speedB(unsigned char servoNum, unsigned int speed)
 extern "C" unsigned int get_servo_speedB(unsigned char servoNum)
 {
 	return OrangutanServos::getServoSpeedB(servoNum);
+}
+
+extern "C" void servos_stop()
+{
+	OrangutanServos::stop();
 }
 
 #endif
@@ -335,15 +352,25 @@ OrangutanServos::~OrangutanServos()
 // represents a set of up to eight digital I/O pins on which the servo signals should be output.
 // If you don't want this second set of eight servos, use a numPinsB value of 0 (and you can pass in NULL for servoPinsB).
 // A nonzero return value indicates that memory for the desired arrays could not be allocated
-unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned char numPins)
+inline unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned char numPins)
 {
 	return init(servoPins, numPins, 0, 0);
 }
 
+extern unsigned char buzzerInitialized;
+extern volatile unsigned char buzzerFinished;
+extern const char *buzzerSequence;
+
+
 unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned char numPins, const unsigned char *servoPinsB, unsigned char numPinsB)
 {
-	TCCR1B = 0;
 	TIMSK1 = 0;					// disable all timer1 interrupts
+
+	buzzerInitialized = 0;
+	buzzerFinished = 1;
+	buzzerSequence = 0;
+	
+	TCCR1B = 0;
 
 #ifdef _ORANGUTAN_SVP
 	if (numPins > 3)
@@ -567,6 +594,32 @@ unsigned int OrangutanServos::getServoSpeedB(unsigned char servoNum)
 	return servoSpeedB[servoNum & 7];
 }
 
+
+// stops timer 1, sets all servo outputs low, and frees up memory that's been used
+// servos cannot be used after stop() is called without calling start() again.
+void OrangutanServos::stop()
+{
+	// disable timer 1 interrupts and stop the timer
+	TIMSK1 = 0;
+	TCCR1A = 0;
+	TCCR1B = 0;
+	
+	unsigned char i;
+	
+	#ifndef _ORANGUTAN_SVP
+	
+	// set used servo pins as driving-low outputs
+	for (i = 0; i < numServos; i++)
+		*(portPin[i].portRegister) &= ~portPin[i].bitmask;
+	
+	#endif
+
+	// set used servo pins as driving-low outputs
+	for (i = 0; i < numServosB; i++)
+		*(portPinB[i].portRegister) &= ~portPinB[i].bitmask;
+
+	freeServoMemory();
+}
 
 
 // Local Variables: **

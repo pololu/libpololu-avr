@@ -81,7 +81,13 @@ class OrangutanPulseIn
 	// destructor (frees allocated memory)
 	~OrangutanPulseIn();
 	
+	// use of init() is discouraged; use start() instead
 	static unsigned char init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
+	
+	inline static unsigned char start(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
+	{
+		return init(pulsePins, numPins, maxLengthEnum);
+	}
 	
 	static void update();
 	
@@ -90,15 +96,20 @@ class OrangutanPulseIn
 	static struct PulseInputStruct getPulseInfo(unsigned char idx);
 
 	static unsigned long toMicroseconds(unsigned int pulse);
+	
+	static void stop();
 };
 
 #else
 
+// use of pulse_in_init() is discouraged; use pulse_in_start() instead
+unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
 unsigned char pulse_in_init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
 void pulse_in_update();
 void set_max_pulse_length(unsigned char maxLengthEnum);
 struct PulseInputStruct get_pulse_info(unsigned char idx);
 unsigned long pulse_to_microseconds(unsigned int pulse);
+void pulse_in_stop();
 
 #endif // _cplusplus
 

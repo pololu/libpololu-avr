@@ -1,8 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * motors2: for the 3pi robot, Orangutan LV-168,
- *    Orangutan SVP, and Orangutan SV-xx8.	
+ * motors2: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This example uses the OrangutanMotors and OrangutanLCD libraries to drive
  * motors in response to the position of user trimmer potentiometer

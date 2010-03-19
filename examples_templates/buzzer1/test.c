@@ -1,12 +1,16 @@
 #include <pololu/orangutan.h>
 /*
- * buzzer1: for the Orangutan LV/SV-xx8
+ * buzzer1: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * Uses the OrangutanBuzzer library to play a series of notes on the
  * Orangutan's buzzer.  It also uses the OrangutanLCD library to
  * display the notes its playing, and it uses the OrangutanPushbuttons
  * library to allow the user to stop/reset the melody with the top
- * pushbutton.
+ * pushbutton.  This is a very simple example that does not take
+ * advantage of OrangutanBuzzer's more advanced play() and
+ * play_from_program_space() functionality.  This code will work
+ * on the Baby Orangutan if you connect an external buzzer to
+ * pin PB2.
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com
@@ -15,7 +19,8 @@
 
 #define MELODY_LENGTH 95
 
-// These arrays take up a total of 285 bytes of RAM (out of a 1k limit)
+// These arrays take up a total of 285 bytes of RAM (see buzzer2
+// example to learn how to store songs in program memory)
 unsigned char note[MELODY_LENGTH] = 
 {
   E(5), SILENT_NOTE, E(5), SILENT_NOTE, E(5), SILENT_NOTE, C(5), E(5),

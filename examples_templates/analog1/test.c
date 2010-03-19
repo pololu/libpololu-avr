@@ -1,13 +1,12 @@
 #include <pololu/orangutan.h>
 
 /*
- * analog1: for the Orangutan LV/SV-xx8 or Baby Orangutan B
+ * analog1: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This example uses the OrangutanAnalog functions to read the voltage
  * output of the trimpot in the background while the rest of the main
  * loop executes.  The LED is flashed so that its brightness appears
- * proportional to the trimpot position.  This example will work on
- * both the Orangutan LV/SV-xx8 and Baby Orangutan B.
+ * proportional to the trimpot position.
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com

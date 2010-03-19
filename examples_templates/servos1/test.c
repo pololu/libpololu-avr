@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * servos1: for the all Orangutans (LV, SV, SVP, X2, Baby) and the 3pi robot.
+ * servos1: for all Orangutans (LV, SV, SVP, X2, Baby) and the 3pi robot.
  *
  * This example uses the OrangutanServos functions to control two servos
  * connected to pins PD0 and PD1.  The servo pulses are generated in the

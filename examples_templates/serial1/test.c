@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>  
   
 /*  
- * serial1: for the Orangutan controllers and 3pi robot.
+ * serial1: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This example listens for bytes on PD0/RXD.  Whenever it receives a byte, it
  * performs a custom action.  Whenever the user presses the middle button, it

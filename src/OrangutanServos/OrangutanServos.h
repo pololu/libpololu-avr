@@ -85,9 +85,20 @@ class OrangutanServos
 	// If you don't want this second set of eight servos, use a numPinsB value of 0 (and you can pass in NULL for servoPinsB).
 	// A nonzero return value indicates that memory for the desired arrays could not be allocated
 	static unsigned char init(const unsigned char servoPins[], unsigned char numPins);
-	static unsigned char init(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB);
+	static unsigned char init(const unsigned char servoPins[], unsigned char numPins, 
+		const unsigned char servoPinsB[], unsigned char numPinsB);
 
+	// ***NOTE*** use of init() is discouraged; use start() instead
+	inline static unsigned char start(const unsigned char servoPins[], unsigned char numPins)
+	{
+		return init(servoPins, numPins);
+	}
 
+	inline static unsigned char start(const unsigned char servoPins[], unsigned char numPins, 
+		const unsigned char servoPinsB[], unsigned char numPinsB)
+	{
+		return init(servoPins, numPins, servoPinsB, numPinsB);
+	}
 
 	// get the current width of the pulse (in us) being supplied to the specified servo.
 	// This method does not rely on feedback from the servo, so if the servo
@@ -137,6 +148,9 @@ class OrangutanServos
 	// get the speed of the specified servo (the amount in tenths of a microsecond
 	// that the servo position is incremented or decremented every 20 ms).
 	static unsigned int getServoSpeedB(unsigned char servoNum);
+	
+	// disable timer interrupt and stop generating pulses (leave lines driving low)
+	static void stop();
 };
 
 #endif

@@ -85,6 +85,12 @@ ISR(PCINT3_vect,ISR_ALIASOF(PCINT0_vect));
 
 #ifdef LIB_POLOLU
 
+// use of pulse_in_init() is discouraged; use pulse_in_start() instead
+extern "C" unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
+{
+	return OrangutanPulseIn::start(pulsePins, numPins, maxLengthEnum);
+}
+
 extern "C" unsigned char pulse_in_init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
 {
 	return OrangutanPulseIn::init(pulsePins, numPins, maxLengthEnum);
@@ -108,6 +114,11 @@ extern "C" struct PulseInputStruct get_pulse_info(unsigned char idx)
 extern "C" unsigned long pulse_to_microseconds(unsigned int pulse)
 {
 	return OrangutanPulseIn::toMicroseconds(pulse);
+}
+
+extern "C" void pulse_in_stop()
+{
+	OrangutanPulseIn::stop();
 }
 
 #endif
@@ -137,9 +148,18 @@ OrangutanPulseIn::~OrangutanPulseIn()
 }
 
 
+extern unsigned char buzzerInitialized;
+extern volatile unsigned char buzzerFinished;
+extern const char *buzzerSequence;
+
 unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
 {
 	TIMSK1 = 0;			// disable all timer 1 interrupts
+	
+	buzzerInitialized = 0;
+	buzzerFinished = 1;
+	buzzerSequence = 0;
+	
 	TCCR1A = 0;
 
 	if (maxLengthEnum < 1)
@@ -305,6 +325,25 @@ unsigned long OrangutanPulseIn::toMicroseconds(unsigned int pulse)
 			return 0;
 	}
 }
+
+
+// Disables pin change interrupts and frees memory that's been used
+// After calling stop(), start() must be recalled to begin reading
+// pulses again.
+void OrangutanPulseIn::stop()
+{
+	PCICR = 0;			// disable pin-change interrupts
+	PCMSK0 = 0;
+	PCMSK1 = 0;
+	PCMSK2 = 0;
+    #ifdef PCMSK3  // for the Orangutan X2 and SVP
+	PCMSK3 = 0;
+    #endif
+
+	freePulseMemory();
+}
+
+
 
 
 // Local Variables: **

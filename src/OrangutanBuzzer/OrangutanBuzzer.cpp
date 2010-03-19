@@ -53,9 +53,11 @@
 // declaring these globals as static means they won't conflict
 // with globals in other .cpp files that share the same name
 static volatile unsigned int buzzerTimeout = 0;		// tracks buzzer time limit
-static volatile unsigned char buzzerFinished = 1;	// flag: 0 while playing
-static const char *sequence = 0;
 static char play_mode_setting = PLAY_AUTOMATIC;
+
+extern volatile unsigned char buzzerFinished;	// flag: 0 while playing
+extern const char *buzzerSequence;
+
 
 static unsigned char use_program_space; // boolean: true if we should
 										// use program space
@@ -85,7 +87,7 @@ ISR (TIMER1_OVF_vect)
 		OCR1B = 0;						// 0% duty cycle
 		buzzerFinished = 1;
 		DISABLE_TIMER1_INTERRUPT();
-		if (sequence && (play_mode_setting == PLAY_AUTOMATIC))
+		if (buzzerSequence && (play_mode_setting == PLAY_AUTOMATIC))
 			nextNote();
 	}
 }
@@ -142,6 +144,18 @@ extern "C" unsigned char play_check()
 }
 
 #endif
+
+extern unsigned char buzzerInitialized;
+
+// this is called by playFrequency()
+inline void OrangutanBuzzer::init()
+{
+	if (!buzzerInitialized)
+	{
+		buzzerInitialized = 1;
+		init2();
+	}
+}
 
 // initializes timer1 for buzzer control
 void OrangutanBuzzer::init2()
@@ -414,10 +428,11 @@ void OrangutanBuzzer::playNote(unsigned char note, unsigned int dur,
 }
 
 
+
 // Returns 1 if the buzzer is currently playing, otherwise it returns 0
 unsigned char OrangutanBuzzer::isPlaying()
 {
-	return !buzzerFinished || sequence != 0;
+	return !buzzerFinished || buzzerSequence != 0;
 }
 
 
@@ -481,7 +496,7 @@ unsigned char OrangutanBuzzer::isPlaying()
 void OrangutanBuzzer::play(const char *notes)
 {
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
-	sequence = notes;
+	buzzerSequence = notes;
 	use_program_space = 0;
 	staccato_rest_duration = 0;
 	nextNote();					// this re-enables the timer1 interrupt
@@ -490,7 +505,7 @@ void OrangutanBuzzer::play(const char *notes)
 void OrangutanBuzzer::playFromProgramSpace(const char *notes_p)
 {
 	DISABLE_TIMER1_INTERRUPT();	// prevent this from being interrupted
-	sequence = notes_p;
+	buzzerSequence = notes_p;
 	use_program_space = 1;
 	staccato_rest_duration = 0;
 	nextNote();					// this re-enables the timer1 interrupt
@@ -505,7 +520,7 @@ void OrangutanBuzzer::stopPlaying()
 	OCR1A = (F_CPU/2) / 1000;					// set TOP for freq = 1 kHz
 	OCR1B = 0;									// 0% duty cycle
 	buzzerFinished = 1;
-	sequence = 0;
+	buzzerSequence = 0;
 #ifdef _ORANGUTAN_X2
 	OrangutanX2::buzzerOff();
 #endif
@@ -519,18 +534,18 @@ static char currentCharacter()
 	do
 	{
 		if(use_program_space)
-			c = pgm_read_byte(sequence);
+			c = pgm_read_byte(buzzerSequence);
 		else
-			c = *sequence;
+			c = *buzzerSequence;
 
 		if(c >= 'A' && c <= 'Z')
 			c += 'a'-'A';
-	} while(c == ' ' && (sequence ++));
+	} while(c == ' ' && (buzzerSequence ++));
 
 	return c;
 }
 
-// Returns the numerical argument specified at sequence[0] and
+// Returns the numerical argument specified at buzzerSequence[0] and
 // increments sequence to point to the character immediately after the
 // argument.
 static unsigned int getNumber()
@@ -543,7 +558,7 @@ static unsigned int getNumber()
 	{
 		arg *= 10;
 		arg += c-'0';
-		sequence ++;
+		buzzerSequence ++;
 		c = currentCharacter();
 	}
 
@@ -572,7 +587,7 @@ static void nextNote()
 
 	// Get current character
 	c = currentCharacter();
-	sequence ++;
+	buzzerSequence ++;
 
 	// Interpret the character.
 	switch(c)
@@ -620,7 +635,7 @@ static void nextNote()
 			staccato = true;
 			staccato_rest_duration = 0;
 		}
-		sequence ++;
+		buzzerSequence ++;
 		goto parse_character;
 	case 'o':
 		// set the octave permanently
@@ -653,7 +668,7 @@ static void nextNote()
 		tmp_duration = duration;
 		goto parse_character;
 	default:
-		sequence = 0;
+		buzzerSequence = 0;
 		return;
 	}
 
@@ -663,13 +678,13 @@ static void nextNote()
 	c = currentCharacter();
 	while(c == '+' || c == '#')
 	{
-		sequence ++;
+		buzzerSequence ++;
 		note ++;
 		c = currentCharacter();
 	}
 	while(c == '-')
 	{
-		sequence ++;
+		buzzerSequence ++;
 		note --;
 		c = currentCharacter();
 	}
@@ -686,7 +701,7 @@ static void nextNote()
 	dot_add = tmp_duration/2;
 	while(currentCharacter() == '.')
 	{
-		sequence ++;
+		buzzerSequence ++;
 		tmp_duration += dot_add;
 		dot_add /= 2;
 	}
@@ -736,10 +751,10 @@ void OrangutanBuzzer::playMode(unsigned char mode)
 unsigned char OrangutanBuzzer::playCheck()
 {
 	DISABLE_TIMER1_INTERRUPT();
-	if(buzzerFinished && sequence != 0)
+	if(buzzerFinished && buzzerSequence != 0)
 		nextNote();
 	ENABLE_TIMER1_INTERRUPT();
-	return sequence != 0;
+	return buzzerSequence != 0;
 }
 
 // Local Variables: **
