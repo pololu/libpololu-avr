@@ -56,6 +56,8 @@ const char fugue[] PROGMEM =
   "O5 e>ee>ef>df>d b->c#b->c#a>df>d e>ee>ef>df>d"
   "e>d>c#>db>d>c#b >c#agaegfe f O6 dc#dfdc#<b c#4";
 
+#ifndef _ORANGUTAN_X2	// this code isn't needed if we're using the Orangutan X2
+
 // frequencies in tenths of a Hertz of lowest 12 allowed notes (stored in program memory)
 unsigned int base_freqs[] PROGMEM = {412, 437, 463, 490, 519, 550, 583, 617, 654, 693, 734, 778}; 
 
@@ -91,6 +93,8 @@ unsigned int get_frequency(unsigned char note)
 	return freq;
 }
 
+#endif
+
 
 // Play a note without using timer 1 or the OrangutanBuzzer library, which
 // means it is safe to use this function while using the OrangutanServo or
@@ -100,6 +104,13 @@ unsigned int get_frequency(unsigned char note)
 // buzzer operation.  The argument freq is in Hz and duration is in ms.
 void play_simple_note(unsigned char note, unsigned int duration)
 {
+#ifdef _ORANGUTAN_X2	// buzzer is controlled by aux MCU on X2
+
+	x2_play_note(note, duration);
+	delay_ms(duration);
+
+#else	// if using any non-X2 Orangutan or 3pi robot
+
 	unsigned long time = get_ms();
 	unsigned int freq = get_frequency(note);
 	unsigned int half_us_delay = (500000UL + freq/2) / freq;
@@ -114,6 +125,8 @@ void play_simple_note(unsigned char note, unsigned int duration)
 		set_digital_output(BUZZER_IO, LOW);
 		delay_us(half_us_delay);
 	}
+
+#endif
 }
 
 
