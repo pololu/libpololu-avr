@@ -1,14 +1,19 @@
 /*
-  OrangutanPulseIn.h - Library for reading digital pulses with the
-	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  This library
-	can be used to read RC inputs.  To use this library, you must
-	repeatedly call the update() function in your main loop more often
-	than your configured maximum pulse length.  If this is done,
-	pulses longer than the maximum pulse length will be reported as having
-	a duration of 0xFFFF (65535).  If update() is not called often enough,
-	pulses longer than the maximum pulse length can be reported as having
-	any pulse length from 0 and 65535, depending on how the timer has
-	overflowed.
+   OrangutanPulseIn.cpp - Library for reading digital pulses with the
+	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  Pulses
+	are measured in ticks, which have units of 0.4 us.  Note that the
+	pulse info is updated by pin change interrupts as the pulses occur,
+	so unless you use the get_pulse_info() function to freeze a snapshot
+	of the current pulse state, values might change on you in unexpected
+	ways.  For example, if you want to do something only when there is
+	a new high pulse, you might do the following:
+	
+	if (new_high_pulse(0) && !new_low_pulse(0))
+		do something with pulse data
+		
+	However, a pulse might occur right after you make it past the if
+	statement but before you run your conditional code, changing the
+	condition to one that would never have made it past the if statement.
 */
 
 /*
@@ -38,20 +43,7 @@
 // possible values for the newPulse member of PulseInputStruct
 #define LOW_PULSE			1		// the pulse just completed was a low pulse (pin just went high)
 #define HIGH_PULSE			2		// the pulse just completed was a high pulse (pin just went low)
-
-// possible values for the argument to the setMaxPulseLength method
-#define MAX_PULSE_3MS		1	// can measure pulses with 0.05 us resolution
-#define MAX_PULSE_26MS		2	// can measure pulses with 0.4 us resolution
-#define MAX_PULSE_210MS		3	// can measure pulses with 3.2 us resolution
-#define MAX_PULSE_839MS		4	// can measure pulses with 12.8 us resolution
-#define MAX_PULSE_3355MS	5	// can measure pulses with 51.2 us resolution
-
-// easier-to-remember defines:
-#define MAX_PULSE_200MS		3	// can measure pulses with 3.2 us resolution
-#define MAX_PULSE_800MS		4	// can measure pulses with 12.8 us resolution
-#define MAX_PULSE_3000MS	5	// can measure pulses with 51.2 us resolution
-
-#define MAX_PULSE			0xFFFF	// value of pulses that are longer than we can time
+#define ANY_PULSE			3		// newPulse member is not zero
 
 
 // Structure for storing the port register and approrpiate bitmask for an I/O pin.
@@ -60,11 +52,10 @@ struct PulseInputStruct
 {
 	volatile unsigned char* pinRegister;
 	unsigned char bitmask;
-	volatile unsigned int lastPCTime;
+	volatile unsigned long lastPCTime;
 	volatile unsigned char inputState;
-	volatile unsigned int curPulseWidth;
-	volatile unsigned int lastHighPulse;
-	volatile unsigned int lastLowPulse;
+	volatile unsigned long lastHighPulse;
+	volatile unsigned long lastLowPulse;
 	volatile unsigned char newPulse;
 };
 
@@ -80,35 +71,45 @@ class OrangutanPulseIn
 	
 	// destructor (frees allocated memory)
 	~OrangutanPulseIn();
-	
-	// use of init() is discouraged; use start() instead
-	static unsigned char init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
-	
-	inline static unsigned char start(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
-	{
-		return init(pulsePins, numPins, maxLengthEnum);
-	}
-	
-	static void update();
-	
-	static void setMaxPulseLength(unsigned char maxLengthEnum);
-	
-	static struct PulseInputStruct getPulseInfo(unsigned char idx);
+		
+	static unsigned char start(const unsigned char *pulsePins, unsigned char numPins);
+		
+	static void getPulseInfo(unsigned char idx, struct PulseInputStruct* pulseInfo);
 
-	static unsigned long toMicroseconds(unsigned int pulse);
+	static unsigned char newPulse(unsigned char idx);
+	
+	static unsigned char newHighPulse(unsigned char idx);
+	
+	static unsigned char newLowPulse(unsigned char idx);
+	
+	static unsigned long getLastHighPulse(unsigned char idx);
+	
+	static unsigned long getLastLowPulse(unsigned char idx);
+	
+	static void getCurrentState(unsigned char idx, unsigned long* pulseWidth, unsigned char* state);
+
+	static unsigned long toMicroseconds(unsigned long pulse);
 	
 	static void stop();
+	
+	
+  private:
+
+	static unsigned char newPulse(unsigned char idx, unsigned char state);
 };
 
 #else
 
 // use of pulse_in_init() is discouraged; use pulse_in_start() instead
-unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
-unsigned char pulse_in_init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum);
-void pulse_in_update();
-void set_max_pulse_length(unsigned char maxLengthEnum);
-struct PulseInputStruct get_pulse_info(unsigned char idx);
-unsigned long pulse_to_microseconds(unsigned int pulse);
+unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins);
+void get_pulse_info(unsigned char idx, struct PulseInputStruct* pulse_info);
+unsigned char new_pulse(unsigned char idx);
+unsigned char new_high_pulse(unsigned char idx);
+unsigned char new_low_pulse(unsigned char idx);
+unsigned long get_last_high_pulse(unsigned char idx);
+unsigned long get_last_low_pulse(unsigned char idx);
+void get_current_pulse_state(unsigned char idx, unsigned long* pulse_width, unsigned char* state);
+unsigned long pulse_to_microseconds(unsigned long pulse);
 void pulse_in_stop();
 
 #endif // _cplusplus

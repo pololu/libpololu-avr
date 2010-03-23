@@ -113,7 +113,8 @@ OrangutanLCD::OrangutanLCD()
 
 #ifdef LIB_POLOLU
 
-#include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
+#include "../OrangutanTime/OrangutanTime.h"
+
 #include <stdio.h>
 
 // LCD_WIDTH is the number of characters in each line of the LCD.
@@ -330,13 +331,26 @@ void OrangutanLCD::loadCustomCharacter(const char *picture_p, unsigned char numb
   }
 }
 
+
+unsigned long lcdTimeout;	// in microseconds;
+
 // Initialize the LCD for an 8-bit interface if using the Orangutan X2
 // else for a 4-bit interface.
 // this method is automatically called the first time any LCD member
 // function is called.  See page 45 of the Hitachi HD44780U datasheet
 // for LCD initialization procedure details.
 void OrangutanLCD::init2()
-{
+{	
+#ifdef _ORANGUTAN_SVP	// BF pin is floating on Orangutan SVP
+						//  which causes problems if LCD code is used with LCD removed
+	LCD_BF_DDR &= ~LCD_BF_MASK;		// make pull-up pin an input
+	LCD_BF_PORT |= LCD_BF_MASK;		// enable pull-up on BF pin
+	lcdTimeout = 30000;		// 20ms
+
+#else
+	lcdTimeout = 10000;		// 3ms
+#endif
+	
 	// Set up the DDR for the LCD control lines
 	LCD_RS_DDR |= 1 << LCD_RS;
 	LCD_RW_DDR |= 1 << LCD_RW;
@@ -375,6 +389,7 @@ void OrangutanLCD::init2()
 	send_cmd(0x0C);	// display on, cursor off, blinking off
 }
 
+
 // Wait for the busy flag to clear.  The 4-bit interface is 
 // more complicated than the 8-bit interface because E must
 // be strobed twice to get the full eight bits back from
@@ -392,8 +407,8 @@ void OrangutanLCD::busyWait()
 	// Set up RS and RW to read the state of the LCD's busy flag
 	LCD_RS_PORT &= ~(1 << LCD_RS);
 	LCD_RW_PORT |= 1 << LCD_RW;
-
-	uint32_t time = millis();
+	
+	unsigned int usCounter = 0;
 
 	do
 	{
@@ -414,6 +429,8 @@ void OrangutanLCD::busyWait()
 
 		// Bring E low
 		LCD_E_PORT &= ~(1 << LCD_E);
+		
+		usCounter += 2;
 
 #ifndef _ORANGUTAN_X2
 
@@ -431,12 +448,25 @@ void OrangutanLCD::busyWait()
 
 		// Bring E low
 		LCD_E_PORT &= ~(1 << LCD_E);
+		
+		usCounter += 2;
 #endif
 	}
-	while ((data & LCD_BF_MASK) && (millis() - time < 10));
+	while ((data & LCD_BF_MASK) && (usCounter < lcdTimeout));
 
 	// To reach here our busy flag must be zero, meaning the LCD is free
-	// or the 10ms timeout period has elapsed
+	// or the 20ms timeout period has elapsed	
+
+#ifdef _ORANGUTAN_SVP
+
+	if (usCounter >= lcdTimeout)	// if we timeout, LCD might be removed
+		lcdTimeout = 50;			// make timeout period much shorter
+	else							// if we don't timeout
+	{
+		lcdTimeout = 30000;			// make timeout period long again
+	}
+	
+#endif
 
 	// Restore our DDR information
 	LCD_BF_DDR = temp_ddr;

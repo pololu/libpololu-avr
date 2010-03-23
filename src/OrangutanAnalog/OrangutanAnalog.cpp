@@ -46,6 +46,11 @@ extern "C" unsigned int analog_read_average(unsigned char channel, unsigned int 
 	return OrangutanAnalog::readAverage(channel, samples);
 }
 
+extern "C" unsigned int analog_read_average_millivolts(unsigned char channel, unsigned int samples)
+{
+	return OrangutanAnalog::readAverageMillivolts(channel, samples);
+}
+
 extern "C" void start_analog_conversion(unsigned char channel)
 {
 	OrangutanAnalog::startConversion(channel);
@@ -79,6 +84,11 @@ extern "C" unsigned int to_millivolts(unsigned int analog_result)
 extern "C" unsigned int read_trimpot()
 {
 	return OrangutanAnalog::readTrimpot();
+}
+
+extern "C" unsigned int read_trimpot_millivolts()
+{
+	return OrangutanAnalog::readTrimpotMillivolts();
 }
 
 #ifdef _ORANGUTAN_SVP
@@ -318,6 +328,20 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 	return (sum + (samples >> 1)) / samples;	// compute the rounded avg
 }
 
+inline unsigned int OrangutanAnalog::readAverageMillivolts(unsigned char channel, unsigned int samples)
+{
+#ifdef _ORANGUTAN_SVP
+	if (channel > 31)
+	{
+		// We have not implemented averaging of the adc readings from the auxiliary
+		// processor on the SVP, so we will just return a simple reading.
+		return readMillivolts(channel);
+	}
+#else
+	return toMillivolts(readAverage(channel, samples));
+#endif
+}
+
 // sets the value used to calibrate the conversion from ADC reading
 // to millivolts.  The argument calibration should equal VCC in millivolts,
 // which can be automatically measured using the function readVCCMillivolts():
@@ -362,9 +386,18 @@ unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 // On the Orangutan SVP, the trimpot is on the auxiliary processor, so 
 // calling this function can have side effects related to enabling SPI
 // communication (see the SVP user's guide for more info).
-unsigned int OrangutanAnalog::readTrimpot()
+inline unsigned int OrangutanAnalog::readTrimpot()
 {
 	return readAverage(TRIMPOT, 20);
+}
+
+inline unsigned int OrangutanAnalog::readTrimpotMillivolts()
+{
+#ifdef _ORANGUTAN_SVP
+	return OrangutanSVP::getTrimpotMillivolts();
+#else
+	return toMillivolts(readTrimpot());
+#endif
 }
 
 #ifdef _ORANGUTAN_SVP
@@ -397,7 +430,7 @@ unsigned int OrangutanAnalog::readBatteryMillivolts_X2()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	unsigned int value = (toMillivolts(readAverage(6, 10)) * 3208UL + 500) / 1000;
+	unsigned int value = (readAverageMillivolts(6, 10) * 3208UL + 500) / 1000;
 	setMode(mode);
 	return value;
 }
@@ -412,7 +445,7 @@ int OrangutanAnalog::readTemperatureF()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	int value = (((int)(toMillivolts(readAverage(TEMP_SENSOR, 20))) * 12) - 634) / 13;
+	int value = (((int)(readAverageMillivolts(TEMP_SENSOR, 20)) * 12) - 634) / 13;
 	setMode(mode);
 	return value;
 }
@@ -423,7 +456,7 @@ int OrangutanAnalog::readTemperatureC()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	int value = (((int)(toMillivolts(readAverage(TEMP_SENSOR, 20)) * 20)) - 7982) / 39;
+	int value = (((int)(readAverageMillivolts(TEMP_SENSOR, 20) * 20)) - 7982) / 39;
 	setMode(mode);
 	return value;
 }
@@ -432,7 +465,7 @@ unsigned int OrangutanAnalog::readBatteryMillivolts_3pi()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	unsigned int value = (toMillivolts(readAverage(6, 10)) * 3 + 1) / 2;
+	unsigned int value = (readAverageMillivolts(6, 10) * 3 + 1) / 2;
 	setMode(mode);
 	return value;
 }
@@ -441,7 +474,7 @@ unsigned int OrangutanAnalog::readBatteryMillivolts_SV()
 {
 	unsigned char mode = getMode();
 	setMode(MODE_10_BIT);
-	unsigned int value = toMillivolts(readAverage(6,10)) * 3;
+	unsigned int value = readAverageMillivolts(6,10) * 3;
 	setMode(mode);
 	return value;
 }

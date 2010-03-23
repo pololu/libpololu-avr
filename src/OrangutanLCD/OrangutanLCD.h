@@ -55,6 +55,7 @@
 
 #define LCD_BF_DDR			DDRC
 #define LCD_BF_PIN			PINC
+#define LCD_BF_PORT			PORTC
 #define LCD_BF_MASK			(1 << LCD_DB7)
 
 // Since we're only using four data lines, and since the pins they're
@@ -89,6 +90,7 @@
 
 #define LCD_BF_DDR			DDRC
 #define LCD_BF_PIN			PINC
+#define LCD_BF_PORT			PORTC
 #define LCD_BF_MASK			(1 << PORTC7)
 
 
@@ -115,6 +117,7 @@
 
 #define LCD_BF_DDR			DDRD
 #define LCD_BF_PIN			PIND
+#define LCD_BF_PORT			PORTD
 #define LCD_BF_MASK			(1 << LCD_DB7)
 
 // Since we're only using four data lines, and since the pins they're

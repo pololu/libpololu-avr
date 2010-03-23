@@ -55,7 +55,7 @@ int main()
 	while (1)			// continuously display the trimpot voltage in mV
 	{
 		lcd_goto_xy(0, 1);	// go to start of second LCD row
-		printf("%4u mV", read_trimpot());	// print trimpot voltage
+		printf("%4u mV", to_millivolts(read_trimpot()));	// print trimpot voltage
 		delay_ms(50);	// wait for 50 ms to reduce LCD flicker
 	}
 }

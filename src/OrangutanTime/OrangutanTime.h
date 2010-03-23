@@ -34,6 +34,12 @@ class OrangutanTime
 
 	// Resets the ms and us counters to zero.
 	static void reset();
+	
+	// Returns the number of elapsed ticks (in units of 0.4 us)
+	static unsigned long ticks();
+	
+	// Converts ticks to microseconds
+	static unsigned long ticksToMicroseconds(unsigned long numTicks);
 
 	// Returns the number of elapsed milliseconds.
 	static unsigned long ms();

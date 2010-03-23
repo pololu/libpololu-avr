@@ -2,6 +2,8 @@
 #define OrangutanTime_h
 
 // these are defined in the .cpp file:
+unsigned long get_ticks();
+unsigned long ticks_to_microseconds(unsigned long ticks);
 unsigned long get_ms();
 void delay_ms(unsigned int milliseconds);
 void time_reset();

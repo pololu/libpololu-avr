@@ -89,6 +89,8 @@ class OrangutanAnalog
 	// take 'sample' readings of the specified channel and return the average
 	static unsigned int readAverage(unsigned char channel, 
 									  unsigned int samples);
+	static unsigned int readAverageMillivolts(unsigned char channel, 
+									  unsigned int samples);
 	
 	// returns the position of the trimpot (20 readings averaged together).
 	// For all devices except the Orangutan SVP, the trimpot is on ADC channel 7.
@@ -96,6 +98,7 @@ class OrangutanAnalog
 	// calling this function can have side effects related to enabling SPI
 	// communication (see the SVP user's guide for more info).
 	static unsigned int readTrimpot();
+	static unsigned int readTrimpotMillivolts();
 
 	// the following method can be used to initiate an ADC conversion
 	// that runs in the background, allowing the CPU to perform other tasks

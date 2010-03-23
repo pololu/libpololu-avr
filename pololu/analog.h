@@ -63,6 +63,7 @@ static inline unsigned char get_analog_mode()
 unsigned int analog_read(unsigned char channel);
 unsigned int analog_read_millivolts(unsigned char channel);
 unsigned int analog_read_average(unsigned char channel, unsigned int samples);
+unsigned int analog_read_average_millivolts(unsigned char channel, unsigned int samples);
 void start_analog_conversion(unsigned char channel);
 static inline unsigned char analog_is_converting()
 {
@@ -74,6 +75,7 @@ void set_millivolt_calibration(unsigned int calibration);
 unsigned int read_vcc_millivolts();
 unsigned int to_millivolts(unsigned int analog_result);
 unsigned int read_trimpot();
+unsigned int read_trimpot_millivolts();
 
 #ifdef _ORANGUTAN_SVP
 

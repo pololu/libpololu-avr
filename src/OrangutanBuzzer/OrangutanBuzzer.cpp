@@ -82,11 +82,12 @@ ISR (TIMER1_OVF_vect)
 {
 	if (buzzerTimeout-- == 0)
 	{
+		DISABLE_TIMER1_INTERRUPT();
+		sei();		// re-enable global interrupts (nextNote() is very slow)
 		TCCR1B = (TCCR1B & 0xF8) | TIMER1_CLK_1;	// select IO clock
 		OCR1A = (F_CPU/2) / 1000;			// set TOP for freq = 1 kHz
 		OCR1B = 0;						// 0% duty cycle
 		buzzerFinished = 1;
-		DISABLE_TIMER1_INTERRUPT();
 		if (buzzerSequence && (play_mode_setting == PLAY_AUTOMATIC))
 			nextNote();
 	}
@@ -200,6 +201,7 @@ void OrangutanBuzzer::init2()
 #ifndef _ORANGUTAN_X2
 	BUZZER_DDR |= BUZZER;		// buzzer pin set as an output
 #endif
+	sei();
 }
 
 
@@ -294,7 +296,7 @@ void OrangutanBuzzer::playFrequency(unsigned int freq, unsigned int dur,
 	TIFR1 |= 0xFF;						// clear any pending t1 overflow int.
 	ENABLE_TIMER1_INTERRUPT();			// this is the only place the t1
 										//  overflow is enabled unless using X2
-	sei();
+										
 }
 
 

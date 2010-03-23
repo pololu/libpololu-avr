@@ -1,14 +1,19 @@
 /*
   OrangutanPulseIn.cpp - Library for reading digital pulses with the
-	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  This library
-	can be used to read RC inputs.  To use this library, you must
-	repeatedly call the update() function in your main loop more often
-	than your configured maximum pulse length.  If this is done,
-	pulses longer than the maximum pulse length will be reported as having
-	a duration of MAX_PULSE (0xFFFF, or 65535).  If update() is not called
-	often enough, pulses longer than the maximum pulse length can be reported
-	as having any pulse length from 0 and 65535, depending on how the timer
-	has overflowed.
+	Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  Pulses
+	are measured in ticks, which have units of 0.4 us.  Note that the
+	pulse info is updated by pin change interrupts as the pulses occur,
+	so unless you use the get_pulse_info() function to freeze a snapshot
+	of the current pulse state, values might change on you in unexpected
+	ways.  For example, if you want to do something only when there is
+	a new high pulse, you might do the following:
+	
+	if (new_high_pulse(0) && !new_low_pulse(0))
+		do something with pulse data
+		
+	However, a pulse might occur right after you make it past the if
+	statement but before you run your conditional code, changing the
+	condition to one that would never have made it past the if statement.
 */
 
 /*
@@ -34,6 +39,7 @@
 #include "../OrangutanResources/include/OrangutanModel.h"
 #include "OrangutanPulseIn.h"
 #include "../OrangutanDigital/OrangutanDigital.h"	// digital I/O routines
+#include "../OrangutanTime/OrangutanTime.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdlib.h>
@@ -42,34 +48,42 @@
 struct PulseInputStruct *pis;
 unsigned char numPulsePins;
 
+extern volatile unsigned long tickCount;
 
 ISR(PCINT0_vect)
 {
-	unsigned int time = TCNT1;
+	// the following is copied from OrangutanTime::ticks() since this is faster than calling
+	// the ticks() method:
+	unsigned long time = TCNT2 | tickCount;
+	if (TIFR2 & (1 << TOV2))	// if TCNT2 has overflowed since we disabled t2 ovf interrupt
+	{
+		// NOTE: it is important to perform this computation again.  If we use a value of TCNT2 read
+		// before we checked for the overflow, it might be something like 255 while it becomes 0 after
+		// the overflow.  Using an old value could produce a result that is bigger than it should be.
+		// For example, the following line should *NOT* be: numTicks += 256;
+		time = TCNT2 | (tickCount + 256);		// compute ticks again and add 256 for the overflow
+	}
+	
 	unsigned char i;
 	for (i = 0; i < numPulsePins; i++)
 	{
 		unsigned char pr = (*pis[i].pinRegister & pis[i].bitmask) != 0;
 		if (pr != pis[i].inputState)
 		{
-			unsigned int width = time - pis[i].lastPCTime;
-			if (width < pis[i].curPulseWidth)
-			{
-				width = MAX_PULSE;
-			}
+			unsigned long width = time - pis[i].lastPCTime;
+
 			if (pis[i].inputState)
 			{
 				pis[i].lastHighPulse = width;
-				pis[i].newPulse = HIGH_PULSE;
+				pis[i].newPulse |= HIGH_PULSE;
 			}
 			else
 			{
 				pis[i].lastLowPulse = width;
-				pis[i].newPulse = LOW_PULSE;
+				pis[i].newPulse |= LOW_PULSE;
 			}
 			
 			pis[i].inputState = pr;
-			pis[i].curPulseWidth = 0;
 			pis[i].lastPCTime = time;
 		}
 	}
@@ -86,32 +100,47 @@ ISR(PCINT3_vect,ISR_ALIASOF(PCINT0_vect));
 #ifdef LIB_POLOLU
 
 // use of pulse_in_init() is discouraged; use pulse_in_start() instead
-extern "C" unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
+extern "C" unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins)
 {
-	return OrangutanPulseIn::start(pulsePins, numPins, maxLengthEnum);
+	return OrangutanPulseIn::start(pulsePins, numPins);
 }
 
-extern "C" unsigned char pulse_in_init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
+extern "C" void get_pulse_info(unsigned char idx, struct PulseInputStruct* pulse_info)
 {
-	return OrangutanPulseIn::init(pulsePins, numPins, maxLengthEnum);
+	OrangutanPulseIn::getPulseInfo(idx, pulse_info);
 }
 
-extern "C" void pulse_in_update()
+extern "C" unsigned char new_pulse(unsigned char idx)
 {
-	OrangutanPulseIn::update();
+	return OrangutanPulseIn::newPulse(idx);
 }
 
-extern "C" void set_max_pulse_length(unsigned char maxLengthEnum)
+extern "C" unsigned char new_high_pulse(unsigned char idx)
 {
-	OrangutanPulseIn::setMaxPulseLength(maxLengthEnum);
+	return OrangutanPulseIn::newHighPulse(idx);
 }
 
-extern "C" struct PulseInputStruct get_pulse_info(unsigned char idx)
+extern "C" unsigned char new_low_pulse(unsigned char idx)
 {
-	return OrangutanPulseIn::getPulseInfo(idx);
+	return OrangutanPulseIn::newLowPulse(idx);
 }
 
-extern "C" unsigned long pulse_to_microseconds(unsigned int pulse)
+extern "C" unsigned long get_last_high_pulse(unsigned char idx)
+{
+	return OrangutanPulseIn::getLastHighPulse(idx);
+}
+
+extern "C" unsigned long get_last_low_pulse(unsigned char idx)
+{
+	return OrangutanPulseIn::getLastLowPulse(idx);
+}
+
+extern "C" void get_current_pulse_state(unsigned char idx, unsigned long* pulse_width, unsigned char* state)
+{
+	OrangutanPulseIn::getCurrentState(idx, pulse_width, state);
+}
+
+extern "C" unsigned long pulse_to_microseconds(unsigned long pulse)
 {
 	return OrangutanPulseIn::toMicroseconds(pulse);
 }
@@ -148,26 +177,8 @@ OrangutanPulseIn::~OrangutanPulseIn()
 }
 
 
-extern unsigned char buzzerInitialized;
-extern volatile unsigned char buzzerFinished;
-extern const char *buzzerSequence;
-
-unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned char numPins, unsigned char maxLengthEnum)
+unsigned char OrangutanPulseIn::start(const unsigned char *pulsePins, unsigned char numPins)
 {
-	TIMSK1 = 0;			// disable all timer 1 interrupts
-	
-	buzzerInitialized = 0;
-	buzzerFinished = 1;
-	buzzerSequence = 0;
-	
-	TCCR1A = 0;
-
-	if (maxLengthEnum < 1)
-		maxLengthEnum = 1;
-	if (maxLengthEnum > 5)
-		maxLengthEnum = 5;
-	TCCR1B = maxLengthEnum;	// set clock tick rate (determines resolution and max measurable pulse length)
-	
 	PCICR = 0;			// disable pin-change interrupts
 	PCMSK0 = 0;
 	PCMSK1 = 0;
@@ -193,7 +204,7 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 		pis[i].bitmask = io.bitmask;
 		pis[i].lastHighPulse = 0;
 		pis[i].lastLowPulse = 0;
-		pis[i].curPulseWidth = MAX_PULSE;
+		pis[i].lastPCTime = OrangutanTime::ticks();
 		pis[i].inputState = *io.pinRegister & io.bitmask;
 		pis[i].newPulse = 0;
 		
@@ -238,92 +249,110 @@ unsigned char OrangutanPulseIn::init(const unsigned char *pulsePins, unsigned ch
 }
 
 
-void OrangutanPulseIn::update()
+// Places a snapshot of the current pulse state into the supplied pulseInfo argument.
+// This lets the user evaluate the state without worrying that the data will change
+// in the middle of the analysis due to an incoming pulse.
+void OrangutanPulseIn::getPulseInfo(unsigned char idx, struct PulseInputStruct* pulseInfo)
 {
-	unsigned char i;
-	for (i = 0; i < numPulsePins; i++)
-	{
-		unsigned char origPCICR = PCICR;
-		PCICR = 0;				// disable pin-change interrupts
-		unsigned int width = TCNT1 - pis[i].lastPCTime;
-		if (width < pis[i].curPulseWidth)
-		{
-			width = MAX_PULSE;
-		}
-		pis[i].curPulseWidth = width;
-		PCICR = origPCICR;		// re-enable pin-change interrupts
-	}
-}
-
-
-void OrangutanPulseIn::setMaxPulseLength(unsigned char maxLengthEnum)
-{
-	unsigned char origPCICR = PCICR;
-	PCICR = 0;				// disable pin-change interrupts
-	if (maxLengthEnum < 1)
-		maxLengthEnum = 1;
-	if (maxLengthEnum > 5)
-		maxLengthEnum = 5;
-	TCCR1B = maxLengthEnum;
-
-	unsigned char i;
-	for (i = 0; i < numPulsePins; i++)
-	{
-		pis[i].lastHighPulse = 0;
-		pis[i].lastLowPulse = 0;
-		pis[i].curPulseWidth = MAX_PULSE;
-		pis[i].inputState = *pis[i].pinRegister & pis[i].bitmask;
-		pis[i].newPulse = 0;
-	}
-	PCIFR = 0XFF;			// cancel any pending pin-change interrupts
-	PCICR = origPCICR;		// re-enable pin-change interrupts
-}
-
-
-struct PulseInputStruct OrangutanPulseIn::getPulseInfo(unsigned char idx)
-{
-	struct PulseInputStruct ret;
-	
 	if (idx >= numPulsePins)
-		return ret;
+		return;
 		
 	unsigned char origPCICR = PCICR;
 	PCICR = 0;				// disable pin-change interrupts
 	
-	ret = pis[idx];
+	*pulseInfo = pis[idx];
 	pis[idx].newPulse = 0;
 	
 	PCICR = origPCICR;		// re-enable pin-change interrupts
-	
-	return ret;
 }
 
 
-unsigned long OrangutanPulseIn::toMicroseconds(unsigned int pulse)
+// returns pulse state if there is a new pulse on the specified channel of the specified state
+// this is a PRIVATE method
+unsigned char OrangutanPulseIn::newPulse(unsigned char idx, unsigned char state)
 {
-	if (pulse == 0xFFFF)
-		return 0xFFFFFFFF;
-		
-	switch (TCCR1B)
+	if (idx >= numPulsePins)
+		return 0;
+
+	unsigned char val = 0;
+
+	if (pis[idx].newPulse & state)
 	{
-		case MAX_PULSE_3MS:
-			return (pulse + 10) / 20;
-			
-		case MAX_PULSE_26MS:
-			return (pulse * 4UL + 5) / 10;
-			
-		case MAX_PULSE_200MS:
-			return (pulse * 32UL + 5) / 10;
-		
-		case MAX_PULSE_800MS:
-			return (pulse * 128UL + 5) / 10;
-			
-		case MAX_PULSE_3000MS:
-			return (pulse * 512UL + 5) / 10;
-		
-		default:
-			return 0;
+		val = pis[idx].newPulse;
+		unsigned char origPCICR = PCICR;
+		PCICR = 0;				// disable pin-change interrupts
+		pis[idx].newPulse &= ~state;
+		PCICR = origPCICR;		// re-enable pin-change interrupts
 	}
+	
+	return val;
+}
+
+
+inline unsigned char OrangutanPulseIn::newHighPulse(unsigned char idx)
+{
+	return newPulse(idx, HIGH_PULSE);
+}
+
+inline unsigned char OrangutanPulseIn::newLowPulse(unsigned char idx)
+{
+	return newPulse(idx, LOW_PULSE);
+}
+
+inline unsigned char OrangutanPulseIn::newPulse(unsigned char idx)
+{
+	return newPulse(idx, ANY_PULSE);
+}
+
+unsigned long OrangutanPulseIn::getLastHighPulse(unsigned char idx)
+{
+	unsigned long val = 0;
+
+	// make sure we get a good reading of the last high pulse
+	// without disabling interrupts
+	do
+	{
+		val = pis[idx].lastHighPulse;
+	}
+	while (val != pis[idx].lastHighPulse);
+	
+	return val;
+}
+
+unsigned long OrangutanPulseIn::getLastLowPulse(unsigned char idx)
+{
+	unsigned long val = 0;
+
+	// make sure we get a good reading of the last high pulse
+	// without disabling interrupts
+	do
+	{
+		val = pis[idx].lastLowPulse;
+	}
+	while (val != pis[idx].lastLowPulse);
+	
+	return val;
+}
+
+
+
+void OrangutanPulseIn::getCurrentState(unsigned char idx, unsigned long* pulseWidth, unsigned char *state)
+{
+	// make sure we get a good reading of the current pulse width
+	// without disabling interrupts
+	do
+	{
+		*state = pis[idx].inputState;
+		*pulseWidth = pis[idx].lastPCTime;
+	}
+	while (*pulseWidth != pis[idx].lastPCTime);
+	*pulseWidth = OrangutanTime::ticks() - *pulseWidth;
+}
+
+
+inline unsigned long OrangutanPulseIn::toMicroseconds(unsigned long pulse)
+{
+	return OrangutanTime::ticksToMicroseconds(pulse);
 }
 
 
