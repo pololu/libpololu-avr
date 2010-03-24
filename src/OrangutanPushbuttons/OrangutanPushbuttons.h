@@ -111,6 +111,10 @@ class OrangutanPushbuttons
 	// can refer to multiple buttons using the bitwise OR operator |.
 	static unsigned char isPressed(unsigned char buttons);
 	
+	// These are more complex functions that make it easy to perform
+	// button-triggered actions from within a loop, since they only return
+	// a non-zero value once for each button transition from up to down or
+	// down to up.
 	static unsigned char getSingleDebouncedPress(unsigned char buttons);
 	static unsigned char getSingleDebouncedRelease(unsigned char buttons);
 	

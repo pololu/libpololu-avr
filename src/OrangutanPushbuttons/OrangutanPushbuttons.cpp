@@ -164,6 +164,13 @@ unsigned char OrangutanPushbuttons::isPressed(unsigned char buttons)
 }
 
 
+// Uses a finite state machine to detect a single button press and return
+// the pressed button.  It requires the button to be up for at least 15 ms
+// and then down for at least 15 ms before reporting the press.  This function
+// handles all necessary debouncing and should be called repeatedly in a loop
+// with the same button-mask argument.  The argument 'buttons' can refer to 
+// multiple buttons using the bitwise OR operator | or (e.g.
+// TOP_BUTTON | MIDDLE_BUTTON) or the value ANY_BUTTON.
 unsigned char OrangutanPushbuttons::getSingleDebouncedPress(unsigned char buttons)
 {
 	static unsigned char state = 0;
@@ -233,6 +240,13 @@ unsigned char OrangutanPushbuttons::getSingleDebouncedPress(unsigned char button
 }
 
 
+// Uses a finite state machine to detect a single button release and return
+// the released button.  It requires the button to be down for at least 15 ms
+// and then up for at least 15 ms before reporting the press.  This function
+// handles all necessary debouncing and should be called repeatedly in a loop
+// with the same button-mask argument.  The argument 'buttons' can refer to 
+// multiple buttons using the bitwise OR operator | or (e.g.
+// TOP_BUTTON | MIDDLE_BUTTON) or the value ANY_BUTTON.
 unsigned char OrangutanPushbuttons::getSingleDebouncedRelease(unsigned char buttons)
 {
 	static unsigned char state = 0;
