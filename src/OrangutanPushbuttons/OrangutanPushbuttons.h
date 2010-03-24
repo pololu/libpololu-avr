@@ -81,6 +81,8 @@
 #define ANY_BUTTON		ALL_BUTTONS
 
 
+#ifdef __cplusplus
+
 class OrangutanPushbuttons
 {
   public:
@@ -108,24 +110,29 @@ class OrangutanPushbuttons
 	// method will return (TOP_BUTTON | MIDDLE_BUTTON).  The argument 'buttons'
 	// can refer to multiple buttons using the bitwise OR operator |.
 	static unsigned char isPressed(unsigned char buttons);
-
+	
+	static unsigned char getSingleDebouncedPress(unsigned char buttons);
+	static unsigned char getSingleDebouncedRelease(unsigned char buttons);
 	
   private:
 
-	static inline void init()
-	{
-		static unsigned char initialized = 0;
-
-		if (!initialized)
-		{
-			initialized = 1;
-			init2();
-		}
-	}
+	static void init();
   	
 	// initializes I/O pins for use as button inputs
 	static void init2();
 };
+
+#else
+
+void buttons_init();
+unsigned char wait_for_button_press(unsigned char buttons);
+unsigned char wait_for_button_release(unsigned char buttons);
+unsigned char wait_for_button(unsigned char buttons);
+unsigned char button_is_pressed(unsigned char buttons);
+unsigned char get_single_debounced_button_press(unsigned char buttons);
+unsigned char get_single_debounced_button_release(unsigned char buttons);
+
+#endif	// __cplusplus
 
 #endif
 

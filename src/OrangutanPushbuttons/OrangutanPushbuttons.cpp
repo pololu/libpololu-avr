@@ -62,9 +62,34 @@ extern "C" unsigned char button_is_pressed(unsigned char buttons)
 	return OrangutanPushbuttons::isPressed(buttons);
 }
 
+extern "C" unsigned char get_single_debounced_button_press(unsigned char buttons)
+{
+	return OrangutanPushbuttons::getSingleDebouncedPress(buttons);
+}
+
+extern "C" unsigned char get_single_debounced_button_release(unsigned char buttons)
+{
+	return OrangutanPushbuttons::getSingleDebouncedRelease(buttons);
+}
+
 #else
 #include "wiring.h"		// provides access to delay() and delayMicroseconds()
 #endif
+
+
+
+inline void OrangutanPushbuttons::init()
+{
+	{
+		static unsigned char initialized = 0;
+
+		if (!initialized)
+		{
+			initialized = 1;
+			init2();
+		}
+	}
+}
 
 // initializes I/O pins for use as button inputs
 void OrangutanPushbuttons::init2()
@@ -73,7 +98,7 @@ void OrangutanPushbuttons::init2()
 #ifndef _ORANGUTAN_X2
 	BUTTON_PORT |= ALL_BUTTONS;		// enable pullups on the pushbutton pins
 #endif
-	delayMicroseconds(1);			// give pullups time to stabilize
+	delayMicroseconds(5);			// give pullups time to stabilize
 }
 
 // wait for any of the specified buttons to be pressed, at which point
@@ -136,6 +161,146 @@ unsigned char OrangutanPushbuttons::isPressed(unsigned char buttons)
 {
 	init();		// initialize pushbutton I/O pins if necessary
 	return BUTTONS_DOWN & buttons;
+}
+
+
+unsigned char OrangutanPushbuttons::getSingleDebouncedPress(unsigned char buttons)
+{
+	static unsigned char state = 0;
+	static unsigned long prevTimeMillis = 0;
+	static unsigned char mask = 0;
+	
+	unsigned char buttonsDown = BUTTONS_DOWN;
+	unsigned long timeMillis = millis();
+	
+	init();
+	switch (state)
+	{
+		case 0:
+			if (~buttonsDown & buttons)				// if one of the specified buttons is up
+			{
+				mask = ~buttonsDown & buttons;		// mask becomes all of masked up buttons
+				prevTimeMillis = timeMillis;
+				state = 1;
+			}
+			break;
+			
+		case 1:
+			if (timeMillis - prevTimeMillis >= 15)	// if 15 ms or longer has elapsed
+			{
+				if (~buttonsDown & mask)			// and if a masked button is still up
+				{
+					state = 2;						// proceed to next state
+					mask = ~buttonsDown & mask;		// new mask becomes all of masked up buttons
+				}
+				else
+				{
+					state = 0;						// go back to previous (initial) state
+				}
+			}
+			break;
+			
+		case 2:
+			if (buttonsDown & mask)					// if a masked button is now down
+			{
+				state = 3;							// proceed to next state
+				mask = buttonsDown & mask;			// new mask becomes all of masked down buttons
+				prevTimeMillis = timeMillis;
+			}
+			else if (mask != (~buttonsDown & buttons))	// if our mask becomes inaccurate
+			{
+				state = 0;							// go back to the initial state
+			}
+			break;
+			
+		case 3:
+			if (timeMillis - prevTimeMillis >= 15)	// if 15 ms or longer has elapsed
+			{
+				if (buttonsDown & mask)				// and if a masked button is still down
+				{
+					state = 0;						// next state becomes initial state
+					return buttonsDown & mask;		// return masked down buttons
+				}
+				else
+				{
+					state = 2;						// go back to previous state
+				}
+			}
+			break;
+	}
+	
+	return 0;
+}
+
+
+unsigned char OrangutanPushbuttons::getSingleDebouncedRelease(unsigned char buttons)
+{
+	static unsigned char state = 0;
+	static unsigned long prevTimeMillis = 0;
+	static unsigned char mask = 0;
+	
+	unsigned char buttonsUp = BUTTONS_UP;
+	unsigned long timeMillis = millis();
+	
+	init();
+	switch (state)
+	{
+		case 0:
+			if (~buttonsUp & buttons)				// if one of the specified buttons is down
+			{
+				mask = ~buttonsUp & buttons;		// mask becomes all of masked down buttons
+				prevTimeMillis = timeMillis;
+				state = 1;
+			}
+			break;
+			
+		case 1:
+			if (timeMillis - prevTimeMillis >= 15)	// if 15 ms or longer has elapsed
+			{
+				if (~buttonsUp & mask)				// and if a masked button is still down
+				{
+					state = 2;						// proceed to next state
+					mask = ~buttonsUp & mask;		// new mask becomes all of masked down buttons
+				}
+				else
+				{
+					state = 0;						// go back to previous (initial) state
+				}
+			}
+			break;
+			
+		case 2:
+			if (buttonsUp & mask)					// if a masked button is now up
+			{
+				state = 3;							// proceed to next state
+				mask = buttonsUp & mask;			// new mask becomes all of masked up buttons
+				prevTimeMillis = timeMillis;
+			}
+			else if (mask != (~buttonsUp & buttons))	// if our mask becomes inaccurate
+			{
+				state = 0;							// go back to the initial state
+			}
+			break;
+
+			break;
+			
+		case 3:
+			if (timeMillis - prevTimeMillis >= 15)	// if 15 ms or longer has elapsed
+			{
+				if (buttonsUp & mask)				// and if a masked button is still up
+				{
+					state = 0;						// next state becomes initial state
+					return buttonsUp & mask;		// return masked up buttons
+				}
+				else
+				{
+					state = 2;						// go back to previous state
+				}
+			}
+			break;
+	}
+	
+	return 0;
 }
 
 // Local Variables: **
