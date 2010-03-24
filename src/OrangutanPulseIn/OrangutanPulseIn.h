@@ -39,6 +39,7 @@
 #ifndef OrangutanPulseIn_h
 #define OrangutanPulseIn_h
 
+#include "../OrangutanTime/OrangutanTime.h"
 
 // possible values for the newPulse member of PulseInputStruct
 #define LOW_PULSE			1		// the pulse just completed was a low pulse (pin just went high)
@@ -76,11 +77,20 @@ class OrangutanPulseIn
 		
 	static void getPulseInfo(unsigned char idx, struct PulseInputStruct* pulseInfo);
 
-	static unsigned char newPulse(unsigned char idx);
-	
-	static unsigned char newHighPulse(unsigned char idx);
-	
-	static unsigned char newLowPulse(unsigned char idx);
+	static inline unsigned char newHighPulse(unsigned char idx)
+	{
+		return newPulse(idx, HIGH_PULSE);
+	}
+
+	static inline unsigned char newLowPulse(unsigned char idx)
+	{
+		return newPulse(idx, LOW_PULSE);
+	}
+
+	static inline unsigned char newPulse(unsigned char idx)
+	{
+		return newPulse(idx, ANY_PULSE);
+	}
 	
 	static unsigned long getLastHighPulse(unsigned char idx);
 	
@@ -88,7 +98,10 @@ class OrangutanPulseIn
 	
 	static void getCurrentState(unsigned char idx, unsigned long* pulseWidth, unsigned char* state);
 
-	static unsigned long toMicroseconds(unsigned long pulse);
+	static inline unsigned long toMicroseconds(unsigned long pulse)
+	{
+		return OrangutanTime::ticksToMicroseconds(pulse);
+	}
 	
 	static void stop();
 	

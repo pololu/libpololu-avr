@@ -226,17 +226,57 @@ class OrangutanX2
   private:
 	static void writeToEEPROM(unsigned int address, unsigned char data);
 	static unsigned char isEEPROMBusy();
-	static void waitForEEPROM();
+
+	// Delays execution until the EEPROM on the auxiliary MCU is available for
+	// writing or reading.  This is a PRIVATE method.
+	static inline void waitForEEPROM()
+	{
+		while (isEEPROMBusy());
+	}
+
 
   public:
 	static unsigned char getStatus();
 	static void getFirmwareVersion(unsigned char &majorVersion, unsigned char &minorVersion);
-	static void restoreDefaultSettings();
+
+	// After this function is called, the mega168 must be manually reset for the
+	// changes to take effect.  After the reset the settings will all be restored
+	//  to their factory default values.
+	static inline void restoreDefaultSettings()
+	{
+		writeToEEPROM(ADDR_INIT_CHECK, 0xFF);
+	}
+	
 	static void saveAVRISPVersion(unsigned char vMajor, unsigned char vMinor);
-	static void saveEEPROMByte(unsigned int address, unsigned char data);
-	static void saveParameter(unsigned int paramAddress, unsigned char paramValue);
+	
+	// This method writes a byte to EEPROM if the specified address is outside
+	// the parameter address space.  It can be safely used for general non-volatile
+	// data storage using the auxiliary MCU's EEPROM.  If the specified address is
+	// inside the parameter address space (i.e. address <= 23), the method
+	// does nothing and the data is not stored.
+	static inline void saveEEPROMByte(unsigned int address, unsigned char data)
+	{
+		if (address > 23)
+			writeToEEPROM(address, data);
+	}
+
+	// This method provides public access to the private writeToEEPROM() method.
+	// It is intended to be used for saving X2 parameters, but it can be used to write
+	// bytes to any address in the auxiliary MCU's EEPROM (0 - 511).  For saving bytes
+	// that are not parameters, the saveEEPROMByte() method should be used so that
+	// parameter data cannot be accidentally corrupted.  Parameter addresses are defined
+	// in OrangutanX2.h.
+	static inline void saveParameter(unsigned int paramAddress, unsigned char paramValue)
+	{
+		writeToEEPROM(paramAddress, paramValue);
+	}
+	
 	static unsigned char readEEPROMByte(unsigned int address);
-	static unsigned char readParameter(unsigned int paramAddress);
+
+	static inline unsigned char readParameter(unsigned int paramAddress)
+	{
+		return readEEPROMByte(paramAddress);
+	}
 	
 	static void setMotor(unsigned char motor, unsigned char operationMode, int speed);
 	static void setPWMFrequencies(unsigned char M1Resolution, unsigned char M1Prescaler,

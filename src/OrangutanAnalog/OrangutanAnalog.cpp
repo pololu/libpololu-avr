@@ -328,19 +328,6 @@ unsigned int OrangutanAnalog::readAverage(unsigned char channel,
 	return (sum + (samples >> 1)) / samples;	// compute the rounded avg
 }
 
-inline unsigned int OrangutanAnalog::readAverageMillivolts(unsigned char channel, unsigned int samples)
-{
-#ifdef _ORANGUTAN_SVP
-	if (channel > 31)
-	{
-		// We have not implemented averaging of the adc readings from the auxiliary
-		// processor on the SVP, so we will just return a simple reading.
-		return readMillivolts(channel);
-	}
-#else
-	return toMillivolts(readAverage(channel, samples));
-#endif
-}
 
 // sets the value used to calibrate the conversion from ADC reading
 // to millivolts.  The argument calibration should equal VCC in millivolts,
@@ -381,24 +368,6 @@ unsigned int OrangutanAnalog::toMillivolts(unsigned int adcResult)
 	return (temp + 511) / 1023;
 }
 
-// returns the position of the trimpot (20 readings averaged together).
-// For all devices except the Orangutan SVP, the trimpot is on ADC channel 7.
-// On the Orangutan SVP, the trimpot is on the auxiliary processor, so 
-// calling this function can have side effects related to enabling SPI
-// communication (see the SVP user's guide for more info).
-inline unsigned int OrangutanAnalog::readTrimpot()
-{
-	return readAverage(TRIMPOT, 20);
-}
-
-inline unsigned int OrangutanAnalog::readTrimpotMillivolts()
-{
-#ifdef _ORANGUTAN_SVP
-	return OrangutanSVP::getTrimpotMillivolts();
-#else
-	return toMillivolts(readTrimpot());
-#endif
-}
 
 #ifdef _ORANGUTAN_SVP
 static unsigned int fromMillivoltsToNormal(unsigned int millivolts)

@@ -177,6 +177,7 @@ OrangutanPulseIn::~OrangutanPulseIn()
 }
 
 
+// Note: the initialization function deliberately does not set the specified pins as inputs
 unsigned char OrangutanPulseIn::start(const unsigned char *pulsePins, unsigned char numPins)
 {
 	PCICR = 0;			// disable pin-change interrupts
@@ -199,7 +200,6 @@ unsigned char OrangutanPulseIn::start(const unsigned char *pulsePins, unsigned c
 	for (i = 0; i < numPins; i++)
 	{
 		OrangutanDigital::getIORegisters(&io, pulsePins[i]);
-		OrangutanDigital::setDataDirection(&io, 0);			// set pin as an input
 		pis[i].pinRegister = io.pinRegister;
 		pis[i].bitmask = io.bitmask;
 		pis[i].lastHighPulse = 0;
@@ -289,21 +289,6 @@ unsigned char OrangutanPulseIn::newPulse(unsigned char idx, unsigned char state)
 }
 
 
-inline unsigned char OrangutanPulseIn::newHighPulse(unsigned char idx)
-{
-	return newPulse(idx, HIGH_PULSE);
-}
-
-inline unsigned char OrangutanPulseIn::newLowPulse(unsigned char idx)
-{
-	return newPulse(idx, LOW_PULSE);
-}
-
-inline unsigned char OrangutanPulseIn::newPulse(unsigned char idx)
-{
-	return newPulse(idx, ANY_PULSE);
-}
-
 unsigned long OrangutanPulseIn::getLastHighPulse(unsigned char idx)
 {
 	unsigned long val = 0;
@@ -349,11 +334,6 @@ void OrangutanPulseIn::getCurrentState(unsigned char idx, unsigned long* pulseWi
 	*pulseWidth = OrangutanTime::ticks() - *pulseWidth;
 }
 
-
-inline unsigned long OrangutanPulseIn::toMicroseconds(unsigned long pulse)
-{
-	return OrangutanTime::ticksToMicroseconds(pulse);
-}
 
 
 // Disables pin change interrupts and frees memory that's been used

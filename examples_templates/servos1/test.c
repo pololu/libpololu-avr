@@ -30,9 +30,7 @@
  * with servos_init().
  *
  * The OrangutanServo library uses timer 1, so it conflicts with the
- * OrangutanBuzzer and OrangutanPulseIn libraries, which also use timer 1.
- * You should not add calls to OrangutanBuzzer or OrangutanPulseIn
- * functions to this example.
+ * OrangutanBuzzer library, which also uses timer 1.
  *
  * http://www.pololu.com/docs/0J20
  * http://www.pololu.com

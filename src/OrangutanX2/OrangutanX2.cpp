@@ -211,15 +211,6 @@ unsigned char OrangutanX2::getStatus()
 }
 
 
-// After this function is called, the mega168 must be manually reset for the
-// changes to take effect.  After the reset the settings will all be restored
-//  to their factory default values.
-inline void OrangutanX2::restoreDefaultSettings()
-{
-	writeToEEPROM(ADDR_INIT_CHECK, 0xFF);
-}
-
-
 // At the time of the X2's release, the current AVR Studio AVRISP version is
 // 2.0A. The arguments to this function represent the version AVRISP version
 // number the mega168 will transmit to AVR Studio when you attempt to program
@@ -259,28 +250,6 @@ void OrangutanX2::writeToEEPROM(unsigned int address, unsigned char data)
 	OrangutanSPIMaster::transmit(data & 0x7F);
 }
 
-// This method writes a byte to EEPROM if the specified address is outside
-// the parameter address space.  It can be safely used for general non-volatile
-// data storage using the auxiliary MCU's EEPROM.  If the specified address is
-// inside the parameter address space (i.e. address <= 23), the method
-// does nothing and the data is not stored.
-inline void OrangutanX2::saveEEPROMByte(unsigned int address, unsigned char data)
-{
-	if (address > 23)
-		writeToEEPROM(address, data);
-}
-
-// This method provides public access to the private writeToEEPROM() method.
-// It is intended to be used for saving X2 parameters, but it can be used to write
-// bytes to any address in the auxiliary MCU's EEPROM (0 - 511).  For saving bytes
-// that are not parameters, the saveEEPROMByte() method should be used so that
-// parameter data cannot be accidentally corrupted.  Parameter addresses are defined
-// in OrangutanX2.h.
-inline void OrangutanX2::saveParameter(unsigned int paramAddress, unsigned char paramValue)
-{
-	writeToEEPROM(paramAddress, paramValue);
-}
-
 
 // Read a byte from the mega168's EEPROM.  This command can be used to check
 // the values of the settings that are loaded when the 168 is reset.
@@ -299,11 +268,6 @@ unsigned char OrangutanX2::readEEPROMByte(unsigned int address)
 	return OrangutanSPIMaster::transmit(0);		// send a junk data byte here
 }
 
-inline unsigned char OrangutanX2::readParameter(unsigned int paramAddress)
-{
-	return readEEPROMByte(paramAddress);
-}
-
 
 // Check to see if the mega168's EEPROM is currently being written to, which
 // means it is not possible to read from it or start a new write.  This is
@@ -312,14 +276,6 @@ unsigned char OrangutanX2::isEEPROMBusy()
 {
 	OrangutanSPIMaster::transmitAndDelay(CMD_GET_EEPROM_BUSY, 3);
 	return OrangutanSPIMaster::transmit(0);		// send a junk data byte here
-}
-
-
-// Delays execution until the EEPROM on the auxiliary MCU is available for
-// writing or reading.  This is a PRIVATE method.
-inline void OrangutanX2::waitForEEPROM()
-{
-	while (isEEPROMBusy());
 }
 
 

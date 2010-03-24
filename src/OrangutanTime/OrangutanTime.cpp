@@ -134,7 +134,7 @@ unsigned long OrangutanTime::ticks()
 // unsigned long ticks = OrangutanTime::ticks();
 // ... (do something)
 // unsigned long elapsedMicroseconds = OrangutanTime::ticksToMicroseconds(OrangutanTime::ticks() - ticks);
-inline unsigned long OrangutanTime::ticksToMicroseconds(unsigned long numTicks)
+unsigned long OrangutanTime::ticksToMicroseconds(unsigned long numTicks)
 {
 	return (numTicks * 2 + 2) / 5;
 }
