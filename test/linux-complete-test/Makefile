@@ -6,9 +6,9 @@ LDFLAGS=-Wl,-gc-sections
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_flt -lm
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_min
 
-DEVICES=168 324p
+DEVICES=168
 
-PORT=/dev/ttyACM0
+PORT=COM24
 AVRDUDE=avrdude
 TARGET=test
 OBJECT_FILES=test.$*.o analog.$*.o assert.$*.o delay.$*.o lcd.$*.o buzzer.$*.o leds.$*.o motors.$*.o pushbuttons.$*.o qtr.$*.o
@@ -18,6 +18,9 @@ all: $(HEXES)
 
 clean:
 	rm -f *.o *.hex *.obj *.hex
+
+program-168: test.168.hex
+	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:test.168.hex
 
 # $< = prerequisite
 # $@ = target

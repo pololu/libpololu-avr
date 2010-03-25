@@ -53,16 +53,16 @@ void test_analog()
   set_analog_mode(MODE_10_BIT);
   x1 = analog_read_average(6,100);
 
-  int expect_temp_f = ((x1 * 18 + 2) >> 2) - 40;
-  int expect_temp_c = ((expect_temp_f - 320)*5+4)/9;
+  int expect_temp_f = (((int)(analog_read_average_millivolts(TEMP_SENSOR, 20)) * 12) - 634) / 13;
+  int expect_temp_c = (((int)(analog_read_average_millivolts(TEMP_SENSOR, 20) * 20)) - 7982) / 39;
   int temp_f = read_temperature_f();
   int temp_c = read_temperature_c();
 
   printf("\nTF10 %d %d", expect_temp_f, temp_f);
-  assert( expect_temp_f == temp_f );
+  assert( expect_temp_f/5 == temp_f/5 );
 
   printf("\nTC10 %d %d", expect_temp_c, temp_c);
-  assert( expect_temp_c == temp_c );
+  assert( expect_temp_c/5 == temp_c/5 );
 
   // try temp in 8bit mode
   set_analog_mode(MODE_8_BIT);
