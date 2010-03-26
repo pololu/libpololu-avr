@@ -16,8 +16,9 @@
 	place of raw digital I/O register manipulation without worrying
 	about any significantly increased overhead or processing time.
 	Using variables as inputs can increase overhead and processing time,
-	but the methods in this library can lead to easier to write (and
-	read) programmatic approaches to dealing with digital I/O.
+	but the functions in this library allow for simpler programmatic
+	approaches to working with digital I/O, since you no longer have to
+	deal with a multitude of pin-specific registers.
 	
 	The digital pins on the AVR default to high-impedance inputs after
 	a power-up or reset.
