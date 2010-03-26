@@ -30,6 +30,7 @@ of robot controllers:
 * Pololu Orangutan SV-328
 * Pololu Orangutan SVP-324
 * Pololu Orangutan SVP-1284
+* Pololu Orangutan X2
 
 Additionally, this library supports:
 
