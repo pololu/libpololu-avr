@@ -1,0 +1,2 @@
+DEVICE = atmega644p
+AVRDUDE_DEVICE = m644p
