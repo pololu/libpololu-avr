@@ -1,4 +1,4 @@
-﻿/*
+/*
  * lv-demo-program - demo code for the Pololu Orangutan LV-168 robot controller
  * 
  *
