@@ -99,9 +99,8 @@ class OrangutanAnalog
 			// processor on the SVP, so we will just return a simple reading.
 			return readMillivolts(channel);
 		}
-	#else
-		return toMillivolts(readAverage(channel, samples));
 	#endif
+		return toMillivolts(readAverage(channel, samples));
 	}
 	
 	// returns the position of the trimpot (20 readings averaged together).
