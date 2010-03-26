@@ -133,8 +133,8 @@ install: $(LIBRARY_FILES)
 # concatenated together with &&.
 
 examples_3pi := 3pi-demo-program 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
-examples_orangutan := buzzer1 buzzer2 buzzer3 lcd1 lcd2 lcd3-hello-world pushbuttons1 pushbuttons2 motors2 simple-test wheel-encoders1 wdt servos-and-buzzer pulsein1 pulsein2
-examples_168_328p := analog2 3pi-serial-master sv-demo-program lv-demo-program serial1
+examples_orangutan := buzzer1 buzzer2 buzzer3 lcd1 lcd2 lcd3-hello-world pushbuttons1 pushbuttons2 motors2 serial1 simple-test wheel-encoders1 wdt servos-and-buzzer pulsein1 pulsein2 stepper-motor1
+examples_168_328p := analog2 3pi-serial-master sv-demo-program lv-demo-program
 examples_svp := svp1 svp-demo-program svp-eight-servo svp-sixteen-servo svp-one-servo serial2
 examples_x2 := digital1 serial2 x2-demo-program
 
