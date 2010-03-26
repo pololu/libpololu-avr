@@ -1,5 +1,5 @@
 /*
- * X2-demo-program - demo code for the Pololu Orangutan X2 robot
+ * x2-demo-program - demo code for the Pololu Orangutan X2 robot
  * controllers.
  * 
  *
@@ -160,7 +160,7 @@ char wait_for_250_ms_or_button_b()
 void led_test()
 {
 	play("c32");
-	print("Red  ");
+	print("Red 1   ");
 
 	red_led(1);
 	if(wait_for_250_ms_or_button_b())
@@ -171,12 +171,45 @@ void led_test()
 
 	play(">c32");
 	lcd_goto_xy(0,0);
-	print("Green");
+	print("Green 1 ");
 
 	green_led(1);
 	if(wait_for_250_ms_or_button_b())
 		return;
 	green_led(0);
+	if(wait_for_250_ms_or_button_b())
+		return;
+
+	play("d32");
+	lcd_goto_xy(0,0);
+	print("Red 2   ");
+
+	red_led2(1);
+	if(wait_for_250_ms_or_button_b())
+		return;
+	red_led2(0);
+	if(wait_for_250_ms_or_button_b())
+		return;
+
+	play(">d32");
+	lcd_goto_xy(0,0);
+	print("Green 2 ");
+
+	green_led2(1);
+	if(wait_for_250_ms_or_button_b())
+		return;
+	green_led2(0);
+	if(wait_for_250_ms_or_button_b())
+		return;
+
+	play("e32>e32");
+	lcd_goto_xy(0,0);
+	print("Yellow  ");
+
+	yellow_led(1);
+	if(wait_for_250_ms_or_button_b())
+		return;
+	yellow_led(0);
 	if(wait_for_250_ms_or_button_b())
 		return;
 }
@@ -612,8 +645,8 @@ unsigned char IOTest()
 	unsigned char direction = 0;
 	unsigned char button;
 
-	red_led(0);		// turn red and green LEDs off
-	green_led(0);
+	red_led(1);
+	green_led(1);
 
 	clear();		// clear the LCD
 	print("User I/O");
@@ -728,6 +761,9 @@ unsigned char motorTest()
 {
 	unsigned char button;
 
+	red_led(1);
+	green_led(1);
+
 	clear();			// clear the LCD, go to the start of the first LCD line
 	print("motor2");	// print to the first line of the LCD
 	lcd_goto_xy(0, 1);	// go to the start of the second LCD line
@@ -791,14 +827,34 @@ void test()
 	unsigned char button;
 
 	clear();
+
 	delay(200);
 	print("Orangutan");	// print to the top line of the LCD
 	delay_ms(400);		// delay 200 ms
 	lcd_goto_xy(0, 1);	// go to the start of the second LCD line
 	print(" X2");	// print to the bottom line of the LCD
 
+	red_led(1);
+	delay_ms(100);
+	green_led(1);
+	delay_ms(100);
+	red_led2(1);
+	delay_ms(100);
+	green_led2(1);
+	delay_ms(100);
+	yellow_led(1);
+	delay_ms(100);
 
-	delay_ms(1000);		// delay 700 ms
+	red_led(0);
+	delay_ms(100);
+	green_led(0);
+	delay_ms(100);
+	red_led2(0);
+	delay_ms(100);
+	green_led2(0);
+	delay_ms(100);
+	yellow_led(0);
+	delay_ms(100);
 
 	clear();			// clear the LCD, move cursor to start of top line
 
@@ -818,6 +874,13 @@ void test()
 		button = button_is_pressed(ANY_BUTTON);	// check for button press
 	}
 	while (button == 0);	// loop if no buttons are being pressed
+
+
+	red_led(1);
+	green_led(1);
+	red_led2(1);
+	green_led2(1);
+	yellow_led(1);
 
 
 	// *** MAIN LOOP ***

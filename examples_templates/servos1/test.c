@@ -26,8 +26,8 @@
  * Orangutans.  If you are not using the Orangutan SVP, you can do not
  * need to use the B versions of the functions (e.g. you can use
  * set_servo_target(0, 1300) instead of set_servo_target_b(0, 1300)).
- * If you do this, you should replace the call to servos_init_extended()
- * with servos_init().
+ * If you do this, you should replace the call to servos_start_extended()
+ * with servos_starts().
  *
  * The OrangutanServo library uses timer 1, so it conflicts with the
  * OrangutanBuzzer library, which also uses timer 1.
@@ -43,7 +43,7 @@ int main()
 	// software-PWMed servos.  Servo 0 is on pin D0 and servo 1 is on pin D1.
 	const unsigned char servoPinsB[] = {IO_D0, IO_D1};
 
-	servos_init_extended((unsigned char[]){}, 0, servoPinsB, sizeof(servoPinsB));
+	servos_start_extended((unsigned char[]){}, 0, servoPinsB, sizeof(servoPinsB));
 
 	while (1)
 	{

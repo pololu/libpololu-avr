@@ -201,13 +201,13 @@ ISR(TIMER1_COMPB_vect)
 // use of init() is discouraged; use start() instead
 extern "C" unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins)
 {
-	return OrangutanServos::init(servoPins, numPins, 0, 0);
+	return OrangutanServos::start(servoPins, numPins, 0, 0);
 }
 
 // use of init() is discouraged; use start() instead
 extern "C" unsigned char servos_init_extended(const unsigned char servoPins[], unsigned char numPins, const unsigned char servoPinsB[], unsigned char numPinsB)
 {
-	return OrangutanServos::init(servoPins, numPins, servoPinsB, numPinsB);
+	return OrangutanServos::start(servoPins, numPins, servoPinsB, numPinsB);
 }
 
 extern "C" unsigned char servos_start(const unsigned char servoPins[], unsigned char numPins)
@@ -357,7 +357,7 @@ extern volatile unsigned char buzzerFinished;
 extern const char *buzzerSequence;
 
 
-unsigned char OrangutanServos::init(const unsigned char *servoPins, unsigned char numPins, const unsigned char *servoPinsB, unsigned char numPinsB)
+unsigned char OrangutanServos::start(const unsigned char *servoPins, unsigned char numPins, const unsigned char *servoPinsB, unsigned char numPinsB)
 {
 	TIMSK1 = 0;					// disable all timer1 interrupts
 

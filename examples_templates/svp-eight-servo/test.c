@@ -26,7 +26,7 @@ int main()
 	//const unsigned char demuxPins[] = {IO_B3};             // two servos, B3=SA
 	//const unsigned char demuxPins[] = {};                  // one servo
 
-	servos_init(demuxPins, sizeof(demuxPins));
+	servos_start(demuxPins, sizeof(demuxPins));
 
 	// Set the servo speed to 150.  This means that the pulse width
 	// will change by at most 15 microseconds every 20 ms.  So it will

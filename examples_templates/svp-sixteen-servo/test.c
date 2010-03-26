@@ -28,7 +28,7 @@ int main()
 	// software-PWMed servos.
 	const unsigned char servoPinsB[] = {IO_A0, IO_A1, IO_A2, IO_A3, IO_A4, IO_A5, IO_A6, IO_A7};
 
-	servos_init_extended(demuxPins, sizeof(demuxPins), servoPinsB, sizeof(servoPinsB));
+	servos_start_extended(demuxPins, sizeof(demuxPins), servoPinsB, sizeof(servoPinsB));
 
 	// Set the servo speed to 150.  This means that the pulse width
 	// will change by at most 15 microseconds every 20 ms.  So it will

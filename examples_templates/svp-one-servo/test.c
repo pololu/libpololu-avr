@@ -18,7 +18,7 @@
 int main()
 {
 	const unsigned char demuxPins[] = {};
-	servos_init(demuxPins, sizeof(demuxPins));
+	servos_start(demuxPins, sizeof(demuxPins));
 
 	set_servo_target(0, 1300);	// Make the servo go to a neutral position.
 
