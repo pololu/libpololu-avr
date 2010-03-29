@@ -47,17 +47,16 @@
 #define ANY_PULSE			3		// newPulse member is not zero
 
 
-// Structure for storing the port register and approrpiate bitmask for an I/O pin.
-// This lets us easily change the output value of the pin represented by the struct.
+// Structure for storing pulse input data.  This structure holds a copy of part of
+// the data maintained by the pin-change ISR.  The copy is made when the user calls the
+// getPulseInfo() method.
 struct PulseInputStruct
 {
-	volatile unsigned char* pinRegister;
-	unsigned char bitmask;
-	volatile unsigned long lastPCTime;
-	volatile unsigned char inputState;
-	volatile unsigned long lastHighPulse;
-	volatile unsigned long lastLowPulse;
-	volatile unsigned char newPulse;
+	unsigned long lastPCTime;
+	unsigned char inputState;
+	unsigned long lastHighPulse;
+	unsigned long lastLowPulse;
+	unsigned char newPulse;
 };
 
 
