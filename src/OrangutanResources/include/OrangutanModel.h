@@ -33,11 +33,16 @@
  * to be responsible for all resulting costs and damages.
  */
 
-#undef _ORANGUTAN_X2
-#undef _ORANGUTAN_SVP
+#undef _ORANGUTAN_X2   // Orangutan X2
+#undef _ORANGUTAN_SVP  // Orangutan SVP-324 or 1284
+#undef _ORANGUTAN_XX4  // Either the X2, SVP-324, or SVP-1284.
 
 #if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega1284PA__)
  #define _ORANGUTAN_SVP
 #elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__)
  #define _ORANGUTAN_X2
+#endif
+
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
+  #define _ORANGUTAN_XX4
 #endif

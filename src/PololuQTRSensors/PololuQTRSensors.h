@@ -34,6 +34,8 @@
 #ifndef PololuQTRSensors_h
 #define PololuQTRSensors_h
 
+#include "../OrangutanResources/include/OrangutanModel.h"
+
 #define QTR_EMITTERS_OFF 0
 #define QTR_EMITTERS_ON 1
 #define QTR_EMITTERS_ON_AND_OFF 2
@@ -237,7 +239,10 @@ class PololuQTRSensorsRC : public PololuQTRSensors
 	unsigned char _bitmask[QTR_MAX_SENSORS];
 	// pointer to PIN registers
 	volatile unsigned char* _register[QTR_MAX_SENSORS];	// needs to be volatile
-		
+
+	#ifdef _ORANGUTAN_XX4
+	unsigned char _portAMask;
+    #endif
 	unsigned char _portBMask;
 	unsigned char _portCMask;
 	unsigned char _portDMask;
@@ -314,7 +319,7 @@ class PololuQTRSensorsAnalog : public PololuQTRSensors
 
 	unsigned char _analogPins[QTR_MAX_SENSORS];
 	unsigned char _numSamplesPerSensor;
-	unsigned char _portCMask;
+	unsigned char _portMask;
 };
 
 

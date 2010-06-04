@@ -13,8 +13,8 @@
 */
 	
 /*
- * Written by Ben Schmidel et al., May 28, 2008.
- * Copyright (c) 2008 Pololu Corporation. For more information, see
+ * Written by Ben Schmidel et al., June 4, 2010.
+ * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -38,11 +38,20 @@
 #include <stdlib.h>
 #include "PololuQTRSensors.h"
 
+#ifdef _ORANGUTAN_XX4
+  #define ANALOG_PORT PORTA
+  #define ANALOG_DDR  DDRA
+#else
+  #define ANALOG_PORT PORTC
+  #define ANALOG_DDR  DDRC
+#endif
+
 #define QTR_RC		0
 #define QTR_A		1
 
 #ifdef LIB_POLOLU
 
+#include "../OrangutanDigital/OrangutanDigital.h" // provides pin definitions
 #include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
 // two options for our sensors
 
@@ -149,30 +158,12 @@ void PololuQTRSensors::init(unsigned char numSensors,
 		_numSensors = numSensors;
 		
 	_type = type;
-		
-	if (emitterPin < 8)				// port D
-	{
-		_emitterBitmask = 1 << emitterPin;
-		_emitterPORT = &PORTD;
-		_emitterDDR = &DDRD;
-	}
-	else if (emitterPin < 14)		// port B
-	{
-		_emitterBitmask = 1 << (emitterPin - 8);
-		_emitterPORT = &PORTB;
-		_emitterDDR = &DDRB;
-	}
-	else if (emitterPin < 20)		// port C
-	{
-		_emitterBitmask = 1 << (emitterPin - 14);
-		_emitterPORT = &PORTC;
-		_emitterDDR = &DDRC;
-	}
-	else
-	{
-		_emitterDDR = 0;
-		_emitterPORT = 0;
-	}
+
+	struct IOStruct emitterIO;
+	OrangutanDigital::getIORegisters(&emitterIO, emitterPin);
+    _emitterBitmask = emitterIO.bitmask;
+    _emitterPORT = emitterIO.portRegister;
+    _emitterDDR = emitterIO.ddrRegister;
 }
 
 
@@ -482,8 +473,11 @@ PololuQTRSensorsRC::PololuQTRSensorsRC(unsigned char* pins,
 }
 
 
-// the array 'pins' contains the Arduino pin assignment for each
-// sensor.  For example, if pins is {3, 6, 15}, sensor 1 is on
+// the array 'pins' contains the pin number for each sensor,
+// as defined in the IO_* macros in OrangutanDigital.h.
+// For ATmega48/168/328 processors, the pin numbers correspond
+// to the Arduino pin numbers.
+// For example, if pins is {3, 6, 15}, sensor 1 is on
 // Arduino digital pin 3, sensor 2 is on Arduino digital pin 6,
 // and sensor 3 is on Arduino analog input 1 (digital pin 15).
 // Note that Arduino digital pins 0 - 7 correpsond to port D
@@ -521,6 +515,9 @@ void PololuQTRSensorsRC::init(unsigned char* pins,
 	PololuQTRSensors::init(numSensors, emitterPin, QTR_RC);
 	
 	unsigned char i;
+    #ifdef _ORANGUTAN_XX4
+	_portAMask = 0;
+    #endif
 	_portBMask = 0;
 	_portCMask = 0;
 	_portDMask = 0;
@@ -528,24 +525,16 @@ void PololuQTRSensorsRC::init(unsigned char* pins,
 	_maxValue = timeout;
 	for (i = 0; i < _numSensors; i++)
 	{
-		if (pins[i] < 8)			// port D
-		{
-			_bitmask[i] = 1 << pins[i];
-			_portDMask |= _bitmask[i];
-			_register[i] = &PIND;
-		}
-		else if (pins[i] < 14)		// port B
-		{
-			_bitmask[i] = 1 << (pins[i] - 8);
-			_portBMask |= _bitmask[i];
-			_register[i] = &PINB;
-		}
-		else if (pins[i] < 20)		// port C
-		{
-			_bitmask[i] = 1 << (pins[i] - 14);
-			_portCMask |= _bitmask[i];
-			_register[i] = &PINC;
-		}
+		struct IOStruct sensorIO;
+		OrangutanDigital::getIORegisters(&sensorIO, pins[i]);
+		_bitmask[i] = sensorIO.bitmask;
+		_register[i] = sensorIO.pinRegister;
+        #ifdef _ORANGUTAN_XX4
+		if (sensorIO.pinRegister == &PINA) { _portAMask |= sensorIO.bitmask; }
+		#endif
+		if (sensorIO.pinRegister == &PINB) { _portBMask |= sensorIO.bitmask; }
+		if (sensorIO.pinRegister == &PINC) { _portCMask |= sensorIO.bitmask; }
+		if (sensorIO.pinRegister == &PIND) { _portDMask |= sensorIO.bitmask; }
 	}
 }
 
@@ -565,6 +554,9 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	unsigned char delta_time;
 	unsigned int time = 0;
 
+	#ifdef _ORANGUTAN_XX4
+	unsigned char last_a = _portAMask;
+    #endif
 	unsigned char last_b = _portBMask;
 	unsigned char last_c = _portCMask;
 	unsigned char last_d = _portDMask;
@@ -572,13 +564,19 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	// reset the values
 	for(i = 0; i < _numSensors; i++)
 		sensor_values[i] = 0;
-	
+		
 	// set all sensor pins to outputs
+	#ifdef _ORANGUTAN_XX4
+	DDRA |= _portAMask;
+	#endif
 	DDRB |= _portBMask;
 	DDRC |= _portCMask;
 	DDRD |= _portDMask;
 	
 	// drive high for 10 us
+	#ifdef _ORANGUTAN_XX4
+	PORTA |= _portAMask;
+	#endif
 	PORTB |= _portBMask;
 	PORTC |= _portCMask;
 	PORTD |= _portDMask;
@@ -586,11 +584,17 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 	delayMicroseconds(10);
 	
 	// set all ports to inputs
+	#ifdef _ORANGUTAN_XX4
+	DDRA &= ~_portAMask;
+	#endif
 	DDRB &= ~_portBMask;
 	DDRC &= ~_portCMask;
 	DDRD &= ~_portDMask;
 	
 	// turn off pull ups
+    #ifdef _ORANGUTAN_XX4
+	PORTA &= ~_portBMask;
+	#endif
 	PORTB &= ~_portBMask;
 	PORTC &= ~_portCMask;
 	PORTD &= ~_portDMask;
@@ -612,10 +616,16 @@ void PololuQTRSensorsRC::readPrivate(unsigned int *sensor_values)
 		last_time += delta_time;
 
 		// continue immediately if there is no change
-		if (PINB == last_b && PINC == last_c && PIND == last_d)
-			continue;
+        #ifdef _ORANGUTAN_XX4
+		if (PINA == last_a && PINB == last_b && PINC == last_c && PIND == last_d) continue;
+		#else
+		if (PINB == last_b && PINC == last_c && PIND == last_d) continue;
+        #endif
 
 		// save the last observed values
+		#ifdef _ORANGUTAN_XX4
+		last_a = PINA;
+		#endif
 		last_b = PINB;
 		last_c = PINC;
 		last_d = PIND;
@@ -649,9 +659,10 @@ PololuQTRSensorsAnalog::PololuQTRSensorsAnalog(unsigned char* analogPins,
 // the array 'pins' contains the Arduino analog pin assignment for each
 // sensor.  For example, if pins is {0, 1, 7}, sensor 1 is on
 // Arduino analog input 0, sensor 2 is on Arduino analog input 1,
-// and sensor 3 is on Arduino analog input 7.  The ATmega168 has 8
+// and sensor 3 is on Arduino analog input 7.  The ATmega168/328 has 8
 // total analog input channels (0 - 7) that correspond to port C
-// pins PC0 - PC7.
+// pins PC0 - PC7.  The ATmega324/644/1284 has 8 total analog input
+// channels (0-7) that correspond to port A pina PA0 - PA7.
 
 // 'numSensors' specifies the length of the 'analogPins' array (i.e. the
 // number of QTR-A sensors you are using).  numSensors must be 
@@ -684,13 +695,17 @@ void PololuQTRSensorsAnalog::init(unsigned char* analogPins,
 	PololuQTRSensors::init(numSensors, emitterPin, QTR_A);
 	
 	_numSamplesPerSensor = numSamplesPerSensor;
-	_portCMask = 0;
+	_portMask = 0;
 	for (i = 0; i < _numSensors; i++)
 	{
 		_analogPins[i] = analogPins[i];
-		if (analogPins[i] <= 5)	// no need to mask for dedicated analog inputs
-			_portCMask |= (1 << analogPins[i]);
+    	_portMask |= (1 << analogPins[i]);
 	}
+
+	#ifndef _ORANGUTAN_XX4
+	// no need to mask for dedicated analog inputs ADC6 and ADC7
+	_portMask &= 0x3F;
+	#endif
 
 	_maxValue = 1023; // this is the maximum returned by the A/D conversion
 }
@@ -711,8 +726,8 @@ void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
 	// store current state of various registers
 	unsigned char admux = ADMUX;
 	unsigned char adcsra = ADCSRA;
-	unsigned char ddrc = DDRC;
-	unsigned char portc = PORTC;
+	unsigned char ddr = ANALOG_DDR;
+	unsigned char port = ANALOG_PORT;
 
 	// wait for any current conversion to finish
 	while (ADCSRA & (1 << ADSC));
@@ -722,15 +737,15 @@ void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
 		sensor_values[i] = 0;
 
 	// set all sensor pins to high-Z inputs
-	DDRC &= ~_portCMask;
-	PORTC &= ~_portCMask;
-	
+	ANALOG_DDR &= ~_portMask;
+	ANALOG_PORT &= ~_portMask;
+
 	ADCSRA = 0x87;	// configure the ADC
 	for (j = 0; j < _numSamplesPerSensor; j++)
 	{
 		for (i = 0; i < _numSensors; i++)
 		{
-			ADMUX = _analogPins[i];			// set analog input channel
+			ADMUX = (1<<6) | _analogPins[i];// set analog input channel
 			ADCSRA |= 1 << ADSC;			// start the conversion
 			while (ADCSRA & (1 << ADSC));	// wait for conversion to finish
 			sensor_values[i] += ADC;		// add in the conversion result
@@ -744,8 +759,8 @@ void PololuQTRSensorsAnalog::readPrivate(unsigned int *sensor_values)
 
 	ADMUX = admux;
 	ADCSRA = adcsra;
-	PORTC = portc;
-	DDRC = ddrc;
+	ANALOG_PORT = port;
+	ANALOG_DDR = ddr;
 }
 
 // the destructor frees up allocated memory
