@@ -44,22 +44,8 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 
-// Structure for storing pulse input data.  The values are updated as needed
-// by the pin-change ISR.
-// Used internally.
-struct PulseInputStructInternal
-{
-	volatile unsigned char* pinRegister;
-	unsigned char bitmask;
-	volatile unsigned long lastPCTime;
-	volatile unsigned char inputState;
-	volatile unsigned long lastHighPulse;
-	volatile unsigned long lastLowPulse;
-	volatile unsigned char newPulse;
-};
 
-
-struct PulseInputStructInternal *pis;
+struct PulseInputStruct *pis;
 unsigned char numPulsePins;
 
 extern volatile unsigned long tickCount;
@@ -205,7 +191,7 @@ unsigned char OrangutanPulseIn::start(const unsigned char *pulsePins, unsigned c
 	numPulsePins = numPins;
 
 	freePulseMemory();
-	pis = (struct PulseInputStructInternal*)malloc(sizeof(struct PulseInputStructInternal)*numPins);
+	pis = (struct PulseInputStruct*)malloc(sizeof(struct PulseInputStruct)*numPins);
 	if (pis == 0)
 		return 1;
 		
@@ -270,17 +256,13 @@ void OrangutanPulseIn::getPulseInfo(unsigned char idx, struct PulseInputStruct* 
 {
 	if (idx >= numPulsePins)
 		return;
-	
+		
 	unsigned char origPCICR = PCICR;
 	PCICR = 0;				// disable pin-change interrupts
-
-	pulseInfo->inputState = pis[idx].inputState;	
-	pulseInfo->newPulse = pis[idx].newPulse;
+	
+	*pulseInfo = pis[idx];
 	pis[idx].newPulse = 0;
-	pulseInfo->lastPCTime = pis[idx].lastPCTime;
-	pulseInfo->lastHighPulse = pis[idx].lastHighPulse;
-	pulseInfo->lastLowPulse = pis[idx].lastLowPulse;
-
+	
 	PCICR = origPCICR;		// re-enable pin-change interrupts
 }
 
@@ -311,13 +293,13 @@ unsigned long OrangutanPulseIn::getLastHighPulse(unsigned char idx)
 {
 	unsigned long val = 0;
 
-	unsigned char origPCICR = PCICR;
-	PCICR = 0;				// disable pin-change interrupts
-
-	val = pis[idx].lastHighPulse;
-	pis[idx].newPulse &= ~HIGH_PULSE;
-
-	PCICR = origPCICR;		// re-enable pin-change interrupts
+	// make sure we get a good reading of the last high pulse
+	// without disabling interrupts
+	do
+	{
+		val = pis[idx].lastHighPulse;
+	}
+	while (val != pis[idx].lastHighPulse);
 	
 	return val;
 }
@@ -326,13 +308,13 @@ unsigned long OrangutanPulseIn::getLastLowPulse(unsigned char idx)
 {
 	unsigned long val = 0;
 
-	unsigned char origPCICR = PCICR;
-	PCICR = 0;				// disable pin-change interrupts
-
-	val = pis[idx].lastLowPulse;
-	pis[idx].newPulse &= ~LOW_PULSE;
-
-	PCICR = origPCICR;		// re-enable pin-change interrupts
+	// make sure we get a good reading of the last high pulse
+	// without disabling interrupts
+	do
+	{
+		val = pis[idx].lastLowPulse;
+	}
+	while (val != pis[idx].lastLowPulse);
 	
 	return val;
 }
