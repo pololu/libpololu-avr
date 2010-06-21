@@ -24,7 +24,7 @@ void test_lcd()
   lcd_goto_xy(7,1);
   print_character('7');
 
-  lcd_goto_xy(8,0);
+  lcd_goto_xy(7,0);
   lcd_show_cursor(CURSOR_BLINKING);
 
   wait_for_button(ALL_BUTTONS);

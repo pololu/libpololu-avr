@@ -20,7 +20,7 @@ clean:
 	rm -f *.o *.hex *.obj *.hex
 
 program-168: test.168.hex
-	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:test.168.hex
+	$(AVRDUDE) -p m328p -c avrisp2 -P $(PORT) -U flash:w:test.168.hex
 
 # $< = prerequisite
 # $@ = target

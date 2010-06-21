@@ -104,7 +104,7 @@ In Linux, the avr-gcc files are probably located in
   /usr/avr
 
 (Note: if you are using Linux and the avr-gcc files are in /usr/avr,
-you can install the library simple by unpacking this archive and
+you can install the library simply by unpacking this archive and
 typing "sudo make install" from within the directory that is created.)
 
 If you currently have an older version of the Pololu AVR Library, your
