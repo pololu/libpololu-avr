@@ -1,6 +1,14 @@
 # NOTE: to compile with avr-gcc less than verson 4.2.3, you must
 # remove the atmega328p from the list of target devices below:
-devices := atmega48 atmega168 atmega328p atmega324p atmega644p atmega1284p
+devices := atmega48 atmega168 atmega328p atmega324p atmega644p atmega1284p atmega1284p_x2
+mcu_atmega48 := atmega48
+mcu_atmega168 := atmega168
+mcu_atmega328p := atmega32p
+mcu_atmega324p := atmega324p
+mcu_atmega644p := atmega644p
+mcu_atmega1284p := atmega1284p
+mcu_atmega1284p_x2 := atmega1284p
+device_specific_cflags_atmega1284p_x2 := -D_X2_1284
 
 LIBRARY_OBJECTS=\
 	OrangutanAnalog \
@@ -148,6 +156,7 @@ examples_atmega328p := $(examples_atmega48) $(examples_3pi) $(examples_orangutan
 examples_atmega324p := $(examples_atmega48) $(examples_orangutan) $(examples_svp)
 examples_atmega644p := $(examples_atmega48) $(examples_orangutan) $(examples_x2)
 examples_atmega1284p := $(examples_atmega324p)
+examples_atmega1284p_x2 := $(examples_atmega644p)
 
 example_template = examples_templates/$(example)
 example_dir = examples/$(device)/$(example)
@@ -157,8 +166,11 @@ make_example = $(foreach example,$(value examples_$(device)), \
 		mkdir -p $(example_dir) && \
 		cp -a $(example_template)/*.[ch] $(example_dir)/ && \
 		cat examples_templates/template_$(device).mk $(example_template)/Makefile > $(example_dir)/Makefile && \
-		cat $(example_template)/*.aps | sed 's/<PART>[^<]*<\/PART>/<PART>$(device)<\/PART>/' \
-			| sed 's/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$(device).a<\/LIB>/' > $(example_dir)/$(example).aps && \
+		cat $(example_template)/*.aps \
+			| sed 's/<PART>[^<]*<\/PART>/<PART>$(mcu_$(device))<\/PART>/' \
+			| sed 's/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$(device).a<\/LIB>/' \
+			| sed 's/<OPTIONSFORALL>/<OPTIONSFORALL>$(device_specific_cflags_$(device)) /' \
+			> $(example_dir)/$(example).aps && \
 		)
 
 .PHONY: examples

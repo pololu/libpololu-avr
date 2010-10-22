@@ -1,12 +1,13 @@
 DEVICE ?= atmega168
+MCU ?= atmega168
 AVRDUDE_DEVICE ?= m168
 
-CFLAGS=-g -Wall -mcall-prologues -mmcu=$(DEVICE) -Os
+CFLAGS=-g -Wall -mcall-prologues -mmcu=$(MCU) $(DEVICE_SPECIFIC_CFLAGS) -Os
 CC=avr-gcc
 OBJ2HEX=avr-objcopy 
 LDFLAGS=-Wl,-gc-sections -lpololu_$(DEVICE) -Wl,-relax
 
-PORT ?= /dev/ttyUSB0
+PORT ?= /dev/ttyACM0
 AVRDUDE=avrdude
 TARGET=test
 OBJECT_FILES=test.o

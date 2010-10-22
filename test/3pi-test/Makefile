@@ -6,7 +6,7 @@ LDFLAGS=-Wl,-gc-sections -lpololu_atmega328p
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_flt -lm
 #LDFLAGS := $(LDFLAGS) -Wl,-u,vfprintf -lprintf_min
 
-PORT=/dev/ttyUSB0
+PORT=/dev/ttyACM0
 AVRDUDE=avrdude
 TARGET=test
 OBJECT_FILES=test.o qtr.o assert.o motors.o pot.o battery.o pushbuttons.o outputs.o leds.o lcd.o demo.o

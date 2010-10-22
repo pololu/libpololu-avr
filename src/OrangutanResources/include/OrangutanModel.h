@@ -2,10 +2,10 @@
   OrangutanModel.h - Header file for determining which Orangutan model is
     being used.
 
-	This header file tests for the __AVR_ATmega* macros, and uses that
-	to define the _ORANGUTAN_* macros, which are used when compiliing
-	the library to compile different code for the different Orangutan
-	models.
+	This header file tests for the __AVR_ATmega* macros and the
+        _X2_1284 macro, and uses those to define the _ORANGUTAN_* macros,
+        which are used when compiliing the library to compile different code
+        for the different Orangutan models.
 
 	This file is part of the internal implementation of the library; we
 	do not recommend using the macros defined here in your code, because
@@ -15,8 +15,8 @@
 */
 
 /*
- * Written by David Grayson, Sep 22, 2009.
- * Copyright (c) 2009 Pololu Corporation. For more information, see
+ * Written by David Grayson, Oct 21, 2010.
+ * Copyright (c) 2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -37,10 +37,10 @@
 #undef _ORANGUTAN_SVP  // Orangutan SVP-324 or 1284
 #undef _ORANGUTAN_XX4  // Either the X2, SVP-324, or SVP-1284.
 
-#if defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega1284PA__)
- #define _ORANGUTAN_SVP
-#elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__)
+#if defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) || defined(_X2_1284)
  #define _ORANGUTAN_X2
+#elif defined(__AVR_ATmega324P__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega324PA__) || defined(__AVR_ATmega1284PA__)
+ #define _ORANGUTAN_SVP
 #endif
 
 #if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
