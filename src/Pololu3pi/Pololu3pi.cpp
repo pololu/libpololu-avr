@@ -4,7 +4,7 @@
 
 /*
  * Written by Paul Grayson, 2008.
- * Copyright (c) 2008 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -22,9 +22,6 @@
  */
  
 //#include <avr/io.h>
-#ifndef LIB_POLOLU
-#define ARDUINO
-#endif
 #include "Pololu3pi.h"
 
 #include "../PololuQTRSensors/PololuQTRSensors.h"

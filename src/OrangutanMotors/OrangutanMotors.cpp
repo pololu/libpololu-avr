@@ -9,7 +9,7 @@
 /*
  * Written by Ben Schmidel, May 15, 2008.
  * Last modified: September 29, 2008
- * Copyright (c) 2008 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -56,7 +56,7 @@
 #endif
 
 
-#if !defined (LIB_POLOLU) && (defined (__AVR_ATmega48__) || defined (__AVR_ATmega168__) || defined (__AVR_ATmega328P__))
+#ifdef ARDUINO
 // This code is for people using the Arduino IDE (it lets the millis() function keep working)
 // It will conflict with OrangutanTime, so Arduino IDE users cannot use OrangutanTime and
 // OrangutanMotors.

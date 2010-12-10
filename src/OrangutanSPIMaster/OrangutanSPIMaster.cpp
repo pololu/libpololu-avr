@@ -5,7 +5,7 @@
 
 /*
  * Written by David Grayson, Sep 2, 2009.
- * Copyright (c) 2009 Pololu Corporation. For more information, see
+ * Copyright (c) 2009-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com

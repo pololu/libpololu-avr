@@ -15,8 +15,6 @@
  * http://forum.pololu.com
  */
 
-unsigned long prevMillis = 0;
-
 int main()
 {
   while(1)

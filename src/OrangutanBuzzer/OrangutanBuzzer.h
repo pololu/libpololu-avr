@@ -11,7 +11,7 @@
 
 /*
  * Written by Ben Schmidel et al., May 23, 2008.
- * Copyright (c) 2008 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -64,7 +64,10 @@
 #define B(x)			(11 + (x)*12)
 
 // special notes
+#ifndef ARDUINO
+// this conflicts with A4 defined to mean an analog pin in Arduino's WProgram.h
 #define A4				A(4)			// center of the Equal-Tempered Scale
+#endif
 #define SILENT_NOTE		0xFF			// this note will silence the buzzer
 
 #define DIV_BY_10		(1 << 15)		// frequency bit that indicates Hz/10

@@ -4,7 +4,7 @@
 
 /*
  * Written by Paul Grayson, 2008.
- * Copyright (c) 2008 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -22,11 +22,6 @@
  */
 
 #include "OrangutanResources.h"
-
-
-unsigned char buzzerInitialized = 0;
-volatile unsigned char buzzerFinished = 1;	// flag: 0 while playing
-const char *buzzerSequence = 0;
 
 
 #ifdef LIB_POLOLU

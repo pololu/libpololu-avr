@@ -1,6 +1,6 @@
 Arduino Library for the Pololu QTR Sensor
 
-Copyright (c) 2008 Pololu Corporation. For more information, see
+Copyright (c) 2008-2010 Pololu Corporation. For more information, see
 
 http://www.pololu.com/docs/0J19
 http://www.pololu.com

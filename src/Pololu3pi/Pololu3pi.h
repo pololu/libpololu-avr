@@ -4,7 +4,7 @@
 
 /*
  * Written by Paul Grayson, 2008.
- * Copyright (c) 2008 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -25,7 +25,7 @@
 #define Pololu3pi_h
 
 #ifndef LIB_POLOLU
-#ifdef NOT_ARDUINO
+#ifndef ARDUINO
 
 #include <pololu/OrangutanAnalog.h>
 #include <pololu/OrangutanBuzzer.h>

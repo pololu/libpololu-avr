@@ -1,11 +1,9 @@
 /*
   OrangutanLCD.h - Library for using the LCD on the Orangutan LV, SV, SVP, X2, or 3pi robot.
-  This library incorporates some code originally written by Tom Benedict as part of Orangutan-Lib.
-  Released into the public domain.
 */
 
 /*
- * Copyright (c) 2008 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -20,6 +18,9 @@
  * Disclaimer: To the extent permitted by law, Pololu provides this work
  * without any warranty.  It might be defective, in which case you agree
  * to be responsible for all resulting costs and damages.
+ *
+ * This library incorporates some code originally written by Tom Benedict
+ * as part of Orangutan-Lib and released into the public domain.
  */
  
 #ifndef OrangutanLCD_h
