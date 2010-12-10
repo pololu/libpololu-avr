@@ -87,7 +87,6 @@
 
 #endif
 
-
 #ifdef __cplusplus
 
 class OrangutanBuzzer
@@ -232,22 +231,25 @@ class OrangutanBuzzer
 	static void init();
 };
 
-#else
+extern "C" {
+#endif // __cplusplus
 
-void buzzer_init();
+void buzzer_init(void);
 void play_frequency(unsigned int freq, unsigned int duration, 
 		       unsigned char volume);
 void play_note(unsigned char note, unsigned int duration,
 		  unsigned char volume);
 void play(const char *sequence);
 void play_from_program_space(const char *sequence);
-unsigned char is_playing();
-void stop_playing();
+unsigned char is_playing(void);
+void stop_playing(void);
 
-unsigned char play_check();
-void play_mode(char on);
+unsigned char play_check(void);
+void play_mode(unsigned char mode);
 
-#endif // __cplusplus
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

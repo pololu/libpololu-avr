@@ -54,7 +54,8 @@ class OrangutanSPIMaster
     static unsigned char transmitAndDelay(unsigned char data, unsigned char post_delay_us);
 };
 
-#else
+extern "C" {
+#endif // __cplusplus
 
 // C Function Declarations
 
@@ -62,6 +63,8 @@ void spi_master_init(unsigned char speed_divider, unsigned char options);
 unsigned char spi_master_transmit(unsigned char data);
 unsigned char spi_master_transmit_and_delay(unsigned char data, unsigned char post_delay_us);
 
+#ifdef __cplusplus
+}
 #endif
 
 #endif

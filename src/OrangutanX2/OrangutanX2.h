@@ -215,8 +215,6 @@
 // there is room in EEPROM for 159 notes, distributed in any way amongst the
 // eight melodies.  The mega168's EEPROM is 512 bytes in size.
 
-
-
 #ifdef __cplusplus
 
 // C++ Function Declarations
@@ -308,13 +306,14 @@ class OrangutanX2
 	static unsigned char readSerialByte();
 };
 
-#else
+extern "C" {
+#endif // __cplusplus
 
 // C Function Declarations
 
 void x2_get_firmware_version(unsigned char *vmajor, unsigned char *vminor);
-unsigned char x2_get_status();
-void x2_restore_default_settings();
+unsigned char x2_get_status(void);
+void x2_restore_default_settings(void);
 void x2_save_avrisp_version(unsigned char vmajor, unsigned char vminor);
 void x2_save_eeprom_byte(unsigned int address, unsigned char data);
 void x2_save_parameter(unsigned int param_address, unsigned char param_value);
@@ -333,7 +332,7 @@ unsigned char x2_get_motor_current(unsigned char motor);
 
 void x2_play_note(unsigned char note, unsigned int duration);
 void x2_play_frequency(unsigned int frequency, unsigned int duration);
-void x2_buzzer_off();
+void x2_buzzer_off(void);
 void x2_set_volume(unsigned char volume, unsigned char save);
 void x2_set_note_gap(unsigned char note_gap, unsigned char save);
 
@@ -341,13 +340,15 @@ void x2_set_serial(unsigned char parity, unsigned char stop_bits, unsigned char 
 	unsigned int baud_ubrr, unsigned char save);
 void x2_enable_permanent_programming_mode(unsigned char save);
 void x2_set_read_ready_size(unsigned char rrsize, unsigned char save);
-unsigned char x2_get_tx_buffer_space();
-unsigned char x2_get_num_rx_bytes();
-unsigned char x2_get_serial_error();
+unsigned char x2_get_tx_buffer_space(void);
+unsigned char x2_get_num_rx_bytes(void);
+unsigned char x2_get_serial_error(void);
 unsigned char x2_send_serial_byte_if_ready(unsigned char data);
-unsigned char x2_read_serial_byte();
+unsigned char x2_read_serial_byte(void);
 
-#endif // _cplusplus
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _ORANGUTAN_X2
 

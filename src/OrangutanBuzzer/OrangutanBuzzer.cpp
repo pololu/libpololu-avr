@@ -122,7 +122,7 @@ extern "C" void play(const char *sequence)
 	OrangutanBuzzer::play(sequence);
 }
 
-extern "C" void play_from_program_space(char *sequence_p)
+extern "C" void play_from_program_space(const char *sequence_p)
 {
 	OrangutanBuzzer::playFromProgramSpace(sequence_p);
 }

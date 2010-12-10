@@ -43,6 +43,7 @@
 #define GREEN_LED		IO_D7
 #endif
 
+#ifdef __cplusplus
 
 class OrangutanLEDs
 {
@@ -109,8 +110,76 @@ class OrangutanLEDs
 	{
 		OrangutanDigital::setOutput(YELLOW_LED, on);
 	}
-#endif //_ORANGUTAN_X2
+#endif // _ORANGUTAN_X2
 };
+
+extern "C" {
+#endif // __cplusplus
+
+// turns the target LED off if 'on' is zero, else this method
+// turns the LED on.  Note that the Baby Orangutan B only has
+// one LED (the red one), so green() will just drive I/O line PD7
+// high or low, depending on the argument.
+static inline void red_led(unsigned char on)
+{
+	#if defined (_ORANGUTAN_SVP)	// red LED turns on when driven low
+	if (on == TOGGLE)
+		set_digital_output(RED_LED, TOGGLE);
+	else if (on == LOW)
+		set_digital_output(RED_LED, HIGH);
+	else
+		set_digital_output(RED_LED, LOW);
+	#else					// else red LED turns on when driven high
+	set_digital_output(RED_LED, on);
+	#endif
+}
+	
+static inline void green_led(unsigned char on)
+{
+	set_digital_output(GREEN_LED, on);
+}
+
+static inline void left_led(unsigned char on)
+{
+	#ifdef _ORANGUTAN_SVP
+	green_led(on);
+	#else
+	red_led(on);
+	#endif
+}
+
+static inline void right_led(unsigned char on)
+{
+	#ifdef _ORANGUTAN_SVP
+	red_led(on);
+	#else
+	green_led(on);
+	#endif
+}
+
+#ifdef _ORANGUTAN_X2
+// functions for controlling the additional LED red, green, and yellow
+// LEDs on the Orangutan X2
+static inline void red_led2(unsigned char on)
+{
+	set_digital_output(RED_LED2, on);
+}
+
+static inline void green_led2(unsigned char on)
+{
+	set_digital_output(GREEN_LED2, on);
+}
+
+static inline void yellow_led(unsigned char on)
+{
+	set_digital_output(YELLOW_LED, on);
+}
+#endif //_ORANGUTAN_X2
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

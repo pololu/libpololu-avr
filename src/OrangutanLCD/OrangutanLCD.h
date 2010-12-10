@@ -26,6 +26,7 @@
 #ifndef OrangutanLCD_h
 #define OrangutanLCD_h
 
+#include <avr/pgmspace.h>
 #include <avr/io.h>
 #include "../OrangutanResources/include/OrangutanModel.h"
 
@@ -149,8 +150,6 @@
 
 #endif
 
-
-
 // Commands
 
 #define LCD_CLEAR		0x01
@@ -162,7 +161,7 @@
 #define LCD_SHIFT_L		0x18
 #define LCD_SHIFT_R		0x1C
 
-
+#ifdef __cplusplus
 
 class OrangutanLCD
 {
@@ -322,6 +321,32 @@ class OrangutanLCD
 	// your current cursor location.
 	static void printHexNibble(unsigned char nibble);
 };
+
+extern "C" {
+#endif // __cplusplus
+
+void lcd_init_printf(void);
+void lcd_init_printf_with_dimensions(unsigned char width, unsigned char height);
+void clear(void);
+void print(const char *str);
+void print_from_program_space(const char *str);
+void print_character(char c);
+void print_long(long value);
+void print_unsigned_long(unsigned long value);
+void print_binary(unsigned char value);
+void print_hex(unsigned int value);
+void print_hex_byte(unsigned char value);
+void lcd_goto_xy(unsigned char col, unsigned char row);
+void lcd_show_cursor(unsigned char cursorType);
+void lcd_hide_cursor(void);
+void lcd_move_cursor(unsigned char direction, unsigned char num);
+void lcd_scroll(unsigned char direction, unsigned char num, 
+		unsigned int delay_time);
+void lcd_load_custom_character(const char *picture, unsigned char number);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

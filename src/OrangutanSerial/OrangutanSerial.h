@@ -192,10 +192,11 @@ class OrangutanSerial
 	static inline void serial_rx_handle_byte(unsigned char port, unsigned char byte_received);
 };
 
-#else
+extern "C" {
+#endif //__cplusplus
 
 // C Function declarations.
-void serial_check();
+void serial_check(void);
 
 #if _SERIAL_PORTS > 1
 void serial_set_baud_rate(unsigned char port, unsigned long baud);
@@ -214,20 +215,21 @@ char serial_send_buffer_empty(unsigned char port);
 #else
 void serial_set_baud_rate(unsigned long baud);
 void serial_set_mode(unsigned char mode);
-unsigned char serial_get_mode();
+unsigned char serial_get_mode(void);
 void serial_receive(char *buffer, unsigned char size);
-void serial_cancel_receive();
+void serial_cancel_receive(void);
 char serial_receive_blocking(char *buffer, unsigned char size, unsigned int timeout);
 void serial_receive_ring(char *buffer, unsigned char size);
-unsigned char serial_get_received_bytes();
-char serial_receive_buffer_full();
+unsigned char serial_get_received_bytes(void);
+char serial_receive_buffer_full(void);
 void serial_send(char *buffer, unsigned char size);
 void serial_send_blocking(char *buffer, unsigned char size);
-unsigned char serial_get_sent_bytes();
-char serial_send_buffer_empty();
+unsigned char serial_get_sent_bytes(void);
+char serial_send_buffer_empty(void);
 #endif
 
-// __cplusplus
+#ifdef __cplusplus
+}
 #endif
 
 //OrangutanSerial_h

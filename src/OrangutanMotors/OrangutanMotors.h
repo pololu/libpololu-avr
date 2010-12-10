@@ -25,6 +25,7 @@
 #ifndef OrangutanMotors_h
 #define OrangutanMotors_h
 
+#ifdef __cplusplus
 
 class OrangutanMotors
 {
@@ -57,6 +58,18 @@ class OrangutanMotors
 	// initializes timers 0 and 2 for proper PWM generation
 	static void init2();
 };
+
+extern "C" {
+#endif // __cplusplus
+
+void motors_init(void);
+void set_m1_speed(int speed);
+void set_m2_speed(int speed);
+void set_motors(int m1, int m2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

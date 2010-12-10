@@ -88,29 +88,32 @@ class OrangutanSVP
 	static SVPStatus getStatus();
 };
 
-#else
+extern "C" {
+#endif // __cplusplus
 
 // C Function Declarations
 
 void svp_set_mode(unsigned char mode);
 
-unsigned char svp_get_firmware_version();
+unsigned char svp_get_firmware_version(void);
 
-SVPStatus svp_get_status();
-static inline unsigned char usb_power_present(){ return svp_get_status().usbPowerPresent; }
-static inline unsigned char usb_configured(){ return svp_get_status().usbConfigured; }
-static inline unsigned char usb_suspend(){ return svp_get_status().usbSuspend; }
-static inline unsigned char dtr_enabled(){ return svp_get_status().dtrEnabled; }
-static inline unsigned char rts_enabled(){ return svp_get_status().rtsEnabled; }
+SVPStatus svp_get_status(void);
+static inline unsigned char usb_power_present(void) { return svp_get_status().usbPowerPresent; }
+static inline unsigned char usb_configured(void) { return svp_get_status().usbConfigured; }
+static inline unsigned char usb_suspend(void) { return svp_get_status().usbSuspend; }
+static inline unsigned char dtr_enabled(void) { return svp_get_status().dtrEnabled; }
+static inline unsigned char rts_enabled(void) { return svp_get_status().rtsEnabled; }
 
 // Encoder Functions
-int svp_get_counts_ab();
-int svp_get_counts_and_reset_ab();
-int svp_get_counts_cd();
-int svp_get_counts_and_reset_cd();
-unsigned char svp_check_error_ab();
-unsigned char svp_check_error_cd();
+int svp_get_counts_ab(void);
+int svp_get_counts_and_reset_ab(void);
+int svp_get_counts_cd(void);
+int svp_get_counts_and_reset_cd(void);
+unsigned char svp_check_error_ab(void);
+unsigned char svp_check_error_cd(void);
 
+#ifdef __cplusplus
+}
 #endif
 
 // endif 324 or 1284

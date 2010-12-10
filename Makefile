@@ -37,9 +37,9 @@ SHELL = sh
 # See WinAVR bug 1932584, "recursive make call fails"
 .PHONY: library_files
 library_files:
-	echo making library files
-	echo $(SHELL)
-	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) ; cd ../.. ;)
+	@echo making library files
+	@echo $(SHELL)
+	$(foreach device,$(devices),cd devices/$(device) && $(MAKE) && cd ../.. &&) echo -n
 
 # Change the path to allow make within sh to work: see WinAVR bug 1915456 "make ignores parameters when executed from sh"
 PATH := $(shell echo $$PATH | sed 's/\(WinAVR-[0-9]*\)\/bin/\\1\/utils\/bin/g'):$(PATH)
@@ -50,8 +50,8 @@ SHELL=sh
 
 .PHONY: clean
 clean:
-	echo $(SHELL)
-	$(foreach device,$(devices),cd devices/$(device) ; $(MAKE) clean ; cd ../.. ;)
+	@echo $(SHELL)
+	$(foreach device,$(devices),cd devices/$(device) && $(MAKE) clean && cd ../.. &&) echo -n
 	if [ -e examples_templates -a -e examples ]; then \
 		for dir in examples/*/*; \
 		do \

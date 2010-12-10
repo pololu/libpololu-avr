@@ -23,6 +23,8 @@
 #ifndef PololuWheelEncoders_h
 #define PololuWheelEncoders_h
 
+#ifdef __cplusplus
+
 class PololuWheelEncoders
 {
   public:
@@ -78,8 +80,20 @@ class PololuWheelEncoders
 	static unsigned char checkErrorM2();
 };
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+extern "C" {
+#endif // __cplusplus
+
+void encoders_init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b);
+int encoders_get_counts_m1(void);
+int encoders_get_counts_m2(void);
+int encoders_get_counts_and_reset_m1(void);
+int encoders_get_counts_and_reset_m2(void);
+int encoders_check_error_m1(void);
+int encoders_check_error_m2(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

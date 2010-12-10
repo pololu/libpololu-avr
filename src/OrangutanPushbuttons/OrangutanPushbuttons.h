@@ -80,7 +80,6 @@
 #define ALL_BUTTONS		(TOP_BUTTON | MIDDLE_BUTTON | BOTTOM_BUTTON)
 #define ANY_BUTTON		ALL_BUTTONS
 
-
 #ifdef __cplusplus
 
 class OrangutanPushbuttons
@@ -126,9 +125,10 @@ class OrangutanPushbuttons
 	static void init2();
 };
 
-#else
+extern "C" {
+#endif	// __cplusplus
 
-void buttons_init();
+void buttons_init(void);
 unsigned char wait_for_button_press(unsigned char buttons);
 unsigned char wait_for_button_release(unsigned char buttons);
 unsigned char wait_for_button(unsigned char buttons);
@@ -136,7 +136,9 @@ unsigned char button_is_pressed(unsigned char buttons);
 unsigned char get_single_debounced_button_press(unsigned char buttons);
 unsigned char get_single_debounced_button_release(unsigned char buttons);
 
-#endif	// __cplusplus
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

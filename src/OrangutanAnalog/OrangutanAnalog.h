@@ -23,15 +23,16 @@
  * to be responsible for all resulting costs and damages.
  */
 
-
 #ifndef OrangutanAnalog_h
 #define OrangutanAnalog_h
 
 #include <avr/io.h>
 #include "../OrangutanResources/include/OrangutanModel.h"
 
+#ifdef __cplusplus
 #ifdef _ORANGUTAN_SVP
 #include "../OrangutanSVP/OrangutanSVP.h"
+#endif
 #endif
 
 #define MODE_8_BIT		1
@@ -53,6 +54,8 @@
 #define TEMP_SENSOR		6
 
 #endif
+
+#ifdef __cplusplus
 
 class OrangutanAnalog
 {
@@ -220,6 +223,72 @@ class OrangutanAnalog
 	
 #endif // _ORANGUTAN_SVP
 };
+
+extern "C" {
+#endif // __cplusplus
+
+static inline void set_analog_mode(unsigned char mode)
+{
+	if (mode == MODE_10_BIT)
+		ADMUX &= ~(1 << ADLAR);	// right-adjust result (ADC has result)
+	else
+		ADMUX |= 1 << ADLAR;		// left-adjust result (ADCH has result)	
+}
+static inline unsigned char get_analog_mode(void)
+{
+	return (ADMUX >> ADLAR) & 1;
+}
+unsigned int analog_read(unsigned char channel);
+unsigned int analog_read_millivolts(unsigned char channel);
+unsigned int analog_read_average(unsigned char channel, unsigned int samples);
+unsigned int analog_read_average_millivolts(unsigned char channel, unsigned int samples);
+void start_analog_conversion(unsigned char channel);
+static inline unsigned char analog_is_converting(void)
+{
+	return (ADCSRA >> ADSC) & 1;
+}
+unsigned int analog_conversion_result(void);
+unsigned int analog_conversion_result_millivolts(void);
+void set_millivolt_calibration(unsigned int calibration);
+unsigned int read_vcc_millivolts(void);
+unsigned int to_millivolts(unsigned int analog_result);
+unsigned int read_trimpot(void);
+unsigned int read_trimpot_millivolts(void);
+
+#ifdef _ORANGUTAN_SVP
+
+unsigned int read_battery_millivolts_svp(void);
+static inline unsigned int read_battery_millivolts(void)
+{
+  return read_battery_millivolts_svp();
+}
+
+#elif defined(_ORANGUTAN_X2)
+
+unsigned int read_battery_millivolts_x2(void);
+static inline unsigned int read_battery_millivolts(void)
+{
+  return read_battery_millivolts_x2();
+}
+
+#else
+
+int read_temperature_f(void);
+int read_temperature_c(void);
+
+unsigned int read_battery_millivolts_3pi(void);
+static inline unsigned int read_battery_millivolts(void)
+{
+  return read_battery_millivolts_3pi();
+}
+unsigned int read_battery_millivolts_sv(void);
+unsigned int read_battery_millivolts_sv168(void);
+
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // OrangutanAnalog_h
 

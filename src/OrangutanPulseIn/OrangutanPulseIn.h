@@ -60,7 +60,6 @@ struct PulseInputStruct
 	volatile unsigned char newPulse;
 };
 
-
 #ifdef __cplusplus
 
 class OrangutanPulseIn
@@ -111,7 +110,8 @@ class OrangutanPulseIn
 	static unsigned char newPulse(unsigned char idx, unsigned char state);
 };
 
-#else
+extern "C" {
+#endif // __cplusplus
 
 // use of pulse_in_init() is discouraged; use pulse_in_start() instead
 unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins);
@@ -123,9 +123,11 @@ unsigned long get_last_high_pulse(unsigned char idx);
 unsigned long get_last_low_pulse(unsigned char idx);
 void get_current_pulse_state(unsigned char idx, unsigned long* pulse_width, unsigned char* state);
 unsigned long pulse_to_microseconds(unsigned long pulse);
-void pulse_in_stop();
+void pulse_in_stop(void);
 
-#endif // _cplusplus
+#ifdef __cplusplus
+}
+#endif
 
 #endif // OrangutanPulseIn_h
 

@@ -68,27 +68,30 @@ class OrangutanResources
 	}
 };
 
-#else
+extern "C" {
+#endif // __cplusplus
 
-int get_free_ram();
+int get_free_ram(void);
 
 // returns the register that contains latched flags indicating
 // previous reset sources.  Individual flags can be accessed by
 // ANDing the result with the x_RESET constants defined in this
 // file.  For example:
 // if (get_reset_flags() & WATCHDOG_RESET) ..
-static inline unsigned char get_reset_flags()
+static inline unsigned char get_reset_flags(void)
 {
 	return MCUSR;
 }
 
 // clear latched reset flags
-static inline void clear_reset_flags()
+static inline void clear_reset_flags(void)
 {
 	MCUSR = 0;
 }
 
-#endif // __cplusplus
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

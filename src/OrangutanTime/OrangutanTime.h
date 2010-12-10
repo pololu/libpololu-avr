@@ -25,6 +25,8 @@
 #ifndef OrangutanTime_h
 #define OrangutanTime_h
 
+#ifdef __cplusplus
+
 class OrangutanTime
 {
   public:
@@ -90,17 +92,39 @@ class OrangutanTime
 
 };
 
-#ifndef OrangutanTime_cpp
-// More convenient aliases for the static class functions.
-// These aliases are only accessible when the file is included from
-// another C++ file.
-inline unsigned long get_ms() { return OrangutanTime::ms(); }
-inline unsigned long millis() { return OrangutanTime::ms(); }
+extern "C" {
+#endif
 
-inline void delay(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
-inline void delay_ms(unsigned int milliseconds) { OrangutanTime::delayMilliseconds(milliseconds); }
-inline void delay_us(unsigned int microseconds) { OrangutanTime::delayMicroseconds(microseconds); }
-inline void delayMicroseconds(unsigned int microseconds) { OrangutanTime::delayMicroseconds(microseconds); }
+// these are defined in the .cpp file:
+unsigned long get_ticks(void);
+unsigned long ticks_to_microseconds(unsigned long ticks);
+unsigned long get_ms(void);
+void delay_ms(unsigned int milliseconds);
+void time_reset(void);
+
+// This is inline for efficiency:
+static inline void delay_us(unsigned int microseconds)
+{
+  __asm__ volatile (
+		    "1: push r22"     "\n\t"
+		    "   ldi  r22, 4"  "\n\t"
+		    "2: dec  r22"     "\n\t"
+		    "   brne 2b"      "\n\t"
+		    "   pop  r22"     "\n\t"   
+		    "   sbiw %0, 1"   "\n\t"
+		    "   brne 1b"
+		    : "=w" ( microseconds )  
+		    : "0" ( microseconds )
+		    );  
+}
+
+// These are alternative aliases:
+static inline void delay(unsigned int milliseconds) { delay_ms(milliseconds); }
+static inline unsigned long millis(void) { return get_ms(); }
+static inline void delayMicroseconds(unsigned int microseconds) { delay_us(microseconds); }
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

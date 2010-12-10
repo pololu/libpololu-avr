@@ -34,11 +34,15 @@
 #ifndef PololuQTRSensors_h
 #define PololuQTRSensors_h
 
+#ifdef __cplusplus
 #include "../OrangutanResources/include/OrangutanModel.h"
+#endif
 
 #define QTR_EMITTERS_OFF 0
 #define QTR_EMITTERS_ON 1
 #define QTR_EMITTERS_ON_AND_OFF 2
+
+#ifdef __cplusplus
 
 #define QTR_MAX_SENSORS 16
 
@@ -108,7 +112,7 @@ class PololuQTRSensors
 	// black, set the optional second argument white_line to true.  In
 	// this case, each sensor value will be replaced by (1000-value)
 	// before the averaging.
-	int readLine(unsigned int *sensor_values, unsigned char readMode = QTR_EMITTERS_ON, unsigned char white_line = 0);
+	unsigned int readLine(unsigned int *sensor_values, unsigned char readMode = QTR_EMITTERS_ON, unsigned char white_line = 0);
 
 	// Calibrated minumum and maximum values. These start at 1000 and
 	// 0, respectively, so that the very first sensor reading will
@@ -322,6 +326,30 @@ class PololuQTRSensorsAnalog : public PololuQTRSensors
 	unsigned char _portMask;
 };
 
+extern "C" {
+#endif // __cplusplus
+
+char qtr_rc_init(unsigned char* pins, unsigned char numSensors, 
+		 unsigned int timeout, unsigned char emitterPin);
+char qtr_analog_init(unsigned char* analogPins, unsigned char numSensors, 
+		     unsigned char numSamplesPerSensor, unsigned char emitterPin);
+void qtr_emitters_on(void);
+void qtr_emitters_off(void);
+void qtr_read(unsigned int *sensor_values, unsigned char readMode);
+void qtr_calibrate(unsigned char readMode);
+void qtr_reset_calibration(void);
+void qtr_read_calibrated(unsigned int *sensor_values, unsigned char readMode);
+unsigned int qtr_read_line(unsigned int *sensor_values, unsigned char readMode);
+unsigned int qtr_read_line_white(unsigned int *sensor_values, unsigned char readMode);
+
+unsigned int *qtr_calibrated_minimum_on(void);
+unsigned int *qtr_calibrated_maximum_on(void);
+unsigned int *qtr_calibrated_minimum_off(void);
+unsigned int *qtr_calibrated_maximum_off(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

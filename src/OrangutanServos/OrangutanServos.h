@@ -1,5 +1,5 @@
 /*
-  OrangutanServo.h - Library for generating servo control pulses with digital
+  OrangutanServos.h - Library for generating servo control pulses with digital
 	outputs on the Orangutan LV, SV, SVP, X2, Baby Orangutan B, or 3pi robot.  Note
 	that only the Orangutan SV and SVP can supply enough current to power servos
 	off of their regulated voltage.  All other devices can supply the control
@@ -34,9 +34,10 @@
  * to be responsible for all resulting costs and damages.
  */
 
-
 #ifndef OrangutanServos_h
 #define OrangutanServos_h
+
+#ifdef __cplusplus
 
 #include "../OrangutanDigital/OrangutanDigital.h"	// digital I/O routines
 
@@ -127,7 +128,7 @@ class OrangutanServos
 	static unsigned int getServoSpeed(unsigned char servoNum);
 	
 	
-		// get the current width of the pulse (in us) being supplied to the specified servo.
+	// get the current width of the pulse (in us) being supplied to the specified servo.
 	// This method does not rely on feedback from the servo, so if the servo
 	// is being restrained or overly torqued, it might not return the actual
 	// position of the servo.  If you have speed limiting enabled, you can
@@ -154,6 +155,67 @@ class OrangutanServos
 	// disable timer interrupt and stop generating pulses (leave lines driving low)
 	static void stop();
 };
+
+extern "C" {
+#endif // __cplusplus
+
+// use of servos_init() is discouraged; use servos_start() instead
+unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins) __attribute__ ((deprecated));
+
+// use of servos_init_extended() is discouraged; use servos_start_extended() instead
+unsigned char servos_init_extended(const unsigned char servoPins[], unsigned char numPins, 
+	const unsigned char servoPinsB[], unsigned char numPinsB) __attribute__ ((deprecated));
+
+unsigned char servos_start(const unsigned char servoPins[], unsigned char numPins);
+
+unsigned char servos_start_extended(const unsigned char servoPins[], unsigned char numPins, 
+	const unsigned char servoPinsB[], unsigned char numPinsB);
+
+unsigned int get_servo_position(unsigned char servoNum);
+
+void set_servo_target(unsigned char servoNum, unsigned int pos_us);
+
+unsigned int get_servo_target(unsigned char servoNum);
+
+void set_servo_speed(unsigned char servoNum, unsigned int speed);
+
+unsigned int get_servo_speed(unsigned char servoNum);
+
+unsigned int get_servo_positionB(unsigned char servoNum);
+static inline unsigned int get_servo_position_b(unsigned char servoNum)
+{
+	return get_servo_position_b(servoNum);
+}
+
+void set_servo_targetB(unsigned char servoNum, unsigned int pos_us);
+static inline void set_servo_target_b(unsigned char servoNum, unsigned int pos_us)
+{
+	set_servo_targetB(servoNum, pos_us);
+}
+
+unsigned int get_servo_targetB(unsigned char servoNum);
+static inline unsigned int get_servo_tartget_b(unsigned char servoNum)
+{
+	return get_servo_targetB(servoNum);
+}
+
+void set_servo_speedB(unsigned char servoNum, unsigned int speed);
+static inline void set_servo_speed_b(unsigned char servoNum, unsigned int speed)
+{
+	set_servo_speedB(servoNum, speed);
+}
+
+unsigned int get_servo_speedB(unsigned char servoNum);
+static inline unsigned int get_servo_speed_b(unsigned char servoNum)
+{
+	return get_servo_speedB(servoNum);
+}
+
+void servos_stop(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

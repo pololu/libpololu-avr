@@ -65,7 +65,7 @@ extern "C" void calibrate_line_sensors(unsigned char readMode)
 	qtr3pi.calibrate(readMode);
 }
 
-extern "C" void line_sensors_reset_calibration(unsigned char readMode)
+extern "C" void line_sensors_reset_calibration()
 {
 	qtr3pi.resetCalibration();
 }
@@ -143,6 +143,11 @@ void Pololu3pi::emittersOff()
 void Pololu3pi::calibrateLineSensors(unsigned char readMode)
 {
 	qtr3pi.calibrate(readMode);
+}
+
+void Pololu3pi::lineSensorsResetCalibration()
+{
+	qtr3pi.resetCalibration();
 }
 
 void Pololu3pi::readLineSensorsCalibrated(unsigned int *sensor_values, unsigned char readMode)
