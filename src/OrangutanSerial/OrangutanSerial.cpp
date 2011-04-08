@@ -309,6 +309,12 @@ inline volatile unsigned char * udr(unsigned char port)
 
 /** INITIALIZATION ************************************************************/
 
+// empty constructor
+OrangutanSerial::OrangutanSerial()
+{
+
+}
+
 void OrangutanSerial::initUART_inline(unsigned char port)
 {
 	if (!_PORT_IS_UART)
