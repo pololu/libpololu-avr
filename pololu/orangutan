@@ -13,5 +13,5 @@
 #include "OrangutanServos/OrangutanServos.h"
 #include "OrangutanPulseIn/OrangutanPulseIn.h"
 #include "OrangutanSVP/OrangutanSVP.h"
-#include "OrangutanSVP/OrangutanX2.h"
+#include "OrangutanX2/OrangutanX2.h"
 #include "OrangutanSPIMaster/OrangutanSPIMaster.h"
