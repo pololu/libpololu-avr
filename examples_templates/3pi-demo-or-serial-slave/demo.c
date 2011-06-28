@@ -480,6 +480,15 @@ void initialize()
 	
 	serial_initialize();
 
+	// Delay 0.5 seconds, giving the serial master a chance to start
+	// before going further in the demo program.
+	unsigned long last_time = get_ms();
+	unsigned long delay_time = 500;
+	while (get_ms() - last_time < delay_time)
+	{
+		check_for_serial_slave();
+	}
+	
 	play_from_program_space(welcome);
 	print_two_lines_delay_1s(welcome_line1,welcome_line2);
 	print_two_lines_delay_1s(demo_name_line1,demo_name_line2);

@@ -1,5 +1,3 @@
-#include <pololu/3pi.h>
-
 /*
  * 3pi-serial-slave - An example serial slave program for the Pololu
  * 3pi Robot.  See the following pages for more information:
@@ -7,8 +5,11 @@
  * http://www.pololu.com/docs/0J21
  * http://www.pololu.com/docs/0J20
  * http://www.poolu.com/
+ * http://forum.pololu.com
  * 
  */
+#include <pololu/3pi.h>
+
 
 // PID constants
 unsigned int pid_enabled = 0;
@@ -33,10 +34,8 @@ void pid_check()
 		return;
 	}	
 
-	// Read the line position, with serial interrupts running in the background.
-	serial_set_mode(SERIAL_AUTOMATIC);
+	// Read the line position.
 	unsigned int position = read_line(sensors, IR_EMITTERS_ON);
-	serial_set_mode(SERIAL_CHECK);
 
 	// The "proportional" term should be 0 when we are on the line.
 	int proportional = ((int)position) - 2000;
@@ -52,7 +51,7 @@ void pid_check()
 	// to the right.  If it is a negative number, the robot will
 	// turn to the left, and the magnitude of the number determines
 	// the sharpness of the turn.
-	int power_difference = proportional*p_num/p_den + derivative*p_num/p_den;
+	int power_difference = proportional*p_num/p_den + derivative*d_num/d_den;
 
 	// Compute the actual motor settings.  We never set either motor
 	// to a negative value.
@@ -75,13 +74,11 @@ char buffer[100];
 unsigned char read_index = 0;
 
 // Waits for the next byte and returns it.  Runs play_check to keep
-// the music playing and serial_check to keep receiving bytes.
-// Calls pid_check() to keep following the line.
+// the music playing and calls pid_check() to keep following the line.
 char read_next_byte()
 {
 	while(serial_get_received_bytes() == read_index)
 	{
-		serial_check();
 		play_check();
 
 		// pid_check takes some time; only run it if we don't have more bytes to process
@@ -149,7 +146,7 @@ char check_data_byte(char byte)
 // useful as an initial command.
 void send_signature()
 {
-	serial_send_blocking("3pi1.0", 6);
+	serial_send_blocking("3pi1.1", 6);
 	set_motors(0,0);
 	pid_enabled = 0;
 }
@@ -312,11 +309,7 @@ void do_print()
 		if(check_data_byte(character))
 			return;
 
-		// Before printing to the LCD we need to go to AUTOMATIC mode.
-		// Otherwise, we might miss characters during the lengthy LCD routines.
-		serial_set_mode(SERIAL_AUTOMATIC);
  		print_character(character);
-		serial_set_mode(SERIAL_CHECK);
 	}
 }
 
@@ -390,13 +383,10 @@ int main()
 {
 	pololu_3pi_init(2000);  
 	play_mode(PLAY_CHECK);
-
 	clear();
-	print("Slave");
 
 	// start receiving data at 115.2 kbaud
 	serial_set_baud_rate(115200);
-	serial_set_mode(SERIAL_CHECK);
 	serial_receive_ring(buffer, 100);
 
 	while(1)
@@ -410,7 +400,7 @@ int main()
 		switch(command)
 		{
 		case (char)0x00:
-			// slient error - probable master resetting
+			// silent error - probable master resetting
 			break;
 
 		case (char)0x81:
