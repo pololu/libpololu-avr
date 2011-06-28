@@ -17,6 +17,8 @@
 // pieces of static data should be stored in program space.
 #include <avr/pgmspace.h>
 
+#include "m3pi.h"
+
 // Introductory messages.  The "PROGMEM" identifier causes the data to
 // go into program space.
 const char welcome_line1[] PROGMEM = " Pololu";
@@ -520,7 +522,7 @@ void pid_check()
 	// to the right.  If it is a negative number, the robot will
 	// turn to the left, and the magnitude of the number determines
 	// the sharpness of the turn.
-	int power_difference = proportional*p_num/p_den + derivative*p_num/p_den;
+	int power_difference = proportional*p_num/p_den + derivative*d_num/d_den;
 
 	// Compute the actual motor settings.  We never set either motor
 	// to a negative value.
@@ -616,7 +618,7 @@ char check_data_byte(char byte)
 // useful as an initial command.
 void send_signature()
 {
-	serial_send_blocking("3pi1.0", 6);
+	serial_send_blocking("3pi1.1", 6);
 	set_motors(0,0);
 	pid_enabled = 0;
 }
@@ -853,9 +855,6 @@ void serial_slave_loop()
 {
 	play_mode(PLAY_CHECK);
 
-	clear();
-	print("Slave");
-
 	while(1)
 	{
 		// wait for a command
@@ -962,6 +961,20 @@ void initialize()
 	load_custom_characters(); // load the custom characters
 	
 	serial_initialize();
+	
+
+	// Delay 5 seconds, giving the serial master a chance to start
+	// before going further in the demo program.
+	unsigned long last_time = get_ms();
+	#ifdef M3PI
+		unsigned long delay_time = 5000;
+	#else
+		unsigned long delay_time = 500;
+	#endif
+	while (get_ms() - last_time < delay_time)
+	{
+		check_for_serial_slave();
+	}
 
 	play_from_program_space(welcome);
 	print_two_lines_delay_1s(welcome_line1,welcome_line2);

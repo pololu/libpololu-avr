@@ -10,8 +10,9 @@ PORT=/dev/ttyACM0
 AVRDUDE=avrdude
 TARGET=test
 OBJECT_FILES=test.o qtr.o assert.o motors.o pot.o battery.o pushbuttons.o outputs.o leds.o lcd.o demo.o
+M3PI_OBJECT_FILES=test.o qtr.o assert.o motors.o pot.o battery.o pushbuttons.o outputs.o leds.o lcd.o demo.m3pi.o
 
-all: $(TARGET).hex
+all: $(TARGET).hex m3pi_$(TARGET).hex
 
 clean:
 	rm -f *.o *.hex *.obj *.hex
@@ -19,10 +20,17 @@ clean:
 %.hex: %.obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
 
-test.o: test.c assert.h qtr.h motors.h pot.h battery.h pushbuttons.h outputs.h leds.h lcd.h
+%.o: test.c assert.h qtr.h motors.h pot.h battery.h pushbuttons.h outputs.h leds.h lcd.h
 
-%.obj: $(OBJECT_FILES)
-	$(CC) $(CFLAGS) $(OBJECT_FILES) $(LDFLAGS) -o $@
+%.m3pi.o : %.c
+	$(CC) $(CFLAGS) -DM3PI -c -o $@ $<
 
-program: $(TARGET).hex
-	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
+test.obj: $(OBJECT_FILES)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
+m3pi_test.obj: $(M3PI_OBJECT_FILES)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@ 
+	
+#program: $(TARGET).hex
+#	$(AVRDUDE) -p m168 -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
+
