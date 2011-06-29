@@ -755,10 +755,8 @@ void OrangutanBuzzer::playMode(unsigned char mode)
 // Returns true if it is still playing.
 unsigned char OrangutanBuzzer::playCheck()
 {
-	DISABLE_TIMER1_INTERRUPT();
 	if(buzzerFinished && buzzerSequence != 0)
 		nextNote();
-	ENABLE_TIMER1_INTERRUPT();
 	return buzzerSequence != 0;
 }
 
