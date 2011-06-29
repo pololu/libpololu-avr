@@ -13,10 +13,18 @@
 #include <avr/pgmspace.h>
 
 // Introductory messages.
+#ifdef M3PI
+const char welcome_test[] PROGMEM = ">d32>>g32>d32>>a32";
+const char welcome_test_line1[] PROGMEM = "*Pololu*";
+const char welcome_test_line2[] PROGMEM = "*  m3\xf7 *"; // \xf7 is a greek
+													// pi character
+#else
 const char welcome_test[] PROGMEM = ">g32>>c32";
 const char welcome_test_line1[] PROGMEM = " Pololu";
 const char welcome_test_line2[] PROGMEM = "3\xf7 Robot"; // \xf7 is a greek
 													// pi character
+#endif
+
 const char test_name_line1[] PROGMEM = "Test";
 const char test_name_line2[] PROGMEM = "Program";
 
