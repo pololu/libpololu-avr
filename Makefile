@@ -3,7 +3,7 @@
 devices := atmega48 atmega168 atmega328p atmega324p atmega644p atmega1284p atmega1284p_x2
 mcu_atmega48 := atmega48
 mcu_atmega168 := atmega168
-mcu_atmega328p := atmega32p
+mcu_atmega328p := atmega328p
 mcu_atmega324p := atmega324p
 mcu_atmega644p := atmega644p
 mcu_atmega1284p := atmega1284p
