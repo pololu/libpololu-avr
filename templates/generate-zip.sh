@@ -9,5 +9,8 @@
 set -ue
 
 rm -f *.zip
-zip -jq svp324.zip svp/svp324.vstemplate svp/*.c svp/*.avrgccproj svp/*.jpg
-zip -jq svp1284.zip svp/svp1284.vstemplate svp/*.c svp/*.avrgccproj svp/*.jpg
+zip -jq svp-324.zip svp/svp-324.vstemplate svp/*.c svp/*.avrgccproj svp/*.jpg
+zip -jq svp-1284.zip svp/svp-1284.vstemplate svp/*.c svp/*.avrgccproj svp/*.jpg
+
+zip -jq x2-1284.zip x2/x2-1284.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
+zip -jq x2-644.zip x2/x2-644.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
