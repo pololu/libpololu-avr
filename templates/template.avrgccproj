@@ -18,9 +18,9 @@
     <GlobalToolchainPath>C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR ToolChain\bin</GlobalToolchainPath>
     <AvrGccProjectExtensions>
     </AvrGccProjectExtensions>
-    <AssemblyName>svp</AssemblyName>
-    <Name>svp</Name>
-    <RootNamespace>svp</RootNamespace>
+    <AssemblyName>app</AssemblyName>
+    <Name>app</Name>
+    <RootNamespace>app</RootNamespace>
     <avrtool>com.atmel.avrdbg.tool.simulator</avrtool>
     <com_atmel_avrdbg_tool_simulator>
       <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>

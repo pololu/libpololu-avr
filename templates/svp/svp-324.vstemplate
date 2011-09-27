@@ -15,7 +15,7 @@
     <PreviewImage>svp_preview.jpg</PreviewImage>
   </TemplateData>
   <TemplateContent>
-    <Project TargetFileName="svp.avrgccproj" File="svp.avrgccproj" ReplaceParameters="true">
+    <Project TargetFileName="template.avrgccproj" File="template.avrgccproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" OpenInEditor="true" TargetFileName="main.c">main.c</ProjectItem>
     </Project>
   <CustomParameters>
