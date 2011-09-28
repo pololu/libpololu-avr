@@ -9,16 +9,18 @@
 set -ue
 
 rm -f *.zip
-zip -jq svp-324.zip svp/svp-324.vstemplate svp/*.c template.avrgccproj svp/*.jpg
-zip -jq svp-1284.zip svp/svp-1284.vstemplate svp/*.c template.avrgccproj svp/*.jpg
+zip -j orangutan_svp_324.zip svp/svp_324.vstemplate svp/*.c template.avrgccproj svp/*.jpg
+zip -j orangutan_svp_1284.zip svp/svp_1284.vstemplate svp/*.c template.avrgccproj svp/*.jpg
 
-zip -jq x2-1284.zip x2/x2-1284.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
-zip -jq x2-644.zip x2/x2-644.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
+zip -j orangutan_x2_1284.zip x2/x2_1284.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
+zip -j orangutan_x2_644.zip x2/x2_644.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
 
-zip -jq 3pi-328.zip 3pi/3pi-328.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
-zip -jq 3pi-168.zip 3pi/3pi-168.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
+zip -j 3pi_328.zip 3pi/3pi_328.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
+zip -j 3pi_168.zip 3pi/3pi_168.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
 
-zip -jq sv-328.zip sv/sv-328.vstemplate sv/*.c template.avrgccproj sv/sv-328_preview.jpg sv/sv_icon.jpg
-zip -jq sv-168.zip sv/sv-168.vstemplate sv/*.c template.avrgccproj sv/sv-168_preview.jpg sv/sv_icon.jpg
+zip -j orangutan_sv_328.zip sv/sv_328.vstemplate sv/*.c template.avrgccproj sv/sv_328_preview.jpg sv/sv_icon.jpg
+zip -j orangutan_sv_168.zip sv/sv_168.vstemplate sv/*.c template.avrgccproj sv/sv_168_preview.jpg sv/sv_icon.jpg
 
-zip -jq lv-168.zip lv/lv-168.vstemplate lv/*.c template.avrgccproj lv/*.jpg
+zip -j orangutan_lv_168.zip lv/lv_168.vstemplate lv/*.c template.avrgccproj lv/*.jpg
+
+# TODO: baby_orangutan_b_328, baby_orangutan_b_168
