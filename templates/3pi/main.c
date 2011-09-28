@@ -1,7 +1,7 @@
 /* $projectname$ - an application for the Pololu 3pi Robot
  *
- * Author:  $username$
  * Created: $time$
+ *  Author: $username$
  */
 
 #include <pololu/3pi.h>

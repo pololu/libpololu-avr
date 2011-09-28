@@ -1,7 +1,7 @@
 /* $projectname$ - an application for the Pololu Orangutan SVP
  *
- * Author:  $username$
  * Created: $time$
+ *  Author: $username$
  */
 
 #include <pololu/orangutan.h>
@@ -13,7 +13,7 @@ int main()
 	while(1)
 	{
 		// Get battery voltage (in mV) from the auxiliary processor
-    // and print it on the the LCD.
+		// and print it on the the LCD.
 		clear();
 		print_long(read_battery_millivolts_svp());
 

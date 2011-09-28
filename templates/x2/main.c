@@ -1,7 +1,7 @@
 /* $projectname$ - an application for the Pololu Orangutan X2
  *
- * Author:  $username$
  * Created: $time$
+ *  Author: $username$
  */
 
 #include <pololu/orangutan.h>
