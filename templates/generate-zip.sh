@@ -17,3 +17,6 @@ zip -jq x2-644.zip x2/x2-644.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
 
 zip -jq 3pi-328.zip 3pi/3pi-328.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
 zip -jq 3pi-168.zip 3pi/3pi-168.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
+
+zip -jq sv-328.zip sv/sv-328.vstemplate sv/*.c template.avrgccproj sv/sv-328_preview.jpg sv/sv_icon.jpg
+zip -jq sv-168.zip sv/sv-168.vstemplate sv/*.c template.avrgccproj sv/sv-168_preview.jpg sv/sv_icon.jpg
