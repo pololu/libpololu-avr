@@ -14,9 +14,9 @@ int main()
 	{
 		// Update the LCD.
 		clear();
-		print("3pi Robot"); 
+		print("Batt mV:"); 
 		lcd_goto_xy(0, 1);
-		print_long(get_ms());
+		print_long(read_battery_millivolts_3pi());
 
 		red_led(1);     // Turn on the red LED.
 		delay_ms(200);  // Wait for 200 ms.

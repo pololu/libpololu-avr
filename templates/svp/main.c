@@ -12,9 +12,9 @@ int main()
 	{
 		// Update the LCD.
 		clear();
-		print("Orangutan SVP"); 
-		lcd_goto_xy(0, 1);
-		print_long(get_ms());
+		print("Batt (mV): "); 
+		lcd_goto_xy(11, 0);
+		print_long(read_battery_millivolts_svp());
 
 		red_led(1);     // Turn on the red LED.
 		delay_ms(200);  // Wait for 200 ms.
