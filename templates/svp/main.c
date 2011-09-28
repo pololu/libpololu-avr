@@ -8,6 +8,8 @@
 
 int main()
 {
+	play_from_program_space(PSTR(">g32>>c32"));  // Play welcoming notes.
+
 	while(1)
 	{
 		// Update the LCD.
