@@ -5,7 +5,7 @@
     <ProjectType>AVRGCC</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
-    <SortOrder>1000</SortOrder>
+    <SortOrder>30</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>orangutan_app</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>

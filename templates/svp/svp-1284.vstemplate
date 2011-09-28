@@ -5,7 +5,7 @@
     <ProjectType>AVRGCC</ProjectType>
     <ProjectSubType>
     </ProjectSubType>
-    <SortOrder>1000</SortOrder>
+    <SortOrder>20</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>orangutan_app</DefaultName>
     <ProvideDefaultName>true</ProvideDefaultName>
@@ -18,9 +18,9 @@
     <Project TargetFileName="template.avrgccproj" File="template.avrgccproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" OpenInEditor="true" TargetFileName="main.c">main.c</ProjectItem>
     </Project>
-  <CustomParameters>
-    <CustomParameter Name="$mcu$" Value="ATmega1284P"/>
-    <CustomParameter Name="$library$" Value="pololu_atmega1284p"/>
-  </CustomParameters>
+    <CustomParameters>
+      <CustomParameter Name="$mcu$" Value="ATmega1284P"/>
+      <CustomParameter Name="$library$" Value="pololu_atmega1284p"/>
+    </CustomParameters>
   </TemplateContent>
 </VSTemplate>
