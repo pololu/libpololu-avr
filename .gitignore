@@ -2,4 +2,6 @@
 *.o
 /examples/
 /lib_zipfiles/
+
 *~
+\#*\#
