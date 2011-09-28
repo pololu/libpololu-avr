@@ -12,10 +12,9 @@ int main()
 
 	while(1)
 	{
-		// Update the LCD.
+		// Get battery voltage (in mV) from the auxiliary processor
+    // and print it on the the LCD.
 		clear();
-		print("Batt (mV): "); 
-		lcd_goto_xy(11, 0);
 		print_long(read_battery_millivolts_svp());
 
 		red_led(1);     // Turn on the red LED.

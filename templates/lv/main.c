@@ -12,12 +12,9 @@ int main()
 
 	while(1)
 	{
-		// Update the LCD.
+		// Print temperature (in degrees C) on the LCD.
 		clear();
-		print("Temp:"); 
-		lcd_goto_xy(0, 1);
 		print_long(read_temperature_c()/10);
-		print(" C");
 
 		red_led(1);     // Turn on the red LED.
 		delay_ms(200);  // Wait for 200 ms.
