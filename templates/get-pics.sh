@@ -10,7 +10,7 @@ pic 0J1893.32.jpg  > svp/svp_icon.jpg
 pic 0J1882.200.jpg > svp/svp_preview.jpg
 
 pic 0J103.32.jpg   > x2/x2_icon.jpg
-pic 0J1287.200.jpg  > x2/x2_preview.jpg
+pic 0J1287.200.jpg > x2/x2_preview.jpg
 
 pic 0J2415.32.jpg  > 3pi/3pi_icon.jpg
 pic 0J2416.200.jpg > 3pi/3pi_preview.jpg
