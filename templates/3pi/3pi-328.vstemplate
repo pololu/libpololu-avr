@@ -15,8 +15,8 @@
     <PreviewImage>3pi_preview.jpg</PreviewImage>
   </TemplateData>
   <TemplateContent>
-    <Project TargetFileName="template.avrgccproj" File="template.avrgccproj" ReplaceParameters="true">
-      <ProjectItem ReplaceParameters="true" OpenInEditor="true" TargetFileName="main.c">main.c</ProjectItem>
+    <Project File="template.avrgccproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">main.c</ProjectItem>
     </Project>
     <CustomParameters>
       <CustomParameter Name="$mcu$" Value="ATmega328P"/>

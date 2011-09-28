@@ -15,8 +15,8 @@
     <PreviewImage>x2_preview.jpg</PreviewImage>
   </TemplateData>
   <TemplateContent>
-    <Project TargetFileName="x2.avrgccproj" File="x2.avrgccproj" ReplaceParameters="true">
-      <ProjectItem ReplaceParameters="true" OpenInEditor="true" TargetFileName="main.c">main.c</ProjectItem>
+    <Project File="x2.avrgccproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">main.c</ProjectItem>
     </Project>
     <CustomParameters>
       <CustomParameter Name="$mcu$" Value="ATmega644P"/>
