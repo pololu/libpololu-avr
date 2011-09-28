@@ -23,4 +23,8 @@ zip -j orangutan_sv_168.zip sv/sv_168.vstemplate sv/*.c template.avrgccproj sv/s
 
 zip -j orangutan_lv_168.zip lv/lv_168.vstemplate lv/*.c template.avrgccproj lv/*.jpg
 
+zip -j baby_orangutan_b_328.zip baby/baby_b_328.vstemplate baby/*.c template.avrgccproj baby/*.jpg
+zip -j baby_orangutan_b_168.zip baby/baby_b_168.vstemplate baby/*.c template.avrgccproj baby/*.jpg
+zip -j baby_orangutan_b_48.zip baby/baby_b_48.vstemplate baby/*.c template.avrgccproj baby/*.jpg
+
 # TODO: baby_orangutan_b_328, baby_orangutan_b_168
