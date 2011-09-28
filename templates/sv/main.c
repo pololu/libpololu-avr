@@ -4,7 +4,7 @@
  * Created: $time$
  */
 
-#include <pololu/3pi.h>
+#include <pololu/orangutan.h>
 
 int main()
 {
