@@ -12,7 +12,7 @@
     <LocationField>Enabled</LocationField>
     <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
     <Icon>sv_icon.jpg</Icon>
-    <PreviewImage>sv-328_preview.jpg</PreviewImage>
+    <PreviewImage>sv_328_preview.jpg</PreviewImage>
   </TemplateData>
   <TemplateContent>
     <Project File="template.avrgccproj" ReplaceParameters="true">
