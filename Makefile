@@ -136,10 +136,7 @@ install: $(LIBRARY_FILES)
 	$(INSTALL_FILES) pololu/orangutan $(INCLUDE_POLOLU)
 	@echo "Installation is complete."
 
-# We make all of the examples from templates in the examples_templates
-# directory (which is not distributed), by running a bunch of commands
-# concatenated together with &&.
-
+# This section defines which examples are available for each devices.
 examples_3pi := 3pi-demo-program 3pi-demo-or-serial-slave 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
 examples_orangutan := buzzer1 buzzer2 buzzer3 lcd1 lcd2 lcd3-hello-world pushbuttons1 pushbuttons2 motors2 simple-test wheel-encoders1 wdt servos-and-buzzer pulsein1 pulsein2 stepper-motor1
 examples_168_328p := analog2 3pi-serial-master sv-demo-program lv-demo-program serial1
@@ -147,8 +144,7 @@ examples_svp := svp1 svp-demo-program svp-eight-servo svp-sixteen-servo svp-one-
 examples_x2 := digital1 serial2 x2-demo-program
 
 # The 48 examples are the only ones that will work on the mega48.
-# They will also work on the orangutans, which could have either a 168
-# or a 328 processor.
+# They will also work on the orangutans.
 
 examples_atmega48 := digital1 analog1 motors1 led1 servo-control-using-delays servos1
 examples_atmega168 := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
@@ -158,10 +154,14 @@ examples_atmega644p := $(examples_atmega48) $(examples_orangutan) $(examples_x2)
 examples_atmega1284p := $(examples_atmega324p)
 examples_atmega1284p_x2 := $(examples_atmega644p)
 
+# Define various directories.
 example_template = examples_templates/$(example)
 example_dir = examples/$(device)/$(example)
 hex_dir = examples/$(device)/hex_files
 
+# examplss: A phony target that generates the source code in the
+# examples directory from the source code in the examples_templates
+# directory.
 make_example = $(foreach example,$(value examples_$(device)), \
 		mkdir -p $(example_dir) && \
 		cp -a $(example_template)/*.[ch] $(example_dir)/ && \
@@ -177,6 +177,8 @@ make_example = $(foreach example,$(value examples_$(device)), \
 examples:
 	$(foreach device,$(devices),$(make_example)) test 0
 
+# hex_files: A phony target that generates the hex files for the
+# devices.  Uses one large command line.
 make_hex_files = mkdir -p $(hex_dir) && \
 	$(foreach example,$(value examples_$(device)), \
 	make -C $(example_dir) && \
@@ -187,6 +189,12 @@ make_hex_files = mkdir -p $(hex_dir) && \
 hex_files: examples
 	$(foreach device,$(devices),$(make_hex_files)) test 0
 
+# Phony target that generates the AVR Studio 5 template zip files
+# using the files in the templates directory.
+.PHONY: templates
+templates:
+	templates/generate-zip.sh
+
 # The following code creates the zip file.
 ZIPDIR=lib_zipfiles
 DATE := $(shell date +%y%m%d)
@@ -195,13 +203,13 @@ HEX_ZIPFILE := $(ZIPDIR)/libpololu-avr-example-hex-files-$(DATE).zip
 ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
-ZIP_EXCLUDES := \*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
+ZIP_EXCLUDES := \*.o \*/.git/\* .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
 
 ARDUINO_EXCLUDES :=  libpololu-arduino/OrangutanDigital/\* libpololu-arduino/OrangutanPulseIn/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanServos/\* libpololu-arduino/OrangutanSPIMaster/\* libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/OrangutanX2/\* libpololu-arduino/include/\*
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
-zip: library_files examples hex_files arduino_zip
+zip: library_files examples hex_files arduino_zip templates
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
@@ -211,7 +219,7 @@ zip: library_files examples hex_files arduino_zip
 	yes | rm -Rf ./pololu/*/*.cpp ./pololu/*/examples ./pololu/*/private ./pololu/*/keywords.txt
 	ln -s . libpololu-avr
 	zip -rq $(LIB_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) $(NON_ARDUINO_EXCLUDES)
-	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex
+	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex libpololu-avr/templates/*.zip
 	rm libpololu-avr
 	yes | rm -Rf $(foreach object, $(LIBRARY_OBJECTS), ./pololu/$(object))
 
