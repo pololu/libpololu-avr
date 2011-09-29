@@ -8,23 +8,23 @@
 
 set -ue
 
+cd `dirname $0`
 rm -f *.zip
-zip -j orangutan_svp_324.zip svp/svp_324.vstemplate svp/*.c template.avrgccproj svp/*.jpg
-zip -j orangutan_svp_1284.zip svp/svp_1284.vstemplate svp/*.c template.avrgccproj svp/*.jpg
 
-zip -j orangutan_x2_1284.zip x2/x2_1284.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
-zip -j orangutan_x2_644.zip x2/x2_644.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
+zip -MMjq orangutan_svp_324.zip svp/svp_324.vstemplate svp/*.c template.avrgccproj svp/*.jpg
+zip -MMjq orangutan_svp_1284.zip svp/svp_1284.vstemplate svp/*.c template.avrgccproj svp/*.jpg
 
-zip -j 3pi_328.zip 3pi/3pi_328.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
-zip -j 3pi_168.zip 3pi/3pi_168.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
+zip -MMjq orangutan_x2_1284.zip x2/x2_1284.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
+zip -MMjq orangutan_x2_644.zip x2/x2_644.vstemplate x2/*.c x2/*.avrgccproj x2/*.jpg
 
-zip -j orangutan_sv_328.zip sv/sv_328.vstemplate sv/*.c template.avrgccproj sv/sv_328_preview.jpg sv/sv_icon.jpg
-zip -j orangutan_sv_168.zip sv/sv_168.vstemplate sv/*.c template.avrgccproj sv/sv_168_preview.jpg sv/sv_icon.jpg
+zip -MMjq 3pi_328.zip 3pi/3pi_328.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
+zip -MMjq 3pi_168.zip 3pi/3pi_168.vstemplate 3pi/*.c template.avrgccproj 3pi/*.jpg
 
-zip -j orangutan_lv_168.zip lv/lv_168.vstemplate lv/*.c template.avrgccproj lv/*.jpg
+zip -MMjq orangutan_sv_328.zip sv/sv_328.vstemplate sv/*.c template.avrgccproj sv/sv_328_preview.jpg sv/sv_icon.jpg
+zip -MMjq orangutan_sv_168.zip sv/sv_168.vstemplate sv/*.c template.avrgccproj sv/sv_168_preview.jpg sv/sv_icon.jpg
 
-zip -j baby_orangutan_b_328.zip baby/baby_b_328.vstemplate baby/*.c template.avrgccproj baby/*.jpg
-zip -j baby_orangutan_b_168.zip baby/baby_b_168.vstemplate baby/*.c template.avrgccproj baby/*.jpg
-zip -j baby_orangutan_b_48.zip baby/baby_b_48.vstemplate baby/*.c template.avrgccproj baby/*.jpg
+zip -MMjq orangutan_lv_168.zip lv/lv_168.vstemplate lv/*.c template.avrgccproj lv/*.jpg
 
-# TODO: baby_orangutan_b_328, baby_orangutan_b_168
+zip -MMjq baby_orangutan_b_328.zip baby/baby_b_328.vstemplate baby/*.c template.avrgccproj baby/*.jpg
+zip -MMjq baby_orangutan_b_168.zip baby/baby_b_168.vstemplate baby/*.c template.avrgccproj baby/*.jpg
+zip -MMjq baby_orangutan_b_48.zip baby/baby_b_48.vstemplate baby/*.c template.avrgccproj baby/*.jpg
