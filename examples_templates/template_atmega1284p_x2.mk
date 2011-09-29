@@ -2,4 +2,4 @@ DEVICE = atmega1284p_x2
 MCU = atmega1284p
 DEVICE_SPECIFIC_CFLAGS := -D_X2_1284
 AVRDUDE_DEVICE = m1284p
-PORT = /dev/ttyUSB0
+PORT ?= /dev/ttyUSB0
