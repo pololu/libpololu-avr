@@ -8,7 +8,7 @@ mcu_atmega324p := atmega324p
 mcu_atmega644p := atmega644p
 mcu_atmega1284p := atmega1284p
 mcu_atmega1284p_x2 := atmega1284p
-device_specific_cflags_atmega1284p_x2 := -D_X2_1284
+device_specific_macro_atmega1284p_x2 := _X2_1284
 
 LIBRARY_OBJECTS=\
 	OrangutanAnalog \
@@ -155,23 +155,13 @@ examples_atmega1284p := $(examples_atmega324p)
 examples_atmega1284p_x2 := $(examples_atmega644p)
 
 # Define various directories.
-example_template = examples_templates/$(example)
 example_dir = examples/$(device)/$(example)
 hex_dir = examples/$(device)/hex_files
 
 # examplss: A phony target that generates the source code in the
 # examples directory from the source code in the examples_templates
 # directory.
-make_example = $(foreach example,$(value examples_$(device)), \
-		mkdir -p $(example_dir) && \
-		cp -a $(example_template)/*.[ch] $(example_dir)/ && \
-		cat examples_templates/template_$(device).mk $(example_template)/Makefile > $(example_dir)/Makefile && \
-		cat $(example_template)/*.aps \
-			| sed 's/<PART>[^<]*<\/PART>/<PART>$(mcu_$(device))<\/PART>/' \
-			| sed 's/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$(device).a<\/LIB>/' \
-			| sed 's/<OPTIONSFORALL>/<OPTIONSFORALL>$(device_specific_cflags_$(device)) /' \
-			> $(example_dir)/$(example).aps && \
-		)
+make_example = (for example in $(examples_$(device)); do examples_templates/prepare.sh $$example $(device) $(mcu_$(device)) '$(device_specific_macro_$(device))'; done) &&
 
 .PHONY: examples
 examples:
