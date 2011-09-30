@@ -195,7 +195,6 @@ avr_studio_5_stk500_xml:
 ZIPDIR=lib_zipfiles
 DATE := $(shell date +%y%m%d)
 LIB_ZIPFILE := $(ZIPDIR)/libpololu-avr-$(DATE).zip
-HEX_ZIPFILE := $(ZIPDIR)/libpololu-avr-example-hex-files-$(DATE).zip
 ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
@@ -209,7 +208,6 @@ zip: library_files examples hex_files arduino_zip templates avr_studio_5_stk500_
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
-	rm -f $(HEX_ZIPFILE)
 	yes | rm -Rf $(foreach object, $(LIBRARY_OBJECTS), ./pololu/$(object))
 	cp -R $(foreach object, $(LIBRARY_OBJECTS), ./src/$(object)) ./pololu
 	yes | rm -Rf ./pololu/*/*.cpp ./pololu/*/examples ./pololu/*/private ./pololu/*/keywords.txt
