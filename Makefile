@@ -46,8 +46,6 @@ PATH := $(shell echo $$PATH | sed 's/\(WinAVR-[0-9]*\)\/bin/\\1\/utils\/bin/g'):
 
 LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
 
-SHELL=sh
-
 .PHONY: clean
 clean:
 	@echo $(SHELL)
