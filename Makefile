@@ -161,11 +161,11 @@ hex_dir = examples/$(device)/hex_files
 # examplss: A phony target that generates the source code in the
 # examples directory from the source code in the examples_templates
 # directory.
-make_example = (for example in $(examples_$(device)); do examples_templates/prepare.sh $$example $(device) $(mcu_$(device)) '$(device_specific_macro_$(device))'; done) &&
+prepare_example = examples_templates/prepare.sh $$example $(device) $(mcu_$(device)) '$(device_specific_macro_$(device))'
 
 .PHONY: examples
 examples:
-	$(foreach device,$(devices),$(make_example)) test 0
+	$(foreach device,$(devices),(for example in $(examples_$(device)); do $(prepare_example); done) &&) test 0
 
 # hex_files: A phony target that generates the hex files for the
 # devices.  Uses one large command line.
