@@ -2,6 +2,7 @@
 *.o
 /examples/
 /lib_zipfiles/
+/avr_studio_5/templates/
 
 *~
 \#*#

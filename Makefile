@@ -183,7 +183,7 @@ hex_files: examples
 # using the files in the templates directory.
 .PHONY: templates
 templates:
-	templates/generate-zip.sh
+	avr_studio_5/generate_templates.sh
 
 # The following code creates the zip file.
 ZIPDIR=lib_zipfiles
@@ -193,7 +193,7 @@ HEX_ZIPFILE := $(ZIPDIR)/libpololu-avr-example-hex-files-$(DATE).zip
 ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
-ZIP_EXCLUDES := \*.o \*/.git/\* .gitignore .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
+ZIP_EXCLUDES := \*.o \*/.git/\* .gitignore .svn/\* \*/.svn/\* \*.hex avr_studio_5/\*.sh \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
 
 ARDUINO_EXCLUDES :=  libpololu-arduino/OrangutanDigital/\* libpololu-arduino/OrangutanPulseIn/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanServos/\* libpololu-arduino/OrangutanSPIMaster/\* libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/OrangutanX2/\* libpololu-arduino/include/\*
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
