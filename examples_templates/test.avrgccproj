@@ -35,7 +35,6 @@
       </Channel>
     </com_atmel_avrdbg_tool_simulator>
     <avrtoolinterface />
-    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
