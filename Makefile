@@ -84,7 +84,12 @@ clean:
 # For example, you could uncomment these lines:
 #   LIB := /usr/lib/avr/lib
 #   INCLUDE_POLOLU := /usr/lib/avr/include
-
+#
+# Note: Unless you specify LIB and INCLUDE_POLOLU as described above,
+# or you add the AVR Studio 5 toolchain to your path, running
+# 'make install' will NOT install the library into the AVR Studio 5
+# toolchain.  For Windows users, we recommend using the library's
+# executable installer.
 
 # Figure out what operating system we are running in.
 UNAME := $(shell uname)
