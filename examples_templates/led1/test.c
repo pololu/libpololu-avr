@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * led1: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
+ * led1: for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This program uses the OrangutanLEDs functions to control the red and green 
  * LEDs on the 3pi robot or Orangutan.  It will also work to control the red

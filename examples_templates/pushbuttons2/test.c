@@ -2,7 +2,7 @@
 #include <stdio.h>	// for printf()
 
 /*
- * pushbuttons2: for for the Orangutan LV, SV, SVP, X2, and 3pi robot.
+ * pushbuttons2: for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
  * This example uses the OrangutanPushbuttons library to detect user input
  * from the pushbuttons.  Each button press and release triggers an event

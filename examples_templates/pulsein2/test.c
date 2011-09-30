@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * pulsein2: for for the Orangutan LV, SV, SVP, Baby Orangutan, and 3pi robot.
+ * pulsein2: for the Orangutan LV, SV, SVP, Baby Orangutan, and 3pi robot.
  *
  * This program uses the OrangutanPulseIn functions to measure the frequency and
  * duty cycle of the PWM supplied to the buzzer as we play a melody.  The

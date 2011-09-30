@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * analog1: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
+ * analog1: for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This example uses the OrangutanAnalog functions to read the voltage
  * output of the trimpot in the background while the rest of the main

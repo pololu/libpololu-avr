@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * lcd1: for for the Orangutan LV, SV, SVP, X2, and 3pi robot.
+ * lcd1: for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
  * Uses the OrangutanLCD library to display things on the LCD.
  * It will run on the Baby Orangutan, but it won't display
