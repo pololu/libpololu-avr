@@ -64,10 +64,9 @@ environment, which may be downloaded free of charge from Atmel at
   http://www.atmel.com/avrstudio
 
 To program the Pololu Orangutan or 3pi, we recommend the Pololu
-Orangutan Programmer.  If you will be using a Pololu programmer,
-follow the instructions at
+USB AVR Programmer.  Follow the instructions at
 
-  http://www.pololu.com/docs/0J6
+  http://www.pololu.com/docs/0J36
 
 to install it on your computer.
 
@@ -97,7 +96,7 @@ process.
 Determine the location of your avr-gcc files.  In Windows, they will
 usually be in a folder such as:
 
-  C:\WinAVR-20090313\avr
+  C:\WinAVR-20100110\avr
 
 In Linux, the avr-gcc files are probably located in
 
