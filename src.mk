@@ -97,3 +97,24 @@ arduino_zip:
 	ln -s src/PololuQTRSensors .
 	zip -rq $(ARDUINO_QTR_ZIPFILE) PololuQTRSensors -x $(ZIP_EXCLUDES) -x $(ARDUINO_EXCLUDES)
 	rm PololuQTRSensors
+
+
+# Cleanup
+
+clean: clean_examples
+
+.PHONY: clean_examples
+clean_examples:
+	if [ -e examples_templates -a -e examples ]; then \
+		for dir in examples/*/*; \
+		do \
+			$(MAKE) clean -C $$dir; \
+		done; \
+		rm -rf examples; \
+	fi
+	if [ -e examples_templates ]; then \
+		for dir in examples_templates/*/; \
+		do \
+			$(MAKE) clean -C $$dir; \
+		done; \
+	fi

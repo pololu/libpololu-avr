@@ -37,7 +37,6 @@ SHELL = sh
 .PHONY: library_files
 library_files:
 	@echo making library files
-	@echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) && $(MAKE) && cd ../.. &&) echo -n
 
 # Change the path to allow make within sh to work: see WinAVR bug 1915456 "make ignores parameters when executed from sh"
@@ -47,21 +46,7 @@ LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
 
 .PHONY: clean
 clean:
-	@echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) && $(MAKE) clean && cd ../.. &&) echo -n
-	if [ -e examples_templates -a -e examples ]; then \
-		for dir in examples/*/*; \
-		do \
-			$(MAKE) clean -C $$dir; \
-		done; \
-		rm -rf examples; \
-	fi
-	if [ -e examples_templates ]; then \
-		for dir in examples_templates/*/; \
-		do \
-			$(MAKE) clean -C $$dir; \
-		done; \
-	fi
 	rm -f $(LIBRARY_FILES)
 
 # "make install" basically just copies the .a and files to the lib directory,
