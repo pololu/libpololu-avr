@@ -1,5 +1,9 @@
 /* $projectname$ - an application for the Pololu Orangutan SVP
  *
+ * This application uses the Pololu AVR C/C++ Library.  For help, see:
+ * -User's guide: http://www.pololu.com/docs/0J20
+ * -Command reference: http://www.pololu.com/docs/0J18
+ *
  * Created: $time$
  *  Author: $username$
  */
