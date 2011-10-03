@@ -105,10 +105,8 @@ clean: clean_examples
 
 .PHONY: clean_examples
 clean_examples:
-	if [ -e examples_templates -a -e examples ]; then \
-		rm -rf examples; \
-	fi
 	if [ -e examples_templates ]; then \
+		rm -rf examples; \
 		for dir in examples_templates/*/; \
 		do \
 			$(MAKE) clean -C $$dir; \
