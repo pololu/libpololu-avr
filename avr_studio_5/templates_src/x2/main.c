@@ -12,8 +12,14 @@
 
 int main()
 {
+	play_from_program_space(PSTR(">g32>>c32"));  // Play welcoming notes.
+
 	while(1)
 	{
+		// Print battery voltage (in mV) on the LCD.
+		clear();
+		print_long(read_battery_millivolts_x2());
+
 		red_led(1);     // Turn on the red LED.
 		delay_ms(200);  // Wait for 200 ms.
 
