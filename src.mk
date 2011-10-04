@@ -50,8 +50,8 @@ hex_files: examples
 
 # Phony target that generates the AVR Studio 5 template zip files
 # using the files in the templates directory.
-.PHONY: templates
-templates:
+.PHONY: avr_studio_5_templates
+avr_studio_5_templates:
 	avr_studio_5/generate_templates.sh
 
 # Phony target that generates the XML files we need to add support
@@ -73,7 +73,7 @@ ARDUINO_EXCLUDES :=  libpololu-arduino/OrangutanDigital/\* libpololu-arduino/Ora
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
-zip: library_files examples hex_files arduino_zip templates avr_studio_5_stk500_xml
+zip: library_files examples hex_files arduino_zip avr_studio_5_templates avr_studio_5_stk500_xml
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
