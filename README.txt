@@ -19,6 +19,12 @@ to be responsible for all resulting costs and damages.
 
 == Features ===
 
+The Pololu AVR Library is a collection of support functions for
+programming AVR-based Pololu products or for using Pololu products
+with AVRs.  It is designed for use with the free avr-gcc compiler,
+which is included with AVR Studio 5.  Most of the library can also be
+used together with the Arduino environment.
+
 This library includes support for recent members of the Orangutan line
 of robot controllers:
 
@@ -86,9 +92,10 @@ file, while the binary distribution will not.
 
 For the convnience of Windows users, the binary distribution is
 packaged in an executable installer called the Pololu AVR Library
-Installer for Windows.  This installer is included in the Pololu AVR
-Development Bundle, a large download that installs all of the
-prerequisites you will need for programming AVRs in Windows.
+Installer for Windows.  This installer can be downloaded by itself and
+is also included in the Pololu AVR Development Bundle, a large
+download that installs all of the prerequisites you will need for
+programming AVRs in Windows.
 
 The binary distribution zip files, the Pololu AVR Library Installer
 for Windows, and the Pololu AVR Development bundle are all available
