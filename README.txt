@@ -108,10 +108,9 @@ Library User's Guide:
 == Compiling the Pololu AVR Library ==
 
 Unpack the entire archive and open a command prompt within the
-libpololu-avr directory.  If avr-gcc is correctly installed on your
-system, you will be able to type "make" to compile the entire
-library.  Pay attention to any errors that occur during the build
-process.
+libpololu-avr folder.  If avr-gcc is correctly installed on your
+system, you will be able to type "make" to compile the entire library.
+Pay attention to any errors that occur during the build process.
 
 
 == Installation using "make install" ==
@@ -131,7 +130,7 @@ In this folder you will find an "include" folder that has
 AVR header files such as avr/io.h and a "lib" folder that has AVR
 libraries such as lib/libc.a.
 
-In the libpololu-avr directory, type "make show_prefix".  The Makefile
+In the libpololu-avr folder, type "make show_prefix".  The Makefile
 will tell you where it thinks your avr-gcc files are.  If the folder
 names displayed are correct, then you can run "make install" to
 install the library files.  You will need to run this command with the
@@ -139,9 +138,9 @@ correct permissions, so "sudo make install" will usually be required
 in Linux, and in Windows Vista/7 you will have to right-click on
 install.bat and select "Run as administrator".
 
-If "make show_prefix" does not show the correct directories, or the
-steps above don't work for you for any other reason, then you can
-install the library manually by following the instructions below.
+If "make show_prefix" does not show the correct folders, or the steps
+above don't work for you for any other reason, then you can install
+the library manually by following the instructions below.
 
 
 == Manual installation ==
@@ -149,12 +148,12 @@ install the library manually by following the instructions below.
 If you have the source repository of the library instead
 of a binary distribution, you will need to build the library (.a)
 files by running "make" and also copy all the files in the "src"
-directory into the "pololu" subfolder.
+subfolder into the "pololu" subfolder.
 
-Next, copy libpololu_*.a into your avr-gcc "lib" subdirectory.
+Next, copy libpololu_*.a into your avr-gcc "lib" subfolder.
 
 Finally, copy the entire "pololu" subfolder into your avr-gcc
-"include" subdirectory.
+"include" subfolder.
 
 You are now ready to use the Pololu AVR library.
 
@@ -172,7 +171,7 @@ You will need to have a binary distribution instead of a copy of the
 source repository.
 
 To install the templates, copy the the zip files in the
-libpololu-avr\avr_studio_5\templates directory to the
+libpololu-avr\avr_studio_5\templates folder to the
 "projecttemplates\Pololu Boards\" folder in your AVR Studio 5
 installation.  The "projecttemplates" folder should exist already, but
 you might need to create the "Pololu Boards" folder.  Next, close AVR
