@@ -171,20 +171,33 @@ You will need to have a binary distribution instead of a copy of the
 source repository.
 
 To install the templates, copy the the zip files in the library's
-"avr_studio_5\templates folder to the "projecttemplates\Pololu
-Boards\" folder in your AVR Studio 5 installation.  The
-"projecttemplates" folder should exist already, but you might need to
-create the "Pololu Boards" folder.  Next, close AVR Studio 5 and
-delete its ProjectTemplatesCache folder.  The next time you start AVR
-Studio 5, the templates should be available in the "New Project"
-dialog, in the "Pololu Boards" subcategory of "AVR GCC".
+
+  avr_studio_5\templates
+
+folder to the
+
+  projecttemplates\Pololu Boards
+
+folder in your AVR Studio 5 installation.  The "projecttemplates"
+folder should exist already, but you might need to create the "Pololu
+Boards" folder.  Next, close AVR Studio 5 and rename its
+ProjectTemplatesCache folder to "ProjectTemplatesCache.bak".  The next
+time you start AVR Studio 5, the templates should be available in the
+"New Project" dialog, in the "Pololu Boards" subcategory of "AVR GCC".
 
 To install the STK500 XML files, close AVR Studio 5 and copy the XML
-files in the library's "avr_studio_5\stk500_xml\" folder to the
-"tools\STK500\xml" folder in your AVR Studio 5 installation.  The next
-time you start AVR Studio 5, you should see ATmega328P, ATmega1284P,
-and ATmega644P in the "Device" dropdown box of the "AVR Programming"
-dialog box when an STK500 is selected.
+files in the library's
+
+  avr_studio_5\stk500_xml
+
+folder to the
+
+  tools\STK500\xml
+
+folder in your AVR Studio 5 installation.  The next time you start AVR
+Studio 5, you should see ATmega328P, ATmega1284P, and ATmega644P in
+the "Device" dropdown box of the "AVR Programming" dialog box when an
+STK500 is selected.
 
 
 == Using the Pololu AVR Library ==
