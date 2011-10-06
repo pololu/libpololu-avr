@@ -15,7 +15,6 @@
     <SupportedFrameworkRuntimeEdition MinVersion="4.0" MaxVersion="4.0" />
     <AllUsers>true</AllUsers>
   </Identifier>
-  <References />
   <Content>
     <ProjectTemplate>ProjectTemplates</ProjectTemplate>
   </Content>

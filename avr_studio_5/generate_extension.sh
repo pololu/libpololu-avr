@@ -22,4 +22,4 @@ cp -R templates ProjectTemplates/AVRGCC/Pololu
 
 rm extension.vsix
 zip -MMrq extension.vsix \[Content_Types\].xml extension.vsixmanifest ProjectTemplates icon.png preview.png
-zip -MMj extension.vsix ../LICENSE.txt
+zip -MMjq extension.vsix ../LICENSE.txt
