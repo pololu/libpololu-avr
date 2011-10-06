@@ -6,16 +6,6 @@ http://www.pololu.com/docs/0J20
 http://www.pololu.com
 http://forum.pololu.com
 
-You may freely modify and share this code, as long as you keep this
-notice intact (including the three links above).  Licensed under the
-Creative Commons BY-SA 3.0 license:
-
-http://creativecommons.org/licenses/by-sa/3.0/
-
-Disclaimer: To the extent permitted by law, Pololu provides this work
-without any warranty.  It might be defective, in which case you agree
-to be responsible for all resulting costs and damages.
-
 
 == Features ===
 
