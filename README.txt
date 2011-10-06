@@ -176,14 +176,14 @@ To install the templates, copy the the zip files in the library's
 
 folder to the
 
-  projecttemplates\Pololu Boards
+  projecttemplates\Pololu
 
 folder in your AVR Studio 5 installation.  The "projecttemplates"
-folder should exist already, but you might need to create the "Pololu
-Boards" folder.  Next, close AVR Studio 5 and rename its
-ProjectTemplatesCache folder to "ProjectTemplatesCache.bak".  The next
-time you start AVR Studio 5, the templates should be available in the
-"New Project" dialog, in the "Pololu Boards" subcategory of "AVR GCC".
+folder should exist already, but you might need to create the "Pololu"
+folder.  Next, close AVR Studio 5 and rename its ProjectTemplatesCache
+folder to "ProjectTemplatesCache.bak".  The next time you start AVR
+Studio 5, the templates should be available in the "New Project"
+dialog, in the "Pololu" subcategory of "AVR GCC".
 
 To install the STK500 XML files, close AVR Studio 5 and copy the XML
 files in the library's
