@@ -13,7 +13,6 @@ else
   DATE=`date +%y%m%d`
 fi
 
-# Note: Slashes are NOT allowed in the <Name> tag.
 sed "s/YYMMDD/$DATE/" extension.vsixmanifest.template > extension.vsixmanifest
 
 rm -R ProjectTemplates

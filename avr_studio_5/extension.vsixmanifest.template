@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="d0e65ca9-d3c5-496e-95f6-cd3f33361146">
-    <Name>Pololu AVR Library</Name>
+    <Name>Pololu AVR Library</Name><!-- slashes are NOT allowed -->
     <Author>Pololu Corporation</Author>
     <Version>1.YYMMDD</Version>
     <Description xml:space="preserve">An extension for using the Pololu AVR C/C++ Library in AVR Studio 5.</Description>
