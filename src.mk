@@ -60,6 +60,12 @@ avr_studio_5_templates:
 avr_studio_5_stk500_xml:
 	avr_studio_5/generate_stk500_xml.sh
 
+# Phony target that generates the AVR Studio 5 extension
+# (which only installs the templates, not the other parts of the library).
+.PHONY: avr_studio_5_extension
+avr_studio_5_extension: avr_studio_5_templates
+	avr_studio_5/generate_extension.sh
+
 # The following code creates the zip file.
 ZIPDIR=lib_zipfiles
 DATE := $(shell date +%y%m%d)
@@ -67,13 +73,13 @@ LIB_ZIPFILE := $(ZIPDIR)/libpololu-avr-$(DATE).zip
 ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
-ZIP_EXCLUDES := \*~ \*.o \*/.git/\* \*/.gitignore .svn/\* \*/.svn/\* \*.hex libpololu-avr/src.mk libpololu-avr/avr_studio_5/\*.sh libpololu-avr/avr_studio_5/templates_src/\* \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
+ZIP_EXCLUDES := \*~ \*.o \*/.git/\* \*/.gitignore .svn/\* \*/.svn/\* \*.hex libpololu-avr/src.mk libpololu-avr/avr_studio_5/\*.sh libpololu-avr/avr_studio_5/templates_src/\* \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt libpololu-avr/avr_studio_5/\*.xml libpololu-avr/avr_studio_5/extension.vsixmanifest\* extension.vsixmanifest\* libpololu-avr/avr_studio_5/\*.png libpololu-avr/avr_studio_5/ProjectTemplates/\*
 
 ARDUINO_EXCLUDES :=  libpololu-arduino/OrangutanDigital/\* libpololu-arduino/OrangutanPulseIn/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanServos/\* libpololu-arduino/OrangutanSPIMaster/\* libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/OrangutanX2/\* libpololu-arduino/include/\*
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
-zip: library_files examples hex_files arduino_zip avr_studio_5_templates avr_studio_5_stk500_xml
+zip: library_files examples hex_files arduino_zip avr_studio_5_templates avr_studio_5_stk500_xml avr_studio_5_extension
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
