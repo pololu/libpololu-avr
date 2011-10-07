@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # This script generates the AVR Studio 5 extension file, extension.vsix.
-# Prerequisites: Execute generate_stk500_xml.sh and generate_templates.sh.
+# Prerequisites: Execute generate_templates.sh.
 
 set -ue         # Exit if there is an error.
 cd `dirname $0` # Go to the right directory.
