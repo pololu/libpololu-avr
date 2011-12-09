@@ -24,14 +24,10 @@
 #include "OrangutanResources.h"
 
 
-#ifdef LIB_POLOLU
-
 extern "C" int get_free_ram()
 {
 	return OrangutanResources::getFreeRAM();
 }
-
-#endif
 
 
 // constructor

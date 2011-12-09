@@ -96,9 +96,6 @@ ISR(PCINT3_vect,ISR_ALIASOF(PCINT0_vect));
 #endif
 
 
-
-#ifdef LIB_POLOLU
-
 // use of pulse_in_init() is discouraged; use pulse_in_start() instead
 extern "C" unsigned char pulse_in_start(const unsigned char *pulsePins, unsigned char numPins)
 {
@@ -149,8 +146,6 @@ extern "C" void pulse_in_stop()
 {
 	OrangutanPulseIn::stop();
 }
-
-#endif
 
 
 // constructor

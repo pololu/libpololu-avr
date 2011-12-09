@@ -38,9 +38,13 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 
 }
 
-#ifdef LIB_POLOLU
 
+#ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h"	// provides access to delay routines
+#else
+#include "wiring.h"		// provides access to delay() and delayMicroseconds()
+#endif
+
 
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {
@@ -71,11 +75,6 @@ extern "C" unsigned char get_single_debounced_button_release(unsigned char butto
 {
 	return OrangutanPushbuttons::getSingleDebouncedRelease(buttons);
 }
-
-#else
-#include "wiring.h"		// provides access to delay() and delayMicroseconds()
-#endif
-
 
 
 inline void OrangutanPushbuttons::init()

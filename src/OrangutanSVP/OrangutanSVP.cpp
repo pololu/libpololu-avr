@@ -29,7 +29,6 @@
 
 #ifdef _ORANGUTAN_SVP
 
-#ifdef LIB_POLOLU
 
 extern "C" unsigned char svp_get_firmware_version()
 {
@@ -76,7 +75,6 @@ extern "C" unsigned char svp_check_error_cd()
 	return OrangutanSVP::checkErrorCD();
 }
 
-#endif
 
 typedef union SVPVariables
 {

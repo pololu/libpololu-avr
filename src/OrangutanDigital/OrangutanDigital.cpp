@@ -46,12 +46,6 @@
 #include "OrangutanDigital.h"
 
 
-#ifdef LIB_POLOLU
-
-
-#endif
-
-
 // constructor
 OrangutanDigital::OrangutanDigital()
 {

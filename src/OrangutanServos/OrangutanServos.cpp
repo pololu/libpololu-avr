@@ -195,9 +195,6 @@ ISR(TIMER1_COMPB_vect)
 }
 
 
-#ifdef LIB_POLOLU
-
-
 // use of init() is discouraged; use start() instead
 extern "C" unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins)
 {
@@ -275,9 +272,6 @@ extern "C" void servos_stop()
 {
 	OrangutanServos::stop();
 }
-
-#endif
-
 
 
 // constructor

@@ -34,7 +34,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#ifdef LIB_POLOLU
 
 extern "C" void serial_check()
 {
@@ -186,7 +185,6 @@ extern "C" char serial_send_buffer_empty()
 
 #endif
 
-#endif
 
 #if _SERIAL_PORTS==1
 

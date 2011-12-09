@@ -28,8 +28,6 @@
 
 #include "../OrangutanResources/include/OrangutanModel.h"
 
-#ifdef LIB_POLOLU
-
 
 extern "C" unsigned int analog_read(unsigned char channel)
 {
@@ -134,7 +132,6 @@ extern "C" int read_temperature_c()
 
 #endif // _ORANGUTAN_SVP
 
-#endif // LIB_POLOLU
 
 #ifdef _ORANGUTAN_SVP
 static unsigned int fromMillivoltsToNormal(unsigned int millivolts);

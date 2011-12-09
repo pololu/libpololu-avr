@@ -103,7 +103,6 @@ OrangutanBuzzer::OrangutanBuzzer()
 {
 }
 
-#ifdef LIB_POLOLU
 
 extern "C" void play_frequency(unsigned int freq, unsigned int dur, 
 							   unsigned char volume)
@@ -147,7 +146,6 @@ extern "C" unsigned char play_check()
 	return OrangutanBuzzer::playCheck();
 }
 
-#endif
 
 extern unsigned char buzzerInitialized;
 

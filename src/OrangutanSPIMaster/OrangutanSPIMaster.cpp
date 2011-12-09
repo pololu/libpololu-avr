@@ -33,7 +33,7 @@
 #include "OrangutanSPIMaster.h"
 #include "../OrangutanResources/include/OrangutanModel.h"
 
-#ifdef LIB_POLOLU
+#ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h" // provides delayMicroseconds()
 #else
 #include "wiring.h"		// provides delayMicroseconds()
@@ -80,7 +80,6 @@
 #endif
 
 // C wrapper functions
-#ifdef LIB_POLOLU
 
 extern "C" void spi_master_init(unsigned char speed_divider, unsigned char options)
 {
@@ -97,7 +96,6 @@ extern "C" unsigned char spi_master_transmit_and_delay(unsigned char data, unsig
 	return OrangutanSPIMaster::transmitAndDelay(data, delay);
 }
 
-#endif
 
 /*  OrangutanSPIMaster::init(unsigned char sampling_edge, unsigned char speed_divider);
     spi_master_init(unsigned char sampling_edge, unsigned char speed_divider);

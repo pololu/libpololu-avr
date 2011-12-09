@@ -49,11 +49,13 @@
 #define QTR_RC		0
 #define QTR_A		1
 
-#ifdef LIB_POLOLU
-
 #include "../OrangutanDigital/OrangutanDigital.h" // provides pin definitions
+
+#ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
-// two options for our sensors
+#else
+#include "wiring.h"		// provides access to delay() and delayMicroseconds()
+#endif
 
 // one pointer to the type in use
 static PololuQTRSensors *qtr;
@@ -139,9 +141,6 @@ extern "C" unsigned int *qtr_calibrated_maximum_off()
 	return qtr->calibratedMaximumOff;
 }
 
-#else
-#include "wiring.h"		// provides access to delay() and delayMicroseconds()
-#endif
 
 // Base class data member initialization (called by derived class init())
 void PololuQTRSensors::init(unsigned char numSensors, 
