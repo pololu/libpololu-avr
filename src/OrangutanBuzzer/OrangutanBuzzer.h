@@ -65,7 +65,7 @@
 
 // special notes
 #ifndef ARDUINO
-// this conflicts with A4 defined to mean an analog pin in Arduino's WProgram.h
+// this conflicts with the analog pin constant A4 in pins_arduino.h
 #define A4				A(4)			// center of the Equal-Tempered Scale
 #endif
 #define SILENT_NOTE		0xFF			// this note will silence the buzzer

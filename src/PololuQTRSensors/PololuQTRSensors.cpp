@@ -54,7 +54,7 @@
 #ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
 #else
-#include "wiring.h"		// provides access to delay() and delayMicroseconds()
+#include <Arduino.h> // provides access to delay() and delayMicroseconds()
 #endif
 
 // one pointer to the type in use

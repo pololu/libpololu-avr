@@ -116,7 +116,7 @@ OrangutanLCD::OrangutanLCD()
 #ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h"
 #else
-#include "wiring.h"		// provides access to delay() and delayMicroseconds()
+#include <Arduino.h> // provides access to delay() and delayMicroseconds()
 #endif
 
 

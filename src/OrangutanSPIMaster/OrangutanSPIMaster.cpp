@@ -32,12 +32,7 @@
 #include "avr/io.h"
 #include "OrangutanSPIMaster.h"
 #include "../OrangutanResources/include/OrangutanModel.h"
-
-#ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h" // provides delayMicroseconds()
-#else
-#include "wiring.h"		// provides delayMicroseconds()
-#endif
 
 // Default parameter values for svp_master_init
 
