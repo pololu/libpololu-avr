@@ -14,7 +14,7 @@
 	
 /*
  * Written by Ben Schmidel et al., June 4, 2010.
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com

@@ -9,7 +9,7 @@
 /*
  * Written by Ben Schmidel, May 15, 2008.
  * Last modified: September 29, 2008
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
