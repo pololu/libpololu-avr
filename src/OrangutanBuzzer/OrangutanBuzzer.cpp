@@ -604,25 +604,25 @@ static void nextNote()
 		tmp_octave --;
 		goto parse_character;
 	case 'a':
-		note = A(0);
+		note = NOTE_A(0);
 		break;
 	case 'b':
-		note = B(0);
+		note = NOTE_B(0);
 		break;
 	case 'c':
-		note = C(0);
+		note = NOTE_C(0);
 		break;
 	case 'd':
-		note = D(0);
+		note = NOTE_D(0);
 		break;
 	case 'e':
-		note = E(0);
+		note = NOTE_E(0);
 		break;
 	case 'f':
-		note = F(0);
+		note = NOTE_F(0);
 		break;
 	case 'g':
-		note = G(0);
+		note = NOTE_G(0);
 		break;
 	case 'l':
 		// set the default note duration
