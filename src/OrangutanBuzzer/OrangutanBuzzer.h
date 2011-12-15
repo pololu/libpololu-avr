@@ -45,6 +45,27 @@
 //  and a is given by the twelfth root of 2 (~1.059463094359)
 
 // key
+
+#define NOTE_C(x)			( 0 + (x)*12)
+#define NOTE_C_SHARP(x)		( 1 + (x)*12)
+#define NOTE_D_FLAT(x)		( 1 + (x)*12)
+#define NOTE_D(x)			( 2 + (x)*12)
+#define NOTE_D_SHARP(x)		( 3 + (x)*12)
+#define NOTE_E_FLAT(x)		( 3 + (x)*12)
+#define NOTE_E(x)			( 4 + (x)*12)
+#define NOTE_F(x)			( 5 + (x)*12)
+#define NOTE_F_SHARP(x)		( 6 + (x)*12)
+#define NOTE_G_FLAT(x)		( 6 + (x)*12)
+#define NOTE_G(x)			( 7 + (x)*12)
+#define NOTE_G_SHARP(x)		( 8 + (x)*12)
+#define NOTE_A_FLAT(x)		( 8 + (x)*12)
+#define NOTE_A(x)			( 9 + (x)*12)
+#define NOTE_A_SHARP(x)		(10 + (x)*12)
+#define NOTE_B_FLAT(x)		(10 + (x)*12)
+#define NOTE_B(x)			(11 + (x)*12)
+
+#ifndef ARDUINO // don't define these for Arduino (F() and A4 conflict)
+
 #define C(x)			( 0 + (x)*12)
 #define C_SHARP(x)		( 1 + (x)*12)
 #define D_FLAT(x)		( 1 + (x)*12)
@@ -64,10 +85,10 @@
 #define B(x)			(11 + (x)*12)
 
 // special notes
-#ifndef ARDUINO
-// this conflicts with the analog pin constant A4 in pins_arduino.h
 #define A4				A(4)			// center of the Equal-Tempered Scale
+
 #endif
+
 #define SILENT_NOTE		0xFF			// this note will silence the buzzer
 
 #define DIV_BY_10		(1 << 15)		// frequency bit that indicates Hz/10

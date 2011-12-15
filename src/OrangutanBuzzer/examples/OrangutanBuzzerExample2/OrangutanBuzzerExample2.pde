@@ -77,7 +77,7 @@ void loop()                     // run over and over again
     }
     else
     {
-      buzzer.playNote(A(5), 200, 15);
+      buzzer.playNote(NOTE_A(5), 200, 15);
       lcd.print("note A5"); 
     }
   }
