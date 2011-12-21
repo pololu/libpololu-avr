@@ -66,7 +66,7 @@ sketches all have names that end with Example.
 
 == Change Log ==
 
-101221 -
+111221 -
 * Updated the libraries to be compatible with the Arduino 1.0
   environment.  These changes mean that the libraries will not work
   correctly under versions prior to Arduino 1.0.
