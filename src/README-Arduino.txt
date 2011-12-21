@@ -33,23 +33,23 @@ PololuWheelEncoders
 
 == Installation & Usage Instructions ==
 
-Note: the latest version of this library has been tested under the
-Arduino 0021 environment, and will only work on Arduino 0019 or
-higher.  If you have an older version of the Arduino environment,
-please update to version 0021 before using this library.
+Note: the latest version of this library has been tested with and will
+only work with Arduino 1.0 or newer.  If you have an older version of
+the Arduino environment, please update to version 1.0 before using
+this library.
 
 If you currently have an older version of our Orangutan Arduino
 Libraries, your first step should be to delete all of the
 Orangutan____ and Pololu____ directories from your 
-arduino-0021/libraries directory (arduino-____/hardware/libraries for
+arduino-1.0/libraries directory (arduino-____/hardware/libraries for
 some older versions of the Arduino environment). If you don't perform
 this step, the newer version of the libraries might not be compiled.
 
-Extract this archive to your arduino-0021/libraries directory.
+Extract this archive to your arduino-1.0/libraries directory.
 
 You should now be able to use these libraries in your sketches by
 selecting Sketch > Import Library > Orangutan_____ from your Arduino
-0021 IDE (or simply type #include <Orangutan_____.h> at the top of
+1.0 IDE (or simply type #include <Orangutan_____.h> at the top of
 your sketch). Note that you might need to restart your Arduino
 IDE before it sees the new libraries. If you do not need the
 functionality of a specific library, you should leave it out of your
@@ -65,6 +65,11 @@ sketches all have names that end with Example.
 
 
 == Change Log ==
+
+101221 -
+* Updated the libraries to be compatible with the Arduino 1.0
+  environment.  These changes mean that the libraries will not work
+  correctly under versions prior to Arduino 1.0.
 
 101215 -
 * Updated the libraries to be compatible with the Arduino 0021
