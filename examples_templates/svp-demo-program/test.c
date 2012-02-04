@@ -17,7 +17,7 @@
 // PROGMEM tells the compiler to store data in program space.
 #include <avr/pgmspace.h>
 
-const char lcd_width = 16;
+#define LCD_WIDTH 16
 
 // A couple of simple tunes, stored in program space.
 const char welcome[] PROGMEM = ">g32>>c32";
@@ -377,13 +377,13 @@ void music_test()
 	static unsigned char title_pos = 0;
 	unsigned char i;
 
-	for(i = 0; i < lcd_width; i++)
+	for(i = 0; i < LCD_WIDTH; i++)
 	{
 		print_character(pgm_read_byte(music_title + title_pos + i));
 	}
 
 	title_pos++;
-	if(title_pos + lcd_width >= sizeof(music_title))
+	if(title_pos + LCD_WIDTH >= sizeof(music_title))
 	{
 		title_pos = 0;
 	}
@@ -526,7 +526,7 @@ void usb_test()
 {
 	serial_receive(USB_COMM, receive_buffer, sizeof(receive_buffer));
 
-	char screen_string[lcd_width+1] = "Type in to COM.";
+	char screen_string[LCD_WIDTH+1] = "Type in to COM.";
 	unsigned char screen_string_length = 0;
 
 	unsigned char update_lcd_soon = 1;
@@ -557,7 +557,7 @@ void usb_test()
 				// Process the new byte that has been received.
 				serial_send_blocking(USB_COMM, &receive_buffer[i], 1);
 
-				if (screen_string_length == lcd_width)
+				if (screen_string_length == LCD_WIDTH)
 				{
 					screen_string_length = 0;
 				}

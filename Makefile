@@ -8,7 +8,6 @@ mcu_atmega324p := atmega324p
 mcu_atmega644p := atmega644p
 mcu_atmega1284p := atmega1284p
 mcu_atmega1284p_x2 := atmega1284p
-device_specific_cflags_atmega1284p_x2 := -D_X2_1284
 
 LIBRARY_OBJECTS=\
 	OrangutanAnalog \
@@ -38,7 +37,6 @@ SHELL = sh
 .PHONY: library_files
 library_files:
 	@echo making library files
-	@echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) && $(MAKE) && cd ../.. &&) echo -n
 
 # Change the path to allow make within sh to work: see WinAVR bug 1915456 "make ignores parameters when executed from sh"
@@ -46,25 +44,9 @@ PATH := $(shell echo $$PATH | sed 's/\(WinAVR-[0-9]*\)\/bin/\\1\/utils\/bin/g'):
 
 LIBRARY_FILES := $(foreach device,$(devices),libpololu_$(device).a)
 
-SHELL=sh
-
 .PHONY: clean
 clean:
-	@echo $(SHELL)
 	$(foreach device,$(devices),cd devices/$(device) && $(MAKE) clean && cd ../.. &&) echo -n
-	if [ -e examples_templates -a -e examples ]; then \
-		for dir in examples/*/*; \
-		do \
-			$(MAKE) clean -C $$dir; \
-		done; \
-		rm -rf examples; \
-	fi
-	if [ -e examples_templates ]; then \
-		for dir in examples_templates/*/; \
-		do \
-			$(MAKE) clean -C $$dir; \
-		done; \
-	fi
 	rm -f $(LIBRARY_FILES)
 
 # "make install" basically just copies the .a and files to the lib directory,
@@ -87,7 +69,12 @@ clean:
 # For example, you could uncomment these lines:
 #   LIB := /usr/lib/avr/lib
 #   INCLUDE_POLOLU := /usr/lib/avr/include
-
+#
+# Note: Unless you specify LIB and INCLUDE_POLOLU as described above,
+# or you add the AVR Studio 5 toolchain to your path, running
+# 'make install' will NOT install the library into the AVR Studio 5
+# toolchain.  For Windows users, we recommend using the library's
+# executable installer.
 
 # Figure out what operating system we are running in.
 UNAME := $(shell uname)
@@ -136,93 +123,7 @@ install: $(LIBRARY_FILES)
 	$(INSTALL_FILES) pololu/orangutan $(INCLUDE_POLOLU)
 	@echo "Installation is complete."
 
-# We make all of the examples from templates in the examples_templates
-# directory (which is not distributed), by running a bunch of commands
-# concatenated together with &&.
-
-examples_3pi := 3pi-demo-program 3pi-demo-or-serial-slave 3pi-linefollower-pid 3pi-linefollower 3pi-mazesolver 3pi-serial-slave
-examples_orangutan := buzzer1 buzzer2 buzzer3 lcd1 lcd2 lcd3-hello-world pushbuttons1 pushbuttons2 motors2 simple-test wheel-encoders1 wdt servos-and-buzzer pulsein1 pulsein2 stepper-motor1
-examples_168_328p := analog2 3pi-serial-master sv-demo-program lv-demo-program serial1
-examples_svp := svp1 svp-demo-program svp-eight-servo svp-sixteen-servo svp-one-servo serial2
-examples_x2 := digital1 serial2 x2-demo-program
-
-# The 48 examples are the only ones that will work on the mega48.
-# They will also work on the orangutans, which could have either a 168
-# or a 328 processor.
-
-examples_atmega48 := digital1 analog1 motors1 led1 servo-control-using-delays servos1
-examples_atmega168 := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
-examples_atmega328p := $(examples_atmega48) $(examples_3pi) $(examples_orangutan) $(examples_168_328p)
-examples_atmega324p := $(examples_atmega48) $(examples_orangutan) $(examples_svp)
-examples_atmega644p := $(examples_atmega48) $(examples_orangutan) $(examples_x2)
-examples_atmega1284p := $(examples_atmega324p)
-examples_atmega1284p_x2 := $(examples_atmega644p)
-
-example_template = examples_templates/$(example)
-example_dir = examples/$(device)/$(example)
-hex_dir = examples/$(device)/hex_files
-
-make_example = $(foreach example,$(value examples_$(device)), \
-		mkdir -p $(example_dir) && \
-		cp -a $(example_template)/*.[ch] $(example_dir)/ && \
-		cat examples_templates/template_$(device).mk $(example_template)/Makefile > $(example_dir)/Makefile && \
-		cat $(example_template)/*.aps \
-			| sed 's/<PART>[^<]*<\/PART>/<PART>$(mcu_$(device))<\/PART>/' \
-			| sed 's/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$(device).a<\/LIB>/' \
-			| sed 's/<OPTIONSFORALL>/<OPTIONSFORALL>$(device_specific_cflags_$(device)) /' \
-			> $(example_dir)/$(example).aps && \
-		)
-
-.PHONY: examples
-examples:
-	$(foreach device,$(devices),$(make_example)) test 0
-
-make_hex_files = mkdir -p $(hex_dir) && \
-	$(foreach example,$(value examples_$(device)), \
-	make -C $(example_dir) && \
-	cp -a $(example_dir)/*.hex $(hex_dir)/$(example).hex && \
-	)
-
-.PHONY: hex_files
-hex_files: examples
-	$(foreach device,$(devices),$(make_hex_files)) test 0
-
-# The following code creates the zip file.
-ZIPDIR=lib_zipfiles
-DATE := $(shell date +%y%m%d)
-LIB_ZIPFILE := $(ZIPDIR)/libpololu-avr-$(DATE).zip
-HEX_ZIPFILE := $(ZIPDIR)/libpololu-avr-example-hex-files-$(DATE).zip
-ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
-ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
-
-ZIP_EXCLUDES := \*.o .svn/\* \*/.svn/\* \*.hex \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt
-
-ARDUINO_EXCLUDES := libpololu-arduino/OrangutanPulseIn/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanServos/\* libpololu-arduino/OrangutanSPIMaster/\* libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/OrangutanX2/\* libpololu-arduino/include/\*
-NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
-
-.PHONY: zip
-zip: library_files examples hex_files arduino_zip
-	rm -f libpololu-avr
-	mkdir -p $(ZIPDIR)
-	rm -f $(LIB_ZIPFILE)
-	rm -f $(HEX_ZIPFILE)
-	yes | rm -Rf $(foreach object, $(LIBRARY_OBJECTS), ./pololu/$(object))
-	cp -R $(foreach object, $(LIBRARY_OBJECTS), ./src/$(object)) ./pololu
-	yes | rm -Rf ./pololu/*/*.cpp ./pololu/*/examples ./pololu/*/private ./pololu/*/keywords.txt
-	ln -s . libpololu-avr
-	zip -rq $(LIB_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) $(NON_ARDUINO_EXCLUDES)
-	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex
-	rm libpololu-avr
-	yes | rm -Rf $(foreach object, $(LIBRARY_OBJECTS), ./pololu/$(object))
-
-arduino_zip:
-	mkdir -p $(ZIPDIR)
-	rm -f $(ARDUINO_ZIPFILE)
-	rm -f $(ARDUINO_QTR_ZIPFILE)
-	ln -s src libpololu-arduino
-	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino -x $(ZIP_EXCLUDES) -x $(ARDUINO_EXCLUDES)
-	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino/README-Arduino.txt
-	rm libpololu-arduino
-	ln -s src/PololuQTRSensors .
-	zip -rq $(ARDUINO_QTR_ZIPFILE) PololuQTRSensors -x $(ZIP_EXCLUDES) -x $(ARDUINO_EXCLUDES)
-	rm PololuQTRSensors
+# Include additional Makefile rules that are only available if you have
+# downloaded the actual source of the library (from github).
+# Silently fail otherwise.
+-include src.mk

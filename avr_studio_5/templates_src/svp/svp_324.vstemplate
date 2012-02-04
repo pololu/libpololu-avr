@@ -1,0 +1,26 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Orangutan SVP-324</Name>
+    <Description>Simple template for the Pololu Orangutan SVP-324, using the Pololu AVR C/C++ Library.</Description>
+    <ProjectType>AVRGCC</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>21</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>orangutan_app</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>svp_icon.jpg</Icon>
+    <PreviewImage>svp_preview.jpg</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="template.avrgccproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">main.c</ProjectItem>
+    </Project>
+    <CustomParameters>
+      <CustomParameter Name="$mcu$" Value="ATmega324PA"/>
+      <CustomParameter Name="$library$" Value="pololu_atmega324p"/>
+    </CustomParameters>
+  </TemplateContent>
+</VSTemplate>

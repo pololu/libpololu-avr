@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>
 
 /*
- * buzzer2: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
+ * buzzer2: for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * Uses the OrangutanBuzzer functions to play a series of notes on the
  * Orangutan's buzzer.  It uses the OrangutanPushbuttons library to

@@ -2,7 +2,7 @@
 #include <stdio.h>	// required for printf()
 
 /*
- * lcd3-hello-world: for for the Orangutan LV, SV, SVP, X2, and 3pi robot.
+ * lcd3-hello-world: for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
  * This example program is intended for use on the Orangutan LV, SV, SVP, X2,
  * and 3pi robot (any Orangutan with an LCD).  It uses printf() from stdio.h

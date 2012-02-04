@@ -1,0 +1,26 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>3pi Robot with ATmega328P</Name>
+    <Description>Simple template for the Pololu 3pi Robot, using the Pololu AVR C/C++ Library.  This template is for 3pi Robots with the ATmega328P processor (all the robots shipped since June 2009, starting with serial number 0J5840).</Description>
+    <ProjectType>AVRGCC</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>10</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>3pi_app</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>3pi_icon.jpg</Icon>
+    <PreviewImage>3pi_preview.jpg</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="template.avrgccproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">main.c</ProjectItem>
+    </Project>
+    <CustomParameters>
+      <CustomParameter Name="$mcu$" Value="ATmega328P"/>
+      <CustomParameter Name="$library$" Value="pololu_atmega328p"/>
+    </CustomParameters>
+  </TemplateContent>
+</VSTemplate>

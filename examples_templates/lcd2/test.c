@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 /*
- * lcd2: for for the Orangutan LV, SV, SVP, X2, and 3pi robot.
+ * lcd2: for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
  * This example program is for any Orangutan with an LCD (or the 3pi).
  * It uses the OrangutanLCD functions to display custom characters on 

@@ -1,7 +1,7 @@
 #include <pololu/orangutan.h>  
   
 /*  
- * digital1: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
+ * digital1: for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *  
  * This example uses the OrangutanDigital functions to read a digital 
  * input and set a digital output.  It takes a reading on pin PC1, and 

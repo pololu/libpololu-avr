@@ -2,7 +2,7 @@
 #include <stdio.h>	// required for printf()
 
 /*
- * servos-and-buzzer: for for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
+ * servos-and-buzzer: for the Orangutan LV, SV, SVP, X2, Baby-O and 3pi robot.
  *
  * This example demonstrates how you can have a program that makes sounds
  * and uses the OrangutanServos library.  OrangutanServos and OrangutanBuzzer

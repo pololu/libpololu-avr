@@ -2,3 +2,9 @@
 *.o
 /examples/
 /lib_zipfiles/
+/avr_studio_5/templates/
+/avr_studio_5/stk500_xml/
+
+*~
+\#*#
+.#*

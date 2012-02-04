@@ -1,0 +1,27 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Orangutan X2 with ATmega1284P</Name>
+    <Description>Simple template for the Pololu Orangutan X2, using the Pololu AVR C/C++ Library.  This is for boards that have the ATmega1284P microcontroller (all boards shipped after October 25th, 2010).</Description>
+    <ProjectType>AVRGCC</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>30</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>orangutan_app</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <Icon>x2_icon.jpg</Icon>
+    <PreviewImage>x2_preview.jpg</PreviewImage>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="x2.avrgccproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">main.c</ProjectItem>
+    </Project>
+    <CustomParameters>
+      <CustomParameter Name="$mcu$" Value="ATmega1284P"/>
+      <CustomParameter Name="$library$" Value="pololu_atmega1284p_x2"/>
+      <CustomParameter Name="$boardmacro$" Value="_X2_1284"/>
+    </CustomParameters>
+  </TemplateContent>
+</VSTemplate>
