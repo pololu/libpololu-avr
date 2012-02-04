@@ -18,7 +18,7 @@
 
 /*
  * Written by Ben Schmidel, August 13, 2009.
- * Copyright (c) 2009-2011 Pololu Corporation. For more information, see
+ * Copyright (c) 2009-2012 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com

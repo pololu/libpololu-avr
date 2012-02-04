@@ -3,7 +3,7 @@
 */
 
 /*
- * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2012 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com

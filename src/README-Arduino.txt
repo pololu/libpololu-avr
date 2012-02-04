@@ -1,6 +1,6 @@
 Pololu AVR Libraries for the Arduino IDE
 
-Copyright (c) 2008-2011 Pololu Corporation. For more information, see
+Copyright (c) 2008-2012 Pololu Corporation. For more information, see
 
 http://www.pololu.com/docs/0J17/5
 http://www.pololu.com
