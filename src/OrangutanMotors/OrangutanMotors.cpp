@@ -9,7 +9,7 @@
 /*
  * Written by Ben Schmidel, May 15, 2008.
  * Last modified: September 29, 2008
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -56,29 +56,6 @@
 #endif
 
 
-#ifdef ARDUINO
-// This code is for people using the Arduino IDE (it lets the millis() function keep working)
-// It will conflict with OrangutanTime, so Arduino IDE users cannot use OrangutanTime and
-// OrangutanMotors.
-// declared in wiring.c of Arduino-0012 and used to drive millis()
-extern volatile unsigned long timer0_millis;
-unsigned int us_times_10 = 0;		// in units of 10^-7 s
-
-
-// this ISR is called every time timer2 overflows
-ISR(TIMER2_OVF_vect)
-{
-	us_times_10 += 1024;
-	if (us_times_10 >= 10000)
-	{
-		timer0_millis++;
-		us_times_10 -= 10000;
-	}
-}
-#endif
-
-#ifdef LIB_POLOLU
-
 extern "C" void set_m1_speed(int speed)
 {
 	OrangutanMotors::setM1Speed(speed);
@@ -93,8 +70,6 @@ extern "C" void set_motors(int m1, int m2)
 {
 	OrangutanMotors::setSpeeds(m1, m2);
 }
-
-#endif
 
 
 // constructor
@@ -138,13 +113,6 @@ void OrangutanMotors::init2()
 
 #elif !defined(_ORANGUTAN_X2)
 
-	#if !defined(LIB_POLOLU)
-	// this code is for people using the Arduino IDE (it lets the millis() function work using timer 2 instead of timer 0)
-	TIMSK0 &= ~(1 << TOIE0);	// timer0 overflow interrupt disabled
-	TIMSK2 |= 1 << TOIE2;		// timer2 overflow interrupt enabled
-	// we intentionally do not call sei() here
-	#endif
-
 	/*  40 kHz operation (3pi, Orangutan SV and SVP, and Baby Orangutan B can handle this, Orangutan LV cannot)
 	*** Note that using these settings will break OrangutanTime and QTRsensors ***
 	// configure for inverted phase-correct PWM output on motor control pins:   
@@ -161,10 +129,13 @@ void OrangutanMotors::init2()
     //  set OCxx on compare match, clear on timer overflow   
     //  Timer0 and Timer2 counts up from 0 to 255 and then overflows directly to 0   
     TCCR0A = TCCR2A = 0xF3;
-  
+ 
+#ifndef ARDUINO	
     // use the system clock/8 (=2.5 MHz) as the timer clock,
 	// which will produce a PWM frequency of 10 kHz
+	// Arduino uses Timer0 for timing functions like micros() and delay() so we can't change it
     TCCR0B = TCCR2B = 0x02;
+#endif
 
 	// use the system clock (=20 MHz) as the timer clock,
 	// which will produce a PWM frequency of 78 kHz.  The Baby Orangutan B

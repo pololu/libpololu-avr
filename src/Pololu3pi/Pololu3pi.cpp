@@ -4,7 +4,7 @@
 
 /*
  * Written by Paul Grayson, 2008.
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -30,10 +30,10 @@
 // a global qtr sensors
 static PololuQTRSensorsRC qtr3pi;
 
-#ifdef LIB_POLOLU
-
+#ifndef ARDUINO
 // only needed for lib-pololu
 #include "../OrangutanTime/OrangutanTime.h"
+#endif
 
 extern "C" void pololu_3pi_init(unsigned int line_sensor_timeout)
 {
@@ -105,7 +105,6 @@ extern "C" unsigned int *get_line_sensors_calibrated_maximum_off()
 	return qtr3pi.calibratedMaximumOff;
 }
 
-#endif
 
 void Pololu3pi::init(unsigned int line_sensor_timeout_us, unsigned char disable_emitter_pin)
 {
@@ -119,7 +118,7 @@ void Pololu3pi::init(unsigned int line_sensor_timeout_us, unsigned char disable_
 
 	qtr3pi.emittersOff();
 
-#ifdef LIB_POLOLU
+#ifndef ARDUINO
 	// reset the time in lib-pololu mode only 
 	OrangutanTime::reset();
 #endif

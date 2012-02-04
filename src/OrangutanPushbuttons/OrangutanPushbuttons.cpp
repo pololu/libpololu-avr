@@ -5,7 +5,7 @@
 
 /*
  * Written by Ben Schmidel, May 23, 2008.
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -38,9 +38,13 @@ OrangutanPushbuttons::OrangutanPushbuttons()
 
 }
 
-#ifdef LIB_POLOLU
 
+#ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h"	// provides access to delay routines
+#else
+#include <Arduino.h> // provides access to delay() and delayMicroseconds()
+#endif
+
 
 extern "C" unsigned char wait_for_button_press(unsigned char buttons)
 {
@@ -71,11 +75,6 @@ extern "C" unsigned char get_single_debounced_button_release(unsigned char butto
 {
 	return OrangutanPushbuttons::getSingleDebouncedRelease(buttons);
 }
-
-#else
-#include "wiring.h"		// provides access to delay() and delayMicroseconds()
-#endif
-
 
 
 inline void OrangutanPushbuttons::init()

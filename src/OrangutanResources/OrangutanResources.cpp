@@ -4,7 +4,7 @@
 
 /*
  * Written by Paul Grayson, 2008.
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -24,14 +24,10 @@
 #include "OrangutanResources.h"
 
 
-#ifdef LIB_POLOLU
-
 extern "C" int get_free_ram()
 {
 	return OrangutanResources::getFreeRAM();
 }
-
-#endif
 
 
 // constructor

@@ -3,7 +3,7 @@
 */
 	
 /*
- * Copyright (c) 2009-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2009-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include "PololuWheelEncoders.h"
 
-#ifdef LIB_POLOLU
 
 #include "../OrangutanLEDs/OrangutanLEDs.h"
 
@@ -67,7 +66,6 @@ extern "C" int encoders_check_error_m2()
 	return PololuWheelEncoders::checkErrorM2();
 }
 
-#endif
 
 /*
  * Pin Change interrupts

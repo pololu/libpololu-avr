@@ -6,7 +6,7 @@
 
 /*
  * Written by Ben Schmidel, May 27, 2008.
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -27,8 +27,6 @@
 #include "OrangutanAnalog.h"
 
 #include "../OrangutanResources/include/OrangutanModel.h"
-
-#ifdef LIB_POLOLU
 
 
 extern "C" unsigned int analog_read(unsigned char channel)
@@ -134,7 +132,6 @@ extern "C" int read_temperature_c()
 
 #endif // _ORANGUTAN_SVP
 
-#endif // LIB_POLOLU
 
 #ifdef _ORANGUTAN_SVP
 static unsigned int fromMillivoltsToNormal(unsigned int millivolts);

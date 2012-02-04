@@ -17,7 +17,7 @@
 
 /*
  * Written by Ben Schmidel, August 11, 2009.
- * Copyright (c) 2009-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2009-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -195,9 +195,6 @@ ISR(TIMER1_COMPB_vect)
 }
 
 
-#ifdef LIB_POLOLU
-
-
 // use of init() is discouraged; use start() instead
 extern "C" unsigned char servos_init(const unsigned char servoPins[], unsigned char numPins)
 {
@@ -275,9 +272,6 @@ extern "C" void servos_stop()
 {
 	OrangutanServos::stop();
 }
-
-#endif
-
 
 
 // constructor

@@ -5,7 +5,7 @@
 
 /*
  * Written by David Grayson, Sep 2, 2009.
- * Copyright (c) 2009-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2009-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -29,7 +29,6 @@
 
 #ifdef _ORANGUTAN_SVP
 
-#ifdef LIB_POLOLU
 
 extern "C" unsigned char svp_get_firmware_version()
 {
@@ -76,7 +75,6 @@ extern "C" unsigned char svp_check_error_cd()
 	return OrangutanSVP::checkErrorCD();
 }
 
-#endif
 
 typedef union SVPVariables
 {

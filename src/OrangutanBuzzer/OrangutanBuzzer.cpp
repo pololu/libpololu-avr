@@ -11,7 +11,7 @@
 
 /*
  * Written by Ben Schmidel et al., May 23, 2008.
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -103,7 +103,6 @@ OrangutanBuzzer::OrangutanBuzzer()
 {
 }
 
-#ifdef LIB_POLOLU
 
 extern "C" void play_frequency(unsigned int freq, unsigned int dur, 
 							   unsigned char volume)
@@ -147,7 +146,6 @@ extern "C" unsigned char play_check()
 	return OrangutanBuzzer::playCheck();
 }
 
-#endif
 
 extern unsigned char buzzerInitialized;
 
@@ -606,25 +604,25 @@ static void nextNote()
 		tmp_octave --;
 		goto parse_character;
 	case 'a':
-		note = A(0);
+		note = NOTE_A(0);
 		break;
 	case 'b':
-		note = B(0);
+		note = NOTE_B(0);
 		break;
 	case 'c':
-		note = C(0);
+		note = NOTE_C(0);
 		break;
 	case 'd':
-		note = D(0);
+		note = NOTE_D(0);
 		break;
 	case 'e':
-		note = E(0);
+		note = NOTE_E(0);
 		break;
 	case 'f':
-		note = F(0);
+		note = NOTE_F(0);
 		break;
 	case 'g':
-		note = G(0);
+		note = NOTE_G(0);
 		break;
 	case 'l':
 		// set the default note duration

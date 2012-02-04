@@ -3,7 +3,7 @@
 */
 
 /*
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -112,9 +112,13 @@ OrangutanLCD::OrangutanLCD()
 {
 }
 
-#ifdef LIB_POLOLU
 
+#ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h"
+#else
+#include <Arduino.h> // provides access to delay() and delayMicroseconds()
+#endif
+
 
 #include <stdio.h>
 
@@ -307,9 +311,6 @@ extern "C" void lcd_load_custom_character(const char *picture_p, unsigned char n
 	OrangutanLCD::loadCustomCharacter(picture_p, number);
 }
 
-#else
-#include "wiring.h"		// provides access to delay() and delayMicroseconds()
-#endif
 
 #define LCD_CGRAM   6
 
@@ -582,7 +583,6 @@ void OrangutanLCD::clear()
 {
 	send_cmd(LCD_CLEAR);
 
-#ifdef LIB_POLOLU
 	if (printf_chars == 0)		// if we haven't used printf(), return now
 		return;
 
@@ -594,7 +594,6 @@ void OrangutanLCD::clear()
 
 	col = 0;
 	row = 0;
-#endif
 }
 
 
@@ -627,14 +626,12 @@ void OrangutanLCD::printFromProgramSpace(const char *str)
 	}
 }
 
-#ifndef LIB_POLOLU
 // other LCD libraries have this incorrectly named method, so it is here to
 // provide some semblance of compatibility
 void OrangutanLCD::printIn(const char *str)
 {
 	print(str);
 }
-#endif
 
 // prints a signed long.  This prints from wherever the cursor is and will not
 // span lines.  (This lets you concatenate print statements.)  This function
@@ -735,11 +732,9 @@ void OrangutanLCD::gotoXY(unsigned char x, unsigned char y)
 	// and add X to it to get the right character location.
 	send_cmd(line_mem[y] + x);
 
-#ifdef LIB_POLOLU
 	// Save it for use with printf.
 	col = x;
 	row = y;
-#endif
 }
 
 
@@ -793,7 +788,6 @@ void OrangutanLCD::scroll(unsigned char direction, unsigned char num,
 	}
 }
 
-#ifdef LIB_POLOLU
 // Initializes the LCD library for printf support.  After this,
 // printf will start sending characters to the LCD.
 void OrangutanLCD::initPrintf()
@@ -816,7 +810,6 @@ void OrangutanLCD::initPrintf(unsigned char lcdWidth, unsigned char lcdHeight)
 	numLCDRows = lcdHeight;
 	initPrintf();
 }
-#endif
 
 // Local Variables: **
 // mode: C++ **

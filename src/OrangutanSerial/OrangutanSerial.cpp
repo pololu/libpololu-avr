@@ -4,7 +4,7 @@
 
 /*
  * Written by Paul Grayson et al., October, 2008.
- * Copyright (c) 2008-2010 Pololu Corporation. For more information, see
+ * Copyright (c) 2008-2011 Pololu Corporation. For more information, see
  *
  *   http://www.pololu.com
  *   http://forum.pololu.com
@@ -34,7 +34,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#ifdef LIB_POLOLU
 
 extern "C" void serial_check()
 {
@@ -186,7 +185,6 @@ extern "C" char serial_send_buffer_empty()
 
 #endif
 
-#endif
 
 #if _SERIAL_PORTS==1
 
