@@ -27,6 +27,8 @@ Page instfiles
 Var /GLOBAL VSShellPath
 Var Dialog
 
+DirText "Setup will install the Pololu AVR C/C++ Library (version ${LIB_VER}) in the following folder.  To install in a different folder, click Browse and select another folder.  Click Next to continue."
+
 # Toolchain variables
 Var WinAVRPath
 Var AS50Path
@@ -89,7 +91,7 @@ Function optionsPage
     GetFunctionAddress $0 "optionsPageLeave"
     nsDialogs::OnBack $0
     
-    ${NSD_CreateLabel} 0 0 100% 12u "Install the library as part of the following toolchains:"
+    ${NSD_CreateLabel} 0 0 100% 12u "Install the library into the following toolchains:"
     Pop $0
 
     !insertmacro CreateToolchainCheckBox "WinAVR" $WinAVRPath $WinAVRIntegrate $WinAVRBox 20u
@@ -113,7 +115,7 @@ Section
     Call WinAVRCheck
     StrCmp $WinAVRPath "" no_winavr
             DetailPrint "Detected WinAVR.  Installing library in it..."
-	    DetailPrint "WinAVR = $WinAVRPath" # tmphax
+        DetailPrint "WinAVR = $WinAVRPath" # tmphax
             #TODO: SetOutPath "$WinAVRPath\avr\lib"
             #TODO: File "${libpololu-avr}\libpololu_*.a"
             #TODO: SetOutPath "$WinAVRPath\avr\include"
@@ -200,5 +202,7 @@ Function VSShellCheck
     DetailPrint "tmphax: found shell at $VSShellPath"
     StrCmp $VSShellPath "" 0 VSShellCheckDone
     ReadRegStr $VSShellPath HKCU "SOFTWARE\Atmel\AvrStudio\5.0_Config" 'ShellFolder'
+    StrCmp $VSShellPath "" 0 VSShellCheckDone
+    ReadRegStr $VSShellPath HKCU "Software\Atmel\AVRStudio51\5.1_Config" 'ShellFolder'
     VSShellCheckDone:
 FunctionEnd
