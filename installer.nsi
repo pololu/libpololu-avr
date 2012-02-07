@@ -2,6 +2,8 @@
 # Detects WinAVR and AVR Studio 5 and adds the library's .h and .a files
 # in the appropriate directories.
 
+# TODO: install AVR Studio 5.1 BETA and make sure this installer works with it!
+
 !define LIB_VER "YYMMDD"
 
 !define libpololu-avr "."
@@ -74,7 +76,7 @@ Section
             #SetOutPath "$AS5Loc\AVR Toolchain\avr\include"
             #File /r "${libpololu-avr}\pololu"
             #SetOutPath "$AS5Loc\tools\STK500\xml"
-            #File /r "${libpololu-avr}\avr_studio_5"
+            #File /r "${libpololu-avr}\avr_studio_5\stk500_xml\*.xml" # TODO: Don't override existing files here
             goto end_as5
         no_as5:
             DetailPrint "Did not detect AVR Studio 5."
@@ -97,18 +99,36 @@ SectionEnd
 # Checks to see if WinAVR is installed.
 # Sets $WinAVRLoc to the location or "" if not found.
 Function WinAVRCheck
-    ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
     ${GetParent} $0 $WinAVRLoc
 FunctionEnd
+
+# The location of AVR Studio 5.0 is stored in several places:
+# HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.0" 'StubExePath'
+# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{60315A8A-5FCA-47CE-A856-681F3A9CDB5B}" 'InstallLocation'
+# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\avrstudio5.exe" (Default) (requires GetParent)
+# HKLM "SOFTWARE\Atmel AVR\AvrStudio\5.0" 'InstallDir' 'InstallDir'   <-- does NOT work for 5.1 beta
+# HKCU "SOFTWARE\Atmel\AVRStudio\5.0_Config" 'InstallDir'
+#   
+# The location of AVR Studio 5.1 is stored in several places:
+# HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath' (requires GetParent)
+# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7BE9E558-BE53-4939-9565-A0BEA2F839D0}" 'InstallLocation'
+# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\avrstudio.exe" (Default) (requires GetParent)
+# HKCU "SOFTWARE\Atmel\AVRStudio51\5.1_Config" 'InstallDir'
+#
+# We would like to look in HKLM (HKEY_LOCAL_MACHINE) instead of HKCU (HKEY_CURRENT_USER) because
+# it doesn't really make sense to look at user settings to find where an application installed.
+# We would also like to use a registry key that appears to be used consistently between the
+# different versions of AVR Studio 5 so it is easy to update our installers.
+# We would also like one that is predictable (e.g. doesn't have a GUID in it).
+# The only one that satisfies all of those criteria is the AppEnv one, so we will use that.
 
 # Checks to see if AVR Studio 5 is installed.
 # Sets $AS5Loc to the location or "" if not found.
 Function AS5Check
-    ReadRegStr $AS5Loc HKCU "Software\Atmel\AVRStudio\5.0_Config" 'InstallDir'
+    ReadRegStr $AS5Loc HKCU "SOFTWARE\Atmel\AVRStudio\5.0_Config" 'InstallDir'
 FunctionEnd
 
 Function VSIXCheck
-    ReadRegStr $0 HKCU "Software\Microsoft\VisualStudio\10.0_Config" 'InstallDir'
-    ReadRegStr $0 HKCU "Software\Microsoft\VCSExpress\10.0_Config" 'InstallDir'
-    StrCpy $VSIXLoc $0
+    ReadRegStr $VSIXLoc HKCU "SOFTWARE\Atmel\AvrStudio\5.0_Config" 'ShellFolder'
 FunctionEnd
