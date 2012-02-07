@@ -11,7 +11,10 @@
     <License>LICENSE.txt</License>
     <Icon>icon.png</Icon>
     <PreviewImage>preview.png</PreviewImage>
-    <SupportedProducts><IsolatedShell Version="5.0">AVRStudio</IsolatedShell></SupportedProducts>
+    <SupportedProducts>
+      <IsolatedShell Version="5.0">AVRStudio</IsolatedShell>
+      <IsolatedShell Version="5.1">AVRStudio</IsolatedShell>
+    </SupportedProducts>
     <SupportedFrameworkRuntimeEdition MinVersion="2.0" />
     <InstalledByMsi>false</InstalledByMsi>
     <AllUsers>true</AllUsers>
