@@ -91,47 +91,24 @@ Section
         DetailPrint "Visual Studio 10 not detected, skipping extension install."
         Goto end_vsix
     end_vsix:
+    
 SectionEnd
 
+# Checks to see if WinAVR is installed.
+# Sets $WinAVRLoc to the location or "" if not found.
 Function WinAVRCheck
-    ReadRegStr $R0 HKLM "Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
-    ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
-    ReadRegStr $R0 HKLM "Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR-20100110" 'UninstallString'
-    ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR-20100110" 'UninstallString'
-    ; ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\blahblahblah" 'UninstallString'
-    ${GetParent} $R0 $WinAVRLoc
-    ; MessageBox MB_OKCANCEL "Contents of $$WinAVRLoc $WinAVRLoc" IDOK okay IDCANCEL cancel
-        ; cancel:
-        ; Quit
-        ; okay:
-    ; MessageBox MB_OKCANCEL "Contents of R0 - $R0, contents of 0 - $0" IDOK okay IDCANCEL cancel
-        ; cancel:
-        ; Quit
-        ; okay:
-        
-    ; StrCmp $ "" isempty isnotempty
-        ; isempty:
-        ; MessageBox MB_OK "$$0 was $0 in isempty"
-        ; StrCpy
-        ; goto end
-
-        ; isnotempty:
-        ; MessageBox MB_OK "$$0 was $0 in isnotempty" 
-        ; goto end
-
-        ; end:
-        
+    ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
+    ${GetParent} $0 $WinAVRLoc
 FunctionEnd
 
+# Checks to see if AVR Studio 5 is installed.
+# Sets $AS5Loc to the location or "" if not found.
 Function AS5Check
-    ReadRegStr $R0 HKCU "Software\Atmel\AVRStudio\5.0_Config" 'InstallDir'
-    ; Push $R0
-    ; Pop $0
-    StrCpy $AS5Loc $R0
+    ReadRegStr $AS5Loc HKCU "Software\Atmel\AVRStudio\5.0_Config" 'InstallDir'
 FunctionEnd
 
 Function VSIXCheck
-    ReadRegStr $R0 HKCU "Software\Microsoft\VisualStudio\10.0_Config" 'InstallDir'
-    ReadRegStr $R0 HKCU "Software\Microsoft\VCSExpress\10.0_Config" 'InstallDir'
-    StrCpy $VSIXLoc $R0
+    ReadRegStr $0 HKCU "Software\Microsoft\VisualStudio\10.0_Config" 'InstallDir'
+    ReadRegStr $0 HKCU "Software\Microsoft\VCSExpress\10.0_Config" 'InstallDir'
+    StrCpy $VSIXLoc $0
 FunctionEnd
