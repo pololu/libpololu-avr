@@ -2,8 +2,6 @@
 # Detects WinAVR and AVR Studio 5 and adds the library's .h and .a files
 # in the appropriate directories.
 
-# TODO: install AVR Studio 5.1 BETA and make sure this installer works with it!
-
 !define LIB_VER "YYMMDD"
 
 !define libpololu-avr "."
@@ -17,22 +15,70 @@ SetCompressor /solid lzma
 RequestExecutionLevel admin
 OutFile "libpololu-avr-${LIB_VER}.exe"
 Name "Pololu AVR C/C++ Library"
-InstallDir "C:\libpololu-avr\"
+InstallDir "C:\libpololu-avr"
 ShowInstDetails show
 AllowSkipFiles on
 XPStyle on
 
 Page directory
-#Page custom optionsPage
+Page custom optionsPage optionsPageLeave
 Page instfiles
 
-Var /GLOBAL WinAVRLoc
-Var /GLOBAL AS5Loc
-Var /GLOBAL VSIXLoc
+Var /GLOBAL VSShellPath
 Var Dialog
-Var Label
-Var Text
 
+# Toolchain variables
+Var WinAVRPath
+Var AS50Path
+Var AS51Path
+
+Var WinAVRBox
+Var AS50Box
+Var AS51Box
+
+Var WinAVRIntegrate
+Var AS50Integrate
+Var AS51Integrate
+
+# When the installer starts, detect the different things we need to detect.
+Function .onInit
+    Call WinAVRCheck
+    Call AS5Check
+    Call VSShellCheck
+    
+    # Check the assumptions we make when calling NSD_GetState and NSD_SetState.
+    ${If} ${BST_CHECKED} != 1
+      Abort
+    ${EndIf}
+    ${If} ${BST_UNCHECKED} != 0
+      Abort
+    ${EndIf}
+    
+    # By default, any checkbox that is available will be checked.
+    StrCpy $WinAVRIntegrate "1"
+    StrCpy $AS50Integrate "1"
+    StrCpy $AS51Integrate "1"
+    
+    DetailPrint "Hello"
+FunctionEnd
+
+!macro CreateToolchainCheckBox Name Path Checked Box Y
+    ${If} "${Path}" != ""
+      StrCpy $1 "${Name} (${Path})"
+      StrCpy $2 1                    # enable the checkbox
+      StrCpy $3 "${Checked}"         # check the box if appropriate
+    ${Else}
+      StrCpy $1 "${Name} (not detected)"
+      StrCpy $2 0                    # disable the checkbox
+      StrCpy $3 0                    # uncheck the checkbox
+    ${Endif}
+    ${NSD_CreateCheckBox} 0 ${Y} 100% 12u $1
+    Pop ${Box}
+    EnableWindow ${Box} $2     # disable/enable the checkbox
+    ${NSD_SetState} ${Box} $3
+!macroend
+
+# Creates the optionsPage and all the checkboxes in it.    
 Function optionsPage
     nsDialogs::Create 1018
     Pop $Dialog
@@ -40,25 +86,37 @@ Function optionsPage
         Abort
     ${EndIf}
     
-    ${NSD_CreateLabel} 0 0 100% 12u "Hello, welcome to nsDialogs!"
-    Pop $Label
+    GetFunctionAddress $0 "optionsPageLeave"
+    nsDialogs::OnBack $0
+    
+    ${NSD_CreateLabel} 0 0 100% 12u "Install the library as part of the following toolchains:"
+    Pop $0
 
-    ${NSD_CreateText} 0 13u 100% -13u "Type something here..."
-    Pop $Text
+    !insertmacro CreateToolchainCheckBox "WinAVR" $WinAVRPath $WinAVRIntegrate $WinAVRBox 20u
+    !insertmacro CreateToolchainCheckBox "AVR Studio 5.0" $AS50Path $AS50Integrate $AS50Box 40u
+    !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 60u
     
     nsDialogs::Show
+FunctionEnd
+
+# Gets called when leaving the options page (forward or back)
+# Stores the user's choices from the check boxes.
+Function optionsPageLeave
+  ${NSD_GetState} $WinAVRBox $WinAVRIntegrate
+  ${NSD_GetState} $AS50Box $AS50Integrate
+  ${NSD_GetState} $AS51Box $AS51Integrate
 FunctionEnd
 
 Section
     SetOutPath "$INSTDIR"
     File /r /x libpololu-avr-*.exe "${libpololu-avr}\*.*"
     Call WinAVRCheck
-    StrCmp $WinAVRLoc "" no_winavr
+    StrCmp $WinAVRPath "" no_winavr
             DetailPrint "Detected WinAVR.  Installing library in it..."
-	    DetailPrint "WinAVR = $WinAVRLoc" # tmphax
-            #TODO: SetOutPath "$WinAVRLoc\avr\lib"
+	    DetailPrint "WinAVR = $WinAVRPath" # tmphax
+            #TODO: SetOutPath "$WinAVRPath\avr\lib"
             #TODO: File "${libpololu-avr}\libpololu_*.a"
-            #TODO: SetOutPath "$WinAVRLoc\avr\include"
+            #TODO: SetOutPath "$WinAVRPath\avr\include"
             #TODO: File /r "${libpololu-avr}\pololu"
             goto end_winavr
         no_winavr:
@@ -67,40 +125,37 @@ Section
         end_winavr:
         
         
-    Call AS5Check
-    StrCmp $AS5Loc "" no_as5
-            DetailPrint "Detected AVR Studio 5.  Installing library in it..."
-	    DetailPrint "AVR Studio 5 = $AS5Loc" # tmphax
-            #SetOutPath "$AS5Loc\AVR Toolchain\avr\lib"
+    StrCmp $AS50Path "" no_as5
+            DetailPrint "Detected AVR Studio 5.0.  Installing library in it..."
+            #SetOutPath "$AS50Path\AVR Toolchain\avr\lib"
             #File "${libpololu-avr}\libpololu_*.a"
-            #SetOutPath "$AS5Loc\AVR Toolchain\avr\include"
+            #SetOutPath "$AS50Path\AVR Toolchain\avr\include"
             #File /r "${libpololu-avr}\pololu"
-            #SetOutPath "$AS5Loc\tools\STK500\xml"
+            #SetOutPath "$AS50Path\tools\STK500\xml"
             #File /r "${libpololu-avr}\avr_studio_5\stk500_xml\*.xml" # TODO: Don't override existing files here
             goto end_as5
         no_as5:
-            DetailPrint "Did not detect AVR Studio 5."
+            DetailPrint "Did not detect AVR Studio 5.0."
             goto end_as5
         end_as5:
     
-    Call VSIXCheck
-    StrCmp $VSIXLoc "" no_vsix
+    StrCmp $VSShellPath "" no_vsix
         DetailPrint "Detected Visual Studio 10.  Installing extension..."
-	DetailPrint "VSIXLoc = $VSIXLoc"
-        # TODO: ExecWait "$VSIXLoc\vsixinstaller.exe /skuName:AvrStudio /skuVersion:5.0 /quiet Desktop\extension.vsix"
+        # TODO: ExecWait "$VSShellPath\vsixinstaller.exe /skuName:AvrStudio /skuVersion:5.0 /quiet Desktop\extension.vsix"
         Goto end_vsix
     no_vsix:
-        DetailPrint "Visual Studio 10 not detected, skipping extension install."
+        DetailPrint "Visual Studio 10.0 Isolated Shell not detected, skipping extension install."
         Goto end_vsix
     end_vsix:
     
 SectionEnd
 
 # Checks to see if WinAVR is installed.
-# Sets $WinAVRLoc to the location or "" if not found.
+# Sets $WinAVRPath to the Pathation or "" if not found.
 Function WinAVRCheck
+    # ReadRegStr $WinAVRVer HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'DisplayVersion'
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
-    ${GetParent} $0 $WinAVRLoc
+    ${GetParent} $0 $WinAVRPath
 FunctionEnd
 
 # The location of AVR Studio 5.0 is stored in several places:
@@ -124,11 +179,26 @@ FunctionEnd
 # The only one that satisfies all of those criteria is the AppEnv one, so we will use that.
 
 # Checks to see if AVR Studio 5 is installed.
-# Sets $AS5Loc to the location or "" if not found.
+# Sets $AS50Path and $AS51Path to the location or "" if not found.
 Function AS5Check
-    ReadRegStr $AS5Loc HKCU "SOFTWARE\Atmel\AVRStudio\5.0_Config" 'InstallDir'
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.0" 'StubExePath'
+    ${GetParent} $0 $AS50Path
+
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath'
+    ${GetParent} $0 $AS51Path
 FunctionEnd
 
-Function VSIXCheck
-    ReadRegStr $VSIXLoc HKCU "SOFTWARE\Atmel\AvrStudio\5.0_Config" 'ShellFolder'
+# We need to find the location of the Visual Studio 2010 isolated shell.
+# This is available in HKCU "Software\Atmel\AVRStudio\5.0_Config" 'ShellFolder' or
+# in HKCU "Software\Atmel\AVRStudio51\5.1_Config" 'ShellFolder', but that is a bad place
+# to look for the reasons above.  The registry key suggested by Microsoft is better, but
+# the "1033" number in there does assume the user is using English.
+#  HKLM "Software\Microsoft\VisualStudio\10.0\Setup\IsoShell\1033" 'ProductDir'
+#  http://msdn.microsoft.com/en-us/library/bb932484.aspx
+Function VSShellCheck
+    ReadRegStr $VSShellPath HKLM "Software\Microsoft\VisualStudio\10.0\Setup\IsoShell\1033" 'ProductDir'
+    DetailPrint "tmphax: found shell at $VSShellPath"
+    StrCmp $VSShellPath "" 0 VSShellCheckDone
+    ReadRegStr $VSShellPath HKCU "SOFTWARE\Atmel\AvrStudio\5.0_Config" 'ShellFolder'
+    VSShellCheckDone:
 FunctionEnd
