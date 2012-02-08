@@ -109,28 +109,32 @@ Function optionsPageLeave
   ${NSD_GetState} $AS51Box $AS51Integrate
 FunctionEnd
 
+# Install the header (.h) and archive (.a) files that allow
+# compilation of programs that use the library.
 !macro InstallIntoToolChain AvrPath
     SetOutPath "${AvrPath}\lib"
     File "${libpololu-avr}\libpololu_*.a"
     SetOutPath "${AvrPath}\include"
     File /r "${libpololu-avr}\pololu"
-!endmacro
+!macroend
 
-!macro InstallIntoAvrStudio5 Path
-    !insertmacro InstallIntoToolChain "${Path}\AVR Toolchain\avr"
+!macro InstallIntoAvrStudio5 Version Path AvrPath
+    !insertmacro InstallIntoToolChain "${AvrPath}"
     
     # Install the STK500 XML files needed for programming, but don't
     # overwrite any existing XML files.
-    SetOutPath "$AS50Path\tools\STK500\xml"
+    SetOutPath "${Path}\tools\STK500\xml"
     SetOverwrite off
     File "${libpololu-avr}\avr_studio_5\stk500_xml\*.xml"
     SetOverwrite on
-!endmacro
+
+    # Install the AVR Studio 5 extension (new project templates)
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:${Version} /quiet $INSTDIR\avr_studio_5\extension.vsix"
+!macroend
 
 Section
     SetOutPath "$INSTDIR"
     File /r /x libpololu-avr-*.exe "${libpololu-avr}\*.*"
-    
     
     StrCmp $WinAVRPath "" end_winavr
     IntCmp $WinAVRIntegrate 0 end_winavr
@@ -139,30 +143,21 @@ Section
     end_winavr:
        
     StrCmp $AS50Path "" end_as50
+    IntCmp $AS50Integrate 0 end_as50
     DetailPrint "Installing library into AVR Studio 5.0..."
-    !insertmacro InstallIntoAvrStudio5 "$AS50Path"
+    !insertmacro InstallIntoAvrStudio5 "5.0" "$AS50Path" "$AS50Path\AVR Toolchain\avr"
     end_as50:
 
     StrCmp $AS50Path "" end_as51
+    IntCmp $AS51Integrate 0 end_as51
     DetailPrint "Installing library into AVR Studio 5.1..."
-    !insertmacro InstallIntoAvrStudio5 "$AS51Path"
+    !insertmacro InstallIntoAvrStudio5 "5.1" "$AS51Path" "$AS51Path\extensions\Atmel\AVRGCC\3.3.1\AVRToolChain\avr"
     end_as51:
-    
-    StrCmp $VSShellPath "" no_vsix
-        DetailPrint "Detected Visual Studio 10.  Installing extension..."
-        # TODO: ExecWait "$VSShellPath\Common7\IDE\vsixinstaller.exe /skuName:AvrStudio /skuVersion:5.0 /quiet Desktop\extension.vsix"
-        Goto end_vsix
-    no_vsix:
-        DetailPrint "Visual Studio 10.0 Isolated Shell not detected, skipping extension install."
-        Goto end_vsix
-    end_vsix:
-    
 SectionEnd
 
 # Checks to see if WinAVR is installed.
 # Sets $WinAVRPath to the Pathation or "" if not found.
 Function WinAVRCheck
-    # ReadRegStr $WinAVRVer HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'DisplayVersion'
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
     ${GetParent} $0 $WinAVRPath
 FunctionEnd
