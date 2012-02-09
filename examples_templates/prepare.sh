@@ -42,7 +42,10 @@ sed < examples_templates/test.avrgccproj \
   -e "$AS5_DSM" \
   > $example_dir/$example.avrgccproj
 
-# Copy and edit the AVR Studio 5 solution file.
+# Copy and edit the AVR Studio 5.0 solution file.
 sed < examples_templates/test.avrsln \
   -e "s/\"test/\"$example/g" \
   > $example_dir/$example.avrsln
+
+# Make an AVR Studio 5.1 solution file.
+cp $example_dir/$example.avrsln $example_dir/$example.atsln
