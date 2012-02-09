@@ -1,9 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
 set -ue
-
-# This allows the substiatution of AS4_DSM to work.
-IFS=,
 
 example=$1
 device=$2
@@ -27,7 +24,7 @@ if [ $device_specific_macro ]
 then
   AS4_DSM="s/<OPTIONSFORALL>/<OPTIONSFORALL>-D$device_specific_macro /"
 fi
-sed < $example_template/*.aps \
+cat $example_template/*.aps | sed \
   -e "s/<PART>[^<]*<\/PART>/<PART>$mcu<\/PART>/" \
   -e "s/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$device.a<\/LIB>/" \
   -e "$AS4_DSM" \
