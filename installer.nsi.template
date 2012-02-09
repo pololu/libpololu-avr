@@ -1,6 +1,13 @@
 # NSIS installer script for the Pololu AVR C/C++ Library.
 # Detects WinAVR and AVR Studio 5 and adds the library's .h and .a files
 # in the appropriate directories.
+#
+# When "make zip" is run, installer.nsi.template is edited slightly, saved
+# as installer.nsi, and added to the library zip file
+# (e.g. libpololu-avr-120209.zip).
+# To compile the Windows NSIS installer, unzip the zip file,
+# right click on installer.nsi, and select "Compile NSIS Script".
+# You will need NSIS 2.46+ installed.
 
 !define LIB_VER "YYMMDD"
 
@@ -111,11 +118,25 @@ FunctionEnd
 
 # Install the header (.h) and archive (.a) files that allow
 # compilation of programs that use the library.
+# We check the existence of the directories here because the toolchain location for
+# AVR Studio 5.1 looks like it will change often and we'd like to give useful error
+# messages.
 !macro InstallIntoToolChain AvrPath
-    SetOutPath "${AvrPath}\lib"
-    File "${libpololu-avr}\libpololu_*.a"
-    SetOutPath "${AvrPath}\include"
-    File /r "${libpololu-avr}\pololu"
+    ${if} ${FileExists} "${AvrPath}\lib"
+        SetOutPath "${AvrPath}\lib"
+        File "${libpololu-avr}\libpololu_*.a"
+    ${else}
+        DetailPrint "AVR lib folder not found: ${AvrPath}\lib"
+        MessageBox MB_OK|MB_ICONEXCLAMATION "The folder ${AvrPath}\lib was not found.  You might have to find the correct lib folder for your toolchain and copy the $INSTDIR\libpololu_*.a files to it manually.  Please report this problem at http://forum.pololu.com/."
+    ${endif}
+    
+    ${if} ${FileExists} "${AvrPath}\include"
+        SetOutPath "${AvrPath}\include"
+        File /r "${libpololu-avr}\pololu"
+    ${else}
+        DetailPrint "AVR include folder not found: ${AvrPath}\include"
+        MessageBox MB_OK|MB_ICONEXCLAMATION "The folder ${AvrPath}\include was not found.  You might have to find the correct include folder for your toolchain and copy the $INSTDIR\pololu folder to it manually.  Please report this problem at http://forum.pololu.com/."
+    ${endif}
 !macroend
 
 !macro InstallIntoAvrStudio5 Version Path AvrPath
