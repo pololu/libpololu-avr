@@ -27,25 +27,25 @@ if [ $device_specific_macro ]
 then
   AS4_DSM="s/<OPTIONSFORALL>/<OPTIONSFORALL>-D$device_specific_macro /"
 fi
-cat $example_template/*.aps | sed \
-	-e "s/<PART>[^<]*<\/PART>/<PART>$mcu<\/PART>/" \
-	-e "s/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$device.a<\/LIB>/" \
-	-e "$AS4_DSM" \
-	> $example_dir/$example.aps
+sed < $example_template/*.aps \
+  -e "s/<PART>[^<]*<\/PART>/<PART>$mcu<\/PART>/" \
+  -e "s/<LIB>libpololu[^<]*\.a<\/LIB>/<LIB>libpololu_$device.a<\/LIB>/" \
+  -e "$AS4_DSM" \
+  > $example_dir/$example.aps
 
 # Copy and edit the AVR Studio 5 project file.
-cat examples_templates/test.avrgccproj \
-	| sed "s/<avrdevice>[^<]*<\/avrdevice>/<avrdevice>$mcu<\/avrdevice>/" \
-	| sed "s/<Value>pololu_[^<]*<\/Value>/<Value>pololu_$device<\/Value>/" \
-	> $example_dir/$example.avrgccproj
-
+AS5_DSM=
 if [ $device_specific_macro ]
 then
-  sed -i "s/<avrgcc.compiler.symbols.DefSymbols><ListValues><\/ListValues><\/avrgcc.compiler.symbols.DefSymbols>/<avrgcc.compiler.symbols.DefSymbols><ListValues><Value>$device_specific_macro<\/Value><\/ListValues><\/avrgcc.compiler.symbols.DefSymbols>/" $example_dir/$example.avrgccproj
+  AS5_DSM="s/<avrgcc.compiler.symbols.DefSymbols><ListValues><\/ListValues><\/avrgcc.compiler.symbols.DefSymbols>/<avrgcc.compiler.symbols.DefSymbols><ListValues><Value>$device_specific_macro<\/Value><\/ListValues><\/avrgcc.compiler.symbols.DefSymbols>/"
 fi
-
+sed < examples_templates/test.avrgccproj \
+  -e "s/<avrdevice>[^<]*<\/avrdevice>/<avrdevice>$mcu<\/avrdevice>/" \
+  -e "s/<Value>pololu_[^<]*<\/Value>/<Value>pololu_$device<\/Value>/" \
+  -e "$AS5_DSM" \
+  > $example_dir/$example.avrgccproj
 
 # Copy and edit the AVR Studio 5 solution file.
-cat examples_templates/test.avrsln \
-	| sed "s/\"test/\"$example/g" \
-	> $example_dir/$example.avrsln
+sed < examples_templates/test.avrsln \
+  -e "s/\"test/\"$example/g" \
+  > $example_dir/$example.avrsln
