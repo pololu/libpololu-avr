@@ -66,6 +66,11 @@ avr_studio_5_stk500_xml:
 avr_studio_5_extension: avr_studio_5_templates
 	avr_studio_5/generate_extension.sh
 
+# Phony target generates our NSIS installer script (installer.nsi)
+# from the template (installer.nsi.template).
+installer_nsi:
+	sed "s/YYMMDD/$(DATE)/" installer.nsi.template > installer.nsi
+
 # The following code creates the zip file.
 ZIPDIR=lib_zipfiles
 DATE := $(shell date +%y%m%d)
@@ -73,13 +78,13 @@ LIB_ZIPFILE := $(ZIPDIR)/libpololu-avr-$(DATE).zip
 ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
-ZIP_EXCLUDES := \*~ \*.o \*/.git/\* \*/.gitignore .svn/\* \*/.svn/\* \*.hex libpololu-avr/src.mk libpololu-avr/avr_studio_5/\*.sh libpololu-avr/avr_studio_5/templates_src/\* \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt libpololu-avr/avr_studio_5/\*Con*.xml libpololu-avr/avr_studio_5/extension.vsixmanifest\* extension.vsixmanifest\* libpololu-avr/avr_studio_5/\*.png libpololu-avr/avr_studio_5/ProjectTemplates/\*
+ZIP_EXCLUDES := \*~ \*.o \*/.git/\* \*/.gitignore .svn/\* \*/.svn/\* \*.hex libpololu-avr/src.mk libpololu-avr/avr_studio_5/\*.sh libpololu-avr/avr_studio_5/templates_src/\* \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt libpololu-avr/avr_studio_5/\*Con*.xml libpololu-avr/avr_studio_5/extension.vsixmanifest\* extension.vsixmanifest\* libpololu-avr/avr_studio_5/\*.png libpololu-avr/avr_studio_5/ProjectTemplates/\* libpololu-avr/installer.nsi.template
 
 ARDUINO_EXCLUDES :=  libpololu-arduino/OrangutanPulseIn/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanServos/\* libpololu-arduino/OrangutanSPIMaster/\* libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/OrangutanX2/\* libpololu-arduino/include/\*
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
 .PHONY: zip
-zip: library_files examples hex_files arduino_zip avr_studio_5_templates avr_studio_5_stk500_xml avr_studio_5_extension
+zip: library_files examples hex_files arduino_zip avr_studio_5_templates avr_studio_5_stk500_xml avr_studio_5_extension installer_nsi
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
@@ -103,7 +108,6 @@ arduino_zip:
 	ln -s src/PololuQTRSensors .
 	zip -rq $(ARDUINO_QTR_ZIPFILE) PololuQTRSensors -x $(ZIP_EXCLUDES) -x $(ARDUINO_EXCLUDES)
 	rm PololuQTRSensors
-
 
 # Cleanup
 

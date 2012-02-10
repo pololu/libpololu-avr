@@ -111,6 +111,7 @@ for Windows or the Pololu AVR Development Bundle which includes it.
 
 Otherwise, you should determine the location of your avr-gcc files.
 This will typically be one of:
+* C:\Program Files (x86)\Atmel\AVR Studio 5.1\extensions\Atmel\AVRGCC\3.3.1\AVRToolchain\avr
 * C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR Toolchain\avr
 * C:\WinAVR-20100110\avr
 * /usr/lib/avr
