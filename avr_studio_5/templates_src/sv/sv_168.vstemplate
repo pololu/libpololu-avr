@@ -15,7 +15,7 @@
     <PreviewImage>sv_168_preview.jpg</PreviewImage>
   </TemplateData>
   <TemplateContent>
-    <Project File="template.avrgccproj" ReplaceParameters="true">
+    <Project File="template.cproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">main.c</ProjectItem>
     </Project>
     <CustomParameters>
