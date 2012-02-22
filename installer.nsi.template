@@ -38,15 +38,12 @@ DirText "Setup will install the Pololu AVR C/C++ Library (version ${LIB_VER}) in
 
 # Toolchain variables
 Var WinAVRPath
-Var AS50Path
 Var AS51Path
 
 Var WinAVRBox
-Var AS50Box
 Var AS51Box
 
 Var WinAVRIntegrate
-Var AS50Integrate
 Var AS51Integrate
 
 # When the installer starts, detect the different things we need to detect.
@@ -65,7 +62,6 @@ Function .onInit
     
     # By default, any checkbox that is available will be checked.
     StrCpy $WinAVRIntegrate "1"
-    StrCpy $AS50Integrate "1"
     StrCpy $AS51Integrate "1"
     
     DetailPrint "Hello"
@@ -102,8 +98,7 @@ Function optionsPage
     Pop $0
 
     !insertmacro CreateToolchainCheckBox "WinAVR" $WinAVRPath $WinAVRIntegrate $WinAVRBox 20u
-    !insertmacro CreateToolchainCheckBox "AVR Studio 5.0" $AS50Path $AS50Integrate $AS50Box 40u
-    !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 60u
+    !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 40u
     
     nsDialogs::Show
 FunctionEnd
@@ -112,7 +107,6 @@ FunctionEnd
 # Stores the user's choices from the check boxes.
 Function optionsPageLeave
   ${NSD_GetState} $WinAVRBox $WinAVRIntegrate
-  ${NSD_GetState} $AS50Box $AS50Integrate
   ${NSD_GetState} $AS51Box $AS51Integrate
 FunctionEnd
 
@@ -163,16 +157,11 @@ Section
     !insertmacro InstallIntoToolChain "$WinAVRPath\avr"
     end_winavr:
        
-    StrCmp $AS50Path "" end_as50
-    IntCmp $AS50Integrate 0 end_as50
-    DetailPrint "Installing library into AVR Studio 5.0..."
-    !insertmacro InstallIntoAvrStudio5 "5.0" "$AS50Path" "$AS50Path\AVR Toolchain\avr"
-    end_as50:
-
-    StrCmp $AS50Path "" end_as51
+    StrCmp $AS51Path "" end_as51
     IntCmp $AS51Integrate 0 end_as51
     DetailPrint "Installing library into AVR Studio 5.1..."
-    !insertmacro InstallIntoAvrStudio5 "5.1" "$AS51Path" "$AS51Path\extensions\Atmel\AVRGCC\3.3.1\AVRToolChain\avr"
+    // NOTE: For the AVR Studio 5.1 beta, this path didn't have the ".27" in it.
+    !insertmacro InstallIntoAvrStudio5 "5.1" "$AS51Path" "$AS51Path\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolChain\avr"
     end_as51:
 SectionEnd
 
@@ -183,13 +172,6 @@ Function WinAVRCheck
     ${GetParent} $0 $WinAVRPath
 FunctionEnd
 
-# The location of AVR Studio 5.0 is stored in several places:
-# HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.0" 'StubExePath'
-# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{60315A8A-5FCA-47CE-A856-681F3A9CDB5B}" 'InstallLocation'
-# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\avrstudio5.exe" (Default) (requires GetParent)
-# HKLM "SOFTWARE\Atmel AVR\AvrStudio\5.0" 'InstallDir' 'InstallDir'   <-- does NOT work for 5.1 beta
-# HKCU "SOFTWARE\Atmel\AVRStudio\5.0_Config" 'InstallDir'
-#   
 # The location of AVR Studio 5.1 is stored in several places:
 # HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath' (requires GetParent)
 # HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7BE9E558-BE53-4939-9565-A0BEA2F839D0}" 'InstallLocation'
@@ -204,11 +186,8 @@ FunctionEnd
 # The only one that satisfies all of those criteria is the AppEnv one, so we will use that.
 
 # Checks to see if AVR Studio 5 is installed.
-# Sets $AS50Path and $AS51Path to the location or "" if not found.
+# Sets $AS51Path to the location or "" if not found.
 Function AS5Check
-    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.0" 'StubExePath'
-    ${GetParent} $0 $AS50Path
-
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath'
     ${GetParent} $0 $AS51Path
 FunctionEnd
