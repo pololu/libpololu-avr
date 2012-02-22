@@ -160,13 +160,13 @@ Section
     StrCmp $AS51Path "" end_as51
     IntCmp $AS51Integrate 0 end_as51
     DetailPrint "Installing library into AVR Studio 5.1..."
-    // NOTE: For the AVR Studio 5.1 beta, this path didn't have the ".27" in it.
+    ; NOTE: For the AVR Studio 5.1 beta, this path didn't have the ".27" in it.
     !insertmacro InstallIntoAvrStudio5 "5.1" "$AS51Path" "$AS51Path\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolChain\avr"
     end_as51:
 SectionEnd
 
 # Checks to see if WinAVR is installed.
-# Sets $WinAVRPath to the Pathation or "" if not found.
+# Sets $WinAVRPath to the path or "" if not found.
 Function WinAVRCheck
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
     ${GetParent} $0 $WinAVRPath
