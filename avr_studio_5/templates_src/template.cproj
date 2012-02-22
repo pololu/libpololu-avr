@@ -58,6 +58,11 @@
         <avrgcc.linker.libraries.Libraries><ListValues><Value>$library$</Value><Value>m</Value></ListValues></avrgcc.linker.libraries.Libraries>
         <avrgcc.compiler.symbols.DefSymbols><ListValues></ListValues></avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>$boardmacro$</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
       </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
@@ -75,6 +80,11 @@
         <avrgcc.compiler.symbols.DefSymbols><ListValues></ListValues></avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
         <avrgcc.assembler.debugging.DebugLevel>Default (-g2)</avrgcc.assembler.debugging.DebugLevel>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>$boardmacro$</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
       </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>

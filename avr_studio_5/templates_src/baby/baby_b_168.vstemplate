@@ -21,6 +21,7 @@
     <CustomParameters>
       <CustomParameter Name="$mcu$" Value="ATmega168"/>
       <CustomParameter Name="$library$" Value="pololu_atmega168"/>
+      <CustomParameter Name="$boardmacro$" Value=""/>
     </CustomParameters>
   </TemplateContent>
 </VSTemplate>

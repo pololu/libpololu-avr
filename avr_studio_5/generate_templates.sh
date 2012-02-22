@@ -14,8 +14,8 @@ mkdir -p $D
 zip -MMjq $D/orangutan_svp_324.zip svp/svp_324.vstemplate svp/*.c template.cproj svp/*.jpg
 zip -MMjq $D/orangutan_svp_1284.zip svp/svp_1284.vstemplate svp/*.c template.cproj svp/*.jpg
 
-zip -MMjq $D/orangutan_x2_1284.zip x2/x2_1284.vstemplate x2/*.c x2/*.cproj x2/*.jpg
-zip -MMjq $D/orangutan_x2_644.zip x2/x2_644.vstemplate x2/*.c x2/*.cproj x2/*.jpg
+zip -MMjq $D/orangutan_x2_1284.zip x2/x2_1284.vstemplate x2/*.c template.cproj x2/*.jpg
+zip -MMjq $D/orangutan_x2_644.zip x2/x2_644.vstemplate x2/*.c template.cproj x2/*.jpg
 
 zip -MMjq $D/3pi_328.zip 3pi/3pi_328.vstemplate 3pi/*.c template.cproj 3pi/*.jpg
 zip -MMjq $D/3pi_168.zip 3pi/3pi_168.vstemplate 3pi/*.c template.cproj 3pi/*.jpg
