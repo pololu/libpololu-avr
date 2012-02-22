@@ -56,13 +56,8 @@
         <avrgcc.compiler.optimization.DebugLevel>None</avrgcc.compiler.optimization.DebugLevel>
         <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
         <avrgcc.linker.libraries.Libraries><ListValues><Value>$library$</Value><Value>m</Value></ListValues></avrgcc.linker.libraries.Libraries>
-        <avrgcc.compiler.symbols.DefSymbols><ListValues></ListValues></avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.symbols.DefSymbols><ListValues><Value>$boardmacro$</Value></ListValues></avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
-        <avrgcc.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>$boardmacro$</Value>
-          </ListValues>
-        </avrgcc.compiler.symbols.DefSymbols>
       </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
@@ -77,14 +72,9 @@
         <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
         <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
         <avrgcc.linker.libraries.Libraries><ListValues><Value>$library$</Value><Value>m</Value></ListValues></avrgcc.linker.libraries.Libraries>
-        <avrgcc.compiler.symbols.DefSymbols><ListValues></ListValues></avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.symbols.DefSymbols><ListValues><Value>$boardmacro$</Value></ListValues></avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
         <avrgcc.assembler.debugging.DebugLevel>Default (-g2)</avrgcc.assembler.debugging.DebugLevel>
-        <avrgcc.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>$boardmacro$</Value>
-          </ListValues>
-        </avrgcc.compiler.symbols.DefSymbols>
       </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
