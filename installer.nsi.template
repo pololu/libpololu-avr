@@ -144,7 +144,7 @@ FunctionEnd
     SetOverwrite on
 
     # Install the AVR Studio 5 extension (new project templates)
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:${Version} /quiet $INSTDIR\avr_studio_5\extension.vsix"
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:${Version} /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
 !macroend
 
 Section
