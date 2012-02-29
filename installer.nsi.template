@@ -38,15 +38,12 @@ DirText "Setup will install the Pololu AVR C/C++ Library (version ${LIB_VER}) in
 
 # Toolchain variables
 Var WinAVRPath
-Var AS50Path
 Var AS51Path
 
 Var WinAVRBox
-Var AS50Box
 Var AS51Box
 
 Var WinAVRIntegrate
-Var AS50Integrate
 Var AS51Integrate
 
 # When the installer starts, detect the different things we need to detect.
@@ -65,7 +62,6 @@ Function .onInit
     
     # By default, any checkbox that is available will be checked.
     StrCpy $WinAVRIntegrate "1"
-    StrCpy $AS50Integrate "1"
     StrCpy $AS51Integrate "1"
     
     DetailPrint "Hello"
@@ -102,8 +98,7 @@ Function optionsPage
     Pop $0
 
     !insertmacro CreateToolchainCheckBox "WinAVR" $WinAVRPath $WinAVRIntegrate $WinAVRBox 20u
-    !insertmacro CreateToolchainCheckBox "AVR Studio 5.0" $AS50Path $AS50Integrate $AS50Box 40u
-    !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 60u
+    !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 40u
     
     nsDialogs::Show
 FunctionEnd
@@ -112,7 +107,6 @@ FunctionEnd
 # Stores the user's choices from the check boxes.
 Function optionsPageLeave
   ${NSD_GetState} $WinAVRBox $WinAVRIntegrate
-  ${NSD_GetState} $AS50Box $AS50Integrate
   ${NSD_GetState} $AS51Box $AS51Integrate
 FunctionEnd
 
@@ -150,7 +144,7 @@ FunctionEnd
     SetOverwrite on
 
     # Install the AVR Studio 5 extension (new project templates)
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:${Version} /quiet $INSTDIR\avr_studio_5\extension.vsix"
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:${Version} /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
 !macroend
 
 Section
@@ -163,36 +157,24 @@ Section
     !insertmacro InstallIntoToolChain "$WinAVRPath\avr"
     end_winavr:
        
-    StrCmp $AS50Path "" end_as50
-    IntCmp $AS50Integrate 0 end_as50
-    DetailPrint "Installing library into AVR Studio 5.0..."
-    !insertmacro InstallIntoAvrStudio5 "5.0" "$AS50Path" "$AS50Path\AVR Toolchain\avr"
-    end_as50:
-
-    StrCmp $AS50Path "" end_as51
+    StrCmp $AS51Path "" end_as51
     IntCmp $AS51Integrate 0 end_as51
     DetailPrint "Installing library into AVR Studio 5.1..."
-    !insertmacro InstallIntoAvrStudio5 "5.1" "$AS51Path" "$AS51Path\extensions\Atmel\AVRGCC\3.3.1\AVRToolChain\avr"
+    ; NOTE: For the AVR Studio 5.1 beta, this path didn't have the ".27" in it.
+    !insertmacro InstallIntoAvrStudio5 "5.1" "$AS51Path" "$AS51Path\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolChain\avr"
     end_as51:
 SectionEnd
 
 # Checks to see if WinAVR is installed.
-# Sets $WinAVRPath to the Pathation or "" if not found.
+# Sets $WinAVRPath to the path or "" if not found.
 Function WinAVRCheck
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
     ${GetParent} $0 $WinAVRPath
 FunctionEnd
 
-# The location of AVR Studio 5.0 is stored in several places:
-# HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.0" 'StubExePath'
-# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{60315A8A-5FCA-47CE-A856-681F3A9CDB5B}" 'InstallLocation'
-# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\avrstudio5.exe" (Default) (requires GetParent)
-# HKLM "SOFTWARE\Atmel AVR\AvrStudio\5.0" 'InstallDir' 'InstallDir'   <-- does NOT work for 5.1 beta
-# HKCU "SOFTWARE\Atmel\AVRStudio\5.0_Config" 'InstallDir'
-#   
 # The location of AVR Studio 5.1 is stored in several places:
-# HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath' (requires GetParent)
-# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7BE9E558-BE53-4939-9565-A0BEA2F839D0}" 'InstallLocation'
+# HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath' (requires GetParent, seems to get deleted when AVR Studio 5.0 is uninstalled)
+# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{D574D18C-9D52-4B4B-9647-AE6B89FD3F70}" 'InstallLocation'
 # HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\avrstudio.exe" (Default) (requires GetParent)
 # HKCU "SOFTWARE\Atmel\AVRStudio51\5.1_Config" 'InstallDir'
 #
@@ -202,27 +184,35 @@ FunctionEnd
 # different versions of AVR Studio 5 so it is easy to update our installers.
 # We would also like one that is predictable (e.g. doesn't have a GUID in it).
 # The only one that satisfies all of those criteria is the AppEnv one, so we will use that.
-
+# BUT David noticed that it disappear from his computer after uninstalling AVR Studio 5.0, so
+# we will use the Uninstall key as a fallback.
 # Checks to see if AVR Studio 5 is installed.
-# Sets $AS50Path and $AS51Path to the location or "" if not found.
+# Sets $AS51Path to the location or "" if not found.
 Function AS5Check
-    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.0" 'StubExePath'
-    ${GetParent} $0 $AS50Path
-
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath'
     ${GetParent} $0 $AS51Path
+    StrCmp $AS51Path "" 0 AS51Done    # If we found it, then we are done.
+    
+    ReadRegStr $AS51Path HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{D574D18C-9D52-4B4B-9647-AE6B89FD3F70}" 'InstallLocation'
+    StrCmp $AS51Path "" AS51Done      # If AVR Studio 5.1 really isn't there, we are done.
+    
+    # This case seems to happen if you uninstall AVR Studio 5.0 after installing AVR Studio 5.1.
+    # Another bad thing that happens is that the Visual Assist X for AVR Studio extension goes away.
+    MessageBox MB_OK "Your AVR Studio 5.1 installation appears to be corrupted.  You can still install the Pololu AVR C/C++ library into AVR Studio 5.1 but the installation of the project templates will probably not work.  You should be able to fix this problem by reinstalling or repairing AVR Studio 5.1 and then running this installer again."
+    
+    AS51Done:
 FunctionEnd
 
 # We need to find the location of the Visual Studio 2010 isolated shell.
 # This is available in HKCU "Software\Atmel\AVRStudio\5.0_Config" 'ShellFolder' or
 # in HKCU "Software\Atmel\AVRStudio51\5.1_Config" 'ShellFolder', but that is a bad place
-# to look for the reasons above.  The registry key suggested by Microsoft is better, but
-# the "1033" number in there does assume the user is using English.
-#  HKLM "Software\Microsoft\VisualStudio\10.0\Setup\IsoShell\1033" 'ProductDir'
+# to look for the reasons above.  The registry keys suggested by Microsoft are better:
+#  http://osherove.com/blog/2010/4/9/finding-the-location-of-vsixinstallerexe-programmatically.html
+# This one might be even better because it doesn't contain the language but we are not using it yet:
+#    HKLM "SOFTWARE\Microsoft\VisualStudio\10.0\" 'InstallDir'
 #  http://msdn.microsoft.com/en-us/library/bb932484.aspx
 Function VSShellCheck
     ReadRegStr $VSShellPath HKLM "Software\Microsoft\VisualStudio\10.0\Setup\IsoShell\1033" 'ProductDir'
-    DetailPrint "tmphax: found shell at $VSShellPath"
     StrCmp $VSShellPath "" 0 VSShellCheckDone
     ReadRegStr $VSShellPath HKCU "SOFTWARE\Atmel\AvrStudio\5.0_Config" 'ShellFolder'
     StrCmp $VSShellPath "" 0 VSShellCheckDone

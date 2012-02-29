@@ -15,12 +15,13 @@
     <PreviewImage>lv_preview.jpg</PreviewImage>
   </TemplateData>
   <TemplateContent>
-    <Project File="template.avrgccproj" ReplaceParameters="true">
+    <Project File="template.cproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" OpenInEditor="true">main.c</ProjectItem>
     </Project>
     <CustomParameters>
       <CustomParameter Name="$mcu$" Value="ATmega168"/>
       <CustomParameter Name="$library$" Value="pololu_atmega168"/>
+      <CustomParameter Name="$boardmacro$" Value=""/>
     </CustomParameters>
   </TemplateContent>
 </VSTemplate>

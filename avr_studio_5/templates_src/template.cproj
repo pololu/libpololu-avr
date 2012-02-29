@@ -1,40 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- AVR Studio 5 project file -->
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectVersion>5.0</ProjectVersion>
+    <ProjectVersion>5.1</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8</ToolchainName>
     <ProjectGuid>{9af1306c-2019-4186-bd46-48cfeb9a3a92}</ProjectGuid>
-    <avrdevice>ATmega328P</avrdevice>
+    <avrdevice>$mcu$</avrdevice>
     <avrdeviceseries>none</avrdeviceseries>
     <OutputType>Executable</OutputType>
     <Language>C</Language>
-    <OutputFile>$(MSBuildProjectName).elf</OutputFile>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
     <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
-    <UseGlobalToolchain>True</UseGlobalToolchain>
-    <ToolchainDirPath>
-    </ToolchainDirPath>
-    <MakeDirPath>
-    </MakeDirPath>
-    <GlobalToolchainPath>C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR ToolChain\bin</GlobalToolchainPath>
-    <AvrGccProjectExtensions>
-    </AvrGccProjectExtensions>
     <AssemblyName>app</AssemblyName>
     <Name>app</Name>
     <RootNamespace>app</RootNamespace>
-    <avrtool>com.atmel.avrdbg.tool.simulator</avrtool>
-    <com_atmel_avrdbg_tool_simulator>
-      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
-      <ToolName xmlns="">AVR Simulator</ToolName>
-      <ToolNumber xmlns="">
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <AsfVersion>2.11.1</AsfVersion>
+    <avrtool>com.atmel.avrdbg.tool.stk500</avrtool>
+    <avrtoolinterface>ISP</avrtoolinterface>
+    <com_atmel_avrdbg_tool_stk500>
+      <ToolType>com.atmel.avrdbg.tool.stk500</ToolType>
+      <ToolName>STK500</ToolName>
+      <ToolNumber>
       </ToolNumber>
-      <Channel xmlns="">
+      <Channel>
         <host>127.0.0.1</host>
-        <port>58691</port>
+        <port>51562</port>
         <ssl>False</ssl>
       </Channel>
-    </com_atmel_avrdbg_tool_simulator>
-    <avrtoolinterface />
+      <ToolOptions>
+        <InterfaceName>ISP</InterfaceName>
+        <InterfaceProperties>
+          <JtagDbgClock>1000000</JtagDbgClock>
+          <JtagProgClock>1000000</JtagProgClock>
+          <IspClock>500000</IspClock> <!-- 1500 kHz for the Pololu USB AVR Programmer -->
+          <JtagInChain>false</JtagInChain>
+          <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
+          <JtagDevicesBefore>0</JtagDevicesBefore>
+          <JtagDevicesAfter>0</JtagDevicesAfter>
+          <JtagInstrBitsBefore>0</JtagInstrBitsBefore>
+          <JtagInstrBitsAfter>0</JtagInstrBitsAfter>
+        </InterfaceProperties>
+      </ToolOptions>
+    </com_atmel_avrdbg_tool_stk500>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -44,45 +53,35 @@
         <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
         <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
         <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>None</avrgcc.compiler.optimization.DebugLevel>
         <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-        <avrgcc.linker.libraries.Libraries><ListValues><Value>pololu_atmega328p</Value></ListValues></avrgcc.linker.libraries.Libraries>
-        <avrgcc.compiler.symbols.DefSymbols><ListValues></ListValues></avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.linker.libraries.Libraries><ListValues><Value>$library$</Value><Value>m</Value></ListValues></avrgcc.linker.libraries.Libraries>
+        <avrgcc.compiler.symbols.DefSymbols><ListValues><Value>$boardmacro$</Value></ListValues></avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
       </AvrGcc>
     </ToolchainSettings>
-    <MemorySettings>
-    </MemorySettings>
-    <GenerateHexFile>True</GenerateHexFile>
-    <GenerateMapFile>True</GenerateMapFile>
-    <GenerateListFile>True</GenerateListFile>
-    <GenerateEepFile>True</GenerateEepFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
         <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
         <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
         <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
         <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
         <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
         <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-        <avrgcc.linker.libraries.Libraries><ListValues><Value>pololu_atmega328p</Value></ListValues></avrgcc.linker.libraries.Libraries>
-        <avrgcc.compiler.symbols.DefSymbols><ListValues></ListValues></avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.linker.libraries.Libraries><ListValues><Value>$library$</Value><Value>m</Value></ListValues></avrgcc.linker.libraries.Libraries>
+        <avrgcc.compiler.symbols.DefSymbols><ListValues><Value>$boardmacro$</Value></ListValues></avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.linker.optimization.GarbageCollectUnusedSections>True</avrgcc.linker.optimization.GarbageCollectUnusedSections>
         <avrgcc.assembler.debugging.DebugLevel>Default (-g2)</avrgcc.assembler.debugging.DebugLevel>
       </AvrGcc>
     </ToolchainSettings>
-    <MemorySettings>
-    </MemorySettings>
-    <GenerateHexFile>True</GenerateHexFile>
-    <GenerateMapFile>True</GenerateMapFile>
-    <GenerateListFile>True</GenerateListFile>
-    <GenerateEepFile>True</GenerateEepFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="*.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
-  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\AvrGCC.targets" />
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
