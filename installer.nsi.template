@@ -27,7 +27,7 @@ ShowInstDetails show
 AllowSkipFiles on
 XPStyle on
 
-Page directory
+Page directory "" "" checkDirectory
 Page custom optionsPage optionsPageLeave
 Page instfiles
 
@@ -52,8 +52,8 @@ Var AS60Integrate
 # When the installer starts, detect the different things we need to detect.
 Function .onInit
     Call WinAVRCheck
-    Call AS5Check
-    Call AS6Check
+    Call AS51Check
+    Call AS60Check
     Call VSShellCheck
     
     # Check the assumptions we make when calling NSD_GetState and NSD_SetState.
@@ -104,7 +104,7 @@ Function optionsPage
 
     !insertmacro CreateToolchainCheckBox "WinAVR" $WinAVRPath $WinAVRIntegrate $WinAVRBox 20u
     !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 40u
-    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.0" $AS60Path $AS60Integrate $AS60Box 80u
+    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.0" $AS60Path $AS60Integrate $AS60Box 60u
     
     nsDialogs::Show
 FunctionEnd
@@ -200,7 +200,7 @@ FunctionEnd
 # we will use the Uninstall key as a fallback.
 # Checks to see if AVR Studio 5 is installed.
 # Sets $AS51Path to the location or "" if not found.
-Function AS5Check
+Function AS51Check
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath'
     ${GetParent} $0 $AS51Path
     StrCmp $AS51Path "" 0 AS51Done    # If we found it, then we are done.
@@ -244,4 +244,13 @@ Function VSShellCheck
     StrCmp $VSShellPath "" 0 VSShellCheckDone
     ReadRegStr $VSShellPath HKCU "Software\Atmel\AVRStudio51\5.1_Config" 'ShellFolder'
     VSShellCheckDone:
+FunctionEnd
+
+Function checkDirectory
+    # Warn the user if they choose an existing directory.
+    ${if} ${FileExists} $INSTDIR
+        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "The folder $INSTDIR already exists.  Installing to this directory could overwrite existing files." /SD IDOK IDOK dirOk
+        Abort
+        dirOk:
+    ${endif}
 FunctionEnd
