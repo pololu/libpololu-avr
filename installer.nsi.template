@@ -1,6 +1,6 @@
 # NSIS installer script for the Pololu AVR C/C++ Library.
-# Detects WinAVR and AVR Studio 5 and adds the library's .h and .a files
-# in the appropriate directories.
+# Detects WinAVR and various versions of AVR/Atmel studio and adds the
+# library's .h and .a files in the appropriate directories.
 #
 # When "make zip" is run, installer.nsi.template is edited slightly, saved
 # as installer.nsi, and added to the library zip file
@@ -39,17 +39,21 @@ DirText "Setup will install the Pololu AVR C/C++ Library (version ${LIB_VER}) in
 # Toolchain variables
 Var WinAVRPath
 Var AS51Path
+Var AS60Path
 
 Var WinAVRBox
 Var AS51Box
+Var AS60Box
 
 Var WinAVRIntegrate
 Var AS51Integrate
+Var AS60Integrate
 
 # When the installer starts, detect the different things we need to detect.
 Function .onInit
     Call WinAVRCheck
     Call AS5Check
+    Call AS6Check
     Call VSShellCheck
     
     # Check the assumptions we make when calling NSD_GetState and NSD_SetState.
@@ -63,6 +67,7 @@ Function .onInit
     # By default, any checkbox that is available will be checked.
     StrCpy $WinAVRIntegrate "1"
     StrCpy $AS51Integrate "1"
+    StrCpy $AS60Integrate "1"
     
     DetailPrint "Hello"
 FunctionEnd
@@ -99,6 +104,7 @@ Function optionsPage
 
     !insertmacro CreateToolchainCheckBox "WinAVR" $WinAVRPath $WinAVRIntegrate $WinAVRBox 20u
     !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 40u
+    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.0" $AS60Path $AS60Integrate $AS60Box 80u
     
     nsDialogs::Show
 FunctionEnd
@@ -108,6 +114,7 @@ FunctionEnd
 Function optionsPageLeave
   ${NSD_GetState} $WinAVRBox $WinAVRIntegrate
   ${NSD_GetState} $AS51Box $AS51Integrate
+  ${NSD_GetState} $AS60Box $AS60Integrate
 FunctionEnd
 
 # Install the header (.h) and archive (.a) files that allow
@@ -133,18 +140,13 @@ FunctionEnd
     ${endif}
 !macroend
 
-!macro InstallIntoAvrStudio5 Version Path AvrPath
-    !insertmacro InstallIntoToolChain "${AvrPath}"
-    
+!macro InstallSTK500Xml Path
     # Install the STK500 XML files needed for programming, but don't
     # overwrite any existing XML files.
-    SetOutPath "${Path}\tools\STK500\xml"
+    SetOutPath "${Path}"
     SetOverwrite off
     File "${libpololu-avr}\avr_studio_5\stk500_xml\*.xml"
     SetOverwrite on
-
-    # Install the AVR Studio 5 extension (new project templates)
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:${Version} /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
 !macroend
 
 Section
@@ -161,8 +163,18 @@ Section
     IntCmp $AS51Integrate 0 end_as51
     DetailPrint "Installing library into AVR Studio 5.1..."
     ; NOTE: For the AVR Studio 5.1 beta, this path didn't have the ".27" in it.
-    !insertmacro InstallIntoAvrStudio5 "5.1" "$AS51Path" "$AS51Path\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolChain\avr"
+    !insertmacro InstallIntoToolChain "$AS51Path\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolChain\avr"
+    !insertmacro InstallSTK500Xml "$AS51Path\tools\STK500\xml"
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:5.1 /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
     end_as51:
+    
+    StrCmp $AS60Path "" end_as60
+    IntCmp $AS60Integrate 0 end_as60
+    DetailPrint "Installing library into Atmel Studio 6.0..."
+    !insertmacro InstallIntoToolChain "$AS60Path\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolChain\avr"
+    !insertmacro InstallSTK500Xml "$AS60Path\tools\STK500\xml"
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.0 /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
+    end_as60:
 SectionEnd
 
 # Checks to see if WinAVR is installed.
@@ -201,6 +213,20 @@ Function AS5Check
     MessageBox MB_OK "Your AVR Studio 5.1 installation appears to be corrupted.  You can still install the Pololu AVR C/C++ library into AVR Studio 5.1 but the installation of the project templates will probably not work.  You should be able to fix this problem by reinstalling or repairing AVR Studio 5.1 and then running this installer again."
     
     AS51Done:
+FunctionEnd
+
+Function AS60Check
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AtmelStudio_6.0" 'StubExePath'
+    ${GetParent} $0 $AS60Path
+    StrCmp $AS60Path "" 0 AS60Done    # If we found it, then we are done.
+    
+    ReadRegStr $AS60Path HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{770C0BCF-5A67-4B45-A7F1-701A76C01F81}" 'InstallLocation'
+    StrCmp $AS60Path "" AS60Done      # If Atmel Studio 6.0 really isn't there, we are done.
+    
+    # I'm not sure if this case can happen, but it could for AVR Studio 5.1 if
+	# you uninstalled AVR Studio 5.0.
+    MessageBox MB_OK "Your Atmel Studio 6.0 installation appears to be corrupted.  You can still install the Pololu AVR C/C++ library into Atmel Studio 6.0 but the installation of the project templates will probably not work.  You should be able to fix this problem by reinstalling or repairing Atmel Studio 6.0 and then running this installer again."
+    AS60Done:
 FunctionEnd
 
 # We need to find the location of the Visual Studio 2010 isolated shell.
