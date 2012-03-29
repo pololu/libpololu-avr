@@ -3,7 +3,7 @@
 #include <avr/pgmspace.h>
 #include "assert.h"
 
-const prog_char efg[] = "m S e8... f O5 <g";
+const char efg[] PROGMEM = "m S e8... f O5 <g";
 
 extern OrangutanLCD lcd;
 extern OrangutanBuzzer buzzer;

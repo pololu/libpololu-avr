@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "assert.h"
 
-const prog_char bars[] = {
+const char bars[] PROGMEM = {
   0b00000,
   0b00000,
   0b00000,
@@ -21,7 +21,7 @@ const prog_char bars[] = {
   0b11111
 };
 
-const prog_char left_bar[] = {
+const char left_bar[] PROGMEM = {
   0b10000,
   0b10000,
   0b10000,
@@ -32,7 +32,7 @@ const prog_char left_bar[] = {
   0b00000
 };
 
-const prog_char right_bar[] = {
+const char right_bar[] PROGMEM = {
   0b00001,
   0b00001,
   0b00001,
