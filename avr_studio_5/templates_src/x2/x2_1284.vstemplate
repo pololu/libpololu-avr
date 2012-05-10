@@ -20,7 +20,7 @@
     </Project>
     <CustomParameters>
       <CustomParameter Name="$mcu$" Value="ATmega1284P"/>
-      <CustomParameter Name="$library$" Value="pololu_atmega1284p_x2"/>
+      <CustomParameter Name="$pololu_lib$" Value="pololu_atmega1284p_x2"/>
       <CustomParameter Name="$boardmacro$" Value="_X2_1284"/>
     </CustomParameters>
   </TemplateContent>
