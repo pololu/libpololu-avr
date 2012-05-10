@@ -117,6 +117,7 @@ This will typically be one of:
 * C:\WinAVR-20100110\avr
 * /usr/lib/avr
 * /usr/avr
+* /usr/local/CrossPack-AVR/avr/
 
 In this folder you will find an "include" folder that has AVR header
 files such as avr/io.h and a "lib" folder that has AVR libraries such

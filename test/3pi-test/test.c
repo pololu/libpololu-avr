@@ -28,7 +28,7 @@ const char welcome_test_line2[] PROGMEM = "3\xf7 Robot"; // \xf7 is a greek
 const char test_name_line1[] PROGMEM = "Test";
 const char test_name_line2[] PROGMEM = "Program";
 
-const prog_char bars[] PROGMEM = {
+const char bars[] PROGMEM = {
 	0b00000,
 	0b00000,
 	0b00000,

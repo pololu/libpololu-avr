@@ -269,7 +269,7 @@ class OrangutanLCD
 	// may be defined as follows:
 	//
 	// #include <avr/pgmspace.h>
-	// const prog_char pi[] PROGMEM = { 0b11100, .... }
+	// const char pi[] PROGMEM = { 0b11100, .... }
 	//
 	// The first byte represets row one, which has, in this example,
 	// three black pixels on the left, followed by two clear

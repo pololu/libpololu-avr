@@ -96,7 +96,7 @@ const char levels[] PROGMEM = {
 };
 
 // This character is a musical note.
-const prog_char note[] PROGMEM = {
+const char note[] PROGMEM = {
 	0b00100,
 	0b00110,
 	0b00101,
@@ -108,7 +108,7 @@ const prog_char note[] PROGMEM = {
 };
 
 // This character is a back arrow.
-const prog_char back_arrow[] PROGMEM = {
+const char back_arrow[] PROGMEM = {
 	0b00000,
 	0b00010,
 	0b00001,

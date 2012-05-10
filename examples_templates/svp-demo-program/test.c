@@ -54,7 +54,7 @@ void load_custom_characters()
 	};
 
 	// This character is a musical note.
-	static const prog_char note[] PROGMEM = {
+	static const char note[] PROGMEM = {
 		0b00100,
 		0b00110,
 		0b00101,
@@ -66,7 +66,7 @@ void load_custom_characters()
 	};
 
 	// This character is a back arrow.
-	static const prog_char back_arrow[] PROGMEM = {
+	static const char back_arrow[] PROGMEM = {
 		0b00000,
 		0b00010,
 		0b00001,
