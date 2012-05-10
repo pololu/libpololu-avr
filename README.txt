@@ -12,8 +12,8 @@ http://forum.pololu.com
 The Pololu AVR Library is a collection of support functions for
 programming AVR-based Pololu products or for using Pololu products
 with AVRs.  It is designed for use with the free avr-gcc compiler,
-which is included with AVR Studio 5.  Most of the library can also be
-used together with the Arduino environment.
+which is included with Atmel Studio 6 and WinAVR.  Most of the
+library can also be used together with the Arduino environment.
 
 This library includes support for recent members of the Orangutan line
 of robot controllers:
@@ -39,10 +39,10 @@ Additionally, this library supports:
 == Installation instructions ==
 
 Detailed installation instructions for Windows, Linux, and Mac OS X
-and tutorials for using AVR Studio 5 can be found in the Pololu AVR
-C/C++ Library User's Guide:
+and tutorials for using Atmel Studio 6 can be found in the Pololu AVR
+Programming Quick Start Guide:
 
-  http://www.pololu.com/docs/0J20
+  http://www.pololu.com/docs/0J51
 
 The general instructions below apply to all development environments.
 
@@ -51,15 +51,12 @@ The general instructions below apply to all development environments.
 
 The free avr-gcc compiler, avr-libc, and other associated tools must
 be installed before the Pololu AVR library.  Once again, please see
-the Pololu AVR C/C++ Library User's Guide for detailed instructions
+the Pololu AVR Programming Quick Start Guide for detailed instructions
 for Windows, Linux, and Mac OS X.
 
-To program the Pololu Orangutan or 3pi, we recommend the Pololu
-USB AVR Programmer.  Follow the instructions at
+To program your AVR, we recommend the Pololu USB AVR Programmer: 
 
-  http://www.pololu.com/docs/0J36
-
-to install it on your computer.
+  http://www.pololu.com/catalog/product/1300
 
 
 == Distributions of the Pololu AVR Library ==
@@ -71,9 +68,9 @@ repository hosted on github:
 
 The source repository is used to generate a binary distribution that
 has compiled binaries (.a files), headers (.h files), examples for
-every supported device, AVR Studio 5 templates, and more.  The binary
-distribution contains the source code of the libraries, but it does
-NOT include every file from the source repository.  The binary
+every supported device, Atmel Studio 5 templates, and more.  The
+binary distribution contains the source code of the libraries, but it
+does NOT include every file from the source repository.  The binary
 distributions can be downloaded as zip files.
 
 You can tell what type of distribution you have by looking at what
@@ -83,9 +80,7 @@ file, while the binary distribution will not.
 For the convnience of Windows users, the binary distribution is
 packaged in an executable installer called the Pololu AVR Library
 Installer for Windows.  This installer can be downloaded by itself and
-is also included in the Pololu AVR Development Bundle, a large
-download that installs all of the prerequisites you will need for
-programming AVRs in Windows.
+is also included in the Pololu AVR Development Bundle.
 
 The binary distribution zip files, the Pololu AVR Library Installer
 for Windows, and the Pololu AVR Development bundle are all available
@@ -111,7 +106,7 @@ for Windows or the Pololu AVR Development Bundle which includes it.
 
 Otherwise, you should determine the location of your avr-gcc files.
 This will typically be one of:
-* C:\Program Files (x86)\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolChain\avr
+* C:\Program Files (x86)\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.4.0.65\AVRToolchain\avr
 * C:\Program Files (x86)\Atmel\AVR Studio 5.1\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolchain\avr
 * C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR Toolchain\avr
 * C:\WinAVR-20100110\avr
@@ -151,35 +146,26 @@ Finally, copy the entire "pololu" subfolder into your avr-gcc
 You are now ready to use the Pololu AVR library.
 
 
-== Manually installing special files for AVR Studio 5 ==
+== Manually installing special files for Atmel Studio 6 ==
 
-If you are using AVR Studio 5 in Windows, then you might want to
-install our AVR Studio 5 templates so you can easily make new projects
-for Pololu boards, and you might want to install the STK500 XML files
-needed to program these boards from AVR Studio 5.  These files are
-normally installed by the Pololu AVR Library Installer for Windows,
-but you can do it manually if you need to.
+If you are using Atmel Studio 6 in Windows, then you might want to
+install our Atmel Studio 6 templates so you can easily make new
+projects for Pololu boards, and you might want to install the STK500
+XML files needed to program these boards from Atmel Studio 6.  These
+files are normally installed by the Pololu AVR Library Installer for
+Windows, but you can do it manually if you need to.
 
 You will need to have a binary distribution instead of a copy of the
 source repository.
 
-To install the templates, copy the the zip files in the library's
+To install the templates, simply double click on
 
-  avr_studio_5\templates
+  avr_studio_5\extension.vsix
 
-folder to the
+and follow the instructions to install the extension into Atmel
+Studio 6.
 
-  projecttemplates\Pololu
-
-folder in your AVR Studio 5 installation.  The "projecttemplates"
-folder should exist already, but you might need to create the "Pololu"
-folder.  Next, close AVR Studio 5 and rename its ProjectTemplatesCache
-folder to "ProjectTemplatesCache.bak".  The next time you start AVR
-Studio 5, the templates should be available in the "New Project"
-dialog, in the "Pololu" subcategory of "AVR GCC".
-
-To install the STK500 XML files, close AVR Studio 5 and copy the XML
-files in the library's
+Next, copy the files in the
 
   avr_studio_5\stk500_xml
 
@@ -187,16 +173,16 @@ folder to the
 
   tools\STK500\xml
 
-folder in your AVR Studio 5 installation.  The next time you start AVR
-Studio 5, you should see ATmega328P, ATmega1284P, and ATmega644P in
-the "Device" dropdown box of the "AVR Programming" dialog box when an
-STK500 is selected.
+folder in your Atmel Studio 6 installation.  The next time you start
+Atmel Studio 6, you should see ATmega328P, ATmega1284P, and ATmega644P
+in the "Device" dropdown box of the "Device Programming" dialog box when
+an STK500 is selected.
 
 
 == Using the Pololu AVR Library ==
 
-For detailed instructions on using the library, please see our
-instructions at:
+For more information about the library, please see the Pololu AVR
+C/C++ Library User's Guide:
 
   http://www.pololu.com/docs/0J20
 
