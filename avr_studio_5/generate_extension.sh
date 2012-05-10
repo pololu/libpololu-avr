@@ -17,7 +17,7 @@ fi
 
 sed "s/YYMMDD/$DATE/" extension.vsixmanifest.template > extension.vsixmanifest
 
-rm -R ProjectTemplates
+rm -Rf ProjectTemplates
 mkdir -p ProjectTemplates/AVRGCC
 cp -R templates ProjectTemplates/AVRGCC/Pololu
 
