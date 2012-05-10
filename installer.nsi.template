@@ -171,7 +171,7 @@ Section
     StrCmp $AS60Path "" end_as60
     IntCmp $AS60Integrate 0 end_as60
     DetailPrint "Installing library into Atmel Studio 6.0..."
-    !insertmacro InstallIntoToolChain "$AS60Path\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolChain\avr"
+    !insertmacro InstallIntoToolChain "$AS60Path\extensions\Atmel\AVRGCC\3.4.0.65\AVRToolchain\avr"
     !insertmacro InstallSTK500Xml "$AS60Path\tools\STK500\xml"
     ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.0 /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
     end_as60:
@@ -220,7 +220,7 @@ Function AS60Check
     ${GetParent} $0 $AS60Path
     StrCmp $AS60Path "" 0 AS60Done    # If we found it, then we are done.
     
-    ReadRegStr $AS60Path HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{770C0BCF-5A67-4B45-A7F1-701A76C01F81}" 'InstallLocation'
+    ReadRegStr $AS60Path HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{51CC3953-2D06-47FA-832A-B7FD24D01322}" 'InstallLocation'
     StrCmp $AS60Path "" AS60Done      # If Atmel Studio 6.0 really isn't there, we are done.
     
     # I'm not sure if this case can happen, but it could for AVR Studio 5.1 if
@@ -243,6 +243,8 @@ Function VSShellCheck
     ReadRegStr $VSShellPath HKCU "SOFTWARE\Atmel\AvrStudio\5.0_Config" 'ShellFolder'
     StrCmp $VSShellPath "" 0 VSShellCheckDone
     ReadRegStr $VSShellPath HKCU "Software\Atmel\AVRStudio51\5.1_Config" 'ShellFolder'
+    StrCmp $VSShellPath "" 0 VSShellCheckDone
+    ReadRegStr $VSShellPath HKCU "Software\Atmel\AtmelStudio\6.0_Config" 'ShellFolder'
     VSShellCheckDone:
 FunctionEnd
 
