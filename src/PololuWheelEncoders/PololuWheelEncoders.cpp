@@ -28,9 +28,6 @@
 #include <stdlib.h>
 #include "PololuWheelEncoders.h"
 
-
-#include "../OrangutanLEDs/OrangutanLEDs.h"
-
 extern "C" void encoders_init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b)
 {
 	PololuWheelEncoders::init(m1a,m1b,m2a,m2b);
