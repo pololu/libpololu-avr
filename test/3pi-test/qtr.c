@@ -55,7 +55,7 @@ void test_qtr()
 				print_character(' ');
 		}
 
-		display_values(values,1000);
+		display_values(values,2000);
 
 		lcd_goto_xy(6,1);
 		print("B");
@@ -74,7 +74,7 @@ void test_qtr()
 
 		lcd_goto_xy(0,0);
 		print("IR- ");
-		display_values(values,1000);
+		display_values(values,2000);
 		lcd_goto_xy(6,1);
 		print("C");
     
