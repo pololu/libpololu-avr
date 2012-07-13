@@ -22,7 +22,7 @@ void test_qtr()
 
 	clear();
 
-	// Wait for each sensor to be > 1400 while the others are < 800.
+	// Wait for each sensor to be > 1600 while the others are < 1000.
 	unsigned int passed_sensors[5] = {0,0,0,0,0};
 
 	while(!button_is_pressed(BUTTON_B))
@@ -35,12 +35,12 @@ void test_qtr()
 		char num_below=0;
 		for(i=0;i<5;i++)
 		{
-			if(values[i] > 1400)
+			if(values[i] > 1600)
 			{
 				sensor_above = i;
 				num_above ++;
 			}
-			else if(values[i] < 800)
+			else if(values[i] < 1000)
 				num_below ++;
 		}
 
