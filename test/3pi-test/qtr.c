@@ -11,6 +11,7 @@ void display_values(unsigned int *values, unsigned int max)
 	for(i=0;i<5;i++)
 	{
 		// get characters[0] to characters[7]
+		//print_character('0'+values[i] * 10 /(max+1)); // for deugging, shows percentage instead of graph
 		print_character(characters[values[i]*8/(max+1)]);
 	}
 }
@@ -21,7 +22,7 @@ void test_qtr()
 
 	clear();
 
-	// Wait for each sensor to be > 750 while the others are < 250.
+	// Wait for each sensor to be > 1300 while the others are < 700.
 	unsigned int passed_sensors[5] = {0,0,0,0,0};
 
 	while(!button_is_pressed(BUTTON_B))
@@ -34,12 +35,12 @@ void test_qtr()
 		char num_below=0;
 		for(i=0;i<5;i++)
 		{
-			if(values[i] > 750)
+			if(values[i] > 1300)
 			{
 				sensor_above = i;
 				num_above ++;
 			}
-			else if(values[i] < 500)
+			else if(values[i] < 700)
 				num_below ++;
 		}
 
