@@ -11,17 +11,96 @@ void display_values(unsigned int *values, unsigned int max)
 	for(i=0;i<5;i++)
 	{
 		// get characters[0] to characters[7]
+		//print_character('0'+values[i] * 10 /(max+1)); // for deugging, shows percentage instead of graph
 		print_character(characters[values[i]*8/(max+1)]);
 	}
 }
 
-void test_qtr()
+void check_for_qtr_shorts()
+{
+	// Test for shorts
+	unsigned int sensor_pins[] = {IO_C0,IO_C1,IO_C2,IO_C3,IO_C4};
+	unsigned char shorts = 1;
+	clear();
+	print("qtr");
+	lcd_goto_xy(0,1);
+	print("shorts");
+	while (shorts)
+	{
+		unsigned char i;
+		shorts = 0;
+		for(i=0;i<5;i++)
+		{
+			unsigned char j;
+			for (j=0;j<5;j++)
+			{
+				set_digital_input(sensor_pins[j],PULL_UP_ENABLED);
+			}
+			set_digital_output(sensor_pins[i],LOW);
+			delay_ms(2);
+			for (j=0;j<5;j++)
+			{
+				if (i == j && is_digital_input_high(sensor_pins[j]))
+					shorts = 1;
+				if (i != j && !is_digital_input_high(sensor_pins[j]))
+					shorts = 1;
+			}
+		}
+	}
+}
+
+void auto_test_sensor_range()
+{
+	clear();
+	print("Auto Cal");
+	lcd_goto_xy(0,1);
+	print("B");
+	while(!button_is_pressed(BUTTON_B));
+	while(button_is_pressed(ALL_BUTTONS));
+
+	delay_ms(300);
+	clear();
+	// Auto calibrate with IR on
+	time_reset();
+    set_motors(60, -60);
+    while(get_ms() < 250)
+        calibrate_line_sensors(IR_EMITTERS_ON);
+    set_motors(-60, 60);
+    while(get_ms() < 750)
+        calibrate_line_sensors(IR_EMITTERS_ON);
+    set_motors(60, -60);
+    while(get_ms() < 1000)
+        calibrate_line_sensors(IR_EMITTERS_ON);
+    set_motors(0, 0);
+
+	unsigned int * maximum_calibration_values = get_line_sensors_calibrated_maximum_on();
+	unsigned int * minimum_calibration_values = get_line_sensors_calibrated_minimum_on();
+	unsigned char k;
+	unsigned char readings_ok = 1;
+	for (k=0;k<5;k++)
+	{
+		readings_ok &= ((maximum_calibration_values[k]-minimum_calibration_values[k]) > 1000);
+	}
+	if (!readings_ok)
+	{
+		clear();
+		print("12345QTR");
+		lcd_goto_xy(0,1);
+		for (k=0;k<5;k++)
+		{
+			print_long(((maximum_calibration_values[k]-minimum_calibration_values[k]) > 1000));
+		}
+		print(" C ");
+		while(!button_is_pressed(BUTTON_C));
+		while(button_is_pressed(ALL_BUTTONS));
+	}
+}
+
+void sensor_graph()
 {
 	unsigned int values[5];
-
 	clear();
-
-	// Wait for each sensor to be > 750 while the others are < 250.
+	// Wait for each sensor to be > 1600 while the others are < 1000.
 	unsigned int passed_sensors[5] = {0,0,0,0,0};
 
 	while(!button_is_pressed(BUTTON_B))
@@ -34,12 +113,12 @@ void test_qtr()
 		char num_below=0;
 		for(i=0;i<5;i++)
 		{
-			if(values[i] > 750)
+			if(values[i] > 1300)
 			{
 				sensor_above = i;
 				num_above ++;
 			}
-			else if(values[i] < 500)
+			else if(values[i] < 1100)
 				num_below ++;
 		}
 
@@ -62,11 +141,13 @@ void test_qtr()
 
 		delay_ms(50);
 	}
- 
 	while(button_is_pressed(ALL_BUTTONS));
+}
 
+void check_emitter_jumper()
+{
+	unsigned int values[5];
 	clear();
-
 	// off values
 	while(!button_is_pressed(BUTTON_C))
 	{
@@ -77,11 +158,17 @@ void test_qtr()
 		display_values(values,2000);
 		lcd_goto_xy(6,1);
 		print("C");
-    
 		delay_ms(50);
 	}
-
 	while(button_is_pressed(ALL_BUTTONS));
+}
+
+void test_qtr()
+{
+	check_for_qtr_shorts();
+	auto_test_sensor_range();
+	sensor_graph();
+	check_emitter_jumper();
 }
 
 // Local Variables: **
