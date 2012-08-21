@@ -27,6 +27,9 @@
 #include <avr/interrupt.h>
 #include <stdlib.h>
 #include "PololuWheelEncoders.h"
+#include "../OrangutanDigital/OrangutanDigital.h"       // digital I/O routines
+#include "../OrangutanResources/include/OrangutanModel.h"
+
 
 extern "C" void encoders_init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b)
 {
@@ -97,25 +100,12 @@ static char global_last_m2a_val;
 static char global_last_m1b_val;
 static char global_last_m2b_val;
 
-inline unsigned char get_val(unsigned char pin)
-{
-	// Note: get_val will work (i.e. always return the same value)
-	// even with invalid pin values, since the bit shift on the final
-	// return will cause the port value to be shifted all the way to
-	// 0.
-	if(pin <= 7)
-		return (PIND >> pin) & 1;
-	if(pin <= 13)
-		return (PINB >> (pin-8)) & 1;
-	return (PINC >> (pin-14)) & 1;
-}
-
 ISR(PCINT0_vect)
 {
-	unsigned char m1a_val = get_val(global_m1a);
-	unsigned char m2a_val = get_val(global_m2a);
-	unsigned char m1b_val = get_val(global_m1b);
-	unsigned char m2b_val = get_val(global_m2b);
+	unsigned char m1a_val = OrangutanDigital::isInputHigh(global_m1a);
+	unsigned char m2a_val = OrangutanDigital::isInputHigh(global_m2a);
+	unsigned char m1b_val = OrangutanDigital::isInputHigh(global_m1b);
+	unsigned char m2b_val = OrangutanDigital::isInputHigh(global_m2b);
 
 	char plus_m1 = m1a_val ^ global_last_m1b_val;
 	char minus_m1 = m1b_val ^ global_last_m1a_val;
@@ -145,30 +135,44 @@ ISR(PCINT0_vect)
 
 ISR(PCINT1_vect,ISR_ALIASOF(PCINT0_vect));
 ISR(PCINT2_vect,ISR_ALIASOF(PCINT0_vect));
+#ifdef PCINT3_vect
+ISR(PCINT3_vect,ISR_ALIASOF(PCINT0_vect));
+#endif
 
 static void enable_interrupts_for_pin(unsigned char p)
 {
-	// check what block it's in and do the right thing
-	if(p <= 7)
-	{
-		PCICR |= 1 << PCIE2;
-		DDRD &= ~(1 << p);
-		PCMSK2 |= 1 << p;
-	}
-	else if(p <= 13)
-	{
-		PCICR |= 1 << PCIE0;
-		DDRB &= ~(1 << (p - 8));
-		PCMSK0 |= 1 << (p - 8);
-	}
-	else if(p <= 19)
-	{
-		PCICR |= 1 << PCIE1;
-		DDRC &= ~(1 << (p - 14));
-		PCMSK1 |= 1 << (p - 14);
-	}
-	// Note: this will work with invalid port numbers, since there is
-	// no final "else" clause.
+	// TODO: Unify this with the code in OrangutanPulseIn::start
+	// that does the same thing, and move it to OrangutanDigital.
+
+	struct IOStruct io;
+	OrangutanDigital::getIORegisters(&io, p);
+
+#if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
+	if (io.pinRegister == &PINA)
+		PCMSK0 |= io.bitmask;
+	if (io.pinRegister == &PINB)
+		PCMSK1 |= io.bitmask;
+	if (io.pinRegister == &PINC)
+		PCMSK2 |= io.bitmask;
+	if (io.pinRegister == &PIND)
+		PCMSK3 |= io.bitmask;
+#else
+	if (io.pinRegister == &PINB)
+		PCMSK0 |= io.bitmask;
+	if (io.pinRegister == &PINC)
+		PCMSK1 |= io.bitmask;
+	if (io.pinRegister == &PIND)
+		PCMSK2 |= io.bitmask;
+#endif
+
+	// Preserving the old behavior of the library prior to 2012-08-21,
+	// we make the line be an input but do not specify whether its pull-up
+	// should be enabled or not.
+	*io.ddrRegister &= ~io.bitmask;
+
+	// For simplicity set all the bits in PCICR and let the enabling of
+	// pin-change interrupts be solely controlled by PCMSKx bits.
+	PCICR = 0xFF;
 }
 
 void PololuWheelEncoders::init(unsigned char m1a, unsigned char m1b, unsigned char m2a, unsigned char m2b)
@@ -192,15 +196,15 @@ void PololuWheelEncoders::init(unsigned char m1a, unsigned char m1b, unsigned ch
 	global_error_m1 = 0;
 	global_error_m2 = 0;
 
-	global_last_m1a_val = get_val(global_m1a);
-	global_last_m1b_val = get_val(global_m1b);
-	global_last_m2a_val = get_val(global_m2a);
-	global_last_m2b_val = get_val(global_m2b);
+	global_last_m1a_val = OrangutanDigital::isInputHigh(global_m1a);
+	global_last_m1b_val = OrangutanDigital::isInputHigh(global_m1b);
+	global_last_m2a_val = OrangutanDigital::isInputHigh(global_m2a);
+	global_last_m2b_val = OrangutanDigital::isInputHigh(global_m2b);
 
 	// Clear the interrupt flags in case they were set before for any reason.
 	// On the AVR, interrupt flags are cleared by writing a logical 1
 	// to them.
-	PCIFR |= (1 << PCIF0) | (1 << PCIF1) | (1 << PCIF2);
+	PCIFR = 0xFF;
 
 	// enable interrupts
 	sei();
