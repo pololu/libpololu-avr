@@ -75,7 +75,7 @@ int main()
 	}
 	clear();
 
-	pololu_3pi_init(1000);
+	pololu_3pi_init(2000);
 
 	if(test_pushbutton_tries())
 		goto pushbuttons;

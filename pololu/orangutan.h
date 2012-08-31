@@ -15,3 +15,4 @@
 #include "OrangutanSVP/OrangutanSVP.h"
 #include "OrangutanX2/OrangutanX2.h"
 #include "OrangutanSPIMaster/OrangutanSPIMaster.h"
+#include "workaround.h"
