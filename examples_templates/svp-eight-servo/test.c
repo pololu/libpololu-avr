@@ -21,9 +21,9 @@ int main()
 	// output-selection pins.  This demo uses three pins, which allows you
 	// to control up to 8 servos.  You can also use two, one, or zero pins
 	// to control fewer servos.
-	const unsigned char demuxPins[] = {IO_B3, IO_B4, IO_C0}; // eight servos, B3=SA, B4=SB, C0=B5.
-	//const unsigned char demuxPins[] = {IO_B3, IO_B4};      // four servos, B3=SA, B4=SB
-	//const unsigned char demuxPins[] = {IO_B3};             // two servos, B3=SA
+	const unsigned char demuxPins[] = {IO_B3, IO_B4, IO_C0}; // eight servos
+	//const unsigned char demuxPins[] = {IO_B3, IO_B4};      // four servos
+	//const unsigned char demuxPins[] = {IO_B3};             // two servos
 	//const unsigned char demuxPins[] = {};                  // one servo
 
 	servos_start(demuxPins, sizeof(demuxPins));

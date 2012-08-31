@@ -1,5 +1,3 @@
-#include <pololu/orangutan.h>
-
 /*
  * buzzer3: for the Orangutan LV, SV, SVP, X2, and 3pi robot.
  *
@@ -52,12 +50,14 @@
  * http://www.pololu.com
  * http://forum.pololu.com
  */
+
+#include <pololu/orangutan.h>
  
-// *** UNCOMMENT ONE OF THE FOLLOWING PRECOMPILER DIRECTIVES ***
+// *** UNCOMMENT ONE OF THE FOLLOWING PREPROCESSOR DIRECTIVES ***
 // (the remaining two should be commented out)
-#define WORKING_CORRECTLY    // this is the right way to use playMode()
-//#define ALWAYS_AUTOMATIC   // playMode() is always PLAY_AUTOMATIC (timing is inaccurate)
-//#define ALWAYS_CHECK       // playMode() is always PLAY_CHECK (delays interrupt the sequence)
+#define WORKING_CORRECTLY  // this is the right way to use playMode()
+//#define ALWAYS_AUTOMATIC // mode is always PLAY_AUTOMATIC, timing is inaccurate
+//#define ALWAYS_CHECK     // mode is always PLAY_CHECK, delays interrupt the sequence
 
 #include <avr/pgmspace.h>
 const char rhapsody[] PROGMEM = "O6 T40 L16 d#<b<f#<d#<f#<bd#f#"
