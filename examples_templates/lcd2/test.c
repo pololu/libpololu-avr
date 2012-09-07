@@ -86,7 +86,8 @@ int main()
   clear();                  // this must be called before we can use the custom characters
   print("mood: ?");
 
-  // initialize the random number generator based on how long we hold the button the first time
+  // initialize the random number generator based on how long
+  // we hold the button the first time
   wait_for_button_press(ANY_BUTTON);
   long seed = 0;
   while(button_is_pressed(ANY_BUTTON))
