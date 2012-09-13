@@ -50,12 +50,7 @@
 #define QTR_A		1
 
 #include "../OrangutanDigital/OrangutanDigital.h" // provides pin definitions
-
-#ifndef ARDUINO
 #include "../OrangutanTime/OrangutanTime.h"		// provides access to delay routines
-#else
-#include <Arduino.h> // provides access to delay() and delayMicroseconds()
-#endif
 
 // one pointer to the type in use
 static PololuQTRSensors *qtr;
