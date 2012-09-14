@@ -218,7 +218,7 @@ void PololuQTRSensors::emittersOff()
 	*_emitterDDR |= _emitterBitmask;
 	*_emitterPORT &= ~_emitterBitmask;
 
-	OrangutanTime::delayMicroseconds(200);  // Give the sensors time to react.
+	delayMicroseconds(200);  // Give the sensors time to react.
 }
 
 void PololuQTRSensors::emittersOn()
@@ -228,7 +228,7 @@ void PololuQTRSensors::emittersOn()
 	*_emitterDDR |= _emitterBitmask;
 	*_emitterPORT |= _emitterBitmask;
 
-	OrangutanTime::delayMicroseconds(200);  // Give the sensors time to react.
+	delayMicroseconds(200);  // Give the sensors time to react.
 }
 
 // Resets the calibration.
