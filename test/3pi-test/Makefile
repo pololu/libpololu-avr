@@ -20,7 +20,7 @@ clean:
 %.hex: %.obj
 	$(OBJ2HEX) -R .eeprom -O ihex $< $@
 
-%.o: test.c assert.h qtr.h motors.h pot.h battery.h pushbuttons.h outputs.h leds.h lcd.h serial-slave.h
+%.o: test.h test.c assert.h qtr.h motors.h pot.h battery.h pushbuttons.h outputs.h leds.h lcd.h serial-slave.h
 
 %.m3pi.o : %.c
 	$(CC) $(CFLAGS) -DM3PI -c -o $@ $<
@@ -35,4 +35,4 @@ program: $(TARGET).hex
 	$(AVRDUDE) -p m328p -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
 
 program_m3pi: m3pi_$(TARGET).hex
-	$(AVRDUDE) -p m328p -c avrisp2 -P $(PORT) -U flash:w:$(TARGET).hex
+	$(AVRDUDE) -p m328p -c avrisp2 -P $(PORT) -U flash:w:m3pi_$(TARGET).hex
