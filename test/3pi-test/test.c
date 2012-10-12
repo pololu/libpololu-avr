@@ -9,6 +9,7 @@
 #include "leds.h"
 #include "lcd.h"
 #include "demo.h"
+#include "test.h"
 
 #include <avr/pgmspace.h>
 
@@ -75,7 +76,7 @@ int main()
 	}
 	clear();
 
-	pololu_3pi_init(2000);
+	pololu_3pi_init(TEST_LINE_SENSOR_TIMEOUT);
 
 	if(test_pushbutton_tries())
 		goto pushbuttons;
