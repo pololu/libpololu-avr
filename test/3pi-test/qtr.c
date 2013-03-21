@@ -53,7 +53,7 @@ void check_for_qtr_shorts()
 void auto_test_sensor_range()
 {
 	clear();
-	print("Auto Cal");
+	print("AutoTest");
 	lcd_goto_xy(0,1);
 	print("B");
 	while(!button_is_pressed(BUTTON_B));
@@ -63,37 +63,56 @@ void auto_test_sensor_range()
 	clear();
 	// Auto calibrate with IR on
 	time_reset();
-    set_motors(60, -60);
-    while(get_ms() < 250)
-        calibrate_line_sensors(IR_EMITTERS_ON);
-    set_motors(-60, 60);
-    while(get_ms() < 750)
-        calibrate_line_sensors(IR_EMITTERS_ON);
-    set_motors(60, -60);
-    while(get_ms() < 1000)
-        calibrate_line_sensors(IR_EMITTERS_ON);
-    set_motors(0, 0);
+  set_motors(30, -30);
+  while(get_ms() < 500)
+  calibrate_line_sensors(IR_EMITTERS_ON);
+  set_motors(-30, 30);
+  while(get_ms() < 1500)
+  calibrate_line_sensors(IR_EMITTERS_ON);
+  set_motors(30, -30);
+  while(get_ms() < 2000)
+  calibrate_line_sensors(IR_EMITTERS_ON);
+  set_motors(0, 0);
 
 	unsigned int * maximum_calibration_values = get_line_sensors_calibrated_maximum_on();
 	unsigned int * minimum_calibration_values = get_line_sensors_calibrated_minimum_on();
 	unsigned char k;
 	unsigned char readings_ok = 1;
-  unsigned char ok_array[5] = {1,1,1,1,1};
+  unsigned char ok_array[5] = {'G','G','G','G','G'};
 	for (k=0;k<5;k++)
 	{
-    ok_array[k] = ((maximum_calibration_values[k] - minimum_calibration_values[k]) > 1000) &&
-                  ((minimum_calibration_values[k] * 2) < maximum_calibration_values[k]) &&
-                  ((minimum_calibration_values[k]) < 1600);
-		readings_ok &= ok_array[k];
+    if ((maximum_calibration_values[k] - minimum_calibration_values[k]) > 1000)
+    {
+      if ((minimum_calibration_values[k] * 2) < maximum_calibration_values[k])
+      {
+        if (minimum_calibration_values[k] < 1600)
+        {
+           continue;
+        }           
+        else
+        {
+          ok_array[k] = 'H';
+        }          
+      }          
+      else
+      {
+        ok_array[k] = 'M';
+      }        
+    }        
+    else
+    {
+      ok_array[k] = 'R';
+    }      
+    readings_ok = 0;
 	}
 	if (!readings_ok)
 	{
 		clear();
-		print("12345QTR");
+		print("QTR FAIL");
 		lcd_goto_xy(0,1);
 		for (k=0;k<5;k++)
 		{
-      print_long(ok_array[k]);
+      print_character(ok_array[k]);
 		}
 		print(" C ");
 		while(!button_is_pressed(BUTTON_C));
