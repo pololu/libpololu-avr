@@ -21,6 +21,6 @@ rm -Rf ProjectTemplates
 mkdir -p ProjectTemplates/AVRGCC
 cp -R templates ProjectTemplates/AVRGCC/Pololu
 
-rm extension.vsix
+rm -f extension.vsix
 zip -MMrq extension.vsix \[Content_Types\].xml extension.vsixmanifest ProjectTemplates icon.png preview.png
 zip -MMjq extension.vsix ../LICENSE.txt
