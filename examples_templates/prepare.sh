@@ -7,6 +7,15 @@ device=$2
 mcu=$3
 device_specific_macro=$4
 
+# For Atmel Studio, change the MCU to ATmega324PA; otherwise it will give this error
+# message when the user presses F5:
+# dbg ProcessesService::launch() failed: Failed to start programming session before chiperase.
+as_mcu=$3
+if [ "$mcu" = atmega324p ]
+then
+  as_mcu=ATmega324PA
+fi
+
 example_template=examples_templates/$example
 example_dir=examples/$device/$example
 
@@ -31,13 +40,14 @@ cat $example_template/*.aps | sed \
   > $example_dir/$example.aps
 
 # Copy and edit the AVR Studio 5 project file.
+
 AS5_DSM=
 if [ $device_specific_macro ]
 then
   AS5_DSM="s/<avrgcc.compiler.symbols.DefSymbols><ListValues><\/ListValues><\/avrgcc.compiler.symbols.DefSymbols>/<avrgcc.compiler.symbols.DefSymbols><ListValues><Value>$device_specific_macro<\/Value><\/ListValues><\/avrgcc.compiler.symbols.DefSymbols>/"
 fi
 sed < examples_templates/test.cproj \
-  -e "s/<avrdevice>[^<]*<\/avrdevice>/<avrdevice>$mcu<\/avrdevice>/" \
+  -e "s/<avrdevice>[^<]*<\/avrdevice>/<avrdevice>$as_mcu<\/avrdevice>/" \
   -e "s/<Value>pololu_[^<]*<\/Value>/<Value>pololu_$device<\/Value>/" \
   -e "$AS5_DSM" \
   > $example_dir/$example.cproj
