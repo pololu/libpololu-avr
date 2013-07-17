@@ -560,6 +560,9 @@ void OrangutanLCD::send(unsigned char data, unsigned char rs, unsigned char numS
 #endif  // ifdef _ORANGUTAN_X2
 
 	// Restore our DDR and port information
+	// TODO: Fix this code so it does not interfere with interrupts that are
+	// using PORTB/C/D pins as outputs.  Maybe it should only restore the pins
+	// that were actually used by the LCD.
 #if defined(_ORANGUTAN_SVP) || defined(_ORANGUTAN_X2)
 	DDRC = temp_ddrc;
 	PORTC = temp_portc;
