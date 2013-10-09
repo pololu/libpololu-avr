@@ -52,6 +52,10 @@ sed < examples_templates/test.cproj \
   -e "$AS5_DSM" \
   > $example_dir/$example.cproj
 
+# TODO: we should think about editing the cproj file to refer to each .c file by name instead of
+# using "*.c".  That will avoid the double-compilation problem that happens when a user adds a
+# new .c file and tries to compile.
+
 # Copy and edit the AVR Studio 5.1 solution file.
 sed < examples_templates/test.atsln \
   -e "s/\"test/\"$example/g" \

@@ -20,6 +20,7 @@
     <AsfVersion>2.11.1</AsfVersion>
     <avrtool>com.atmel.avrdbg.tool.stk500</avrtool>
     <avrtoolinterface>ISP</avrtoolinterface>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
     <com_atmel_avrdbg_tool_stk500>
       <ToolType>com.atmel.avrdbg.tool.stk500</ToolType>
       <ToolName>STK500</ToolName>
@@ -35,7 +36,7 @@
         <InterfaceProperties>
           <JtagDbgClock>1000000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
-          <IspClock>500000</IspClock> <!-- 1500 kHz for the Pololu USB AVR Programmer -->
+          <IspClock>500000</IspClock>
           <JtagInChain>false</JtagInChain>
           <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
           <JtagDevicesBefore>0</JtagDevicesBefore>
