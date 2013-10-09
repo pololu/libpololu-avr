@@ -58,7 +58,7 @@
         <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
         <avrgcc.linker.libraries.Libraries>
           <ListValues>
-            <Value>$pololu_lib$</Value>  <!-- doesn't work in AS6.0 and later -->
+            <Value>$pololu_lib$</Value>  <!-- doesn't work in AS6.0, so that's why we use LinkerFlags below -->
             <Value>m</Value>
           </ListValues>
         </avrgcc.linker.libraries.Libraries>
@@ -92,7 +92,7 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="*.c">
+    <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
