@@ -19,6 +19,7 @@
     <AsfVersion>2.11.1</AsfVersion>
     <avrtool>com.atmel.avrdbg.tool.stk500</avrtool>
     <avrtoolinterface>ISP</avrtoolinterface>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
     <com_atmel_avrdbg_tool_stk500>
       <ToolType>com.atmel.avrdbg.tool.stk500</ToolType>
       <ToolName>STK500</ToolName>
