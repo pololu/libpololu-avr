@@ -63,14 +63,14 @@ void auto_test_sensor_range()
 	clear();
 	// Auto calibrate with IR on
 	time_reset();
-  set_motors(30, -30);
-  while(get_ms() < 500)
+  set_motors(20, -20);
+  while(get_ms() < 650)
   calibrate_line_sensors(IR_EMITTERS_ON);
-  set_motors(-30, 30);
-  while(get_ms() < 1500)
+  set_motors(-20, 20);
+  while(get_ms() < 1950)
   calibrate_line_sensors(IR_EMITTERS_ON);
-  set_motors(30, -30);
-  while(get_ms() < 2000)
+  set_motors(20, -20);
+  while(get_ms() < 2600)
   calibrate_line_sensors(IR_EMITTERS_ON);
   set_motors(0, 0);
 
