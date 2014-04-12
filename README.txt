@@ -7,7 +7,7 @@ http://www.pololu.com
 http://forum.pololu.com
 
 
-== Features ===
+== Features ==
 
 The Pololu AVR Library is a collection of support functions for
 programming AVR-based Pololu products or for using Pololu products
