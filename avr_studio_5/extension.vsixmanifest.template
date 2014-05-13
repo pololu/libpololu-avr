@@ -15,6 +15,7 @@
       <IsolatedShell Version="5.1">AVRStudio</IsolatedShell>
       <IsolatedShell Version="6.0">AtmelStudio</IsolatedShell>
       <IsolatedShell Version="6.1">AtmelStudio</IsolatedShell>
+      <IsolatedShell Version="6.2">AtmelStudio</IsolatedShell>
     </SupportedProducts>
     <SupportedFrameworkRuntimeEdition MinVersion="2.0" />
     <InstalledByMsi>false</InstalledByMsi>
