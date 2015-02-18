@@ -1,0 +1,8 @@
+name=Pololu Orangutan and 3pi Boards
+version=1.6.0
+
+tools.orangutan_avrdude.cmd.path={runtime.ide.path}/hardware/tools/avr/bin/avrdude
+tools.orangutan_avrdude.config.path={runtime.ide.path}/hardware/tools/avr/etc/avrdude.conf
+tools.orangutan_avrdude.program.params.verbose=-v
+tools.orangutan_avrdude.program.params.quiet=-q -q
+tools.orangutan_avrdude.program.pattern="{cmd.path}" "-C{config.path}" {program.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Uflash:w:{build.path}/{build.project_name}.hex:i"

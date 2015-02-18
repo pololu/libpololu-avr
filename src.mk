@@ -75,16 +75,29 @@ installer_nsi:
 ZIPDIR=lib_zipfiles
 DATE := $(shell date +%y%m%d)
 LIB_ZIPFILE := $(ZIPDIR)/libpololu-avr-$(DATE).zip
-ARDUINO_ZIPFILE := $(ZIPDIR)/PololuArduinoLibraries-$(DATE).zip
+ARDUINO_ZIPFILE := $(ZIPDIR)/libpololu-arduino-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
+ZIP_IGNORES := \*~
 ZIP_EXCLUDES := \*~ \*.o \*/.git/\* \*/.gitignore .svn/\* \*/.svn/\* \*.hex libpololu-avr/src.mk libpololu-avr/avr_studio_5/\*.sh libpololu-avr/avr_studio_5/templates_src/\* \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt libpololu-avr/avr_studio_5/\*Con*.xml libpololu-avr/avr_studio_5/extension.vsixmanifest\* extension.vsixmanifest\* libpololu-avr/avr_studio_5/\*.png libpololu-avr/avr_studio_5/ProjectTemplates/\* libpololu-avr/installer.nsi.template
 
-ARDUINO_EXCLUDES :=  libpololu-arduino/OrangutanPulseIn/\* libpololu-arduino/OrangutanSerial/\* libpololu-arduino/OrangutanServos/\* libpololu-arduino/OrangutanSPIMaster/\* libpololu-arduino/OrangutanTime/\* libpololu-arduino/OrangutanSVP/\* libpololu-arduino/OrangutanX2/\* libpololu-arduino/include/\*
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
+ARDUINO_LIBS := \
+  OrangutanAnalog \
+  OrangutanBuzzer \
+  OrangutanDigital \
+  OrangutanLCD \
+  OrangutanLEDs \
+  OrangutanMotors \
+  OrangutanResources \
+  OrangutanPushbuttons \
+  Pololu3pi \
+  PololuQTRSensors \
+  PololuWheelEncoders
+
 .PHONY: zip
-zip: library_files examples hex_files arduino_zip avr_studio_5_templates avr_studio_5_stk500_xml avr_studio_5_extension installer_nsi
+zip: library_files examples hex_files arduino_zip qtr_zip avr_studio_5_templates avr_studio_5_stk500_xml avr_studio_5_extension installer_nsi
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
@@ -100,13 +113,18 @@ zip: library_files examples hex_files arduino_zip avr_studio_5_templates avr_stu
 arduino_zip:
 	mkdir -p $(ZIPDIR)
 	rm -f $(ARDUINO_ZIPFILE)
+	rm -Rf libpololu-arduino
+	mkdir -p libpololu-arduino/avr/libraries
+	cp arduino/README-Arduino.txt LICENSE.txt libpololu-arduino
+	cp arduino/platform.txt arduino/boards.txt arduino/programmers.txt libpololu-arduino/avr
+	cp -R $(foreach f, $(ARDUINO_LIBS),src/$(f)) libpololu-arduino/avr/libraries
+	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino -x $(ZIP_IGNORES)
+	rm -R libpololu-arduino
+
+qtr_zip:
 	rm -f $(ARDUINO_QTR_ZIPFILE)
-	ln -s src libpololu-arduino
-	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino -x $(ZIP_EXCLUDES) -x $(ARDUINO_EXCLUDES)
-	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino/README-Arduino.txt
-	rm libpololu-arduino
 	ln -s src/PololuQTRSensors .
-	zip -rq $(ARDUINO_QTR_ZIPFILE) PololuQTRSensors -x $(ZIP_EXCLUDES) -x $(ARDUINO_EXCLUDES)
+	zip -rq $(ARDUINO_QTR_ZIPFILE) PololuQTRSensors -x $(ZIP_EXCLUDES)
 	rm PololuQTRSensors
 
 # Cleanup

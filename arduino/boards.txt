@@ -1,0 +1,29 @@
+orangutan_328.name=Pololu Orangutan or 3pi robot w/ ATmega328P
+orangutan_328.upload.tool=
+orangutan_328.upload.maximum_size=32768
+orangutan_328.upload.maximum_data_size=2048
+orangutan_328.build.mcu=atmega328p
+orangutan_328.build.f_cpu=20000000L
+orangutan_328.build.board=AVR_ORANGUTAN
+orangutan_328.build.core=arduino:arduino
+orangutan_328.build.variant=arduino:standard
+
+orangutan_168.name=Pololu Orangutan or 3pi robot w/ ATmega168
+orangutan_168.upload.tool=
+orangutan_168.upload.maximum_size=16384
+orangutan_168.upload.maximum_data_size=1024
+orangutan_168.build.mcu=atmega168p
+orangutan_168.build.f_cpu=20000000L
+orangutan_168.build.board=AVR_ORANGUTAN
+orangutan_168.build.core=arduino:arduino
+orangutan_168.build.variant=arduino:standard
+
+orangutan_48.name=Pololu Baby Orangutan B-48 w/ ATmega48
+orangutan_48.upload.tool=
+orangutan_48.upload.maximum_size=4096
+orangutan_48.upload.maximum_data_size=512
+orangutan_48.build.mcu=atmega48
+orangutan_48.build.f_cpu=20000000L
+orangutan_48.build.board=AVR_ORANGUTAN
+orangutan_48.build.core=arduino:arduino
+orangutan_48.build.variant=arduino:standard

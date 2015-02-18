@@ -1,0 +1,4 @@
+orangutan_usbavrpgm.name=Pololu USB AVR Programmer
+orangutan_usbavrpgm.program.tool=orangutan_avrdude
+orangutan_usbavrpgm.protocol=stk500v2
+orangutan_usbavrpgm.program.extra_params=-P{serial.port}
