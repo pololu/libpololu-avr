@@ -24,7 +24,7 @@ For example, if you are using Windows and you have not changed the
 sketchbook location, the "libpololu-arduino" folder would be copied
 to:
 
-  C:\Users\<username>\Documents\hardware\libpololu-arduino
+  C:\Users\<username>\Documents\Arduino\hardware\libpololu-arduino
 
 Next, restart the Arduino IDE.
 
