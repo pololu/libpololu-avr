@@ -31,9 +31,9 @@ Next, restart the Arduino IDE.
 After installing, you should see several new features inside the
 Arduino IDE:
 
-* You should see entries for the Orangutans in the Boards menu.
+* You should see entries for the Orangutans in the Board menu.
 * You should see an entry for the Pololu USB AVR Programmer in the
-  Programmers menu.
+  Programmer menu.
 * You should see several new entries in the "Examples" menu, like
   "OrangutanMotors" and "OrangutanLCD".
 
@@ -46,8 +46,8 @@ above.
 
 2015 Feb 18 -
 * Packaged the libraries as an Arduino hardware add-on for Arduino
-  1.6.0, which also provides needed entries in the Boards and
-  Programmers menus.
+  1.6.0, which also provides needed entries in the Board and
+  Programmer menus.
 
 2011 Dec 21 -
 * Updated the libraries to be compatible with the Arduino 1.0
