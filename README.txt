@@ -1,6 +1,6 @@
 Pololu AVR Library
 
-Copyright (c) 2008-2012 Pololu Corporation. For more information, see
+Copyright (c) 2008-2015 Pololu Corporation. For more information, see
 
 http://www.pololu.com/docs/0J20
 http://www.pololu.com
@@ -186,4 +186,14 @@ For more information about the library, please see the Pololu AVR
 C/C++ Library User's Guide:
 
   http://www.pololu.com/docs/0J20
+
+
+== Arduino IDE ==
+
+Parts of the Pololu AVR Library can be used in the Arduino IDE.  For
+more information, see "Programming Orangutans and the 3pi Robot from
+the Arduino environment":
+
+  https://www.pololu.com/docs/0J17
+
 
