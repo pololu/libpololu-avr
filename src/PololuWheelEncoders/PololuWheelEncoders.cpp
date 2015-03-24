@@ -102,10 +102,10 @@ static char global_last_m2b_val;
 
 ISR(PCINT0_vect)
 {
-	unsigned char m1a_val = OrangutanDigital::isInputHigh(global_m1a);
-	unsigned char m2a_val = OrangutanDigital::isInputHigh(global_m2a);
-	unsigned char m1b_val = OrangutanDigital::isInputHigh(global_m1b);
-	unsigned char m2b_val = OrangutanDigital::isInputHigh(global_m2b);
+	unsigned char m1a_val = OrangutanDigital::isInputHigh(global_m1a) ? 1 : 0;
+	unsigned char m2a_val = OrangutanDigital::isInputHigh(global_m2a) ? 1 : 0;
+	unsigned char m1b_val = OrangutanDigital::isInputHigh(global_m1b) ? 1 : 0;
+	unsigned char m2b_val = OrangutanDigital::isInputHigh(global_m2b) ? 1 : 0;
 
 	char plus_m1 = m1a_val ^ global_last_m1b_val;
 	char minus_m1 = m1b_val ^ global_last_m1a_val;
@@ -196,10 +196,10 @@ void PololuWheelEncoders::init(unsigned char m1a, unsigned char m1b, unsigned ch
 	global_error_m1 = 0;
 	global_error_m2 = 0;
 
-	global_last_m1a_val = OrangutanDigital::isInputHigh(global_m1a);
-	global_last_m1b_val = OrangutanDigital::isInputHigh(global_m1b);
-	global_last_m2a_val = OrangutanDigital::isInputHigh(global_m2a);
-	global_last_m2b_val = OrangutanDigital::isInputHigh(global_m2b);
+	global_last_m1a_val = OrangutanDigital::isInputHigh(global_m1a) ? 1 : 0;
+	global_last_m1b_val = OrangutanDigital::isInputHigh(global_m1b) ? 1 : 0;
+	global_last_m2a_val = OrangutanDigital::isInputHigh(global_m2a) ? 1 : 0;
+	global_last_m2b_val = OrangutanDigital::isInputHigh(global_m2b) ? 1 : 0;
 
 	// Clear the interrupt flags in case they were set before for any reason.
 	// On the AVR, interrupt flags are cleared by writing a logical 1
