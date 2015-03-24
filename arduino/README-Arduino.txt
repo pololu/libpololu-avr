@@ -44,6 +44,10 @@ above.
 
 == Change Log ==
 
+2015 Mar 24 -
+* Fixed a bug in PololuWheelEncoders that was causing it to lose half
+  of the counts.  This bug was introduced in 2012.
+
 2015 Feb 18 -
 * Packaged the libraries as an Arduino hardware add-on for Arduino
   1.6.0, which also provides needed entries in the Board and
