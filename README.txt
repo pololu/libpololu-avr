@@ -54,7 +54,7 @@ be installed before the Pololu AVR library.  Once again, please see
 the Pololu AVR Programming Quick Start Guide for detailed instructions
 for Windows, Linux, and Mac OS X.
 
-To program your AVR, we recommend the Pololu USB AVR Programmer: 
+To program your AVR, we recommend the Pololu USB AVR Programmer:
 
   http://www.pololu.com/catalog/product/1300
 
@@ -161,14 +161,14 @@ source repository.
 
 To install the templates, simply double click on
 
-  avr_studio_5\extension.vsix
+  atmel_studio\extension.vsix
 
 and follow the instructions to install the extension into Atmel
 Studio 6.
 
 Next, copy the files in the
 
-  avr_studio_5\stk500_xml
+  atmel_studio\stk500_xml
 
 folder to the
 

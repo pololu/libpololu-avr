@@ -50,21 +50,21 @@ hex_files: examples
 
 # Phony target that generates the AVR Studio 5 template zip files
 # using the files in the templates directory.
-.PHONY: avr_studio_5_templates
-avr_studio_5_templates:
-	avr_studio_5/generate_templates.sh
+.PHONY: atmel_studio_templates
+atmel_studio_templates:
+	atmel_studio/generate_templates.sh
 
 # Phony target that generates the XML files we need to add support
 # for programming our AVRs to AVR Studio 5.
-.PHONY: avr_studio_5_stk500_xml
-avr_studio_5_stk500_xml:
-	avr_studio_5/generate_stk500_xml.sh
+.PHONY: atmel_studio_stk500_xml
+atmel_studio_stk500_xml:
+	atmel_studio/generate_stk500_xml.sh
 
 # Phony target that generates the AVR Studio 5 extension
 # (which only installs the templates, not the other parts of the library).
-.PHONY: avr_studio_5_extension
-avr_studio_5_extension: avr_studio_5_templates
-	avr_studio_5/generate_extension.sh
+.PHONY: atmel_studio_extension
+atmel_studio_extension: atmel_studio_templates
+	atmel_studio/generate_extension.sh
 
 # Phony target generates our NSIS installer script (installer.nsi)
 # from the template (installer.nsi.template).
@@ -79,7 +79,7 @@ ARDUINO_ZIPFILE := $(ZIPDIR)/libpololu-arduino-$(DATE).zip
 ARDUINO_QTR_ZIPFILE := $(ZIPDIR)/PololuQTRSensors-$(DATE).zip
 
 ZIP_IGNORES := \*~
-ZIP_EXCLUDES := \*~ \*.o \*/.git/\* \*/.gitignore .svn/\* \*/.svn/\* \*.hex libpololu-avr/src.mk libpololu-avr/avr_studio_5/\*.sh libpololu-avr/avr_studio_5/templates_src/\* \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt libpololu-avr/avr_studio_5/\*Con*.xml libpololu-avr/avr_studio_5/extension.vsixmanifest\* extension.vsixmanifest\* libpololu-avr/avr_studio_5/\*.png libpololu-avr/avr_studio_5/ProjectTemplates/\* libpololu-avr/installer.nsi.template
+ZIP_EXCLUDES := \*~ \*.o \*/.git/\* \*/.gitignore .svn/\* \*/.svn/\* \*.hex libpololu-avr/src.mk libpololu-avr/atmel_studio/\*.sh libpololu-avr/atmel_studio/templates_src/\* \*.zip libpololu-avr/arduino_zipfiles/ arduino_zipfiles/\* \*/lib_zipfiles/\* \*.elf \*.eep \*.lss \*.o.d libpololu-avr/libpololu-avr/\* libpololu-avr/extra/\* libpololu-avr/graphics/\* libpololu-avr/templates/\* \*.map \*/test/\* \*/ArduinoReadMe.txt \*/examples_templates/\* \*/README-Arduino.txt libpololu-avr/atmel_studio/\*Con*.xml libpololu-avr/atmel_studio/extension.vsixmanifest\* extension.vsixmanifest\* libpololu-avr/atmel_studio/\*.png libpololu-avr/atmel_studio/ProjectTemplates/\* libpololu-avr/installer.nsi.template
 
 NON_ARDUINO_EXCLUDES := libpololu-avr/src/\*/examples/\* libpololu-avr/src/\*/keywords.txt
 
@@ -97,7 +97,7 @@ ARDUINO_LIBS := \
   PololuWheelEncoders
 
 .PHONY: zip
-zip: library_files examples hex_files arduino_zip qtr_zip avr_studio_5_templates avr_studio_5_stk500_xml avr_studio_5_extension installer_nsi
+zip: library_files examples hex_files arduino_zip qtr_zip atmel_studio_templates atmel_studio_stk500_xml atmel_studio_extension installer_nsi
 	rm -f libpololu-avr
 	mkdir -p $(ZIPDIR)
 	rm -f $(LIB_ZIPFILE)
@@ -106,7 +106,7 @@ zip: library_files examples hex_files arduino_zip qtr_zip avr_studio_5_templates
 	yes | rm -Rf ./pololu/*/*.cpp ./pololu/*/examples ./pololu/*/private ./pololu/*/keywords.txt
 	ln -s . libpololu-avr
 	zip -rq $(LIB_ZIPFILE) libpololu-avr -x $(ZIP_EXCLUDES) $(NON_ARDUINO_EXCLUDES)
-	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex libpololu-avr/avr_studio_5/templates/*.zip
+	zip -rq $(LIB_ZIPFILE) libpololu-avr/examples/*/hex_files/*.hex libpololu-avr/atmel_studio/templates/*.zip
 	rm libpololu-avr
 	yes | rm -Rf $(foreach object, $(LIBRARY_OBJECTS), ./pololu/$(object))
 

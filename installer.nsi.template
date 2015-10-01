@@ -159,7 +159,7 @@ FunctionEnd
     # overwrite any existing XML files.
     SetOutPath "${Path}"
     SetOverwrite off
-    File "${libpololu-avr}\avr_studio_5\stk500_xml\*.xml"
+    File "${libpololu-avr}\atmel_studio\stk500_xml\*.xml"
     SetOverwrite on
 !macroend
 
@@ -179,7 +179,7 @@ Section
     ; NOTE: For the AVR Studio 5.1 beta, this path didn't have the ".27" in it.
     !insertmacro InstallIntoToolChain "$AS51Path\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolChain\avr"
     !insertmacro InstallSTK500Xml "$AS51Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:5.1 /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:5.1 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
     end_as51:
 
     StrCmp $AS60Path "" end_as60
@@ -196,7 +196,7 @@ Section
       MessageBox MB_OK|MB_ICONEXCLAMATION "The Pololu AVR C/C++ Library installer was unable to find the avr folder for Atmel Studio 6.0's AVR toolchain.  You might have to find your AVR toolchain's avr folder (probably inside $AS60Path\extensions\Atmel\AVRGCC\ ) and then manually copy the $INSTDIR\libpololu_*.a files to avr\lib and copy the $INSTDIR\pololu folder to avr\include.  Please report this problem at http://forum.pololu.com/."
     ${endif}
     !insertmacro InstallSTK500Xml "$AS60Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.0 /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.0 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
     end_as60:
 
     StrCmp $AS61Path "" end_as61
@@ -209,7 +209,7 @@ Section
       MessageBox MB_OK|MB_ICONEXCLAMATION "The Pololu AVR C/C++ Library installer was unable to find the avr folder for Atmel Studio 6.1's 8-bit GNU toolchain.  You might have to find your AVR toolchain's avr folder (probably near $AS61Path ) and then manually copy the $INSTDIR\libpololu_*.a files to avr\lib and copy the $INSTDIR\pololu folder to avr\include.  Please report this problem at http://forum.pololu.com/."
     ${endif}
     !insertmacro InstallSTK500Xml "$AS61Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.1 /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.1 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
     end_as61:
 
     StrCmp $AS62Path "" end_as62
@@ -222,7 +222,7 @@ Section
       MessageBox MB_OK|MB_ICONEXCLAMATION "The Pololu AVR C/C++ Library installer was unable to find the avr folder for Atmel Studio 6.2's 8-bit GNU toolchain.  You might have to find your AVR toolchain's avr folder (probably near $AS62Path ) and then manually copy the $INSTDIR\libpololu_*.a files to avr\lib and copy the $INSTDIR\pololu folder to avr\include.  Please report this problem at http://forum.pololu.com/."
     ${endif}
     !insertmacro InstallSTK500Xml "$AS62Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.2 /quiet $\"$INSTDIR\avr_studio_5\extension.vsix$\""
+    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.2 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
     end_as62:
 
 SectionEnd
