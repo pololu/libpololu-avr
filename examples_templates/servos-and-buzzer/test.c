@@ -42,10 +42,10 @@
  */
 
 #include <avr/pgmspace.h>  // this lets us refer to data in program space (i.e. flash)
-// store this fugue in program space using the PROGMEM macro.  
-// Later we will play it directly from program space, bypassing the need to load it 
+// store this fugue in program space using the PROGMEM macro.
+// Later we will play it directly from program space, bypassing the need to load it
 // all into RAM first.
-const char fugue[] PROGMEM = 
+const char fugue[] PROGMEM =
   "! O5 L16 agafaea dac+adaea fa<aa<bac#a dac#adaea f"
   "O6 dcd<b-d<ad<g d<f+d<gd<ad<b- d<dd<ed<f+d<g d<f+d<gd<ad"
   "L8 MS <b-d<b-d MLe-<ge-<g MSc<ac<a ML d<fd<f O5 MS b-gb-g"
@@ -59,7 +59,7 @@ const char fugue[] PROGMEM =
 #ifndef _ORANGUTAN_X2	// this code isn't needed if we're using the Orangutan X2
 
 // frequencies in tenths of a Hertz of lowest 12 allowed notes (stored in program memory)
-unsigned int base_freqs[] PROGMEM = {412, 437, 463, 490, 519, 550, 583, 617, 654, 693, 734, 778}; 
+const unsigned int base_freqs[] PROGMEM = {412, 437, 463, 490, 519, 550, 583, 617, 654, 693, 734, 778};
 
 // returns the frequency (in Hz) for the specified note.  Note macros are
 // defined in OrangutanBuzzer.h.  For example to get the frequency of note
