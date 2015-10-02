@@ -4,7 +4,7 @@
     <Name>Pololu AVR Library Templates</Name><!-- slashes are NOT allowed -->
     <Author>Pololu Corporation</Author>
     <Version>1.YYMMDD</Version>
-    <Description xml:space="preserve">An extension for AVR Studio 5 and Atmel Studio 6 that provides project templates for using the Pololu AVR C/C++ Library.</Description>
+    <Description xml:space="preserve">An extension for Atmel Studio 6 and 7 that provides project templates for using the Pololu AVR C/C++ Library.</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://www.pololu.com/docs/0J20</MoreInfoUrl>
     <GettingStartedGuide>http://www.pololu.com/docs/0J20</GettingStartedGuide>
@@ -12,10 +12,10 @@
     <Icon>icon.png</Icon>
     <PreviewImage>preview.png</PreviewImage>
     <SupportedProducts>
-      <IsolatedShell Version="5.1">AVRStudio</IsolatedShell>
       <IsolatedShell Version="6.0">AtmelStudio</IsolatedShell>
       <IsolatedShell Version="6.1">AtmelStudio</IsolatedShell>
       <IsolatedShell Version="6.2">AtmelStudio</IsolatedShell>
+      <IsolatedShell Version="7.0">AtmelStudio</IsolatedShell>
     </SupportedProducts>
     <SupportedFrameworkRuntimeEdition MinVersion="2.0" />
     <InstalledByMsi>false</InstalledByMsi>

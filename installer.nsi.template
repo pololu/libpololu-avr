@@ -31,40 +31,42 @@ Page directory "" "" checkDirectory
 Page custom optionsPage optionsPageLeave
 Page instfiles
 
-Var /GLOBAL VSShellPath
+Var VS10ShellPath
+Var VS14ShellPath
 Var Dialog
 
 DirText "Setup will install the Pololu AVR C/C++ Library (version ${LIB_VER}) in the following folder.  To install in a different folder, click Browse and select another folder.  Click Next to continue."
 
 # Toolchain variables
 Var WinAVRPath
-Var AS51Path
 Var AS60Path
 Var AS61Path
 Var AS61PathAvr
 Var AS62Path
 Var AS62PathAvr
+Var AS70Path
 
 Var WinAVRBox
-Var AS51Box
 Var AS60Box
 Var AS61Box
 Var AS62Box
+Var AS70Box
 
 Var WinAVRIntegrate
-Var AS51Integrate
 Var AS60Integrate
 Var AS61Integrate
 Var AS62Integrate
+Var AS70Integrate
 
 # When the installer starts, detect the different things we need to detect.
 Function .onInit
     Call WinAVRCheck
-    Call AS51Check
     Call AS60Check
     Call AS61Check
     Call AS62Check
-    Call VSShellCheck
+    Call AS70Check
+    Call VS10ShellCheck
+    Call VS14ShellCheck
 
     # Check the assumptions we make when calling NSD_GetState and NSD_SetState.
     ${If} ${BST_CHECKED} != 1
@@ -76,10 +78,10 @@ Function .onInit
 
     # By default, any checkbox that is available will be checked.
     StrCpy $WinAVRIntegrate "1"
-    StrCpy $AS51Integrate "1"
     StrCpy $AS60Integrate "1"
     StrCpy $AS61Integrate "1"
     StrCpy $AS62Integrate "1"
+    StrCpy $AS70Integrate "1"
 FunctionEnd
 
 !macro CreateToolchainCheckBox Name Path Checked Box Y
@@ -113,10 +115,10 @@ Function optionsPage
     Pop $0
 
     !insertmacro CreateToolchainCheckBox "WinAVR" $WinAVRPath $WinAVRIntegrate $WinAVRBox 20u
-    !insertmacro CreateToolchainCheckBox "AVR Studio 5.1" $AS51Path $AS51Integrate $AS51Box 40u
-    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.0" $AS60Path $AS60Integrate $AS60Box 60u
-    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.1" $AS61Path $AS61Integrate $AS61Box 80u
-    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.2" $AS62Path $AS62Integrate $AS62Box 100u
+    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.0" $AS60Path $AS60Integrate $AS60Box 40u
+    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.1" $AS61Path $AS61Integrate $AS61Box 60u
+    !insertmacro CreateToolchainCheckBox "Atmel Studio 6.2" $AS62Path $AS62Integrate $AS62Box 80u
+    !insertmacro CreateToolchainCheckBox "Atmel Studio 7.0" $AS70Path $AS70Integrate $AS70Box 100u
 
     nsDialogs::Show
 FunctionEnd
@@ -125,17 +127,16 @@ FunctionEnd
 # Stores the user's choices from the check boxes.
 Function optionsPageLeave
   ${NSD_GetState} $WinAVRBox $WinAVRIntegrate
-  ${NSD_GetState} $AS51Box $AS51Integrate
   ${NSD_GetState} $AS60Box $AS60Integrate
   ${NSD_GetState} $AS61Box $AS61Integrate
   ${NSD_GetState} $AS62Box $AS62Integrate
+  ${NSD_GetState} $AS70Box $AS70Integrate
 FunctionEnd
 
 # Install the header (.h) and archive (.a) files that allow
 # compilation of programs that use the library.
-# We check the existence of the directories here because the toolchain location for
-# AVR Studio 5.1 looks like it will change often and we'd like to give useful error
-# messages.
+# We check the existence of the directories here because the toolchain location
+# might change and we'd like to give useful error messages.
 !macro InstallIntoToolChain AvrPath
     ${if} ${FileExists} "${AvrPath}\lib"
         SetOutPath "${AvrPath}\lib"
@@ -173,15 +174,6 @@ Section
     !insertmacro InstallIntoToolChain "$WinAVRPath\avr"
     end_winavr:
 
-    StrCmp $AS51Path "" end_as51
-    IntCmp $AS51Integrate 0 end_as51
-    DetailPrint "Installing library into AVR Studio 5.1..."
-    ; NOTE: For the AVR Studio 5.1 beta, this path didn't have the ".27" in it.
-    !insertmacro InstallIntoToolChain "$AS51Path\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolChain\avr"
-    !insertmacro InstallSTK500Xml "$AS51Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AvrStudio /skuVersion:5.1 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
-    end_as51:
-
     StrCmp $AS60Path "" end_as60
     IntCmp $AS60Integrate 0 end_as60
     DetailPrint "Installing library into Atmel Studio 6.0..."
@@ -196,7 +188,7 @@ Section
       MessageBox MB_OK|MB_ICONEXCLAMATION "The Pololu AVR C/C++ Library installer was unable to find the avr folder for Atmel Studio 6.0's AVR toolchain.  You might have to find your AVR toolchain's avr folder (probably inside $AS60Path\extensions\Atmel\AVRGCC\ ) and then manually copy the $INSTDIR\libpololu_*.a files to avr\lib and copy the $INSTDIR\pololu folder to avr\include.  Please report this problem at http://forum.pololu.com/."
     ${endif}
     !insertmacro InstallSTK500Xml "$AS60Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.0 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
+    ExecWait "$\"$VS10ShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.0 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
     end_as60:
 
     StrCmp $AS61Path "" end_as61
@@ -209,7 +201,7 @@ Section
       MessageBox MB_OK|MB_ICONEXCLAMATION "The Pololu AVR C/C++ Library installer was unable to find the avr folder for Atmel Studio 6.1's 8-bit GNU toolchain.  You might have to find your AVR toolchain's avr folder (probably near $AS61Path ) and then manually copy the $INSTDIR\libpololu_*.a files to avr\lib and copy the $INSTDIR\pololu folder to avr\include.  Please report this problem at http://forum.pololu.com/."
     ${endif}
     !insertmacro InstallSTK500Xml "$AS61Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.1 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
+    ExecWait "$\"$VS10ShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.1 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
     end_as61:
 
     StrCmp $AS62Path "" end_as62
@@ -222,8 +214,20 @@ Section
       MessageBox MB_OK|MB_ICONEXCLAMATION "The Pololu AVR C/C++ Library installer was unable to find the avr folder for Atmel Studio 6.2's 8-bit GNU toolchain.  You might have to find your AVR toolchain's avr folder (probably near $AS62Path ) and then manually copy the $INSTDIR\libpololu_*.a files to avr\lib and copy the $INSTDIR\pololu folder to avr\include.  Please report this problem at http://forum.pololu.com/."
     ${endif}
     !insertmacro InstallSTK500Xml "$AS62Path\tools\STK500\xml"
-    ExecWait "$\"$VSShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.2 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
+    ExecWait "$\"$VS10ShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:6.2 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
     end_as62:
+
+    StrCmp $AS70Path "" end_as70
+    IntCmp $AS70Integrate 0 end_as70
+    DetailPrint "Installing library into Atmel Studio 7.0..."
+    ${if} ${FileExists} "$AS70Path\toolchain\avr8\avr8-gnu-toolchain\avr"
+      !insertmacro InstallIntoToolChain "$AS70Path\toolchain\avr8\avr8-gnu-toolchain\avr"
+    ${else}
+      DetailPrint "Unable to find Atmel Studio 7.0 toolchain.  Looked in $AS70Path\toolchain\avr8\avr8-gnu-toolchain\avr"
+      MessageBox MB_OK|MB_ICONEXCLAMATION "The Pololu AVR C/C++ Library installer was unable to find the avr folder for Atmel Studio 7.0's 8-bit GNU toolchain.  You might have to find your AVR toolchain's avr folder (probably near $AS70Path ) and then manually copy the $INSTDIR\libpololu_*.a files to avr\lib and copy the $INSTDIR\pololu folder to avr\include.  Please report this problem at http://forum.pololu.com/."
+    ${endif}
+    ExecWait "$\"$VS14ShellPath\Common7\IDE\vsixinstaller.exe$\" /skuName:AtmelStudio /skuVersion:7.0 /quiet $\"$INSTDIR\atmel_studio\extension.vsix$\""
+    end_as70:
 
 SectionEnd
 
@@ -232,37 +236,6 @@ SectionEnd
 Function WinAVRCheck
     ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinAVR" 'UninstallString'
     ${GetParent} $0 $WinAVRPath
-FunctionEnd
-
-# The location of AVR Studio 5.1 is stored in several places:
-# HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath' (requires GetParent, seems to get deleted when AVR Studio 5.0 is uninstalled)
-# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{D574D18C-9D52-4B4B-9647-AE6B89FD3F70}" 'InstallLocation'
-# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\avrstudio.exe" (Default) (requires GetParent)
-# HKCU "SOFTWARE\Atmel\AVRStudio51\5.1_Config" 'InstallDir'
-#
-# We would like to look in HKLM (HKEY_LOCAL_MACHINE) instead of HKCU (HKEY_CURRENT_USER) because
-# it doesn't really make sense to look at user settings to find where an application installed.
-# We would also like to use a registry key that appears to be used consistently between the
-# different versions of AVR Studio 5 so it is easy to update our installers.
-# We would also like one that is predictable (e.g. doesn't have a GUID in it).
-# The only one that satisfies all of those criteria is the AppEnv one, so we will use that.
-# BUT David noticed that it disappear from his computer after uninstalling AVR Studio 5.0, so
-# we will use the Uninstall key as a fallback.
-# Checks to see if AVR Studio 5 is installed.
-# Sets $AS51Path to the location or "" if not found.
-Function AS51Check
-    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\10.0\Apps\AVRStudio_5.1" 'StubExePath'
-    ${GetParent} $0 $AS51Path
-    StrCmp $AS51Path "" 0 AS51Done    # If we found it, then we are done.
-
-    ReadRegStr $AS51Path HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{D574D18C-9D52-4B4B-9647-AE6B89FD3F70}" 'InstallLocation'
-    StrCmp $AS51Path "" AS51Done      # If AVR Studio 5.1 really isn't there, we are done.
-
-    # This case seems to happen if you uninstall AVR Studio 5.0 after installing AVR Studio 5.1.
-    # Another bad thing that happens is that the Visual Assist X for AVR Studio extension goes away.
-    MessageBox MB_OK "Your AVR Studio 5.1 installation appears to be corrupted.  You can still install the Pololu AVR C/C++ library into AVR Studio 5.1 but the installation of the project templates will probably not work.  You should be able to fix this problem by reinstalling or repairing AVR Studio 5.1 and then running this installer again."
-
-    AS51Done:
 FunctionEnd
 
 Function AS60Check
@@ -317,25 +290,39 @@ Function AS62Check
     AS62Done:
 FunctionEnd
 
-# We need to find the location of the Visual Studio 2010 isolated shell so we can install our extension
-# using vsixinstaller.exe.  We check several places in the registry and take the first one.
-# The registry keys suggested by Microsoft are better:
+# The location of Atmel Studio 7.0 is stored in several places:
+# HKLM "SOFTWARE\Microsoft\AppEnv\14.0\Apps\AtmelStudio_7.0" 'StubExePath' (requires GetParent)
+# HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\atmelstudio.exe" (requires GetParent)
+# HKCU "SOFTWARE\Atmel\AtmelStudio\7.0_Config" 'InstallDir'
+Function AS70Check
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\AppEnv\14.0\Apps\AtmelStudio_7.0" 'StubExePath'
+    ${GetParent} $0 $AS70Path
+FunctionEnd
+
+# We need to find the location of the Visual Studio 2010 (10.0) isolated
+# shell (used by Atmel Studio 6.x) so we can install our extension using vsixinstaller.exe.
+# Some other possibilities we aren't usin are documented here:
 #  http://osherove.com/blog/2010/4/9/finding-the-location-of-vsixinstallerexe-programmatically.html
-# This one might be even better because it doesn't contain the language but we are not using it yet:
-#    HKLM "SOFTWARE\Microsoft\VisualStudio\10.0\" 'InstallDir'
 #  http://msdn.microsoft.com/en-us/library/bb932484.aspx
-Function VSShellCheck
-    ReadRegStr $VSShellPath HKLM "Software\Microsoft\VisualStudio\10.0\Setup\IsoShell\1033" 'ProductDir'
-    StrCmp $VSShellPath "" 0 VSShellCheckDone
-    ReadRegStr $VSShellPath HKCU "SOFTWARE\Atmel\AvrStudio\5.0_Config" 'ShellFolder'
-    StrCmp $VSShellPath "" 0 VSShellCheckDone
-    ReadRegStr $VSShellPath HKCU "Software\Atmel\AVRStudio51\5.1_Config" 'ShellFolder'
-    StrCmp $VSShellPath "" 0 VSShellCheckDone
-    ReadRegStr $VSShellPath HKCU "Software\Atmel\AtmelStudio\6.0_Config" 'ShellFolder'
-    StrCmp $VSShellPath "" 0 VSShellCheckDone
-    ReadRegStr $VSShellPath HKCU "Software\Atmel\AtmelStudio\6.1_Config" 'ShellFolder'
-    # Note: Software\Atmel\AtmelStudio\6.2_Config does not exist
-    VSShellCheckDone:
+Function VS10ShellCheck
+    ReadRegStr $VS10ShellPath HKLM "Software\Microsoft\VisualStudio\10.0\Setup\IsoShell\1033" 'ProductDir'
+    StrCmp $VS10ShellPath "" 0 VS10ShellCheckDone
+    ReadRegStr $VS10ShellPath HKCU "Software\Atmel\AtmelStudio\6.0_Config" 'ShellFolder'
+    StrCmp $VS10ShellPath "" 0 VS10ShellCheckDone
+    ReadRegStr $VS10ShellPath HKCU "Software\Atmel\AtmelStudio\6.1_Config" 'ShellFolder'
+    StrCmp $VS10ShellPath "" 0 VS10ShellCheckDone
+    ReadRegStr $VS10ShellPath HKCU "Software\Atmel\AtmelStudio\6.2_Config" 'ShellFolder'
+    VS10ShellCheckDone:
+FunctionEnd
+
+# We need to find the location of the Visual Studio 2015 (14.0)
+# isolated shell (used by Atmel Studio 6.x) so we can install our
+# extension using vsixinstaller.exe.
+Function VS14ShellCheck
+    ReadRegStr $VS14ShellPath HKLM "Software\Microsoft\AppEnv\14.0" 'ShellFolder'
+    StrCmp $VS14ShellPath "" 0 VS14ShellCheckDone
+    ReadRegStr $VS14ShellPath HKCU "Software\Atmel\AtmelStudio\7.0_Config" 'ShellFolder'
+    VS14ShellCheckDone:
 FunctionEnd
 
 Function checkDirectory

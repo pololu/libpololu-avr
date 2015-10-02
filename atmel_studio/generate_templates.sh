@@ -1,8 +1,6 @@
 #!/bin/sh
 
-# Generates the zip files for our AVR Studio 5 templates.
-# These templates support AVR Studio 5.1 but not 5.0
-# because the file extensions for projects and solutions changed.
+# Generates the zip files for our Atmel Studio templates.
 
 set -ue
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# This script generates the AVR Studio 5 extension file, extension.vsix.
-# The extension can then be installed to AVR Studio 5 by double-clicking on it
+# This script generates the Atmel Studio extension file, extension.vsix.
+# The extension can then be installed to Atmel Studio by double-clicking on it
 # in Windows or by running vsixinstaller.exe, as we do in the library installer.
 # Prerequisites: Execute generate_templates.sh.
 

@@ -39,7 +39,7 @@ Additionally, this library supports:
 == Installation instructions ==
 
 Detailed installation instructions for Windows, Linux, and Mac OS X
-and tutorials for using Atmel Studio 6 can be found in the Pololu AVR
+and tutorials for using Atmel Studio can be found in the Pololu AVR
 Programming Quick Start Guide:
 
   http://www.pololu.com/docs/0J51
@@ -106,7 +106,8 @@ for Windows or the Pololu AVR Development Bundle which includes it.
 
 Otherwise, you should determine the location of your avr-gcc files.
 This will typically be one of:
-* C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1051\avr8-gnu-toolchain\avr
+* C:\Program Files (x86)\Atmel\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr
+* C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\avr
 * C:\Program Files (x86)\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.4.0.65\AVRToolchain\avr
 * C:\Program Files (x86)\Atmel\AVR Studio 5.1\extensions\Atmel\AVRGCC\3.3.1.27\AVRToolchain\avr
 * C:\Program Files (x86)\Atmel\AVR Studio 5.0\AVR Toolchain\avr
@@ -117,15 +118,15 @@ This will typically be one of:
 
 In this folder you will find an "include" folder that has AVR header
 files such as avr/io.h and a "lib" folder that has AVR libraries such
-as lib/libc.a.
+as libc.a.
 
 In the library's top-level folder, type "make show_prefix".  The
 Makefile will tell you where it thinks your avr-gcc files are.  If the
 folder names displayed are correct, then you can run "make install" to
 install the library files.  You will need to run this command with the
 correct permissions, so "sudo make install" will usually be required
-in Linux, and in Windows Vista/7 you will have to right-click on
-install.bat and select "Run as administrator".
+in Linux, and in Windows you will have to right-click on install.bat
+and select "Run as administrator".
 
 If "make show_prefix" does not show the correct folders, or the steps
 above don't work for you for any other reason, then you can install
@@ -147,14 +148,13 @@ Finally, copy the entire "pololu" subfolder into your avr-gcc
 You are now ready to use the Pololu AVR library.
 
 
-== Manually installing special files for Atmel Studio 6 ==
+== Manually installing special files for Atmel Studio 7 ==
 
-If you are using Atmel Studio 6 in Windows, then you might want to
-install our Atmel Studio 6 templates so you can easily make new
-projects for Pololu boards, and you might want to install the STK500
-XML files needed to program these boards from Atmel Studio 6.  These
-files are normally installed by the Pololu AVR Library Installer for
-Windows, but you can do it manually if you need to.
+If you are using Atmel Studio 7 in Windows, then you might want to
+install our Atmel Studio 7 templates so you can easily make new
+projects for Pololu boards.  These files are normally installed by the
+Pololu AVR Library Installer for Windows, but you can do it manually
+if you need to.
 
 You will need to have a binary distribution instead of a copy of the
 source repository.
@@ -164,20 +164,7 @@ To install the templates, simply double click on
   atmel_studio\extension.vsix
 
 and follow the instructions to install the extension into Atmel
-Studio 6.
-
-Next, copy the files in the
-
-  atmel_studio\stk500_xml
-
-folder to the
-
-  tools\STK500\xml
-
-folder in your Atmel Studio 6 installation.  The next time you start
-Atmel Studio 6, you should see ATmega328P, ATmega1284P, and ATmega644P
-in the "Device" dropdown box of the "Device Programming" dialog box when
-an STK500 is selected.
+Studio 7.
 
 
 == Using the Pololu AVR Library ==
