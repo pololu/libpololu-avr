@@ -48,6 +48,7 @@ then
 fi
 sed < examples_templates/test.cproj \
   -e "s/<avrdevice>[^<]*<\/avrdevice>/<avrdevice>$as_mcu<\/avrdevice>/" \
+  -e "s/<avrgcc.common.Device>[^<]*<\/avrgcc.common.Device>/<avrgcc.common.Device>-mmcu=$as_mcu<\/avrgcc.common.Device>/" \
   -e "s/<Value>pololu_[^<]*<\/Value>/<Value>pololu_$device<\/Value>/" \
   -e "$AS5_DSM" \
   > $example_dir/$example.cproj
