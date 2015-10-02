@@ -17,7 +17,7 @@
       <IsolatedShell Version="6.2">AtmelStudio</IsolatedShell>
       <IsolatedShell Version="7.0">AtmelStudio</IsolatedShell>
     </SupportedProducts>
-    <SupportedFrameworkRuntimeEdition MinVersion="2.0" />
+    <SupportedFrameworkRuntimeEdition MinVersion="2.0" MaxVersion="99.99" />
     <InstalledByMsi>false</InstalledByMsi>
     <AllUsers>true</AllUsers>
   </Identifier>
