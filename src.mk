@@ -27,7 +27,7 @@ examples_atmega1284p_x2 := $(examples_atmega644p)
 example_dir = examples/$(device)/$(example)
 hex_dir = examples/$(device)/hex_files
 
-# examplss: A phony target that generates the source code in the
+# examples: A phony target that generates the source code in the
 # examples directory from the source code in the examples_templates
 # directory.
 prepare_example = examples_templates/prepare.sh $$example $(device) $(mcu_$(device)) '$(device_specific_macro_$(device))'
