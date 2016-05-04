@@ -34,6 +34,19 @@
 #include "../OrangutanResources/include/OrangutanModel.h"
 #include "../OrangutanTime/OrangutanTime.h" // provides delayMicroseconds()
 
+// Fix incorrect SPI register and bit names used by some
+// versions of avr-libc (in particular, the version 1:1.8.0+Atmel3.4.5-1
+// that ships with Ubuntu 15.10.)
+#if defined(SPCR0) && !defined(SPCR)
+#define SPCR SPCR0
+#define CPHA CPHA0
+#define MSTR MSTR0
+#define SPE  SPE0
+#define SPSR SPSR0
+#define SPIF SPIF0
+#define SPDR SPDR0
+#endif
+
 // Default parameter values for svp_master_init
 
 #ifdef _ORANGUTAN_SVP
