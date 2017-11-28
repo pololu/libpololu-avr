@@ -695,7 +695,7 @@ static void nextNote()
 	tmp_duration = duration;
 
 	// If the input is 'c16', make it a 16th note, etc.
-	if(c > '0' && c < '9')
+	if(c >= '0' && c <= '9')
 		tmp_duration = whole_note_duration/getNumber();
 
 	// Handle dotted notes - the first dot adds 50%, and each
