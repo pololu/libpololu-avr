@@ -118,6 +118,10 @@ arduino_zip:
 	cp arduino/README-Arduino.txt LICENSE.txt libpololu-arduino
 	cp arduino/platform.txt arduino/boards.txt arduino/programmers.txt libpololu-arduino/avr
 	cp -R $(foreach f, $(ARDUINO_LIBS),src/$(f)) libpololu-arduino/avr/libraries
+	for f in $(ARDUINO_LIBS); do\
+		{ echo name=$$f; echo version=1.$(DATE).0; cat arduino/library.properties; \
+		} > libpololu-arduino/avr/libraries/$$f/library.properties; \
+	done
 	zip -rq $(ARDUINO_ZIPFILE) libpololu-arduino -x $(ZIP_IGNORES)
 	rm -R libpololu-arduino
 
