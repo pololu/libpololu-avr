@@ -50,13 +50,25 @@
 #include "../OrangutanResources/include/OrangutanModel.h"
 #include <avr/io.h>
 
-#define INPUT 				0
-#define OUTPUT				1
-#define LOW					0
-#define HIGH				1
-#define TOGGLE				0xFF
-#define HIGH_IMPEDANCE		0
-#define PULL_UP_ENABLED		1
+#ifndef INPUT
+#define INPUT               0
+#endif
+
+#ifndef OUTPUT
+#define OUTPUT              1
+#endif
+
+#ifndef LOW
+#define LOW                 0
+#endif
+
+#ifndef HIGH
+#define HIGH                1
+#endif
+
+#define TOGGLE              0xFF
+#define HIGH_IMPEDANCE      0
+#define PULL_UP_ENABLED     1
 
 // port D pins
 #define IO_D0				0
