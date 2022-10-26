@@ -90,7 +90,7 @@ void display_readings(const unsigned int *calibrated_values)
     // graph.  Using the space, an extra copy of the one-bar
     // character, and character 255 (a full black box), we get 10
     // characters in the array.
-    const char display_characters[10] = { ' ', 0, 0, 1, 2, 3, 4, 5, 6, 255 };
+    const char display_characters[10] = { ' ', 0, 0, 1, 2, 3, 4, 5, 6, (char)255 };
 
     // The variable c will have values from 0 to 9, since
     // calibrated values are in the range of 0 to 1000, and
