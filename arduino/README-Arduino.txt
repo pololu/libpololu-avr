@@ -44,6 +44,11 @@ above.
 
 == Change Log ==
 
+2022 Oct 26 -
+* Got the examples to show up in Arduino 2.0.0.
+* Removed the 'Pololu USB AVR Programmer' entry.
+* Other small improvements.
+
 2015 Mar 24 -
 * Fixed a bug in PololuWheelEncoders that was causing it to lose half
   of the counts.  This bug was introduced in 2012.
