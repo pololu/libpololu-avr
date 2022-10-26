@@ -50,19 +50,12 @@
 #include "../OrangutanResources/include/OrangutanModel.h"
 #include <avr/io.h>
 
-#ifndef INPUT
+#ifdef ARDUINO
+#include <Arduino.h>
+#else
 #define INPUT               0
-#endif
-
-#ifndef OUTPUT
 #define OUTPUT              1
-#endif
-
-#ifndef LOW
 #define LOW                 0
-#endif
-
-#ifndef HIGH
 #define HIGH                1
 #endif
 
